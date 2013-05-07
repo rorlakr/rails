@@ -1,96 +1,96 @@
-Active Support Core Extensions
+액티브서포트 코어확장
 ==============================
 
-Active Support is the Ruby on Rails component responsible for providing Ruby language extensions, utilities, and other transversal stuff.
+액티브서포트는 루비온레일스의 구성요소로서 루비언어에 대한 확장, 유틸리티 그리고 기타 다양한 것들을 제공해 줍니다.
 
-It offers a richer bottom-line at the language level, targeted both at the development of Rails applications, and at the development of Ruby on Rails itself.
+또한, 레일스 어플리케이션을 개발할 경우와 루비온레일스 프레임워크 자체를 개발하는 경우를 대상으로 루비언어 수준에서 핵심적인 것들을 보다 풍부하게 제공해 줍니다.
 
-After reading this guide, you will know:
+본 가이드를 읽고나면 아래 사항을 알게 될 것입니다.
 
-* What Core Extensions are.
-* How to load all extensions.
-* How to cherry-pick just the extensions you want.
-* What extensions ActiveSupport provides.
+* 코어확장이 무엇이지
+* 모든 확장을 로드하는 방법
+* 원하는 확장만을 선별하는 방법
+* 액티브서포트가 제공하는 확장기능들
 
 --------------------------------------------------------------------------------
 
-How to Load Core Extensions
+[How to Load Core Extensions] 코어확장 로드하는 방법
 ---------------------------
 
-### Stand-Alone Active Support
+### [Stand-Alone Active Support] 액티브서포트를 단독으로 사용하기
 
-In order to have a near-zero default footprint, Active Support does not load anything by default. It is broken in small pieces so that you can load just what you need, and also has some convenience entry points to load related extensions in one shot, even everything.
+액티브서포트는 아무런 기능확장을 하지 않도록, 디폴트 상태에서는 아무것도 로드하지 않습니다. 여러 개의 모듈로 분리되어 있어서 필요한 것만 로드할 수 있도록 되어 있습니다. 또한 한번에 관련 확장모듈만을, 심지어 모든 것을 로드할 수 있도록 진입점을 제공해 주어 편리하게 구성되어 있습니다.
 
-Thus, after a simple require like:
+따라서, 아래와 같이 간단하게 require할 경우,
 
 ```ruby
 require 'active_support'
 ```
 
-objects do not even respond to `blank?`. Let's see how to load its definition.
+객체들은 `blank` 메소드에 대해서 반응을 하지 않게 됩니다. 이제 해당 정의를 로드하는 방법을 알아보겠습니다.
 
-#### Cherry-picking a Definition
+#### [Cherry-picking a Definition] 특정 정의만 선별하기
 
-The most lightweight way to get `blank?` is to cherry-pick the file that defines it.
+`blank`를 사용하기 위한 가장 손쉬운 방법은 이에 대한 정의를 포함하는 파일만을 선별하는 것입니다.
 
-For every single method defined as a core extension this guide has a note that says where such a method is defined. In the case of `blank?` the note reads:
+본 가이드에는 코어확장으로 정의된 모든 메소드 각각에 대해서 해당 메소드가 어디에 정의되어 있는지를 노트로 표시해 줍니다. `blank?` 메소드의 경우, 해당 노트는 아래와 같습니다.
 
 NOTE: Defined in `active_support/core_ext/object/blank.rb`.
 
-That means that this single call is enough:
+이것은 한번만 호출하면 된다는 것을 의미합니다.
 
 ```ruby
 require 'active_support/core_ext/object/blank'
 ```
 
-Active Support has been carefully revised so that cherry-picking a file loads only strictly needed dependencies, if any.
+액티브서포트는 세심하게 수정되어서 하나의 파일만을 선별할 경우 해당 의존성 파일들(존재할 경우)만을 로드하게 됩니다.
 
-#### Loading Grouped Core Extensions
+#### [Loading Grouped Core Extensions] 코어확장을 그룹으로 로딩하기
 
-The next level is to simply load all extensions to `Object`. As a rule of thumb, extensions to `SomeClass` are available in one shot by loading `active_support/core_ext/some_class`.
+다음 단계는 `Object`내의 모든 기능확장을 간단하게 로드하는 것입니다. 대개는, `SomeClass`내의 기능을 확장하기 위해서는 `active_support/core_ext/some_class`를 로딩하므로써 단번에 사용할 수 있게 됩니다. 
 
-Thus, to load all extensions to `Object` (including `blank?`):
+따라서, (`blank?` 메소드를 포함하는) `Object`내의 모든 기능을 확장하기 위해서는 아래와 같이 하면 됩니다. 
 
 ```ruby
 require 'active_support/core_ext/object'
 ```
 
-#### Loading All Core Extensions
+#### [Loading All Core Extensions] 모든 코어확장 로드하기
 
-You may prefer just to load all core extensions, there is a file for that:
+모든 코어확장을 로드하고자 할 경우에는 아래와 같이 하나의 파일을 불러 들이면 됩니다. 
 
 ```ruby
 require 'active_support/core_ext'
 ```
 
-#### Loading All Active Support
+#### [Loading All Active Support] 모든 액티브서포트를 로드하기
 
-And finally, if you want to have all Active Support available just issue:
+그리고 마지막으로, 사용가능한 모든 액티브서포트를 불러들일 경우에는 아래와 같이 하면 됩니다. 
 
 ```ruby
 require 'active_support/all'
 ```
 
-That does not even put the entire Active Support in memory upfront indeed, some stuff is configured via `autoload`, so it is only loaded if used.
+이렇게 할 경우에도, 모든 액티브서포트를 메모리상에 로드하지 않는데, 일부 모듈은 `autoload`상태로 설정되기 때문에, 필요할 경우에는 로드됩니다.
 
-### Active Support Within a Ruby on Rails Application
+### [Active Support Within a Ruby on Rails Application] 루비온레일스 어플리케이션 내에서 액티브서포트 사용하기
 
-A Ruby on Rails application loads all Active Support unless `config.active_support.bare` is true. In that case, the application will only load what the framework itself cherry-picks for its own needs, and can still cherry-pick itself at any granularity level, as explained in the previous section.
+루비온레일스 어플리케이션은 `config.active_support.bare`이 true로 설정되어 있지 않는 한, 모든 액티브서포트를 로드하게 됩니다. 이와 같이 true로 지정된 경우에는, 레일스 프레임워크가 필용로하는 것만을 선별해서 로드하게 되고, 이전에 설명한 바와 같이, 각 단계별로 선별해서 사용할 수도 있습니다. 
 
-Extensions to All Objects
+[Extensions to All Objects] 모든 객체에 대해서 확장사용할 수 있는 메소드
 -------------------------
 
-### `blank?` and `present?`
+### [`blank?` and `present?`] `blank?` 와 `present?`
 
-The following values are considered to be blank in a Rails application:
+레일스 어플리케이션에서 다음과 같은 값들은 blank로 인식됩니다.
 
-* `nil` and `false`,
+* `nil` 과 `false`,
 
-* strings composed only of whitespace (see note below),
+* whitespace 만으로 구성된 문자열 (아래의 노트를 참고하세요.),
 
-* empty arrays and hashes, and
+* 빈 배앨과 해시
 
-* any other object that responds to `empty?` and is empty.
+* `empty?` 메소드가 정의되어 있어서 empty를 반환하는 기타 다른 객체들
 
 INFO: The predicate for strings uses the Unicode-aware character class `[:space:]`, so for example U+2029 (paragraph separator) is considered to be whitespace.
 
