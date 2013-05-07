@@ -1,11 +1,18 @@
 Working with JavaScript in Rails
 ================================
 
+레일스에서 자바스크립트로 작업하기
+================================
+
 This guide covers the built-in Ajax/JavaScript functionality of Rails (and
 more); it will enable you to create rich and dynamic Ajax applications with
 ease!
 
+본 가이드는 레일스의 내장 Ajax/JavaScript 기능(그리고 그 이상)을 다룹니다; 당신이 손쉽게 풍부하고 동적인 Ajax 응용프로그램을 작성할 수 있도록 해 줄 것입니다.
+
 After reading this guide, you will know:
+
+본 가이드를 읽은 후, 당신을 아래 내용들을 알게 될 것입니다.
 
 * The basics of Ajax.
 * Unobtrusive JavaScript.
@@ -13,13 +20,26 @@ After reading this guide, you will know:
 * How to handle Ajax on the server side.
 * The Turbolinks gem.
 
+* Ajax의 기초.
+* 겸손한 자바스크립트(Unobtrusive JavaScript).
+* 레일스의 내장 헬퍼가 당신을 돕는 방식.
+* 서버측에서 Ajax를 다루는 법.
+* Turbolinks gem.
+
 -------------------------------------------------------------------------------
 
 An Introduction to Ajax
 ------------------------
 
+-------------------------------------------------------------------------------
+
+Ajax 소개
+------------------------
+
 In order to understand Ajax, you must first understand what a web browser does
 normally.
+
+Ajax를 이해하기 위해, 먼저 웹브라우저가 보통 무엇을 하는지 이해해야 합니다.
 
 When you type `http://localhost:3000` into your browser's address bar and hit
 'Go,' the browser (your 'client') makes a request to the server. It parses the
@@ -28,18 +48,34 @@ stylesheets and images. It then assembles the page. If you click a link, it
 does the same process: fetch the page, fetch the assets, put it all together,
 show you the results. This is called the 'request response cycle.'
 
+당신이 웹브라우저의 주소 막대에 `http://localhost:3000`를 입력하고 'Go'를 누르면, 브라우저는 서버로 보낼 요청을 만듭니다.
+브라우저는 서버로부터의 응답을 분석하고, 자바스크립트 파일들, 스타일시트들 그리고 이미지들과 같은 연관된 모든 자산들을 불러옵니다.
+그리고 나서 페이지들을 조합합니다. 만약 당신이 링크를 클릭하면, 브라우저는 같은 절차를 수행합니다. 
+페이지를 불러오고, 자산들을 불러오고, 그것들을 조합하여 당신에게 결과를 보여줍니다.
+이것을 '요청 응답 순환(Cycle)'이라 합니다.
+
 JavaScript can also make requests to the server, and parse the response. It
 also has the ability to update information on the page. Combining these two
 powers, a JavaScript writer can make a web page that can update just parts of
 itself, without needing to get the full page data from the server. This is a
 powerful technique that we call Ajax.
 
+자바스크립트도 서버로의 요청을 만들고, 응답을 분석할 수 있습니다. 그리고 페이지에 정보를 업데이트할 수 있습니다.
+이 두가지 능력을 조합하여 자바스크립트 작성자는 서버로부터 전체 페이지 데이터를 받아올 필요 없이, 
+단지 페이지의 일부만을 갱신하는 웹 페이지를 작성할 수 있습니다.
+이것이 우리가 Ajax라 부르는 강력한 기술입니다.
+
 Rails ships with CoffeeScript by default, and so the rest of the examples
 in this guide will be in CoffeeScript. All of these lessons, of course, apply
 to vanilla JavaScript as well.
 
+레일스는 커피스크립트(CoffeeScript)를 기본으로 탑재하고 있어 본 가이드에 있는 예제들은 커피스크립트로 만들어질 것입니다.
+예제 강좌 전체는 평범한 자바스크립트에도 물론 적용됩니다.
+
 As an example, here's some CoffeeScript code that makes an Ajax request using
 the jQuery library:
+
+여기 jQuery 라이브러리를 이용하여 Ajax 요청을 만드는 커피스크립트 코드 에제가 있습니다.
 
 ```coffeescript
 $.ajax(url: "/test").done (html) ->
@@ -48,6 +84,8 @@ $.ajax(url: "/test").done (html) ->
 
 This code fetches data from "/test", and then appends the result to the `div`
 with an id of `results`.
+
+이 코드는 "/test"로부터 데이터를 받아온 후, `results` 아이디를 가진 `div`에 그 결과를 덧붙입니다.
 
 Rails provides quite a bit of built-in support for building web pages with this
 technique. You rarely have to write this code yourself. The rest of this guide
