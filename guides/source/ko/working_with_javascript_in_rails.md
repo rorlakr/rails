@@ -69,8 +69,8 @@ Rails ships with CoffeeScript by default, and so the rest of the examples
 in this guide will be in CoffeeScript. All of these lessons, of course, apply
 to vanilla JavaScript as well.
 
-레일스는 커피스크립트(CoffeeScript)를 기본으로 탑재하고 있어 본 가이드에 있는 예제들은 커피스크립트로 만들어질 것입니다.
-예제 강좌 전체는 평범한 자바스크립트에도 물론 적용됩니다.
+레일스는 커피스크립트(CoffeeScript)를 기본으로 탑재하고 있고 본 가이드에 있는 예제들은 커피스크립트로 만들어질 것입니다.
+예제 강좌 전부는 평범한 자바스크립트에도 물론 적용됩니다.
 
 As an example, here's some CoffeeScript code that makes an Ajax request using
 the jQuery library:
