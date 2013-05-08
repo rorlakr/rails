@@ -329,11 +329,16 @@ You can bind to the same Ajax events as `form_for`. Here's an example. Let's
 assume that we have a list of posts that can be deleted with just one
 click. We would generate some HTML like this:
 
+당신은 `form_for`같이 동일한 Ajax 이벤트를 연결할 수 있습니다. 여기 예제가 있습니다. 
+단 한번의 클릭으로 삭제될 수 있는 포스트의 목록이 있다고 가정해 봅시다. 우리는 다음과 같이 HTML을 생성합니다.
+
 ```erb
 <%= link_to "Delete post", @post, remote: true, method: :delete %>
 ```
 
 and write some CoffeeScript like this:
+
+그리고 약간의 커피스크립트를 다음과 같이 작성합니다.
 
 ```coffeescript
 $ ->
@@ -345,11 +350,16 @@ $ ->
 
 [`button_to`](http://api.rubyonrails.org/classes/ActionView/Helpers/UrlHelper.html#method-i-button_to) is a helper that helps you create buttons. It has a `:remote` option that you can call like this:
 
+[`button_to`](http://api.rubyonrails.org/classes/ActionView/Helpers/UrlHelper.html#method-i-button_to)는 버튼을 생성하는 것을 돕는 헬퍼입니다.
+이것은 `:remote` 옵션을 갖고 있으며 다음과 같이 호출할 수 있습니다.
+
 ```erb
 <%= button_to "A post", @post, remote: true %>
 ```
 
 this generates
+
+이것은 다음 코드를 생성합니다.
 
 ```html
 <form action="/posts/1" class="button_to" data-remote="true" method="post">
@@ -359,18 +369,33 @@ this generates
 
 Since it's just a `<form>`, all of the information on `form_for` also applies.
 
+이것은 단지 `<form>`이기 때문에, `form_for`에 있는 모든 정보 역시 적용됩니다.
+
 Server-Side Concerns
+--------------------
+
+서버측 고려사항들
 --------------------
 
 Ajax isn't just client-side, you also need to do some work on the server
 side to support it. Often, people like their Ajax requests to return JSON
 rather than HTML. Let's discuss what it takes to make that happen.
 
+Ajax는 단지 클라이언트측 코드가 아닙니다.
+당신은 Ajax를 지원하기 위해 서버측에도 몇 가지 작업을 해야 합니다.
+사람들은 간혹 Ajax 요청을 하면서 HTML보다는 JSON을 돌려받기를 원합니다. 
+그렇게 하기 위한 얘기를 해 보겠습니다.
+
 ### A Simple Example
+
+### 간단한 예제
 
 Imagine you have a series of users that you would like to display and provide a
 form on that same page to create a new user. The index action of your
 controller looks like this:
+
+만약 사용자들의 목록을 표시하고 같은 페이지에서 새로운 사용자를 만들 수 있다고 해 보겠습니다.
+당신의 컨트롤러의 인덱스 액션은 다음과 같을 것입니다.
 
 ```ruby
 class UsersController < ApplicationController
@@ -382,6 +407,8 @@ class UsersController < ApplicationController
 ```
 
 The index view (`app/views/users/index.html.erb`) contains:
+
+인덱스 뷰 (`app/views/users/index.html.erb`)는 다음 내용을 포함합니다.
 
 ```erb
 <b>Users</b>
@@ -403,6 +430,8 @@ The index view (`app/views/users/index.html.erb`) contains:
 
 The `app/views/users/_user.html.erb` partial contains the following:
 
+`app/views/users/_user.html.erb` 파셜은 다음 내용을 포함합니다.
+
 ```erb
 <li><%= user.name %></li>
 ```
@@ -410,11 +439,17 @@ The `app/views/users/_user.html.erb` partial contains the following:
 The top portion of the index page displays the users. The bottom portion
 provides a form to create a new user.
 
+인덱스 페이지의 상단 부분은 사용자를 표시합니다. 하단 부분은 새로운 사용자를 생성하는 폼을 제공합니다.
+
 The bottom form will call the create action on the Users controller. Because
 the form's remote option is set to true, the request will be posted to the
 users controller as an Ajax request, looking for JavaScript. In order to
 service that request, the create action of your controller would look like
 this:
+
+하단 폼은 Users 컨트롤러에 있는 create 액션을 호출할 것입니다.
+폼의 remote 옵션이 true로 되어 있기 때문에, 요청은 자바스크립트를 찾아 Ajax 요청으로 사용자 컨트롤러에 전송될 것입니다.
+그 요청을 처리하기 위한 컨트롤러의 create 액션은 다음과 같을 것입니다.
 
 ```ruby
   # app/controllers/users_controller.rb
@@ -440,6 +475,9 @@ respond to your Ajax request. You then have a corresponding
 `app/views/users/create.js.erb` view file that generates the actual JavaScript
 code that will be sent and executed on the client side.
 
+`respond_to` 블록에 있는 format.js를 주목하십시오. 이것은 컨트롤러가 당신의 Ajax 요청에 응답할 수 있도록 합니다.
+다음으로 그에 상응하는 뷰파일 `app/views/users/create.js.erb`이 있는데, 이것은 클라이언트측에 전송되고 실행될 실제 자바스크립트 코드를 생성합니다.
+
 ```erb
 $("<%= escape_javascript(render @user) %>").appendTo("#users");
 ```
@@ -450,7 +488,12 @@ Turbolinks
 Rails 4 ships with the [Turbolinks gem](https://github.com/rails/turbolinks).
 This gem uses Ajax to speed up page rendering in most applications.
 
+레일스 4는 [Turbolinks gem](https://github.com/rails/turbolinks)를 포함하여 배포됩니다.
+이 젬은 대부분의 응용프로그램에서 페이지 렌더링 속도를 높이기 위해 Ajax를 사용합니다.
+
 ### How Turbolinks Works
+
+### Turbolinks는 어떻게 작동하는가
 
 Turbolinks attaches a click handler to all `<a>` on the page. If your browser
 supports
@@ -460,12 +503,21 @@ replace the entire `<body>` of the page with the `<body>` of the response. It
 will then use PushState to change the URL to the correct one, preserving
 refresh semantics and giving you pretty URLs.
 
+Turbolinks는 페이지에 있는 모든 `<a>`에 클릭 처리기를 연결합니다. 만약 당신의 브라우저가 [PushState](https://developer.mozilla.org/en-US/docs/DOM/Manipulating_the_browser_history#The_pushState(\).C2.A0method)를 지원하는 것이라면,
+Turbolinks는 Ajax 요청을 만들고, 응답을 분석하고, 응답에 있는 `<body>` 내용으로 페이지상의 `<body>` 전체를 바꿔줍니다.
+그런 다음, PushState를 이용하여 URL을 올바른 것으로 변경하여 새로고침 의미를 유지하고 예쁜 URL을 제공합니다.
+
 The only thing you have to do to enable Turbolinks is have it in your Gemfile,
 and put `//= require turbolinks` in your CoffeeScript manifest, which is usually
 `app/assets/javascripts/application.js`.
 
+Turbolinks를 사용하기 위해 해야할 일은 당신의 Gemfile에 Turbolinks를 포함하고, 커피스크립트 manifest에 `//= require turbolinks`를 넣는 것입니다.
+커피스크립트 manifest는 보통 `app/assets/javascripts/application.js` 안에 있습니다.
+
 If you want to disable Turbolinks for certain links, add a `data-no-turbolink`
 attribute to the tag:
+
+만약 특정 링크에 Turbolinks 지원을 하지 않으려면 태그의 속성에 `data-no-turbolink`를 추가하십시오.
 
 ```html
 <a href="..." data-no-turbolink>No turbolinks here</a>.
@@ -476,6 +528,8 @@ attribute to the tag:
 When writing CoffeeScript, you'll often want to do some sort of processing upon
 page load. With jQuery, you'd write something like this:
 
+커피스크립트를 작성할 때, 페이지 로드시 몇 가지 절차를 수행하고 싶을 때가 있습니다. jQuery로 다음과 같은 코드를 작성할 수 있습니다.
+
 ```coffeescript
 $(document).ready ->
   alert "page has loaded!"
@@ -484,6 +538,9 @@ $(document).ready ->
 However, because Turbolinks overrides the normal page loading process, the
 event that this relies on will not be fired. If you have code that looks like
 this, you must change your code to do this instead:
+
+하지만, Turbolinks는 일반적인 페이지의 로딩 절차를 오버라이드하기 때문에 이에 의존하는 이벤트가 발생하지 않을 것입니다.
+만일 그러한 코드가 있아면, 아래와 같이 코드를 변경해야 합니다. 
 
 ```coffeescript
 $(document).on "page:change", ->
@@ -494,10 +551,17 @@ For more details, including other events you can bind to, check out [the
 Turbolinks
 README](https://github.com/rails/turbolinks/blob/master/README.md).
 
+연결하고자 하는 다른 이벤트들을 포함한 보다 상세한 내용은 [the Turbolinks README](https://github.com/rails/turbolinks/blob/master/README.md)를 참고하십시오.
+
 Other Resources
 ---------------
 
+기타 리소스
+---------------
+
 Here are some helpful links to help you learn even more:
+
+여기 더 많은 내용 학습에 유용한 링크들이 있습니다.
 
 * [jquery-ujs wiki](https://github.com/rails/jquery-ujs/wiki)
 * [jquery-ujs list of external articles](https://github.com/rails/jquery-ujs/wiki/External-articles)
