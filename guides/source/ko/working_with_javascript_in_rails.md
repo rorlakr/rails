@@ -12,7 +12,7 @@ ease!
 
 After reading this guide, you will know:
 
-본 가이드를 읽은 후, 당신을 다음의 내용들을 알게 될 것입니다.
+본 가이드를 읽은 후, 다음의 내용들을 알게 될 것입니다.
 
 * The basics of Ajax.
 * Unobtrusive JavaScript.
@@ -48,10 +48,10 @@ stylesheets and images. It then assembles the page. If you click a link, it
 does the same process: fetch the page, fetch the assets, put it all together,
 show you the results. This is called the 'request response cycle.'
 
-당신이 웹브라우저의 주소 막대에 `http://localhost:3000`를 입력하고 'Go'를 누르면, 브라우저는 서버로 보낼 요청을 만듭니다.
+웹브라우저의 주소 막대에 `http://localhost:3000`를 입력하고 'Go'를 누르면, 브라우저는 서버로 보낼 요청을 만듭니다.
 브라우저는 서버로부터의 응답을 분석하고, 자바스크립트 파일들, 스타일시트들 그리고 이미지들과 같은 연관된 모든 자산들을 불러옵니다.
-그리고 나서 페이지들을 조합합니다. 만약 당신이 링크를 클릭하면, 브라우저는 같은 절차를 수행합니다. 
-페이지를 불러오고, 자산들을 불러오고, 그것들을 조합하여 당신에게 결과를 보여줍니다.
+그리고 나서 페이지들을 조합합니다. 만약 링크를 클릭하면, 브라우저는 같은 절차를 수행합니다. 
+페이지를 불러오고, 자산들을 불러오고, 그것들을 조합하여 결과를 보여줍니다.
 이것을 '요청 응답 순환(Cycle)'이라 합니다.
 
 JavaScript can also make requests to the server, and parse the response. It
@@ -63,7 +63,7 @@ powerful technique that we call Ajax.
 자바스크립트도 서버로의 요청을 만들고, 응답을 분석할 수 있습니다. 그리고 페이지에 정보를 업데이트할 수 있습니다.
 이 두가지 능력을 조합하여 자바스크립트 작성자는 서버로부터 전체 페이지 데이터를 받아올 필요 없이, 
 단지 페이지의 일부만을 갱신하는 웹 페이지를 작성할 수 있습니다.
-이것이 우리가 Ajax라 부르는 강력한 기술입니다.
+이것이 Ajax라 부르는 강력한 기술입니다.
 
 Rails ships with CoffeeScript by default, and so the rest of the examples
 in this guide will be in CoffeeScript. All of these lessons, of course, apply
@@ -93,7 +93,7 @@ will show you how Rails can help you write websites in this way, but it's
 all built on top of this fairly simple technique.
 
 레일스에는 이 기술을 이용하여 웹페이지를 만드는데 필요한 많은 내장 지원이 있습니다. 당신은 이 코드를 직접 작성할 필요가 거의 없습니다.
-이후 본 가이드에서는 어떻게 레일스가 이 방식으로 당신이 웹사이트를 만드는데 도움을 주는지 보여줄 것입니다. 
+이후 본 가이드에서는 어떻게 레일스가 이 방식으로 웹사이트를 만드는데 도움을 주는지 보여줄 것입니다. 
 그러나 이 모든 것이 매우 간단한 기술 위에 만들어져 있습니다.
 
 Unobtrusive JavaScript
@@ -131,6 +131,7 @@ happens when we have lots of JavaScript we want to execute on a click?
 
 Awkward, right? We could pull the function definition out of the click handler,
 and turn it into CoffeeScript:
+
 어색하지 않습니까? 우리는 클릭 처리기 밖으로 함수 정의를 끌어내어 커피스크립트로 바꿀 수 있습니다.
 
 ```coffeescript
@@ -142,7 +143,7 @@ paintIt = (element, backgroundColor, textColor) ->
 
 And then on our page:
 
-이렇게 하면 우리의 페이지는 다음과 같이 됩니다.
+이렇게 하면 페이지는 다음과 같이 됩니다.
 
 ```html
 <a href="#" onclick="paintIt(this, '#990000')">Paint it red</a>
@@ -163,8 +164,8 @@ Not very DRY, eh? We can fix this by using events instead. We'll add a `data-*`
 attribute to our link, and then bind a handler to the click event of every link
 that has that attribute:
 
-그닥 DRY하지 않지요? 우리는 대신 이벤트를 이용하여 이 문제를 해결할 수 있습니다. 
-우리는 링크에 `data-*` 속성을 추가하고 이 속성을 가진 모든 링크의 클릭 이벤트에 처리기를 연결할 것입니다.
+그닥 DRY하지 않지요? 우리는 이벤트를 이용하여 이 문제를 해결할 수 있습니다. 
+링크에 `data-*` 속성을 추가하고 이 속성을 가진 모든 링크의 클릭 이벤트에 처리기를 연결할 것입니다.
 
 ```coffeescript
 paintIt = (element, backgroundColor, textColor) ->
@@ -218,7 +219,7 @@ in generating HTML. Sometimes, you want to add a little Ajax to those elements,
 and Rails has got your back in those cases.
 
 레일스는 HTML을 생성함에 있어 당신을 돕기 위해 루비로 작성된 많은 뷰 헬퍼 메서드를 갖고 있습니다.
-만약 당신이 그런 요소들에 약간의 Ajax를 추가하고자 할 때, 레일스는 
+만약 당신이 그런 요소들에 약간의 Ajax를 추가하고자 할 때, 레일스는 ... (추가 내용 필요)
 
 Because of Unobtrusive JavaScript, the Rails "Ajax helpers" are actually in two
 parts: the JavaScript half and the Ruby half.
@@ -231,8 +232,8 @@ provides the JavaScript half, and the regular Ruby view helpers add appropriate
 tags to your DOM. The CoffeeScript in rails.js then listens for these
 attributes, and attaches appropriate handlers.
 
-[rails.js](https://github.com/rails/jquery-ujs/blob/master/src/rails.js)는 자바스크립트 부분을 제공합니다.
-그리고 루비 뷰 헬퍼는 적절한 태그를 당신의 DOM에 추가합니다.
+[rails.js](https://github.com/rails/jquery-ujs/blob/master/src/rails.js)는 자바스크립트 부분을 제공하고,
+루비 뷰 헬퍼는 적절한 태그를 당신의 DOM에 추가합니다.
 rails.js 안의 CoffeeScript는 이들 속성을 수신하고 적절한 처리기를 연결합니다.
 
 ### form_for
@@ -284,6 +285,7 @@ $(document).ready ->
 
 Obviously, you'll want to be a bit more sophisticated than that, but it's a
 start.
+
 분명 당신은 그보다 좀더 정교해지기를 원할 것입니다. 그러나 이것은 시작입니다.
 
 ### form_tag
