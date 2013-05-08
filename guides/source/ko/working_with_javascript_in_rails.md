@@ -12,7 +12,7 @@ ease!
 
 After reading this guide, you will know:
 
-본 가이드를 읽은 후, 당신을 아래 내용들을 알게 될 것입니다.
+본 가이드를 읽은 후, 당신을 다음의 내용들을 알게 될 것입니다.
 
 * The basics of Ajax.
 * Unobtrusive JavaScript.
@@ -22,7 +22,7 @@ After reading this guide, you will know:
 
 * Ajax의 기초.
 * 겸손한 자바스크립트(Unobtrusive JavaScript).
-* 레일스의 내장 헬퍼가 당신을 돕는 방식.
+* 어떻게 레일스의 내장 헬퍼가 당신을 돕는가.
 * 서버측에서 Ajax를 다루는 법.
 * Turbolinks gem.
 
@@ -92,7 +92,14 @@ technique. You rarely have to write this code yourself. The rest of this guide
 will show you how Rails can help you write websites in this way, but it's
 all built on top of this fairly simple technique.
 
+레일스에는 이 기술을 이용하여 웹페이지를 만드는데 필요한 많은 내장 지원이 있습니다. 당신은 이 코드를 직접 작성할 필요가 거의 없습니다.
+이후 본 가이드에서는 어떻게 레일스가 이 방식으로 당신이 웹사이트를 만드는데 도움을 주는지 보여줄 것입니다. 
+그러나 이 모든 것이 매우 간단한 기술 위에 만들어져 있습니다.
+
 Unobtrusive JavaScript
+-------------------------------------
+
+겸손한(Unobtrusive) 자바스크립트 
 -------------------------------------
 
 Rails uses a technique called "Unobtrusive JavaScript" to handle attaching
@@ -100,8 +107,14 @@ JavaScript to the DOM. This is generally considered to be a best-practice
 within the frontend community, but you may occasionally read tutorials that
 demonstrate other ways.
 
+레일스는 DOM에 연결된 자바스크립트를 다루기 위해 "겸손한 자바스크립트"라 불리는 기술을 사용합니다.
+이것은 일반적으로 프론트엔드 커뮤니티에서 모범사례로 간주됩니다. 
+그러나 당신은 간혹 다른 방식으로 보여주는 튜토리얼을 읽을 수 있습니다.
+
 Here's the simplest way to write JavaScript. You may see it referred to as
 'inline JavaScript':
+
+여기 자바스크립트를 작성하는 가장 간단한 방법이 있습니다. 이것은 'inline JavaScript'라 불리는 것입니다.
 
 ```html
 <a href="#" onclick="this.style.backgroundColor='#990000'">Paint it red</a>
@@ -109,12 +122,16 @@ Here's the simplest way to write JavaScript. You may see it referred to as
 When clicked, the link background will become red. Here's the problem: what
 happens when we have lots of JavaScript we want to execute on a click?
 
+링크가 클릭될 때, 배경색이 붉은색으로 바뀔 것입니다. 여기 문제가 있습니다. 
+클릭했을 때 실행되기를 원하는 자바스크립트가 아주 많이 있다면 어떤 일이 생길까요?
+
 ```html
 <a href="#" onclick="this.style.backgroundColor='#009900';this.style.color='#FFFFFF';">Paint it green</a>
 ```
 
 Awkward, right? We could pull the function definition out of the click handler,
 and turn it into CoffeeScript:
+어색하지 않습니까? 우리는 클릭 처리기 밖으로 함수 정의를 끌어내어 커피스크립트로 바꿀 수 있습니다.
 
 ```coffeescript
 paintIt = (element, backgroundColor, textColor) ->
@@ -125,12 +142,16 @@ paintIt = (element, backgroundColor, textColor) ->
 
 And then on our page:
 
+이렇게 하면 우리의 페이지는 다음과 같이 됩니다.
+
 ```html
 <a href="#" onclick="paintIt(this, '#990000')">Paint it red</a>
 ```
 
 That's a little bit better, but what about multiple links that have the same
 effect?
+
+좀 더 나아졌습니다만, 같은 효과를 가진 여러 링크가 있다면 어떻게 될까요?
 
 ```html
 <a href="#" onclick="paintIt(this, '#990000')">Paint it red</a>
@@ -141,6 +162,9 @@ effect?
 Not very DRY, eh? We can fix this by using events instead. We'll add a `data-*`
 attribute to our link, and then bind a handler to the click event of every link
 that has that attribute:
+
+그닥 DRY하지 않지요? 우리는 대신 이벤트를 이용하여 이 문제를 해결할 수 있습니다. 
+우리는 링크에 `data-*` 속성을 추가하고 이 속성을 가진 모든 링크의 클릭 이벤트에 처리기를 연결할 것입니다.
 
 ```coffeescript
 paintIt = (element, backgroundColor, textColor) ->
@@ -168,30 +192,57 @@ concatenator. We can serve our entire JavaScript bundle on every page, which
 means that it'll get downloaded on the first page load and then be cached on
 every page after that. Lots of little benefits really add up.
 
+우리는 이것을 '겸손한' 자바스크립트라고 부릅니다. 더이상 자바스크립트를 HTML에 섞지 않기 때문입니다.
+우리는 앞으로의 변경을 쉽게 하기 위해 적절하게 우리의 고려사항을 분리했습니다.
+우리는 data 속성을 추가하는 것만으로 어떤 링크에든 손쉽게 동작을 추가할 수 있습니다.
+우리는 미니마이저와 연결연산자를 통해 모든 우리의 자바스크립트를 실행할 수 있습니다.
+우리는 전체 자바스크립트 묶음을 모든 페이지에 제공할 수 있는데, 이는 전체 자바스크립트가 첫 번째 페이지 로드할 때 다운로드되고,
+이후 모든 페이지에서 캐시됨을 뜻합니다. 
+수많은 작은 혜택들이 더해질 것입니다.
+
 The Rails team strongly encourages you to write your CoffeeScript (and
 JavaScript) in this style, and you can expect that many libraries will also
 follow this pattern.
 
+레일스 팀은 이런 스타일로 당신의 커피스크립트(자바스크립트 역시)를 작성할 것을 권장합니다. 
+그리고 많은 라이브러리들이 이 패턴을 따를 것을 당신은 기대할 수 있습니다.
+
 Built-in Helpers
+----------------------
+
+내장 헬퍼들
 ----------------------
 
 Rails provides a bunch of view helper methods written in Ruby to assist you
 in generating HTML. Sometimes, you want to add a little Ajax to those elements,
 and Rails has got your back in those cases.
 
+레일스는 HTML을 생성함에 있어 당신을 돕기 위해 루비로 작성된 많은 뷰 헬퍼 메서드를 갖고 있습니다.
+만약 당신이 그런 요소들에 약간의 Ajax를 추가하고자 할 때, 레일스는 
+
 Because of Unobtrusive JavaScript, the Rails "Ajax helpers" are actually in two
 parts: the JavaScript half and the Ruby half.
+
+겸손한 자바스크립트 때문에, 레일스의 "Ajax Helpers"는 두 부분으로 되어 있습니다.
+자바스크립트 부분과 루비 부분입니다.
 
 [rails.js](https://github.com/rails/jquery-ujs/blob/master/src/rails.js)
 provides the JavaScript half, and the regular Ruby view helpers add appropriate
 tags to your DOM. The CoffeeScript in rails.js then listens for these
 attributes, and attaches appropriate handlers.
 
+[rails.js](https://github.com/rails/jquery-ujs/blob/master/src/rails.js)는 자바스크립트 부분을 제공합니다.
+그리고 루비 뷰 헬퍼는 적절한 태그를 당신의 DOM에 추가합니다.
+rails.js 안의 CoffeeScript는 이들 속성을 수신하고 적절한 처리기를 연결합니다.
+
 ### form_for
 
 [`form_for`](http://api.rubyonrails.org/classes/ActionView/Helpers/FormHelper.html#method-i-form_for)
 is a helper that assists with writing forms. `form_for` takes a `:remote`
 option. It works like this:
+
+[`form_for`](http://api.rubyonrails.org/classes/ActionView/Helpers/FormHelper.html#method-i-form_for)는 form을 작성하는 것을 도와주는 헬퍼입니다.
+`form_for`는 `:remote` 옵션을 가집니다. 이것은 다음과 같이 작동합니다.
 
 ```erb
 <%= form_for(@post, remote: true) do |f| %>
@@ -200,6 +251,8 @@ option. It works like this:
 ```
 
 This will generate the following HTML:
+
+이 코드는 다음과 같은 HTML을 생성합니다.
 
 ```html
 <form accept-charset="UTF-8" action="/posts" class="new_post" data-remote="true" id="new_post" method="post">
@@ -210,9 +263,16 @@ This will generate the following HTML:
 Note the `data-remote='true'`. Now, the form will be submitted by Ajax rather
 than by the browser's normal submit mechanism.
 
+`data-remote='true'` 부분을 참고하십시오. 이제 폼은 브라우저의 일반적은 전송 메커니즘 대신 Ajax에 의해 전송될 것입니다.
+
 You probably don't want to just sit there with a filled out `<form>`, though.
 You probably want to do something upon a successful submission. To do that,
 bind to the `ajax:success` event. On failure, use `ajax:error`. Check it out:
+
+하지만 어쩌면 당신은 완성된 `<form>`을 앉아서 바라보기만 하고 싶지 않을 수 있습니다.
+당신은 전송 성공시 뭔가를 하고 싶을 수 있습니다.
+그렇게 하려면 `ajax:success` 이벤트를 연결하십시오.
+실패시에는 `ajax:error`를 사용하십시오. 다음을 확인해 보십시오.
 
 ```coffeescript
 $(document).ready ->
@@ -224,12 +284,16 @@ $(document).ready ->
 
 Obviously, you'll want to be a bit more sophisticated than that, but it's a
 start.
+분명 당신은 그보다 좀더 정교해지기를 원할 것입니다. 그러나 이것은 시작입니다.
 
 ### form_tag
 
 [`form_tag`](http://api.rubyonrails.org/classes/ActionView/Helpers/FormTagHelper.html#method-i-form_tag)
 is very similar to `form_for`. It has a `:remote` option that you can use like
 this:
+
+[`form_tag`](http://api.rubyonrails.org/classes/ActionView/Helpers/FormTagHelper.html#method-i-form_tag)는 `form_for`와 아주 유사합니다.
+이는 `:remote` 옵션을 가지고 있는데, 다음과 같이 사용할 수 있습니다.
 
 ```erb
 <%= form_tag('/posts', remote: true) %>
@@ -238,17 +302,24 @@ this:
 Everything else is the same as `form_for`. See its documentation for full
 details.
 
+다른 것들은 `form_for`와 같습니다. 세부사항 확인을 위해서는 문서를 확인하십시오.
+
 ### link_to
 
 [`link_to`](http://api.rubyonrails.org/classes/ActionView/Helpers/UrlHelper.html#method-i-link_to)
 is a helper that assists with generating links. It has a `:remote` option you
 can use like this:
 
+[`link_to`](http://api.rubyonrails.org/classes/ActionView/Helpers/UrlHelper.html#method-i-link_to)는 링크를 생성하는 것을 돕는 헬퍼입니다.
+이것은 `:remote` 옵션을 가지고 있는데, 다음과 같이 사용할 수 있습니다.
+
 ```erb
 <%= link_to "a post", @post, remote: true %>
 ```
 
 which generates
+
+이것은 아래 코드를 생성합니다.
 
 ```html
 <a href="/posts/1" data-remote="true">a post</a>
