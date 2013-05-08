@@ -286,7 +286,7 @@ $(document).ready ->
 Obviously, you'll want to be a bit more sophisticated than that, but it's a
 start.
 
-분명 당신은 그보다 좀더 정교해지기를 원할 것입니다. 그러나 이것은 시작입니다.
+분명 당신은 그보다 좀더 정교해지기를 원할 것입니다. 그러나 이것이 시작입니다.
 
 ### form_tag
 
@@ -331,8 +331,8 @@ You can bind to the same Ajax events as `form_for`. Here's an example. Let's
 assume that we have a list of posts that can be deleted with just one
 click. We would generate some HTML like this:
 
-당신은 `form_for`같이 동일한 Ajax 이벤트를 연결할 수 있습니다. 여기 예제가 있습니다. 
-단 한번의 클릭으로 삭제될 수 있는 포스트의 목록이 있다고 가정해 봅시다. 우리는 다음과 같이 HTML을 생성합니다.
+당신은 `form_for`에서와 같은 Ajax 이벤트를 연결할 수 있습니다. 여기 예제가 있습니다. 
+단 한번의 클릭으로 삭제될 수 있는 포스트의 목록이 있다고 가정해 봅시다. 다음과 같이 HTML을 생성합니다.
 
 ```erb
 <%= link_to "Delete post", @post, remote: true, method: :delete %>
