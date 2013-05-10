@@ -499,7 +499,7 @@ replace the entire `<body>` of the page with the `<body>` of the response. It
 will then use PushState to change the URL to the correct one, preserving
 refresh semantics and giving you pretty URLs.
 
-Turbolinks는 페이지에 있는 모든 `<a>`에 클릭 처리기를 연결합니다. 만약 당신의 브라우저가 [PushState](https://developer.mozilla.org/en-US/docs/DOM/Manipulating_the_browser_history#The_pushState(\).C2.A0method)를 지원하는 것이라면,
+Turbolinks는 페이지에 있는 모든 `<a>`에 클릭 핸들러를 연결합니다. 만약 당신의 브라우저가 [PushState](https://developer.mozilla.org/en-US/docs/DOM/Manipulating_the_browser_history#The_pushState(\).C2.A0method)를 지원하는 것이라면,
 Turbolinks는 Ajax 요청을 만들고, 응답을 분석하고, 응답에 있는 `<body>` 내용으로 페이지상의 `<body>` 전체를 바꿔줍니다.
 그 다음으로, PushState를 이용하여 URL을 올바른 것으로 변경하는데, 이는 새로고침 의미를 유지하고 예쁜 URL을 제공하기 위함입니다.
 
