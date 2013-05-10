@@ -48,11 +48,11 @@ stylesheets and images. It then assembles the page. If you click a link, it
 does the same process: fetch the page, fetch the assets, put it all together,
 show you the results. This is called the 'request response cycle.'
 
-웹브라우저의 주소 막대에 `http://localhost:3000`를 입력하고 'Go'를 누르면, 브라우저는 서버로 보낼 요청을 만듭니다.
+웹브라우저의 주소 막대에 `http://localhost:3000`를 입력하고 'Go'를 누르면, 브라우저('클라이언트')는 서버로 요청을 보냅니다.
 브라우저는 서버로부터의 응답을 분석하고, 자바스크립트 파일들, 스타일시트들 그리고 이미지들과 같은 연관된 모든 자산들을 불러옵니다.
 그리고 나서 페이지들을 조합합니다. 만약 링크를 클릭하면, 브라우저는 같은 절차를 수행합니다. 
 페이지를 불러오고, 자산들을 불러오고, 그것들을 조합하여 결과를 보여줍니다.
-이것을 '요청 응답 순환(Cycle)'이라 합니다.
+이것을 '요청 응답 주기(request response cycle)'이라 합니다.
 
 JavaScript can also make requests to the server, and parse the response. It
 also has the ability to update information on the page. Combining these two
@@ -60,17 +60,16 @@ powers, a JavaScript writer can make a web page that can update just parts of
 itself, without needing to get the full page data from the server. This is a
 powerful technique that we call Ajax.
 
-자바스크립트도 서버로의 요청을 만들고, 응답을 분석할 수 있습니다. 그리고 페이지에 정보를 업데이트할 수 있습니다.
-이 두가지 능력을 조합하여 자바스크립트 작성자는 서버로부터 전체 페이지 데이터를 받아올 필요 없이, 
-단지 페이지의 일부만을 갱신하는 웹 페이지를 작성할 수 있습니다.
+자바스크립트도 서버로의 요청을 보내고, 응답을 분석할 수 있습니다. 그리고 페이지에 정보를 업데이트할 수 있습니다.
+이 두가지 능력을 조합하여 자바스크립트 작성자는 서버로부터 전체 페이지 데이터를 받아올 필요 없이, 페이지의 일부만을 갱신하는 웹 페이지를 작성할 수 있습니다.
 이것이 Ajax라 부르는 강력한 기술입니다.
 
 Rails ships with CoffeeScript by default, and so the rest of the examples
 in this guide will be in CoffeeScript. All of these lessons, of course, apply
 to vanilla JavaScript as well.
 
-레일스는 커피스크립트(CoffeeScript)를 기본으로 탑재하고 있고 본 가이드에 있는 예제들은 커피스크립트로 만들어질 것입니다.
-예제 강좌 전부는 평범한 자바스크립트에도 물론 적용됩니다.
+레일스는 커피스크립트(CoffeeScript)를 기본으로 탑재하고 있고 본 가이드의 나머지 예제들은 커피스크립트로 만들어질 것입니다.
+예제 강좌는 모두 평범한 자바스크립트에도 적용됨은 물론입니다.
 
 As an example, here's some CoffeeScript code that makes an Ajax request using
 the jQuery library:
@@ -93,8 +92,8 @@ will show you how Rails can help you write websites in this way, but it's
 all built on top of this fairly simple technique.
 
 레일스에는 이 기술을 이용하여 웹페이지를 만드는데 필요한 많은 내장 지원이 있습니다. 당신은 이 코드를 직접 작성할 필요가 거의 없습니다.
-이후 본 가이드에서는 어떻게 레일스가 이 방식으로 웹사이트를 만드는데 도움을 주는지 보여줄 것입니다. 
-그러나 이 모든 것이 매우 간단한 기술 위에 만들어져 있습니다.
+이후 본 가이드는 당신이 이 방식으로 웹사이트를 만드는데 레일스가 어떻게 도움을 주는지 보여줄 것입니다. 
+하지만 이 모든 것은 매우 간단한 기술 위에 만들어져 있습니다.
 
 Unobtrusive JavaScript
 -------------------------------------
@@ -109,7 +108,7 @@ demonstrate other ways.
 
 레일스는 DOM에 연결된 자바스크립트를 다루기 위해 "겸손한 자바스크립트"라 불리는 기술을 사용합니다.
 이것은 일반적으로 프론트엔드 커뮤니티에서 모범사례로 간주됩니다. 
-그러나 당신은 간혹 다른 방식으로 보여주는 튜토리얼을 읽을 수 있습니다.
+하지마 당신은 간혹 다른 방식으로 보여주는 튜토리얼을 볼 수 있습니다.
 
 Here's the simplest way to write JavaScript. You may see it referred to as
 'inline JavaScript':
@@ -132,7 +131,7 @@ happens when we have lots of JavaScript we want to execute on a click?
 Awkward, right? We could pull the function definition out of the click handler,
 and turn it into CoffeeScript:
 
-어색하지 않습니까? 우리는 클릭 처리기 밖으로 함수 정의를 끌어내어 커피스크립트로 바꿀 수 있습니다.
+어색하지 않습니까? 우리는 클릭 핸들러 밖으로 함수 정의를 끌어내어 커피스크립트로 바꿀 수 있습니다.
 
 ```coffeescript
 paintIt = (element, backgroundColor, textColor) ->
@@ -165,7 +164,7 @@ attribute to our link, and then bind a handler to the click event of every link
 that has that attribute:
 
 그닥 DRY하지 않지요? 우리는 이벤트를 이용하여 이 문제를 해결할 수 있습니다. 
-링크에 `data-*` 속성을 추가하고 이 속성을 가진 모든 링크의 클릭 이벤트에 처리기를 연결할 것입니다.
+링크에 `data-*` 속성을 추가하고 이 속성을 가진 모든 링크의 클릭 이벤트에 핸들러를 연결할 것입니다.
 
 ```coffeescript
 paintIt = (element, backgroundColor, textColor) ->
@@ -193,19 +192,18 @@ concatenator. We can serve our entire JavaScript bundle on every page, which
 means that it'll get downloaded on the first page load and then be cached on
 every page after that. Lots of little benefits really add up.
 
-우리는 이것을 '겸손한' 자바스크립트라고 부릅니다. 더이상 자바스크립트를 HTML에 섞지 않기 때문입니다.
-우리는 앞으로의 변경을 쉽게 하기 위해 적절하게 우리의 고려사항을 분리했습니다.
+우리는 이것을 '겸손한' 자바스크립트라고 부릅니다. 더이상 자바스크립트를 HTML 안에 섞지 않기 때문입니다.
+우리는 앞으로 있을 변경을 쉽게 하기 위해 적절하게 우리 고려사항을 분리했습니다.
 우리는 data 속성을 추가하는 것만으로 어떤 링크에든 손쉽게 동작을 추가할 수 있습니다.
 우리는 미니마이저와 연결연산자를 통해 모든 우리의 자바스크립트를 실행할 수 있습니다.
 우리는 전체 자바스크립트 묶음을 모든 페이지에 제공할 수 있는데, 이는 전체 자바스크립트가 첫 번째 페이지 로드할 때 다운로드되고,
-이후 모든 페이지에서 캐시됨을 뜻합니다. 
-수많은 작은 혜택들이 더해질 것입니다.
+이후 모든 페이지에서 캐시됨을 뜻합니다. 수많은 작은 혜택들이 늘어날 것입니다.
 
 The Rails team strongly encourages you to write your CoffeeScript (and
 JavaScript) in this style, and you can expect that many libraries will also
 follow this pattern.
 
-레일스 팀은 이런 스타일로 당신의 커피스크립트(자바스크립트 역시)를 작성할 것을 권장합니다. 
+레일스 팀은 이런 스타일로 당신의 커피스크립트(자바스크립트 역시)를 작성할 것을 강력 권장합니다. 
 그리고 많은 라이브러리들이 이 패턴을 따를 것을 당신은 기대할 수 있습니다.
 
 Built-in Helpers
@@ -219,13 +217,12 @@ in generating HTML. Sometimes, you want to add a little Ajax to those elements,
 and Rails has got your back in those cases.
 
 레일스는 HTML을 생성함에 있어 당신을 돕기 위해 루비로 작성된 많은 뷰 헬퍼 메서드를 갖고 있습니다.
-만약 당신이 그런 요소들에 약간의 Ajax를 추가하고자 할 때, 레일스는 ... (추가 내용 필요)
+간혹 당신은 요소들에 약간의 Ajax를 추가하기를 원하고, 그러한 경우 레일스는 당신을 도와줄 것입니다.
 
 Because of Unobtrusive JavaScript, the Rails "Ajax helpers" are actually in two
 parts: the JavaScript half and the Ruby half.
 
-겸손한 자바스크립트 때문에, 레일스의 "Ajax Helpers"는 두 부분으로 되어 있습니다.
-자바스크립트 부분과 루비 부분입니다.
+겸손한 자바스크립트 때문에, 레일스의 "Ajax Helpers"는 사실 두 부분으로 되어 있습니다. 자바스크립트 부분과 루비 부분입니다.
 
 [rails.js](https://github.com/rails/jquery-ujs/blob/master/src/rails.js)
 provides the JavaScript half, and the regular Ruby view helpers add appropriate
@@ -233,8 +230,7 @@ tags to your DOM. The CoffeeScript in rails.js then listens for these
 attributes, and attaches appropriate handlers.
 
 [rails.js](https://github.com/rails/jquery-ujs/blob/master/src/rails.js)는 자바스크립트 부분을 제공하고,
-루비 뷰 헬퍼는 적절한 태그를 당신의 DOM에 추가합니다.
-rails.js 안의 CoffeeScript는 이들 속성을 수신하고 적절한 처리기를 연결합니다.
+표준 루비 뷰 헬퍼는 적절한 태그를 당신의 DOM에 추가합니다. rails.js 안의 CoffeeScript는 이들 속성을 수신하고 적절한 핸들러를 연결합니다.
 
 ### form_for
 
@@ -270,7 +266,7 @@ You probably don't want to just sit there with a filled out `<form>`, though.
 You probably want to do something upon a successful submission. To do that,
 bind to the `ajax:success` event. On failure, use `ajax:error`. Check it out:
 
-하지만 어쩌면 당신은 완성된 `<form>`을 앉아서 바라보기만 하고 싶지 않을 수 있습니다.
+하지만 어쩌면 당신은 완성된 `<form>`을 앉아서 구경만 하고 싶지 않을지 모릅니다.
 당신은 전송 성공시 뭔가를 하고 싶을 수 있습니다.
 그렇게 하려면 `ajax:success` 이벤트를 연결하십시오.
 실패시에는 `ajax:error`를 사용하십시오. 다음을 확인해 보십시오.
@@ -295,7 +291,7 @@ is very similar to `form_for`. It has a `:remote` option that you can use like
 this:
 
 [`form_tag`](http://api.rubyonrails.org/classes/ActionView/Helpers/FormTagHelper.html#method-i-form_tag)는 `form_for`와 아주 유사합니다.
-이는 `:remote` 옵션을 가지고 있는데, 다음과 같이 사용할 수 있습니다.
+이는 `:remote` 옵션을 가지고 있는데, 이것은 다음과 같이 사용할 수 있습니다.
 
 ```erb
 <%= form_tag('/posts', remote: true) %>
@@ -321,7 +317,7 @@ can use like this:
 
 which generates
 
-이것은 아래 코드를 생성합니다.
+이것은 다음 코드를 생성합니다.
 
 ```html
 <a href="/posts/1" data-remote="true">a post</a>
@@ -383,10 +379,8 @@ Ajax isn't just client-side, you also need to do some work on the server
 side to support it. Often, people like their Ajax requests to return JSON
 rather than HTML. Let's discuss what it takes to make that happen.
 
-Ajax는 단지 클라이언트측 코드가 아닙니다.
-당신은 Ajax를 지원하기 위해 서버측에도 몇 가지 작업을 해야 합니다.
-사람들은 간혹 Ajax 요청을 하면서 HTML보다는 JSON을 돌려받기를 원합니다. 
-그렇게 하기 위한 얘기를 해 보겠습니다.
+Ajax는 단지 클라이언트측 코드가 아닙니다. 당신은 Ajax를 지원하기 위해 서버측에도 몇 가지 작업을 해야 합니다.
+사람들은 간혹 Ajax 요청을 하면서 HTML보다는 JSON을 돌려받기를 원합니다. 그렇게 하기 위해 필요한 것을 논의해 보겠습니다.
 
 ### A Simple Example
 
@@ -396,7 +390,7 @@ Imagine you have a series of users that you would like to display and provide a
 form on that same page to create a new user. The index action of your
 controller looks like this:
 
-만약 사용자들의 목록을 표시하고 같은 페이지에서 새로운 사용자를 만들 수 있다고 해 보겠습니다.
+당신이 보여주고자 하는 일련의 사용자 목록을 갖고 있으며 같은 페이지에서 새로운 사용자를 만드는 폼을 제공한다고 해 보겠습니다.
 당신의 컨트롤러의 인덱스 액션은 다음과 같을 것입니다.
 
 ```ruby
@@ -507,7 +501,7 @@ refresh semantics and giving you pretty URLs.
 
 Turbolinks는 페이지에 있는 모든 `<a>`에 클릭 처리기를 연결합니다. 만약 당신의 브라우저가 [PushState](https://developer.mozilla.org/en-US/docs/DOM/Manipulating_the_browser_history#The_pushState(\).C2.A0method)를 지원하는 것이라면,
 Turbolinks는 Ajax 요청을 만들고, 응답을 분석하고, 응답에 있는 `<body>` 내용으로 페이지상의 `<body>` 전체를 바꿔줍니다.
-그런 다음, PushState를 이용하여 URL을 올바른 것으로 변경하여 새로고침 의미를 유지하고 예쁜 URL을 제공합니다.
+그 다음으로, PushState를 이용하여 URL을 올바른 것으로 변경하는데, 이는 새로고침 의미를 유지하고 예쁜 URL을 제공하기 위함입니다.
 
 The only thing you have to do to enable Turbolinks is have it in your Gemfile,
 and put `//= require turbolinks` in your CoffeeScript manifest, which is usually
