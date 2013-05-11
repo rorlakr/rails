@@ -1,4 +1,4 @@
-Configuring Rails Applications
+레일스 어플리케이션 설정하기
 ==============================
 
 This guide covers the configuration and initialization features available to Rails applications.
@@ -10,7 +10,7 @@ After reading this guide, you will know:
 
 --------------------------------------------------------------------------------
 
-Locations for Initialization Code
+[Locations for Initialization Code] 초기화 코드 위치
 ---------------------------------
 
 Rails offers four standard spots to place initialization code:
