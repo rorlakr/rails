@@ -19,7 +19,7 @@
 
 ### [Stand-Alone Active Support] 액티브서포트를 단독으로 사용하기
 
-액티브서포트는 아무런 기능확장을 하지 않도록, 디폴트 상태에서는 아무것도 로드하지 않습니다. 여러 개의 모듈로 분리되어 있어서 필요한 것만 로드할 수 있도록 되어 있습니다. 또한 한번에 관련 확장모듈만을, 심지어 모든 것을 로드할 수 있도록 진입점을 제공해 주어 편리하게 구성되어 있습니다.
+액티브서포트는 아무런 기능확장을 하지 않도록, 디폴트 상태에서는 아무것도 로드하지 않습니다. 여러 개의 모듈로 분리되어 있어서 필요한 것만 로드할 수 있도록 되어 있습니다. 또한 한번에 관련 확장모듈만을, 심지어 모든 것을 로드할 수 있도록 진입점을 제공해 주어 편리하게 구성되어 있습니다. [[[In order to have a near-zero default footprint, Active Support does not load anything by default. It is broken in small pieces so that you can load just what you need, and also has some convenience entry points to load related extensions in one shot, even everything.]]]
 
 따라서, 아래와 같이 간단하게 require할 경우,
 
@@ -71,11 +71,11 @@ require 'active_support/core_ext'
 require 'active_support/all'
 ```
 
-이렇게 할 경우에도, 모든 액티브서포트를 메모리상에 로드하지 않는데, 일부 모듈은 `autoload`상태로 설정되기 때문에, 필요할 경우에는 로드됩니다.
+이렇게 할 경우에도, 모든 액티브서포트를 메모리상에 로드하지 않는데, 일부 모듈은 `autoload`상태로 설정되기 때문에, 필요할 경우에만 로드됩니다.
 
 ### [Active Support Within a Ruby on Rails Application] 루비온레일스 어플리케이션 내에서 액티브서포트 사용하기
 
-루비온레일스 어플리케이션은 `config.active_support.bare`이 true로 설정되어 있지 않는 한, 모든 액티브서포트를 로드하게 됩니다. 이와 같이 true로 지정된 경우에는, 레일스 프레임워크가 필용로하는 것만을 선별해서 로드하게 되고, 이전에 설명한 바와 같이, 각 단계별로 선별해서 사용할 수도 있습니다. 
+루비온레일스 어플리케이션은 `config.active_support.bare`이 true로 설정되어 있지 않는 한, 모든 액티브서포트를 로드하게 됩니다. 이와 같이 true로 지정된 경우에는, 레일스 프레임워크가 필요로하는 것만을 선별해서 로드하게 되고, 이전에 설명한 바와 같이, 각 단계별로 선별해서 사용할 수도 있습니다. 
 
 [Extensions to All Objects] 모든 객체에 대해서 확장사용할 수 있는 메소드
 -------------------------
