@@ -27,7 +27,7 @@
 require 'active_support'
 ```
 
-객체들은 `blank` 메소드에 대해서 반응을 하지 않게 됩니다. 이제 해당 정의를 로드하는 방법을 알아보겠습니다.
+객체들은 `blank` 메소드에 대해서 반응을 하지 않게 됩니다. 이제 해당 정의를 로드하는 방법을 알아보겠습니다. [[[objects do not even respond to `blank?`. Let's see how to load its definition.]]]
 
 #### [Cherry-picking a Definition] 특정 정의만 선별하기
 
