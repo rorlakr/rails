@@ -92,11 +92,12 @@ require 'active_support/all'
 
 * `empty?` 메소드가 정의되어 있어서 empty를 반환하는 기타 다른 객체들
 
-INFO: 문자열에 대한 predicate는 유니코드를 인식하는 캐릭터 클래스 `[:space:]` 를 사용합니다. 그래서, 예를 들면, 문단구분자인 U+2020는 whitespace로 인식되는 것입니다. [[[The predicate for strings uses the Unicode-aware character class `[:space:]`, so for example U+2029 (paragraph separator) is considered to be whitespace.]]]
+INFO: 문자열에 대한 서술부분은 유니코드를 인식하는 캐릭터 클래스 `[:space:]` 를 사용합니다. 그래서, 예를 들면, 문단구분자인 U+2020는 whitespace로 인식되는 것입니다. [[[The predicate for strings uses the Unicode-aware character class `[:space:]`, so for example U+2029 (paragraph separator) is considered to be whitespace.]]]
 
 WARNING: 주목할 것은 숫자에 대해서 언급하지 않았습니다. 특히, 0과 0.0은 blank가 **아닙니다**. [[[Note that numbers are not mentioned. In particular, 0 and 0.0 are **not** blank.]]]
 
-For example, this method from `ActionDispatch::Session::AbstractStore` uses `blank?` for checking whether a session key is present:
+예를 들어, `ActionDispatch::Session::AbstractStore`에 있는 아래의 메소드는 세션키의 존재여부를 확인하기 위해 `blank?`를 사용합니다. 
+[[[For example, this method from `ActionDispatch::Session::AbstractStore` uses `blank?` for checking whether a session key is present:]]]
 
 ```ruby
 def ensure_session_key!
@@ -106,7 +107,8 @@ def ensure_session_key!
 end
 ```
 
-The method `present?` is equivalent to `!blank?`. This example is taken from `ActionDispatch::Http::Cache::Response`:
+`present?` 메소드는 `!blank?`와 동일한 것입니다. 아래의 예는 `ActionDispatch::Http::Cache::Response`로부터 발췌한 것입니다. 
+[[[The method `present?` is equivalent to `!blank?`. This example is taken from `ActionDispatch::Http::Cache::Response`:]]]
 
 ```ruby
 def set_conditional_cache_control!
@@ -115,41 +117,45 @@ def set_conditional_cache_control!
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/object/blank.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/blank.rb`에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/blank.rb`.]]]
 
 ### `presence`
 
-The `presence` method returns its receiver if `present?`, and `nil` otherwise. It is useful for idioms like this:
+`presence` 메소드는 `present?` 결과 true 값을 반환할 경우 receiver 객체를, false 값을 반환할 경우 `nil` 객체를 반환하게 됩니다. 이것은 아래와 같은 경우 유용하게 습관적으로 사용할 수 있습니다. [[[The `presence` method returns its receiver if `present?`, and `nil` otherwise. It is useful for idioms like this:]]]
 
 ```ruby
 host = config[:host].presence || 'localhost'
 ```
 
-NOTE: Defined in `active_support/core_ext/object/blank.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/blank.rb`에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/blank.rb`.]]]
 
 ### `duplicable?`
 
-A few fundamental objects in Ruby are singletons. For example, in the whole life of a program the integer 1 refers always to the same instance:
+루비에서 몇가지 기본 객체들은 싱글레톤의 형태를 가지비니다. 예를 들어, 하나의 프로그램 프로세스 동안에, 정수 1 은 항상 동일한 인스턴스를 참조합니다. 
+[[[A few fundamental objects in Ruby are singletons. For example, in the whole life of a program the integer 1 refers always to the same instance:]]]
 
 ```ruby
 1.object_id                 # => 3
 Math.cos(0).to_i.object_id  # => 3
 ```
 
-Hence, there's no way these objects can be duplicated through `dup` or `clone`:
+따라서, 이러한 객체들은 `dup`이나 `clone` 메소드를 이용하여 복제할 수 있는 방법이 없습니다. [[[
+Hence, there's no way these objects can be duplicated through `dup` or `clone`:]]]
 
 ```ruby
 true.dup  # => TypeError: can't dup TrueClass
 ```
 
-Some numbers which are not singletons are not duplicable either:
+싱글레톤 형태를 취하지 않는 몇몇 숫자들도 복제할 수 없는데, 다음과 같습니다. [[[
+Some numbers which are not singletons are not duplicable either:]]]
 
 ```ruby
 0.0.clone        # => allocator undefined for Float
 (2**1024).clone  # => allocator undefined for Bignum
 ```
 
-Active Support provides `duplicable?` to programmatically query an object about this property:
+액티브서포트는 이와 같이 특정 객체가 복제가능한 가를 프로그램상에서 조회해 볼 수 있도록 `duplicable?`이라는 메소드를 제공해 줍니다. [[[
+Active Support provides `duplicable?` to programmatically query an object about this property:]]]
 
 ```ruby
 "foo".duplicable? # => true
@@ -158,15 +164,16 @@ Active Support provides `duplicable?` to programmatically query an object about 
 false.duplicable?  # => false
 ```
 
-By definition all objects are `duplicable?` except `nil`, `false`, `true`, symbols, numbers, class, and module objects.
+정의상, `nil`, `false`, `true`, 심볼, 숫자, 클래스, 모듈 객체들을 제외한 모든 객체는 `duplicable?` 메소드에 대해 true 값을 반환합니다. [[[
+By definition all objects are `duplicable?` except `nil`, `false`, `true`, symbols, numbers, class, and module objects.]]]
 
-WARNING: Any class can disallow duplication by removing `dup` and `clone` or raising exceptions from them. Thus only `rescue` can tell whether a given arbitrary object is duplicable. `duplicable?` depends on the hard-coded list above, but it is much faster than `rescue`. Use it only if you know the hard-coded list is enough in your use case.
+WARNING: 모든 클래스는 `dup`과 `clone` 메소드를 제거하거나 메소드 내에 예외를 발생시켜서 복제를 못하게 할 수 있습니다. 이렇게 하면 `rescue` 만이 유일하게 특정 객체가 복제가능한지를 알려 줄 수 있게 됩니다. `duplicable?` 메소드는 위에서와 같이 코딩에 따라 좌우되지만, `rescue` 보다는 훨씬 빠르게 결과를 알려 줍니다. 따라서 특정 상황에서 하드코딩된 목록으로도 충분한 경우에만 사용하기 바랍니다. [[[Any class can disallow duplication by removing `dup` and `clone` or raising exceptions from them. Thus only `rescue` can tell whether a given arbitrary object is duplicable. `duplicable?` depends on the hard-coded list above, but it is much faster than `rescue`. Use it only if you know the hard-coded list is enough in your use case.]]]
 
-NOTE: Defined in `active_support/core_ext/object/duplicable.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/duplicable.rb`에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/duplicable.rb`.]]]
 
 ### `deep_dup`
 
-The `deep_dup` method returns deep copy of a given object. Normally, when you `dup` an object that contains other objects, ruby does not `dup` them, so it creates a shallow copy of the object. If you have an array with a string, for example, it will look like this:
+`deep_dup` 메소드는 특정 객체를 deep 복사해서 반환해 줍니다. 보통은, 다른 객체를 포함하는 특정 객체를 `dup` 할 때, 루비는 포함된 객체는 `dup` 하지 않게 됩니다. 따라서, 해당 객체를 shallow 복사를 하게 됩니다. 특정 문자열을 가지는 특정 배열을 예를 들면, 다음과 같습니다. [[[The `deep_dup` method returns deep copy of a given object. Normally, when you `dup` an object that contains other objects, ruby does not `dup` them, so it creates a shallow copy of the object. If you have an array with a string, for example, it will look like this:]]]
 
 ```ruby
 array     = ['string']
@@ -185,9 +192,11 @@ array     #=> ['foo']
 duplicate #=> ['foo', 'another-string']
 ```
 
-As you can see, after duplicating the `Array` instance, we got another object, therefore we can modify it and the original object will stay unchanged. This is not true for array's elements, however. Since `dup` does not make deep copy, the string inside the array is still the same object.
+알 수 있듯이, `Array` 인스턴스를 복제하면, 또 다른 배열 객체를 가지게 됩니다. 그러므로 복제한 배열 객체를 변경하면 원래의 배열 객체는 변경되지 않은 채로 있게 될 것입니다. 그러나, 배열 요소에 대해서 이러한 사항이 해당되지 않습니다. `dup` 메소드는 deep 복사를 하지 않기 때문에, 배열내의 문자열은 여전히 동일한 객체가 되는 것입니다. 
+[[[As you can see, after duplicating the `Array` instance, we got another object, therefore we can modify it and the original object will stay unchanged. This is not true for array's elements, however. Since `dup` does not make deep copy, the string inside the array is still the same object.]]]
 
-If you need a deep copy of an object, you should use `deep_dup`. Here is an example:
+특정 객체에 대해서 deep 복사를 해야할 경우에는, `deep_dup` 메소드를 사용해야 합니다. 다음에 그 예가 있습니다. 
+[[[If you need a deep copy of an object, you should use `deep_dup`. Here is an example:]]]
 
 ```ruby
 array     = ['string']
@@ -199,7 +208,8 @@ array     #=> ['string']
 duplicate #=> ['foo']
 ```
 
-If the object is not duplicable, `deep_dup` will just return it:
+특정 객체가 복제가능하지 않을 경우에, `deep_dup` 메소드는 단지 해당 객체만을 반화해 줄 것입니다. 
+[[[If the object is not duplicable, `deep_dup` will just return it:]]]
 
 ```ruby
 number = 1
@@ -207,7 +217,7 @@ duplicate = number.deep_dup
 number.object_id == duplicate.object_id   # => true
 ```
 
-NOTE: Defined in `active_support/core_ext/object/deep_dup.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/deep_dup.rb` 파일에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/deep_dup.rb`.]]]
 
 ### `try`
 
