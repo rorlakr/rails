@@ -51,8 +51,7 @@ $.ajax(url: "/test").done (html) ->
 이것은 일반적으로 프론트엔드 커뮤니티에서 모범사례로 간주됩니다. 
 하지마 당신은 간혹 다른 방식으로 보여주는 튜토리얼을 볼 수 있습니다.
 
-Here's the simplest way to write JavaScript. You may see it referred to as
-'inline JavaScript':
+여기 자바스크립트를 작성하는 가장 간단한 방법이 있습니다. 이것은 'inline JavaScript'라 불리는 것입니다.
 
 ```html
 <a href="#" onclick="this.style.backgroundColor='#990000'">Paint it red</a>
