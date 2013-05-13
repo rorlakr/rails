@@ -24,9 +24,9 @@ After reading this guide, you will know:
 * How to experiment with objects through an interactive shell.
 * How to profile and benchmark your new creation.
 
---------------------------------------------------------------------------------
+NOTE: This tutorial assumes you have basic Rails knowledge from reading the [Getting Started with Rails Guide](getting_started.html).
+]]]
 
-NOTE: This tutorial assumes you have basic Rails knowledge from reading the [Getting Started with Rails Guide](getting_started.html).]]]
 
 커맨드라인 기초
 -------------------
