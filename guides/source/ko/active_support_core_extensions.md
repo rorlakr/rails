@@ -88,13 +88,13 @@ require 'active_support/all'
 
 * whitespace 만으로 구성된 문자열 (아래의 노트를 참고하세요.),
 
-* 빈 배앨과 해시
+* 빈 배열과 해시
 
 * `empty?` 메소드가 정의되어 있어서 empty를 반환하는 기타 다른 객체들
 
-INFO: The predicate for strings uses the Unicode-aware character class `[:space:]`, so for example U+2029 (paragraph separator) is considered to be whitespace.
+INFO: 문자열에 대한 predicate는 유니코드를 인식하는 캐릭터 클래스 `[:space:]` 를 사용합니다. 그래서, 예를 들면, 문단구분자인 U+2020는 whitespace로 인식되는 것입니다. [[[The predicate for strings uses the Unicode-aware character class `[:space:]`, so for example U+2029 (paragraph separator) is considered to be whitespace.]]]
 
-WARNING: Note that numbers are not mentioned. In particular, 0 and 0.0 are **not** blank.
+WARNING: 주목할 것은 숫자에 대해서 언급하지 않았습니다. 특히, 0과 0.0은 blank가 **아닙니다**. [[[Note that numbers are not mentioned. In particular, 0 and 0.0 are **not** blank.]]]
 
 For example, this method from `ActionDispatch::Session::AbstractStore` uses `blank?` for checking whether a session key is present:
 
