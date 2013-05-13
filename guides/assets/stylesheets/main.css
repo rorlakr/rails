@@ -712,46 +712,20 @@ table td, table th { padding: 9px 10px; text-align: left; }
 
 }
 
-
-/* Added by Lucius from RORLAB */
-#feature .wrapper ul li p {
-  font-size:1em;
-  margin-bottom:0;
-}
-#feature .wrapper ul li p.original-text {
-  margin-top:.2em;
-}
-#feature .wrapper p.original-text {
-  margin-top:-.5em;
-}
-.original-text, .original-text-h {
+.original-text {
   display:none;
-  color:black;
-  background-color: #e0d389;
-  border:1px solid #cccccc;
-  margin-top:-1.2em;
+  color:#000;
+  background-color: #d5e9f6;
+  border:1px solid #81b0c3;
+  margin-top:-1em;
   padding:.3em .5em;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
-.original-text-h {
-  border:0;
-  background-color: transparent;
-  padding:0;
-  margin-left: 5px;
-}
+
 a.original-link {
   font-size:10px;
   margin-top:-2em;
   text-decoration:none !important;
-}
-a .original-text-h {
-  color:#980905;
-}
-.chapters span, .chapters .original-link {
-  display:none;
-}
-.tip .original-text, .important .original-text, .caution .original-text, .warning .original-text, .note .original-text, .info .original-text, .todo .original-text {
-  margin-top:-.6em;
 }

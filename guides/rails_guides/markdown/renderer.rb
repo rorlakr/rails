@@ -34,9 +34,10 @@ HTML
         elsif text =~ /^\[<sup>(\d+)\]:<\/sup> (.+)$/
           linkback = %(<a href="#footnote-#{$1}-ref"><sup>#{$1}</sup></a>)
           %(<p class="footnote" id="footnote-#{$1}">#{linkback} #{$2}</p>)
-        # added by Lucius from RORLAB
-        elsif text =~ /^(.+?)\s*\[{3}(.+?)\]{3}$/
+        elsif text =~ /^(.+)\[\[\[(.+)\]\]\]$/
           convert_original(text)
+          # linkback = %(<a href="#" class="original-link" onclick="$(this).parent().parent().next().toggle();return false;">[원문보기]</a>)
+          # %(<p>#{$1} <sup>#{linkback}</sup></p><p class="original-text">#{$2}</p>)
         else
           text = convert_footnotes(text)
           "<p>#{text}</p>"
@@ -45,19 +46,9 @@ HTML
 
       private
 
-        # added by Lucius
-        def convert_header_original(text, header_level)
-          text.gsub(/^\[(.*)\]\s(.*)$/) do
-            linkback = %(<a href="#" class="original-link" onclick="$(this).parent().prev().toggle();return false;">{원문</a><a href="#" class="original-link">·</a><a href='#' class="original-link" onclick="$('.original-text, .original-text-h').toggle();return false;">전체}</a>)
-            %(<h#{header_level}>#{$2}<span class="original-text-h">(#{$1})</span> <sup>#{linkback}</sup></h#{header_level}>)
-          end
-        end
-
-        # added by Lucius
         def convert_original(text)
-          text = text.gsub(/\n/, " ")
-          text.gsub(/^(.+?)\s*\[{3}(.+?)\]{3}$/) do
-            linkback = %(<a href="#" class="original-link" onclick="$(this).parent().parent().next().toggle();return false;">{원문</a><a href="#" class="original-link">·</a><a href='#' class="original-link" onclick="$('.original-text').toggle();return false;">전체}</a>)
+          text.gsub(/^(.+)\[\[\[(.+)\]\]\]$/) do
+            linkback = %(<a href="#" class="original-link" onclick="$(this).parent().parent().next().toggle();return false;">[원문보기]</a>)
             %(<p>#{$1} <sup>#{linkback}</sup></p><p class="original-text">#{$2}</p>)
           end
         end
@@ -100,10 +91,9 @@ HTML
                         else
                           $1.downcase
                         end
-            # added by Lucius
             original_text = $2
-            if original_text =~ /\n*(.+?)\s*\[{3}(.+?)\]{3}\s*/
-              original_text = convert_original(original_text)
+            if original_text =~ /^(.+)\[\[\[(.+)\]\]\]$/ 
+              original_text = convert_original(original_text) 
             else
               original_text = "<p>#{original_text}</p>"
             end
