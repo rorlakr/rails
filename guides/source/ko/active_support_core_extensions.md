@@ -96,8 +96,7 @@ INFO: 문자열에 대한 서술부분은 유니코드를 인식하는 캐릭터
 
 WARNING: 주목할 것은 숫자에 대해서 언급하지 않았습니다. 특히, 0과 0.0은 blank가 **아닙니다**. [[[Note that numbers are not mentioned. In particular, 0 and 0.0 are **not** blank.]]]
 
-예를 들어, `ActionDispatch::Session::AbstractStore`에 있는 아래의 메소드는 세션키의 존재여부를 확인하기 위해 `blank?`를 사용합니다. 
-[[[For example, this method from `ActionDispatch::Session::AbstractStore` uses `blank?` for checking whether a session key is present:]]]
+예를 들어, `ActionDispatch::Session::AbstractStore`에 있는 아래의 메소드는 세션키의 존재여부를 확인하기 위해 `blank?`를 사용합니다. [[[For example, this method from `ActionDispatch::Session::AbstractStore` uses `blank?` for checking whether a session key is present:]]]
 
 ```ruby
 def ensure_session_key!
@@ -107,8 +106,7 @@ def ensure_session_key!
 end
 ```
 
-`present?` 메소드는 `!blank?`와 동일한 것입니다. 아래의 예는 `ActionDispatch::Http::Cache::Response`로부터 발췌한 것입니다. 
-[[[The method `present?` is equivalent to `!blank?`. This example is taken from `ActionDispatch::Http::Cache::Response`:]]]
+`present?` 메소드는 `!blank?`와 동일한 것입니다. 아래의 예는 `ActionDispatch::Http::Cache::Response`로부터 발췌한 것입니다. [[[The method `present?` is equivalent to `!blank?`. This example is taken from `ActionDispatch::Http::Cache::Response`:]]]
 
 ```ruby
 def set_conditional_cache_control!
@@ -131,31 +129,27 @@ NOTE: 이 메소드는 `active_support/core_ext/object/blank.rb`에 정의되어
 
 ### `duplicable?`
 
-루비에서 몇가지 기본 객체들은 싱글레톤의 형태를 가지비니다. 예를 들어, 하나의 프로그램 프로세스 동안에, 정수 1 은 항상 동일한 인스턴스를 참조합니다. 
-[[[A few fundamental objects in Ruby are singletons. For example, in the whole life of a program the integer 1 refers always to the same instance:]]]
+루비에서 몇가지 기본 객체들은 싱글레톤의 형태를 가지비니다. 예를 들어, 하나의 프로그램 프로세스 동안에, 정수 1 은 항상 동일한 인스턴스를 참조합니다. [[[A few fundamental objects in Ruby are singletons. For example, in the whole life of a program the integer 1 refers always to the same instance:]]]
 
 ```ruby
 1.object_id                 # => 3
 Math.cos(0).to_i.object_id  # => 3
 ```
 
-따라서, 이러한 객체들은 `dup`이나 `clone` 메소드를 이용하여 복제할 수 있는 방법이 없습니다. [[[
-Hence, there's no way these objects can be duplicated through `dup` or `clone`:]]]
+따라서, 이러한 객체들은 `dup`이나 `clone` 메소드를 이용하여 복제할 수 있는 방법이 없습니다. [[[Hence, there's no way these objects can be duplicated through `dup` or `clone`:]]]
 
 ```ruby
 true.dup  # => TypeError: can't dup TrueClass
 ```
 
-싱글레톤 형태를 취하지 않는 몇몇 숫자들도 복제할 수 없는데, 다음과 같습니다. [[[
-Some numbers which are not singletons are not duplicable either:]]]
+싱글레톤 형태를 취하지 않는 몇몇 숫자들도 복제할 수 없는데, 다음과 같습니다. [[[Some numbers which are not singletons are not duplicable either:]]]
 
 ```ruby
 0.0.clone        # => allocator undefined for Float
 (2**1024).clone  # => allocator undefined for Bignum
 ```
 
-액티브서포트는 이와 같이 특정 객체가 복제가능한 가를 프로그램상에서 조회해 볼 수 있도록 `duplicable?`이라는 메소드를 제공해 줍니다. [[[
-Active Support provides `duplicable?` to programmatically query an object about this property:]]]
+액티브서포트는 이와 같이 특정 객체가 복제가능한 가를 프로그램상에서 조회해 볼 수 있도록 `duplicable?`이라는 메소드를 제공해 줍니다. [[[Active Support provides `duplicable?` to programmatically query an object about this property:]]]
 
 ```ruby
 "foo".duplicable? # => true
@@ -164,8 +158,7 @@ Active Support provides `duplicable?` to programmatically query an object about 
 false.duplicable?  # => false
 ```
 
-정의상, `nil`, `false`, `true`, 심볼, 숫자, 클래스, 모듈 객체들을 제외한 모든 객체는 `duplicable?` 메소드에 대해 true 값을 반환합니다. [[[
-By definition all objects are `duplicable?` except `nil`, `false`, `true`, symbols, numbers, class, and module objects.]]]
+정의상, `nil`, `false`, `true`, 심볼, 숫자, 클래스, 모듈 객체들을 제외한 모든 객체는 `duplicable?` 메소드에 대해 true 값을 반환합니다. [[[By definition all objects are `duplicable?` except `nil`, `false`, `true`, symbols, numbers, class, and module objects.]]]
 
 WARNING: 모든 클래스는 `dup`과 `clone` 메소드를 제거하거나 메소드 내에 예외를 발생시켜서 복제를 못하게 할 수 있습니다. 이렇게 하면 `rescue` 만이 유일하게 특정 객체가 복제가능한지를 알려 줄 수 있게 됩니다. `duplicable?` 메소드는 위에서와 같이 코딩에 따라 좌우되지만, `rescue` 보다는 훨씬 빠르게 결과를 알려 줍니다. 따라서 특정 상황에서 하드코딩된 목록으로도 충분한 경우에만 사용하기 바랍니다. [[[Any class can disallow duplication by removing `dup` and `clone` or raising exceptions from them. Thus only `rescue` can tell whether a given arbitrary object is duplicable. `duplicable?` depends on the hard-coded list above, but it is much faster than `rescue`. Use it only if you know the hard-coded list is enough in your use case.]]]
 
@@ -192,11 +185,9 @@ array     #=> ['foo']
 duplicate #=> ['foo', 'another-string']
 ```
 
-알 수 있듯이, `Array` 인스턴스를 복제하면, 또 다른 배열 객체를 가지게 됩니다. 그러므로 복제한 배열 객체를 변경하면 원래의 배열 객체는 변경되지 않은 채로 있게 될 것입니다. 그러나, 배열 요소에 대해서 이러한 사항이 해당되지 않습니다. `dup` 메소드는 deep 복사를 하지 않기 때문에, 배열내의 문자열은 여전히 동일한 객체가 되는 것입니다. 
-[[[As you can see, after duplicating the `Array` instance, we got another object, therefore we can modify it and the original object will stay unchanged. This is not true for array's elements, however. Since `dup` does not make deep copy, the string inside the array is still the same object.]]]
+알 수 있듯이, `Array` 인스턴스를 복제하면, 또 다른 배열 객체를 가지게 됩니다. 그러므로 복제한 배열 객체를 변경하면 원래의 배열 객체는 변경되지 않은 채로 있게 될 것입니다. 그러나, 배열 요소에 대해서 이러한 사항이 해당되지 않습니다. `dup` 메소드는 deep 복사를 하지 않기 때문에, 배열내의 문자열은 여전히 동일한 객체가 되는 것입니다. [[[As you can see, after duplicating the `Array` instance, we got another object, therefore we can modify it and the original object will stay unchanged. This is not true for array's elements, however. Since `dup` does not make deep copy, the string inside the array is still the same object.]]]
 
-특정 객체에 대해서 deep 복사를 해야할 경우에는, `deep_dup` 메소드를 사용해야 합니다. 다음에 그 예가 있습니다. 
-[[[If you need a deep copy of an object, you should use `deep_dup`. Here is an example:]]]
+특정 객체에 대해서 deep 복사를 해야할 경우에는, `deep_dup` 메소드를 사용해야 합니다. 다음에 그 예가 있습니다. [[[If you need a deep copy of an object, you should use `deep_dup`. Here is an example:]]]
 
 ```ruby
 array     = ['string']
@@ -208,8 +199,7 @@ array     #=> ['string']
 duplicate #=> ['foo']
 ```
 
-특정 객체가 복제가능하지 않을 경우에, `deep_dup` 메소드는 단지 해당 객체만을 반화해 줄 것입니다. 
-[[[If the object is not duplicable, `deep_dup` will just return it:]]]
+특정 객체가 복제가능하지 않을 경우에, `deep_dup` 메소드는 단지 해당 객체만을 반화해 줄 것입니다. [[[If the object is not duplicable, `deep_dup` will just return it:]]]
 
 ```ruby
 number = 1
