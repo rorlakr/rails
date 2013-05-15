@@ -92,7 +92,7 @@ require 'active_support/all'
 
 * `empty?` 메소드가 정의되어 있어서 empty를 반환하는 기타 다른 객체들
 
-INFO: 문자열에 대한 서술부분은 유니코드를 인식하는 캐릭터 클래스 `[:space:]` 를 사용합니다. 그래서, 예를 들면, 문단구분자인 U+2020는 whitespace로 인식되는 것입니다. [[[The predicate for strings uses the Unicode-aware character class `[:space:]`, so for example U+2029 (paragraph separator) is considered to be whitespace.]]]
+INFO: 문자열에 대한 서술부분은 유니코드를 인식하는 캐릭터 클래스 `[:space:]` 를 사용합니다. 그래서, 예를 들면, 문단구분자인 U+2029는 whitespace로 인식되는 것입니다. [[[The predicate for strings uses the Unicode-aware character class `[:space:]`, so for example U+2029 (paragraph separator) is considered to be whitespace.]]]
 
 WARNING: 주목할 것은 숫자에 대해서 언급하지 않았습니다. 특히, 0과 0.0은 blank가 **아닙니다**. [[[Note that numbers are not mentioned. In particular, 0 and 0.0 are **not** blank.]]]
 
@@ -129,7 +129,7 @@ NOTE: 이 메소드는 `active_support/core_ext/object/blank.rb`에 정의되어
 
 ### `duplicable?`
 
-루비에서 몇가지 기본 객체들은 싱글레톤의 형태를 가지비니다. 예를 들어, 하나의 프로그램 프로세스 동안에, 정수 1 은 항상 동일한 인스턴스를 참조합니다. [[[A few fundamental objects in Ruby are singletons. For example, in the whole life of a program the integer 1 refers always to the same instance:]]]
+루비에서 몇가지 기본 객체들은 싱글레톤의 형태를 가집니다. 예를 들어, 하나의 프로그램 프로세스 동안에, 정수 1 은 항상 동일한 인스턴스를 참조합니다. [[[A few fundamental objects in Ruby are singletons. For example, in the whole life of a program the integer 1 refers always to the same instance:]]]
 
 ```ruby
 1.object_id                 # => 3
@@ -185,7 +185,7 @@ array     #=> ['foo']
 duplicate #=> ['foo', 'another-string']
 ```
 
-알 수 있듯이, `Array` 인스턴스를 복제하면, 또 다른 배열 객체를 가지게 됩니다. 그러므로 복제한 배열 객체를 변경하면 원래의 배열 객체는 변경되지 않은 채로 있게 될 것입니다. 그러나, 배열 요소에 대해서 이러한 사항이 해당되지 않습니다. `dup` 메소드는 deep 복사를 하지 않기 때문에, 배열내의 문자열은 여전히 동일한 객체가 되는 것입니다. [[[As you can see, after duplicating the `Array` instance, we got another object, therefore we can modify it and the original object will stay unchanged. This is not true for array's elements, however. Since `dup` does not make deep copy, the string inside the array is still the same object.]]]
+알 수 있듯이, `Array` 인스턴스를 복제하면, 또 다른 배열 객체를 가지게 됩니다. 그러므로 복제한 배열 객체를 변경하면 원래의 배열 객체는 변경되지 않은 채로 있게 될 것입니다. 그러나, 배열 요소에 대해서는 이러한 사항이 해당되지 않습니다. `dup` 메소드는 deep 복사를 하지 않기 때문에, 배열내의 문자열은 여전히 동일한 객체가 되는 것입니다. [[[As you can see, after duplicating the `Array` instance, we got another object, therefore we can modify it and the original object will stay unchanged. This is not true for array's elements, however. Since `dup` does not make deep copy, the string inside the array is still the same object.]]]
 
 특정 객체에 대해서 deep 복사를 해야할 경우에는, `deep_dup` 메소드를 사용해야 합니다. 다음에 그 예가 있습니다. [[[If you need a deep copy of an object, you should use `deep_dup`. Here is an example:]]]
 
@@ -199,7 +199,7 @@ array     #=> ['string']
 duplicate #=> ['foo']
 ```
 
-특정 객체가 복제가능하지 않을 경우에, `deep_dup` 메소드는 단지 해당 객체만을 반화해 줄 것입니다. [[[If the object is not duplicable, `deep_dup` will just return it:]]]
+특정 객체가 복제가능하지 않을 경우에, `deep_dup` 메소드는 단지 해당 객체만을 반환해 줄 것입니다. [[[If the object is not duplicable, `deep_dup` will just return it:]]]
 
 ```ruby
 number = 1
@@ -211,9 +211,9 @@ NOTE: 이 메소드는 `active_support/core_ext/object/deep_dup.rb` 파일에 �
 
 ### `try`
 
-When you want to call a method on an object only if it is not `nil`, the simplest way to achieve it is with conditional statements, adding unnecessary clutter. The alternative is to use `try`. `try` is like `Object#send` except that it returns `nil` if sent to `nil`.
+특정 객체에 대해서 `nil`이 아닐 경우에만 메소드를 호출하고자 할 때, 가장 손쉬운 방법은 좀 너저분하게 생각되지만 조건절을 사용하는 것입니다. 다른 대안으로는 `try` 메소드를 사용하는 것입니다. `try`는 `nil` 값을 보내면 `nil`을 반환하는 것만 제외하고는 `Object#send`와 동일하게 동작합니다. [[[When you want to call a method on an object only if it is not `nil`, the simplest way to achieve it is with conditional statements, adding unnecessary clutter. The alternative is to use `try`. `try` is like `Object#send` except that it returns `nil` if sent to `nil`.]]]
 
-Here is an example:
+아래에 이에 대한 예가 있습니다. [[[Here is an example:]]]
 
 ```ruby
 # without try
@@ -225,7 +225,7 @@ end
 @number.try(:next)
 ```
 
-Another example is this code from `ActiveRecord::ConnectionAdapters::AbstractAdapter` where `@logger` could be `nil`. You can see that the code uses `try` and avoids an unnecessary check.
+`ActiveRecord::ConnectionAdapters::AbstractAdapter`에서 다른 예를 볼 수 있는데, `@logger`가 `nil` 값을 가질 수 있습니다. 그래서 `try` 메소드를 이용해서 불필요한 체크를 하지 않도록 한 것을 알 수 있습니다. [[[Another example is this code from `ActiveRecord::ConnectionAdapters::AbstractAdapter` where `@logger` could be `nil`. You can see that the code uses `try` and avoids an unnecessary check.]]]
 
 ```ruby
 def log_info(sql, name, ms)
@@ -236,17 +236,17 @@ def log_info(sql, name, ms)
 end
 ```
 
-`try` can also be called without arguments but a block, which will only be executed if the object is not nil:
+`try` 메소드는 인수 대신에 코드블록을 사용하여 호출할 수 있는데, 이 코드블록은 receiver 객체가 `nil`이 아닐 경우에만 실행될 것입니다. [[[`try` can also be called without arguments but a block, which will only be executed if the object is not nil:]]]
 
 ```ruby
 @person.try { |p| "#{p.first_name} #{p.last_name}" }
 ```
 
-NOTE: Defined in `active_support/core_ext/object/try.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/try.rb` 파일에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/try.rb`.]]]
 
 ### `class_eval(*args, &block)`
 
-You can evaluate code in the context of any object's singleton class using `class_eval`:
+`class_eval` 메소드를 이용하면, 모든 객체의 싱글레톤 클래스 내에서 코드가 실행되도록 할 수 있습니다. [[[You can evaluate code in the context of any object's singleton class using `class_eval`:]]]
 
 ```ruby
 class Proc
@@ -263,52 +263,52 @@ class Proc
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/kernel/singleton_class.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/kernel/singleton_class.rb` 파일 내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/kernel/singleton_class.rb`.]]]
 
 ### `acts_like?(duck)`
 
-The method `acts_like?` provides a way to check whether some class acts like some other class based on a simple convention: a class that provides the same interface as `String` defines
+`acts_like?` 메소드는, `String` 클래스가 정의하는 것과 동일한 인터페이스를 제공하는 임의의 클래스, 즉, 이와 같이 간단한 규칙에 근거하여, 어떤 클래스가 다른 어떤 클래스처럼 동작하는지를 체크하는 방법을 제공해 줍니다. [[[The method `acts_like?` provides a way to check whether some class acts like some other class based on a simple convention: a class that provides the same interface as `String` defines]]]
 
 ```ruby
 def acts_like_string?
 end
 ```
 
-which is only a marker, its body or return value are irrelevant. Then, client code can query for duck-type-safeness this way:
+위의 코드는 단지 하나의 표식자에 불과하며, 메소드 내의 코드나 반환값은 별개의 문제입니다. 그러면 아래와 같이 duct-type-safeness를 조회해 볼 수 있게 됩니다. [[[which is only a marker, its body or return value are irrelevant. Then, client code can query for duck-type-safeness this way:]]]
 
 ```ruby
 some_klass.acts_like?(:string)
 ```
 
-Rails has classes that act like `Date` or `Time` and follow this contract.
+레일스는 `Date` 또는 `Time`처럼 동작하며 이와 같은 규칙을 따르는 클래스들을 제공해 줍니다. [[[Rails has classes that act like `Date` or `Time` and follow this contract.]]]
 
-NOTE: Defined in `active_support/core_ext/object/acts_like.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/acts_like.rb` 파일 내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/acts_like.rb`.]]]
 
 ### `to_param`
 
-All objects in Rails respond to the method `to_param`, which is meant to return something that represents them as values in a query string, or as URL fragments.
+레일스에서 모든 객체는 `to_param` 메소드에 반응하게 되며, 해당 객체를 쿼리문자열이나 URL 일부 값을 결과값으로 반환해 줍니다. [[[All objects in Rails respond to the method `to_param`, which is meant to return something that represents them as values in a query string, or as URL fragments.]]]
 
-By default `to_param` just calls `to_s`:
+디폴트로 `to_param` 메소드는 단지 `to_s` 메소드를 호출하기만 합니다. [[[By default `to_param` just calls `to_s`:]]]
 
 ```ruby
 7.to_param # => "7"
 ```
 
-The return value of `to_param` should **not** be escaped:
+`to_param` 메소드의 반환값은 이스케이핑되지 **안는다는 것입니다**. (역자주: 이스케이프 문자가 포함될 경우에도 그데로 문자로 반환된다는 의미로 해석) [[[The return value of `to_param` should **not** be escaped:]]]
 
 ```ruby
 "Tom & Jerry".to_param # => "Tom & Jerry"
 ```
 
-Several classes in Rails overwrite this method.
+레일스의 몇가지 클래스는 이 메소드를 재정의하여 사용합니다. [[[Several classes in Rails overwrite this method.]]]
 
-For example `nil`, `true`, and `false` return themselves. `Array#to_param` calls `to_param` on the elements and joins the result with "/":
+예를 들어, `nil`, `true`, `false`는 자기자신을 반환합니다. `Array#to_param` 메소드는 배열 각요소에 대해서 `to_param` 메소드를 호출하여 결과를 `/`문자로 연결해서 반환해 줍니다. [[[For example `nil`, `true`, and `false` return themselves. `Array#to_param` calls `to_param` on the elements and joins the result with "/":]]]
 
 ```ruby
 [0, true, String].to_param # => "0/true/String"
 ```
 
-Notably, the Rails routing system calls `to_param` on models to get a value for the `:id` placeholder. `ActiveRecord::Base#to_param` returns the `id` of a model, but you can redefine that method in your models. For example, given
+주목할 것은, 레일스 라우팅 시스템은 모델에 대해서 `to_param` 메소드를 호출하여 `:id` 값을 얻어냅니다. `ActiveRecord::Base#to_param`은 특정 모델의 `id` 값을 반환해주지만, 예를 들어, 아래와 같이, 모델 클래스에서 이 메소드를 재정의할 수도 있습니다. [[[Notably, the Rails routing system calls `to_param` on models to get a value for the `:id` placeholder. `ActiveRecord::Base#to_param` returns the `id` of a model, but you can redefine that method in your models. For example, given]]]
 
 ```ruby
 class User
@@ -318,19 +318,19 @@ class User
 end
 ```
 
-we get:
+이와 같이 재정의하면 아래와 같은 결과를 얻을 수 있습니다. [[[we get:]]]
 
 ```ruby
 user_path(@user) # => "/users/357-john-smith"
 ```
 
-WARNING. Controllers need to be aware of any redefinition of `to_param` because when a request like that comes in "357-john-smith" is the value of `params[:id]`.
+WARNING. 이와 같이 요청이 들어올 경우, `params[:id]`의 값이 "357-john-smith"가 되기 때문에 컨트롤러는 `to_param`이 재정의된 것을 알 필요가 있습니다. [[[Controllers need to be aware of any redefinition of `to_param` because when a request like that comes in "357-john-smith" is the value of `params[:id]`.]]]
 
-NOTE: Defined in `active_support/core_ext/object/to_param.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/to_param.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/to_param.rb`.]]]
 
 ### `to_query`
 
-Except for hashes, given an unescaped `key` this method constructs the part of a query string that would map such key to what `to_param` returns. For example, given
+해시를 제외하고, 이스케이프되지 않은 `key`가 주어진 상태에서 이 메소드는 해당 키를 `to_param`이 반환하는 값으로 매핑시켜 주는 쿼리문자열 일부를 생성해 줍니다. 예를 들어 아래와 같이 `to_param`이 재정의된 경우에, [[[Except for hashes, given an unescaped `key` this method constructs the part of a query string that would map such key to what `to_param` returns. For example, given]]]
 
 ```ruby
 class User
@@ -340,48 +340,48 @@ class User
 end
 ```
 
-we get:
+아래와 같은 결과를 얻게 될 것입니다. [[[we get:]]]
 
 ```ruby
 current_user.to_query('user') # => user=357-john-smith
 ```
 
-This method escapes whatever is needed, both for the key and the value:
+이 메소드는 키와 값을 모두 이스케이프시키게 됩니다. [[[This method escapes whatever is needed, both for the key and the value:]]]
 
 ```ruby
 account.to_query('company[name]')
 # => "company%5Bname%5D=Johnson+%26+Johnson"
 ```
 
-so its output is ready to be used in a query string.
+따라서 위와 같은 결과물은 쿼리문자열로 사용할 수 있는 상태가 되는 것입니다. [[[so its output is ready to be used in a query string.]]]
 
-Arrays return the result of applying `to_query` to each element with `_key_[]` as key, and join the result with "&":
+배열은 각요소에 대해서 `_key_[]`형태의 키로써 `to_query` 메소드를 적용하고 각각의 결과를 "&" 문자로 연결해서 결과물로 반환하게 됩니다.  [[[Arrays return the result of applying `to_query` to each element with `_key_[]` as key, and join the result with "&":]]]
 
 ```ruby
 [3.4, -45.6].to_query('sample')
 # => "sample%5B%5D=3.4&sample%5B%5D=-45.6"
 ```
 
-Hashes also respond to `to_query` but with a different signature. If no argument is passed a call generates a sorted series of key/value assignments calling `to_query(key)` on its values. Then it joins the result with "&":
+해시도 `to_query` 메소드에 반응하지만, 다른 특징을 가지고 있습니다. 인수없이 호출하게 되면 일련의 키/값 할당문을 생성하고 각 값에 대해서 `to_query(key)`를 호출하게 됩니다. 그리고 그 결과들을 "&" 문자로 연결하여 반환합니다. [[[Hashes also respond to `to_query` but with a different signature. If no argument is passed a call generates a sorted series of key/value assignments calling `to_query(key)` on its values. Then it joins the result with "&":]]]
 
 ```ruby
 {c: 3, b: 2, a: 1}.to_query # => "a=1&b=2&c=3"
 ```
 
-The method `Hash#to_query` accepts an optional namespace for the keys:
+`Hash#to_query` 메소드는 키에 대한 네임스페이스를 옵션으로 지정할 수 있습니다. [[[The method `Hash#to_query` accepts an optional namespace for the keys:]]]
 
 ```ruby
 {id: 89, name: "John Smith"}.to_query('user')
 # => "user%5Bid%5D=89&user%5Bname%5D=John+Smith"
 ```
 
-NOTE: Defined in `active_support/core_ext/object/to_query.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/to_query.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/to_query.rb`.]]]
 
 ### `with_options`
 
-The method `with_options` provides a way to factor out common options in a series of method calls.
+`with_options` 메소드는 일련의 메소드 호출시 공통되는 옵션을 별도로 빼는 방법을 제공해 줍니다. [[[The method `with_options` provides a way to factor out common options in a series of method calls.]]]
 
-Given a default options hash, `with_options` yields a proxy object to a block. Within the block, methods called on the proxy are forwarded to the receiver with their options merged. For example, you get rid of the duplication in:
+디폴트 옵션 해시를 넘겨 주면, `with_options` 메소드는 코드블록으로 대리 객체를 넘겨주게 됩니다. 그러면 블록내에서 대리객체에 대해서 호출된 메소드는 넘겨 받은 옵션들을 머지해서 receiver 객체로 전달됩니다. 예를 들면, 아래의 코드에서 중복된 옵션을 제거할 수 있습니다. [[[Given a default options hash, `with_options` yields a proxy object to a block. Within the block, methods called on the proxy are forwarded to the receiver with their options merged. For example, you get rid of the duplication in:]]]
 
 ```ruby
 class Account < ActiveRecord::Base
@@ -392,7 +392,7 @@ class Account < ActiveRecord::Base
 end
 ```
 
-this way:
+이 메소드를 이용하면 아래와 같이 코딩할 수 있습니다. [[[this way:]]]
 
 ```ruby
 class Account < ActiveRecord::Base
@@ -405,7 +405,7 @@ class Account < ActiveRecord::Base
 end
 ```
 
-That idiom may convey _grouping_ to the reader as well. For example, say you want to send a newsletter whose language depends on the user. Somewhere in the mailer you could group locale-dependent bits like this:
+이와 같은 관용적인 용법은 독자들을 그룹화할 수 있게도 합니다. 예를 들면, 독자들이 등록해 놓은 언어에 맞는 뉴스레터를 발송하고자 할 때 아래와 같이 메일러 내에 로케일별로 그룹화할 수 있을 것입니다. [[[That idiom may convey _grouping_ to the reader as well. For example, say you want to send a newsletter whose language depends on the user. Somewhere in the mailer you could group locale-dependent bits like this:]]]
 
 ```ruby
 I18n.with_options locale: user.locale, scope: "newsletter" do |i18n|
@@ -414,18 +414,17 @@ I18n.with_options locale: user.locale, scope: "newsletter" do |i18n|
 end
 ```
 
-TIP: Since `with_options` forwards calls to its receiver they can be nested. Each nesting level will merge inherited defaults in addition to their own.
+TIP: `with_options` 메소드는 호출을 자신의 recevier 객체로 전달하기 때문에 얼마든지 중첩해서 호출할 수 있습니다. 각각의 중첩레벌은 자신 뿐만아니라 상속된 디폴트 설정을 머지하게 될 것입니다. [[[Since `with_options` forwards calls to its receiver they can be nested. Each nesting level will merge inherited defaults in addition to their own.]]]
 
-NOTE: Defined in `active_support/core_ext/object/with_options.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/with_options.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/with_options.rb`.]]]
 
 ### Instance Variables
 
-Active Support provides several methods to ease access to instance variables.
+액티브서포트는 인스턴스 변수를 쉽게 접근할 수 있는 다양한 메소드를 제공해 줍니다. [[[Active Support provides several methods to ease access to instance variables.]]]
 
 #### `instance_values`
 
-The method `instance_values` returns a hash that maps instance variable names without "@" to their
-corresponding values. Keys are strings:
+`instance_values` 메소드는 인스턴스 변수 이름에서 `@` 문자를 제거한 상태로 해당 값을 매핑해 주는 해시를 반환해 줍니다. 키들은 문자열형태를 가집니다. [[[The method `instance_values` returns a hash that maps instance variable names without "@" to their corresponding values. Keys are strings:]]]
 
 ```ruby
 class C
@@ -437,17 +436,17 @@ end
 C.new(0, 1).instance_values # => {"x" => 0, "y" => 1}
 ```
 
-NOTE: Defined in `active_support/core_ext/object/instance_variables.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/instance_variables.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/instance_variables.rb`.]]]
 
-### Silencing Warnings, Streams, and Exceptions
+### [[[Silencing Warnings, Streams, and Exceptions]]] 경고, 스트림, 예외 표시 감추기
 
-The methods `silence_warnings` and `enable_warnings` change the value of `$VERBOSE` accordingly for the duration of their block, and reset it afterwards:
+`silence_warnings`와 `enable_warnings` 메소드는 블록내의 코드가 실행되는 동안 `$VERBOSE` 값을 변경하여 경고표시 상태를 결정하게 되는데 블록내의 코드 실행이 종료되면 다시 이전 상태로 되돌려 주게 됩니다. [[[The methods `silence_warnings` and `enable_warnings` change the value of `$VERBOSE` accordingly for the duration of their block, and reset it afterwards:]]]
 
 ```ruby
 silence_warnings { Object.const_set "RAILS_DEFAULT_LOGGER", logger }
 ```
 
-You can silence any stream while a block runs with `silence_stream`:
+`silence_stream` 메소드에 코드블록을 넘겨 주어 블록이 실행되는 동안 스트림으로 아무 것도 표시되지 않도록 할 수 있습니다. [[[You can silence any stream while a block runs with `silence_stream`:]]]
 
 ```ruby
 silence_stream(STDOUT) do
@@ -455,30 +454,32 @@ silence_stream(STDOUT) do
 end
 ```
 
-The `quietly` method addresses the common use case where you want to silence STDOUT and STDERR, even in subprocesses:
+`quietly` 메소드는 흔히 서브프로세스에서 조차도 STDOUT과 STDERR을 표시하지 않도록 할 때 사용할 수 있습니다. [[[The `quietly` method addresses the common use case where you want to silence STDOUT and STDERR, even in subprocesses:]]]
 
 ```ruby
 quietly { system 'bundle install' }
 ```
 
-For example, the railties test suite uses that one in a few places to prevent command messages from being echoed intermixed with the progress status.
+예를 들면, railties 테스트 류들은 군데군데 이러한 메소드를 사용해서 명령 메시지가 진행상태 메시지와 혼재되어 표시되는 것을 방지해 줍니다.[[[For example, the railties test suite uses that one in a few places to prevent command messages from being echoed intermixed with the progress status.]]]
 
-Silencing exceptions is also possible with `suppress`. This method receives an arbitrary number of exception classes. If an exception is raised during the execution of the block and is `kind_of?` any of the arguments, `suppress` captures it and returns silently. Otherwise the exception is reraised:
+예외를 표시하지 않기 위해서는 `suppress`라는 메소드를 사용할 수 있습니다. 이 메소드는 여러개의 예외 클래스를 취할 수 있는데, 코드블록이 실행될 때 발생하는 예외가 인수로 넘겨진 예외의 `kind_of?` 클래스이면 `suppress` 메소드가 그 예외를 인지해서 표시하지 않도록 해 줍니다. 넘겨진 예외 클래스와 일치하지 않는 경우에는 해당 예외를 다시 발생시키게 됩니다. [[[Silencing exceptions is also possible with `suppress`. This method receives an arbitrary number of exception classes. If an exception is raised during the execution of the block and is `kind_of?` any of the arguments, `suppress` captures it and returns silently. Otherwise the exception is reraised:]]]
 
 ```ruby
-# If the user is locked the increment is lost, no big deal.
+# 해당 유저가 lock 상태일 때 increments 메소드는 값을 증가시키지 못하게 됩니다. 이것은 당연한 일이기도 합니다. 
 suppress(ActiveRecord::StaleObjectError) do
   current_user.increment! :visits
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/kernel/reporting.rb`.
+코멘트 중 한역부분 [[[If the user is locked the increment is lost, no big deal.]]]
+
+NOTE: 이 메소드는 `active_support/core_ext/kernel/reporting.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/kernel/reporting.rb`.]]]
 
 ### `in?`
 
-The predicate `in?` tests if an object is included in another object or a list of objects. An `ArgumentError` exception will be raised if a single argument is passed and it does not respond to `include?`.
+`in?` 메소드는 특정 객체가 다른 객체나 객체 목록에 포함되는지를 테스트해 줍니다. 인수 하나만 넘겨지고 `include?` 메소드에 반응하지 않으면 `ArgumentError` 예외가 발생할 것입니다. [[[The predicate `in?` tests if an object is included in another object or a list of objects. An `ArgumentError` exception will be raised if a single argument is passed and it does not respond to `include?`.]]]
 
-Examples of `in?`:
+`in?` 메소드의 예는 아래와 같습니다. [[[Examples of `in?`:]]]
 
 ```ruby
 1.in?(1,2)          # => true
@@ -488,7 +489,7 @@ Examples of `in?`:
 1.in?(1)            # => ArgumentError
 ```
 
-NOTE: Defined in `active_support/core_ext/object/inclusion.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/inclusion.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/inclusion.rb`.]]]
 
 Extensions to `Module`
 ----------------------
