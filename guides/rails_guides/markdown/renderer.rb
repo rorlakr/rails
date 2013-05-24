@@ -34,10 +34,8 @@ HTML
         elsif text =~ /^\[<sup>(\d+)\]:<\/sup> (.+)$/
           linkback = %(<a href="#footnote-#{$1}-ref"><sup>#{$1}</sup></a>)
           %(<p class="footnote" id="footnote-#{$1}">#{linkback} #{$2}</p>)
-        elsif text =~ /^(.+)\[\[\[(.+)\]\]\]$/
+        elsif text =~ /^(.*)\[\[\[(.+)\]\]\]$/
           convert_original(text)
-          # linkback = %(<a href="#" class="original-link" onclick="$(this).parent().parent().next().toggle();return false;">[원문보기]</a>)
-          # %(<p>#{$1} <sup>#{linkback}</sup></p><p class="original-text">#{$2}</p>)
         else
           text = convert_footnotes(text)
           "<p>#{text}</p>"
@@ -47,8 +45,8 @@ HTML
       private
 
         def convert_original(text)
-          text.gsub(/^(.+)\[\[\[(.+)\]\]\]$/) do
-            linkback = %(<a href="#" class="original-link" onclick="$(this).parent().parent().next().toggle();return false;">[원문보기]</a>)
+          text.gsub(/^(.*)\[\[\[(.+)\]\]\]$/) do
+            linkback = %(<a href="#" class="original-link" onclick="$(this).parent().parent().next().toggle();return false;">[원문</a>·<a href='#' class="original-link" onclick="$('.original-text').toggle();return false;">전체]</a>)
             %(<p>#{$1} <sup>#{linkback}</sup></p><p class="original-text">#{$2}</p>)
           end
         end
@@ -92,7 +90,7 @@ HTML
                           $1.downcase
                         end
             original_text = $2
-            if original_text =~ /^(.+)\[\[\[(.+)\]\]\]$/ 
+            if original_text =~ /^(.*)\[\[\[(.+)\]\]\]$/ 
               original_text = convert_original(original_text) 
             else
               original_text = "<p>#{original_text}</p>"
