@@ -747,6 +747,9 @@ a.original-link {
   margin-top:-2em;
   text-decoration:none !important;
 }
+a .original-text-h {
+  color:#980905;
+}
 .chapters span, .chapters .original-link {
   display:none;
 }

@@ -2194,9 +2194,11 @@ NOTE: 이 메소드는 `active_support/core_ext/array/extract_options.rb` 파일
 
 이 메소드는 3가지 옵션을 가집니다. [[[This method accepts three options:]]]
 
-* `:two_words_connector`: 배열의 길이가 2인 경우 사용하며 디폴트는 " and " 입니다.
-* `:words_connector`: 배열의 길이가 2이상인 경우 사용하며 마지막 2개의 요소에 대해서는 적용하지 않습니다. 디폴트는 ", " 입니다. 
-* `:last_word_connector`: 배열의 길이가 2이상인 경우 사용하며 마지막 요소들을 연결하기 위해서 사용합니다. 디폴트는 ", and " 입니다. 
+* `:two_words_connector`: 배열의 길이가 2인 경우 사용하며 디폴트는 " and " 입니다. [[[What is used for arrays of length 2. Default is " and ".]]]
+
+* `:words_connector`: 배열의 길이가 2이상인 경우 사용하며 마지막 2개의 요소에 대해서는 적용하지 않습니다. 디폴트는 ", " 입니다. [[[What is used to join the elements of arrays with 3 or more elements, except for the last two. Default is ", ".]]]
+
+* `:last_word_connector`: 배열의 길이가 2이상인 경우 사용하며 마지막 요소들을 연결하기 위해서 사용합니다. 디폴트는 ", and " 입니다. [[[What is used to join the last items of an array with 3 or more elements. Default is ", and ".]]]
 
 이 옵션의 디폴트 값에 로케일을 적용할 수도 있는데, 해당 로케일 키는 아래와 같습니다. [[[The defaults for these options can be localized, their keys are:]]]
 
