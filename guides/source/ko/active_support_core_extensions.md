@@ -1,23 +1,26 @@
 액티브서포트 코어확장
 ==============================
 
-액티브서포트는 루비온레일스의 구성요소로서 루비언어에 대한 확장, 유틸리티 그리고 기타 다양한 것들을 제공해 줍니다.
+액티브서포트는 루비온레일스의 구성요소로서 루비언어에 대한 확장, 유틸리티 그리고 기타 다양한 것들을 제공해 줍니다. [[[Active Support is the Ruby on Rails component responsible for providing Ruby language extensions, utilities, and other transversal stuff.]]]
 
-또한, 레일스 어플리케이션을 개발할 경우와 루비온레일스 프레임워크 자체를 개발하는 경우를 대상으로 루비언어 수준에서 핵심적인 것들을 보다 풍부하게 제공해 줍니다.
+또한, 레일스 어플리케이션을 개발할 경우와 루비온레일스 프레임워크 자체를 개발하는 경우를 대상으로 루비언어 수준에서 핵심적인 것들을 보다 풍부하게 제공해 줍니다. [[[It offers a richer bottom-line at the language level, targeted both at the development of Rails applications, and at the development of Ruby on Rails itself.]]]
 
-본 가이드를 읽고나면 아래 사항을 알게 될 것입니다.
+본 가이드를 읽고나면 아래 사항을 알게 될 것입니다. [[[After reading this guide, you will know:]]]
 
-* 코어확장이 무엇이지
-* 모든 확장을 로드하는 방법
-* 원하는 확장만을 선별하는 방법
-* 액티브서포트가 제공하는 확장기능들
+* 코어확장이 무엇이지 [[[What Core Extensions are.]]]
+
+* 모든 확장을 로드하는 방법 [[[How to load all extensions.]]]
+
+* 원하는 확장만을 선별하는 방법 [[[How to cherry-pick just the extensions you want.]]]
+
+* 액티브서포트가 제공하는 확장기능들 [[[What extensions Active Support provides.]]]
 
 --------------------------------------------------------------------------------
 
-[How to Load Core Extensions] 코어확장 로드하는 방법
+[How to Load Core Extensions] 코어확장 로드하는 방법 (How to Load Core Extensions)
 ---------------------------
 
-### [Stand-Alone Active Support] 액티브서포트를 단독으로 사용하기
+### [Stand-Alone Active Support] 액티브서포트를 단독으로 사용하기 (Stand-Alone Active Support)
 
 액티브서포트는 아무런 기능확장을 하지 않도록, 디폴트 상태에서는 아무것도 로드하지 않습니다. 여러 개의 모듈로 분리되어 있어서 필요한 것만 로드할 수 있도록 되어 있습니다. 또한 한번에 관련 확장모듈만을, 심지어 모든 것을 로드할 수 있도록 진입점을 제공해 주어 편리하게 구성되어 있습니다. [[[In order to have a near-zero default footprint, Active Support does not load anything by default. It is broken in small pieces so that you can load just what you need, and also has some convenience entry points to load related extensions in one shot, even everything.]]]
 
@@ -29,68 +32,68 @@ require 'active_support'
 
 객체들은 `blank` 메소드에 대해서 반응을 하지 않게 됩니다. 이제 해당 정의를 로드하는 방법을 알아보겠습니다. [[[objects do not even respond to `blank?`. Let's see how to load its definition.]]]
 
-#### [Cherry-picking a Definition] 특정 정의만 선별하기
+#### [Cherry-picking a Definition] 특정 정의만 선별하기 (Cherry-picking a Definition)
 
-`blank`를 사용하기 위한 가장 손쉬운 방법은 이에 대한 정의를 포함하는 파일만을 선별하는 것입니다.
+`blank`를 사용하기 위한 가장 손쉬운 방법은 이에 대한 정의를 포함하는 파일만을 선별하는 것입니다. [[[The most lightweight way to get `blank?` is to cherry-pick the file that defines it.]]]
 
-본 가이드에는 코어확장으로 정의된 모든 메소드 각각에 대해서 해당 메소드가 어디에 정의되어 있는지를 노트로 표시해 줍니다. `blank?` 메소드의 경우, 해당 노트는 아래와 같습니다.
+본 가이드에는 코어확장으로 정의된 모든 메소드 각각에 대해서 해당 메소드가 어디에 정의되어 있는지를 노트로 표시해 줍니다. `blank?` 메소드의 경우, 해당 노트는 아래와 같습니다. [[[For every single method defined as a core extension this guide has a note that says where such a method is defined. In the case of `blank?` the note reads:]]]
 
-NOTE: Defined in `active_support/core_ext/object/blank.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/object/blank.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/blank.rb`.]]]
 
-이것은 한번만 호출하면 된다는 것을 의미합니다.
+이것은 한번만 호출하면 된다는 것을 의미합니다. [[[That means that this single call is enough:]]]
 
 ```ruby
 require 'active_support/core_ext/object/blank'
 ```
 
-액티브서포트는 세심하게 수정되어서 하나의 파일만을 선별할 경우 해당 의존성 파일들(존재할 경우)만을 로드하게 됩니다.
+액티브서포트는 세심하게 수정되어서 하나의 파일만을 선별할 경우 해당 의존성 파일들(존재할 경우)만을 로드하게 됩니다. [[[Active Support has been carefully revised so that cherry-picking a file loads only strictly needed dependencies, if any.]]]
 
-#### [Loading Grouped Core Extensions] 코어확장을 그룹으로 로딩하기
+#### [Loading Grouped Core Extensions] 코어확장을 그룹으로 로딩하기 (Loading Grouped Core Extensions)
 
-다음 단계는 `Object`내의 모든 기능확장을 간단하게 로드하는 것입니다. 대개는, `SomeClass`내의 기능을 확장하기 위해서는 `active_support/core_ext/some_class`를 로딩하므로써 단번에 사용할 수 있게 됩니다. 
+다음 단계는 `Object`내의 모든 기능확장을 간단하게 로드하는 것입니다. 대개는, `SomeClass`내의 기능을 확장하기 위해서는 `active_support/core_ext/some_class`를 로딩하므로써 단번에 사용할 수 있게 됩니다. [[[The next level is to simply load all extensions to `Object`. As a rule of thumb, extensions to `SomeClass` are available in one shot by loading `active_support/core_ext/some_class`.]]]
 
-따라서, (`blank?` 메소드를 포함하는) `Object`내의 모든 기능을 확장하기 위해서는 아래와 같이 하면 됩니다. 
+따라서, (`blank?` 메소드를 포함하는) `Object`내의 모든 기능을 확장하기 위해서는 아래와 같이 하면 됩니다. [[[Thus, to load all extensions to `Object` (including `blank?`):]]]
 
 ```ruby
 require 'active_support/core_ext/object'
 ```
 
-#### [Loading All Core Extensions] 모든 코어확장 로드하기
+#### [Loading All Core Extensions] 모든 코어확장 로드하기 (Loading All Core Extensions)
 
-모든 코어확장을 로드하고자 할 경우에는 아래와 같이 하나의 파일을 불러 들이면 됩니다. 
+모든 코어확장을 로드하고자 할 경우에는 아래와 같이 하나의 파일을 불러 들이면 됩니다. [[[You may prefer just to load all core extensions, there is a file for that:]]]
 
 ```ruby
 require 'active_support/core_ext'
 ```
 
-#### [Loading All Active Support] 모든 액티브서포트를 로드하기
+#### [Loading All Active Support] 모든 액티브서포트를 로드하기 (Loading All Active Support)
 
-그리고 마지막으로, 사용가능한 모든 액티브서포트를 불러들일 경우에는 아래와 같이 하면 됩니다. 
+그리고 마지막으로, 사용가능한 모든 액티브서포트를 불러들일 경우에는 아래와 같이 하면 됩니다. [[[And finally, if you want to have all Active Support available just issue:]]]
 
 ```ruby
 require 'active_support/all'
 ```
 
-이렇게 할 경우에도, 모든 액티브서포트를 메모리상에 로드하지 않는데, 일부 모듈은 `autoload`상태로 설정되기 때문에, 필요할 경우에만 로드됩니다.
+이렇게 할 경우에도, 모든 액티브서포트를 메모리상에 로드하지 않는데, 일부 모듈은 `autoload`상태로 설정되기 때문에, 필요할 경우에만 로드됩니다. [[[That does not even put the entire Active Support in memory upfront indeed, some stuff is configured via `autoload`, so it is only loaded if used.]]]
 
-### [Active Support Within a Ruby on Rails Application] 루비온레일스 어플리케이션 내에서 액티브서포트 사용하기
+### [Active Support Within a Ruby on Rails Application] 루비온레일스 어플리케이션 내에서 액티브서포트 사용하기 (Active Support Within a Ruby on Rails Application)
 
-루비온레일스 어플리케이션은 `config.active_support.bare`이 true로 설정되어 있지 않는 한, 모든 액티브서포트를 로드하게 됩니다. 이와 같이 true로 지정된 경우에는, 레일스 프레임워크가 필요로하는 것만을 선별해서 로드하게 되고, 이전에 설명한 바와 같이, 각 단계별로 선별해서 사용할 수도 있습니다. 
+루비온레일스 어플리케이션은 `config.active_support.bare`이 true로 설정되어 있지 않는 한, 모든 액티브서포트를 로드하게 됩니다. 이와 같이 true로 지정된 경우에는, 레일스 프레임워크가 필요로하는 것만을 선별해서 로드하게 되고, 이전에 설명한 바와 같이, 각 단계별로 선별해서 사용할 수도 있습니다. [[[A Ruby on Rails application loads all Active Support unless `config.active_support.bare` is true. In that case, the application will only load what the framework itself cherry-picks for its own needs, and can still cherry-pick itself at any granularity level, as explained in the previous section.]]]
 
-[Extensions to All Objects] 모든 객체에 대해서 확장사용할 수 있는 메소드
+[Extensions to All Objects] 객체에 대한 확장 메소드 (Extensions to All Objects)
 -------------------------
 
 ### [`blank?` and `present?`] `blank?` 와 `present?`
 
-레일스 어플리케이션에서 다음과 같은 값들은 blank로 인식됩니다.
+레일스 어플리케이션에서 다음과 같은 값들은 blank로 인식됩니다. [[[The following values are considered to be blank in a Rails application:]]]
 
-* `nil` 과 `false`,
+* `nil` 과 `false`, [[[`nil` and `false`,]]]
 
-* whitespace 만으로 구성된 문자열 (아래의 노트를 참고하세요.),
+* whitespace 만으로 구성된 문자열 (아래의 노트를 참고하세요.), [[[strings composed only of whitespace (see note below),]]]
 
-* 빈 배열과 해시
+* 빈 배열과 해시 [[[empty arrays and hashes, and]]]
 
-* `empty?` 메소드가 정의되어 있어서 empty를 반환하는 기타 다른 객체들
+* `empty?` 메소드가 정의되어 있어서 empty를 반환하는 기타 다른 객체들 [[[any other object that responds to `empty?` and is empty.]]]
 
 INFO: 문자열에 대한 서술부분은 유니코드를 인식하는 캐릭터 클래스 `[:space:]` 를 사용합니다. 그래서, 예를 들면, 문단구분자인 U+2029는 whitespace로 인식되는 것입니다. [[[The predicate for strings uses the Unicode-aware character class `[:space:]`, so for example U+2029 (paragraph separator) is considered to be whitespace.]]]
 
@@ -491,14 +494,14 @@ NOTE: 이 메소드는 `active_support/core_ext/kernel/reporting.rb` 파일내�
 
 NOTE: 이 메소드는 `active_support/core_ext/object/inclusion.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/inclusion.rb`.]]]
 
-Extensions to `Module`
+[Extensions to `Module`] 모듈에 대한 확장 메소드 (Extensions to `Module`)
 ----------------------
 
 ### `alias_method_chain`
 
-Using plain Ruby you can wrap methods with other methods, that's called _alias chaining_.
+루비에서는 다른 메소드로 메소드를 감싸 줄 수 있습니다. 바로 이런 것을 _alias_chaining_ 이라고 합니다. [[[Using plain Ruby you can wrap methods with other methods, that's called _alias chaining_.]]]
 
-For example, let's say you'd like params to be strings in functional tests, as they are in real requests, but still want the convenience of assigning integers and other kind of values. To accomplish that you could wrap `ActionController::TestCase#process` this way in `test/test_helper.rb`:
+예를 들어, 기능테스트에서 실제적인 요청이 있을 때 문자열을 params로 사용하기를 원하지만, 정수와 다른 형의 값들로도 사용하기를 원한다고 가정해 봅시다. 이를 구현하기 위해서는 `test/test_helper.rb` 파일내에 있는 `ActionController::TestCase#process`를 이런식으로 감싸줄 수 있을 것입니다. [[[For example, let's say you'd like params to be strings in functional tests, as they are in real requests, but still want the convenience of assigning integers and other kind of values. To accomplish that you could wrap `ActionController::TestCase#process` this way in `test/test_helper.rb`:]]]
 
 ```ruby
 ActionController::TestCase.class_eval do
@@ -513,9 +516,9 @@ ActionController::TestCase.class_eval do
 end
 ```
 
-That's the method `get`, `post`, etc., delegate the work to.
+`get`, `post`등과 같은 메소드가 그 일을 위임받아 처리하게 됩니다.(역자주: 번역이 불완전합니다) [[[That's the method `get`, `post`, etc., delegate the work to.]]]
 
-That technique has a risk, it could be the case that `:original_process` was taken. To try to avoid collisions people choose some label that characterizes what the chaining is about:
+이러한 기법은 위험성이 있습니다. 예를 들어, `:original_process`를 취하게 될 때가 그런 경우입니다. 이 때 충돌을 피하기 위해서는 어떤 라벨을 선택하게 되는데, 바로 이것이 `alias chaining`이 어떤 특징이 있는지를 잘 설명해 줍니다. [[[That technique has a risk, it could be the case that `:original_process` was taken. To try to avoid collisions people choose some label that characterizes what the chaining is about:]]]
 
 ```ruby
 ActionController::TestCase.class_eval do
@@ -528,7 +531,7 @@ ActionController::TestCase.class_eval do
 end
 ```
 
-The method `alias_method_chain` provides a shortcut for that pattern:
+`alias_method_chain`은 이러한 기법를 단순화 시켜 줍니다.[[[The method `alias_method_chain` provides a shortcut for that pattern:]]]
 
 ```ruby
 ActionController::TestCase.class_eval do
@@ -540,15 +543,15 @@ ActionController::TestCase.class_eval do
 end
 ```
 
-Rails uses `alias_method_chain` all over the code base. For example validations are added to `ActiveRecord::Base#save` by wrapping the method that way in a separate module specialized in validations.
+레일스는 코드 전반에 결쳐서 `alias_chain_methods`를 사용합니다. 예를 들어, 유효성검증에 특화된 별도의 모듈에서 그런식으로 감싸줌으로써 `ActiveRecord::Base#save`에 유효성 검증 기능을 추가해 주었습니다. [[[Rails uses `alias_method_chain` all over the code base. For example validations are added to `ActiveRecord::Base#save` by wrapping the method that way in a separate module specialized in validations.]]]
 
-NOTE: Defined in `active_support/core_ext/module/aliasing.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/module/aliasing.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/aliasing.rb`.]]]
 
 ### Attributes
 
 #### `alias_attribute`
 
-Model attributes have a reader, a writer, and a predicate. You can alias a model attribute having the corresponding three methods defined for you in one shot. As in other aliasing methods, the new name is the first argument, and the old name is the second (my mnemonic is they go in the same order as if you did an assignment):
+모델 속성들은 reader, writer, predicate(논리값을 반환하는 reader)를 가집니다. 하나의 모델 속성에 별칭을 부여해서 한번에 이 세가지 메소드가 정의되도록 할 수 있습니다. 다른 별칭부여 메소스와 같이, 새로운 이름이 첫번째 인수가 되고 이전 이름이 두번째 인수가 됩니다.(이것은 할당 문법을 생각하면 쉽게 기억할 수 있습니다.)[[[Model attributes have a reader, a writer, and a predicate. You can alias a model attribute having the corresponding three methods defined for you in one shot. As in other aliasing methods, the new name is the first argument, and the old name is the second (my mnemonic is they go in the same order as if you did an assignment):]]]
 
 ```ruby
 class User < ActiveRecord::Base
@@ -558,15 +561,15 @@ class User < ActiveRecord::Base
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/module/aliasing.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/module/aliasing.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/aliasing.rb`.]]]
 
 #### Internal Attributes
 
-When you are defining an attribute in a class that is meant to be subclassed, name collisions are a risk. That's remarkably important for libraries.
+상속을 전제로 하여 클래스에서 하나의 속성을 정의할 때, 이름 충돌의 위험성이 있습니다. 이것은 라이브러리를 구축할 때 매우 심각한 일입니다. [[[When you are defining an attribute in a class that is meant to be subclassed, name collisions are a risk. That's remarkably important for libraries.]]]
 
-Active Support defines the macros `attr_internal_reader`, `attr_internal_writer`, and `attr_internal_accessor`. They behave like their Ruby built-in `attr_*` counterparts, except they name the underlying instance variable in a way that makes collisions less likely.
+액티브서프트는 `attr_internal_reader`, `attr_internal_writer`, `attr_internal_accessor` 매크로를 정의하고 있습니다. 이것들은 루비의 `attr_*` 해당 매크로와 같이 동작을 하지만 인스턴스변수명 앞에 밑줄문자가 붙여 이름 충돌을 최소한으로 피하도록 했습니다. [[[Active Support defines the macros `attr_internal_reader`, `attr_internal_writer`, and `attr_internal_accessor`. They behave like their Ruby built-in `attr_*` counterparts, except they name the underlying instance variable in a way that makes collisions less likely.]]]
 
-The macro `attr_internal` is a synonym for `attr_internal_accessor`:
+`attr_internal` 매크로는 `attr_internal_accessor`와 같은 것입니다. [[[The macro `attr_internal` is a synonym for `attr_internal_accessor`:]]]
 
 ```ruby
 # library
@@ -580,11 +583,11 @@ class MyCrawler < ThirdPartyLibrary::Crawler
 end
 ```
 
-In the previous example it could be the case that `:log_level` does not belong to the public interface of the library and it is only used for development. The client code, unaware of the potential conflict, subclasses and defines its own `:log_level`. Thanks to `attr_internal` there's no collision.
+이전 예에서 `:log_level`은 라이브러리의 공개 인턴페이스로 제공되지 않고 단지 개발을 위해서 사용됩니다. 이러한 이름 충돌의 가능성을 알지 못하는 클라이언트 코드에서 이 클래스를 상속해서 자신만의 `:log_level`을 정의하지만 `attr_internal` 덕분에 충돌현상을 발생하지 않게 됩니다. [[[In the previous example it could be the case that `:log_level` does not belong to the public interface of the library and it is only used for development. The client code, unaware of the potential conflict, subclasses and defines its own `:log_level`. Thanks to `attr_internal` there's no collision.]]]
 
-By default the internal instance variable is named with a leading underscore, `@_log_level` in the example above. That's configurable via `Module.attr_internal_naming_format` though, you can pass any `sprintf`-like format string with a leading `@` and a `%s` somewhere, which is where the name will be placed. The default is `"@_%s"`.
+디폴트 상태에서는 내부 인스턴스 변수의 이름은 위의 예에서 볼 때 `@_log_level`과 같이 이름 앞에 밑줄문자가 붙게 됩니다. 그러나 이러한 명칭 포맷은 `Module.attr_internal_naming_format`을 수정하여 변경할 수 있는데, 변수명이 위치하는 곳에 `sprintf`에서 사용하는 포맷 문자열의 앞에 `@`을 붙이고 문자열 중간에 `%s`를 삽입하면 됩니다. 디폴트는 `"@_%s"`입니다. [[[By default the internal instance variable is named with a leading underscore, `@_log_level` in the example above. That's configurable via `Module.attr_internal_naming_format` though, you can pass any `sprintf`-like format string with a leading `@` and a `%s` somewhere, which is where the name will be placed. The default is `"@_%s"`.]]]
 
-Rails uses internal attributes in a few spots, for examples for views:
+레일스는 몇군데에서 이러한 내부 속성을 사용하는데, 뷰를 예를 들면, 다음과 같습니다. [[[Rails uses internal attributes in a few spots, for examples for views:]]]
 
 ```ruby
 module ActionView
@@ -596,13 +599,13 @@ module ActionView
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/module/attr_internal.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/module/attr_internal.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/attr_internal.rb`.]]]
 
 #### Module Attributes
 
-The macros `mattr_reader`, `mattr_writer`, and `mattr_accessor` are analogous to the `cattr_*` macros defined for class. Check [Class Attributes](#class-attributes).
+`mattr_reader`, `mattr_writer`, `mattr_accessor` 매크로는 클래스에서 정의되는 `cattr_*` 매크로에 해당하는 것입니다. [Class Attributes](#class-attributes)를 확인해 보기 바랍니다. [[[The macros `mattr_reader`, `mattr_writer`, and `mattr_accessor` are analogous to the `cattr_*` macros defined for class. Check [Class Attributes](#class-attributes).]]]
 
-For example, the dependencies mechanism uses them:
+예를 들면, 의존성 메카니즘이 이것을 사용합니다. [[[For example, the dependencies mechanism uses them:]]]
 
 ```ruby
 module ActiveSupport
@@ -623,13 +626,13 @@ module ActiveSupport
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/module/attribute_accessors.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/module/attribute_accessors.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/attribute_accessors.rb`.]]]
 
 ### Parents
 
 #### `parent`
 
-The `parent` method on a nested named module returns the module that contains its corresponding constant:
+명칭이 붙은 모듈이 중첩된 경우 `parent` 메소드는 해당 모듈 상수를 포함하는 모듈을 반환해 줍니다. [[[The `parent` method on a nested named module returns the module that contains its corresponding constant:]]]
 
 ```ruby
 module X
@@ -644,15 +647,15 @@ X::Y::Z.parent # => X::Y
 M.parent       # => X::Y
 ```
 
-If the module is anonymous or belongs to the top-level, `parent` returns `Object`.
+모듈에 명칭이 없거나 최상위에 속할 경우, `parent`는 `Object`를 반환해 줍니다. [[[If the module is anonymous or belongs to the top-level, `parent` returns `Object`.]]]
 
-WARNING: Note that in that case `parent_name` returns `nil`.
+WARNING: 이럴 경우에, `parent_name`은 `nil` 값을 반환해 준다는 것을 주목하기 바랍니다. [[[Note that in that case `parent_name` returns `nil`.]]]
 
-NOTE: Defined in `active_support/core_ext/module/introspection.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/module/introspection.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/introspection.rb`.]]]
 
 #### `parent_name`
 
-The `parent_name` method on a nested named module returns the fully-qualified name of the module that contains its corresponding constant:
+모듈에 명칭이 있는 경우 중첩되어 사용될 때 `parent_name` 메소드는 해당 모듈 상수를 포함하는 모듈명을 전체 네임스페이스를 포함해서 문자열로 반환해 줍니다. [[[The `parent_name` method on a nested named module returns the fully-qualified name of the module that contains its corresponding constant:]]]
 
 ```ruby
 module X
@@ -667,15 +670,15 @@ X::Y::Z.parent_name # => "X::Y"
 M.parent_name       # => "X::Y"
 ```
 
-For top-level or anonymous modules `parent_name` returns `nil`.
+최상위 또는 명칭이 없는 모듈인 경우에 `parent_name`은 `nil` 값을 반환해 줍니다. [[[For top-level or anonymous modules `parent_name` returns `nil`.]]]
 
-WARNING: Note that in that case `parent` returns `Object`.
+WARNING: 이런 경우에 `parent`는 `Object`를 반환한다는 것을 주목하기 바랍니다. [[[Note that in that case `parent` returns `Object`.]]]
 
-NOTE: Defined in `active_support/core_ext/module/introspection.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/module/introspection.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/introspection.rb`.]]]
 
 #### `parents`
 
-The method `parents` calls `parent` on the receiver and upwards until `Object` is reached. The chain is returned in an array, from bottom to top:
+`parents` 메소든 receiver에 대해서 `Object`에 도달할 때까지 `parent` 메소드를 호출합니다. 결과 체인은 아래서부터 최상위 순서로 배열에 담겨 반환됩니다. [[[The method `parents` calls `parent` on the receiver and upwards until `Object` is reached. The chain is returned in an array, from bottom to top:]]]
 
 ```ruby
 module X
@@ -690,7 +693,7 @@ X::Y::Z.parents # => [X::Y, X, Object]
 M.parents       # => [X::Y, X, Object]
 ```
 
-NOTE: Defined in `active_support/core_ext/module/introspection.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/module/introspection.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/introspection.rb`.]]]
 
 ### Constants
 
@@ -2460,25 +2463,25 @@ NOTE: 이 메소드는 `active_support/core_ext/array/grouping.rb` 파일내에 
 
 #### `split(value = nil)`
 
-The method `split` divides an array by a separator and returns the resulting chunks.
+`split` 메소드는 분리자로 배열을 나누어 줍니다. [[[The method `split` divides an array by a separator and returns the resulting chunks.]]]
 
-If a block is passed the separators are those elements of the array for which the block returns true:
+블록이 넘어 올 경우에는, 분리자는 블록 수행결과 true 값을 반환하는 배열요소가 됩니다. [[[If a block is passed the separators are those elements of the array for which the block returns true:]]]
 
 ```ruby
 (-5..5).to_a.split { |i| i.multiple_of?(4) }
 # => [[-5], [-3, -2, -1], [1, 2, 3], [5]]
 ```
 
-Otherwise, the value received as argument, which defaults to `nil`, is the separator:
+그 외에는 값을 인수로 받게 되는데, 디폴트값은 `nil`이며, 이 값이 분리자가 되는 것입니다. [[[Otherwise, the value received as argument, which defaults to `nil`, is the separator:]]]
 
 ```ruby
 [0, 1, -5, 1, 1, "foo", "bar"].split(1)
 # => [[0], [-5], [], ["foo", "bar"]]
 ```
 
-TIP: Observe in the previous example that consecutive separators result in empty arrays.
+TIP: 이전 예여서 주목해서 볼 것은 연속되는 구분자는 빈 배열을 반환하게 된다는 것입니다. [[[Observe in the previous example that consecutive separators result in empty arrays.]]]
 
-NOTE: Defined in `active_support/core_ext/array/grouping.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/array/grouping.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/grouping.rb`.]]]
 
 Extensions to `Hash`
 --------------------
