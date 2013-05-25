@@ -750,5 +750,7 @@ a.original-link {
 .chapters span, .chapters .original-link {
   display:none;
 }
-
+.tip .original-text, .important .original-text, .caution .original-text, .warning .original-text, .note .original-text, .info .original-text, .todo .original-text {
+  margin-top:-.6em;
+}
 

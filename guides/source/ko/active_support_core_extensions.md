@@ -48,7 +48,7 @@ require 'active_support/core_ext/object/blank'
 
 액티브서포트는 세심하게 수정되어서 하나의 파일만을 선별할 경우 해당 의존성 파일들(존재할 경우)만을 로드하게 됩니다. [[[Active Support has been carefully revised so that cherry-picking a file loads only strictly needed dependencies, if any.]]]
 
-#### [Loading Grouped Core Extensions] 코어확장을 그룹으로 로딩하기 (Loading Grouped Core Extensions)
+#### [Loading Grouped Core Extensions] 코어확장을 그룹으로 로딩하기
 
 다음 단계는 `Object`내의 모든 기능확장을 간단하게 로드하는 것입니다. 대개는, `SomeClass`내의 기능을 확장하기 위해서는 `active_support/core_ext/some_class`를 로딩하므로써 단번에 사용할 수 있게 됩니다. [[[The next level is to simply load all extensions to `Object`. As a rule of thumb, extensions to `SomeClass` are available in one shot by loading `active_support/core_ext/some_class`.]]]
 
@@ -441,7 +441,7 @@ C.new(0, 1).instance_values # => {"x" => 0, "y" => 1}
 
 NOTE: 이 메소드는 `active_support/core_ext/object/instance_variables.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/instance_variables.rb`.]]]
 
-### [[[Silencing Warnings, Streams, and Exceptions]]] 경고, 스트림, 예외 표시 감추기
+### [Silencing Warnings, Streams, and Exceptions] 경고, 스트림, 예외 표시 감추기
 
 `silence_warnings`와 `enable_warnings` 메소드는 블록내의 코드가 실행되는 동안 `$VERBOSE` 값을 변경하여 경고표시 상태를 결정하게 되는데 블록내의 코드 실행이 종료되면 다시 이전 상태로 되돌려 주게 됩니다. [[[The methods `silence_warnings` and `enable_warnings` change the value of `$VERBOSE` accordingly for the duration of their block, and reset it afterwards:]]]
 

@@ -45,7 +45,7 @@ HTML
         def convert_header_original(text, header_level)
           text.gsub(/^\[(.*)\]\s(.*)$/) do
             linkback = %(<a href="#" class="original-link" onclick="$(this).parent().prev().toggle();return false;">{원문</a><a href="#" class="original-link">·</a><a href='#' class="original-link" onclick="$('.original-text, .original-text-h').toggle();return false;">전체}</a>)
-            %(<h#{header_level}>#{$2}<span class="original-text-h">#{$1}</span> <sup>#{linkback}</sup></h#{header_level}>)
+            %(<h#{header_level}>#{$2}<span class="original-text-h">(#{$1})</span> <sup>#{linkback}</sup></h#{header_level}>)
           end
         end
 
