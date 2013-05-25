@@ -1,4 +1,4 @@
-액티브서포트 코어확장
+[Active Support Core Extensions] 액티브서포트 코어확장
 ==============================
 
 액티브서포트는 루비온레일스의 구성요소로서 루비언어에 대한 확장, 유틸리티 그리고 기타 다양한 것들을 제공해 줍니다. [[[Active Support is the Ruby on Rails component responsible for providing Ruby language extensions, utilities, and other transversal stuff.]]]
@@ -17,14 +17,14 @@
 
 --------------------------------------------------------------------------------
 
-[How to Load Core Extensions] 코어확장 로드하는 방법 (How to Load Core Extensions)
+[How to Load Core Extensions] 코어확장 로드하는 방법
 ---------------------------
 
-### [Stand-Alone Active Support] 액티브서포트를 단독으로 사용하기 (Stand-Alone Active Support)
+### [Stand-Alone Active Support] 액티브서포트를 단독으로 사용하기
 
 액티브서포트는 아무런 기능확장을 하지 않도록, 디폴트 상태에서는 아무것도 로드하지 않습니다. 여러 개의 모듈로 분리되어 있어서 필요한 것만 로드할 수 있도록 되어 있습니다. 또한 한번에 관련 확장모듈만을, 심지어 모든 것을 로드할 수 있도록 진입점을 제공해 주어 편리하게 구성되어 있습니다. [[[In order to have a near-zero default footprint, Active Support does not load anything by default. It is broken in small pieces so that you can load just what you need, and also has some convenience entry points to load related extensions in one shot, even everything.]]]
 
-따라서, 아래와 같이 간단하게 require할 경우,
+따라서, 아래와 같이 간단하게 require할 경우, [[[Thus, after a simple require like:]]]
 
 ```ruby
 require 'active_support'
@@ -32,7 +32,7 @@ require 'active_support'
 
 객체들은 `blank` 메소드에 대해서 반응을 하지 않게 됩니다. 이제 해당 정의를 로드하는 방법을 알아보겠습니다. [[[objects do not even respond to `blank?`. Let's see how to load its definition.]]]
 
-#### [Cherry-picking a Definition] 특정 정의만 선별하기 (Cherry-picking a Definition)
+#### [Cherry-picking a Definition] 특정 정의만 선별하기
 
 `blank`를 사용하기 위한 가장 손쉬운 방법은 이에 대한 정의를 포함하는 파일만을 선별하는 것입니다. [[[The most lightweight way to get `blank?` is to cherry-pick the file that defines it.]]]
 
@@ -58,7 +58,7 @@ require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/object'
 ```
 
-#### [Loading All Core Extensions] 모든 코어확장 로드하기 (Loading All Core Extensions)
+#### [Loading All Core Extensions] 모든 코어확장 로드하기
 
 모든 코어확장을 로드하고자 할 경우에는 아래와 같이 하나의 파일을 불러 들이면 됩니다. [[[You may prefer just to load all core extensions, there is a file for that:]]]
 
@@ -66,7 +66,7 @@ require 'active_support/core_ext/object'
 require 'active_support/core_ext'
 ```
 
-#### [Loading All Active Support] 모든 액티브서포트를 로드하기 (Loading All Active Support)
+#### [Loading All Active Support] 모든 액티브서포트를 로드하기
 
 그리고 마지막으로, 사용가능한 모든 액티브서포트를 불러들일 경우에는 아래와 같이 하면 됩니다. [[[And finally, if you want to have all Active Support available just issue:]]]
 
@@ -76,11 +76,11 @@ require 'active_support/all'
 
 이렇게 할 경우에도, 모든 액티브서포트를 메모리상에 로드하지 않는데, 일부 모듈은 `autoload`상태로 설정되기 때문에, 필요할 경우에만 로드됩니다. [[[That does not even put the entire Active Support in memory upfront indeed, some stuff is configured via `autoload`, so it is only loaded if used.]]]
 
-### [Active Support Within a Ruby on Rails Application] 루비온레일스 어플리케이션 내에서 액티브서포트 사용하기 (Active Support Within a Ruby on Rails Application)
+### [Active Support Within a Ruby on Rails Application] 루비온레일스 어플리케이션 내에서 액티브서포트 사용하기
 
 루비온레일스 어플리케이션은 `config.active_support.bare`이 true로 설정되어 있지 않는 한, 모든 액티브서포트를 로드하게 됩니다. 이와 같이 true로 지정된 경우에는, 레일스 프레임워크가 필요로하는 것만을 선별해서 로드하게 되고, 이전에 설명한 바와 같이, 각 단계별로 선별해서 사용할 수도 있습니다. [[[A Ruby on Rails application loads all Active Support unless `config.active_support.bare` is true. In that case, the application will only load what the framework itself cherry-picks for its own needs, and can still cherry-pick itself at any granularity level, as explained in the previous section.]]]
 
-[Extensions to All Objects] 객체에 대한 확장 메소드 (Extensions to All Objects)
+[Extensions to All Objects] 객체에 대한 확장 메소드
 -------------------------
 
 ### [`blank?` and `present?`] `blank?` 와 `present?`
@@ -494,7 +494,7 @@ NOTE: 이 메소드는 `active_support/core_ext/kernel/reporting.rb` 파일내�
 
 NOTE: 이 메소드는 `active_support/core_ext/object/inclusion.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/inclusion.rb`.]]]
 
-[Extensions to `Module`] 모듈에 대한 확장 메소드 (Extensions to `Module`)
+[Extensions to `Module`] 모듈에 대한 확장 메소드
 ----------------------
 
 ### `alias_method_chain`
@@ -1414,7 +1414,7 @@ The call `str.last(n)` is equivalent to `str.from(-n)` if `n` > 0, and returns a
 
 NOTE: Defined in `active_support/core_ext/string/access.rb`.
 
-### [Inflections] 어미/어형의 변경 메소드
+### [Inflections] 어미/어형의 변경 메소드 (Inflections)
 
 #### `pluralize`
 
@@ -1554,7 +1554,7 @@ def load_missing_constant(from_mod, const_name)
 end
 ```
 
-INFO: 대개는, `underscore`를 `camelize`의 반대기능으로 생각할 수 있습니다. 그러나, 이러한 규칙의 예외적인 상황이 있는데, 예를 들면, `"SSLError".underscore.camelize`는 '"SslError"` 값을 반환하게 됩니다. [[[As a rule of thumb you can think of `underscore` as the inverse of `camelize`, though there are cases where that does not hold. For example, `"SSLError".underscore.camelize` gives back `"SslError"`.]]]
+INFO: 대개는, `underscore`를 `camelize`의 반대기능으로 생각할 수 있습니다. 그러나, 이러한 규칙의 예외적인 상황이 있는데, 예를 들면, `"SSLError".underscore.camelize`는 `"SslError"` 값을 반환하게 됩니다. [[[As a rule of thumb you can think of `underscore` as the inverse of `camelize`, though there are cases where that does not hold. For example, `"SSLError".underscore.camelize` gives back `"SslError"`.]]]
 
 NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
 
@@ -1830,7 +1830,7 @@ petabytes
 exabytes
 ```
 
-이 메소드들은 1024 변화인자에 근거해서 바이트 크기로 반환합니다. [[[They return the corresponding amount of bytes, using a conversion factor of 1024:]]]
+이 메소드들은 1024 변환인자에 근거해서 바이트 크기로 반환합니다. [[[They return the corresponding amount of bytes, using a conversion factor of 1024:]]]
 
 ```ruby
 2.kilobytes   # => 2048
@@ -2175,9 +2175,9 @@ def caches_action(*actions)
 end
 ```
 
-이 메소드는 액션명을 임의의 갯수만큼 받게되며, 마지막 인수를 해시형태로 취하게 됩니다. `extract_options!`을 호출하게 되면, 옵션 해시를 취해서 간단하고도 명료하게 `actions`에서 빼내서 `options`에 할당하게 됩니다. [[[[This method receives an arbitrary number of action names, and an optional hash of options as last argument. With the call to `extract_options!` you obtain the options hash and remove it from `actions` in a simple and explicit way.]]]]
+이 메소드는 액션명을 임의의 갯수만큼 받게되며, 마지막 인수를 해시형태로 취하게 됩니다. `extract_options!`을 호출하게 되면, 옵션 해시를 취해서 간단하고도 명료하게 `actions`에서 빼내서 `options`에 할당하게 됩니다. [[[This method receives an arbitrary number of action names, and an optional hash of options as last argument. With the call to `extract_options!` you obtain the options hash and remove it from `actions` in a simple and explicit way.]]]
 
-NOTE: 이 메소드는 `active_support/core_ext/array/extract_options.rb` 파일내에 정의되어 있습니다. [[[[Defined in `active_support/core_ext/array/extract_options.rb`.]]]]
+NOTE: 이 메소드는 `active_support/core_ext/array/extract_options.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/extract_options.rb`.]]]
 
 ### [Conversions] 변환하기
 
@@ -2303,7 +2303,7 @@ WARNING. 컬렉션이 비어있을 경우에 루트 요소의 이름은 디폴�
 
 자식 노드의 이름은 디폴트로 루트 노드의 단수형이 됩니다. 위의 예에서, "contributor"와 "object"를 볼 수 있습니다. `:children` 옵션은 이와 같은 자식 노드의 이름을 설정할 수 있게 해 줍니다. [[[The name of children nodes is by default the name of the root node singularized. In the examples above we've seen "contributor" and "object". The option `:children` allows you to set these node names.]]]
 
-디폴트 XML 빌더는 `Builder::XmlMarkup`의 인스턴스 객체가 됩니다. `:builder` 옵션을 이용하면 이러한 빌더의 기능을 변경할 수 있습니다. 또한 `:dasherize` 등과 같은 옵션을 사용할 수 있으며 해당 빌더로 전달 되기도 합니다.  [[[The default XML builder is a fresh instance of `Builder::XmlMarkup`. You can configure your own builder via the `:builder` option. The method also accepts options like `:dasherize` and friends, they are forwarded to the builder:]]]
+디폴트 XML 빌더는 `Builder::XmlMarkup`의 인스턴스 객체가 됩니다. `:builder` 옵션을 이용하면 이러한 빌더의 기능을 변경할 수 있습니다. 또한 `:dasherize` 등과 같은 옵션을 사용할 수 있으며 해당 빌더로 전달 되기도 합니다. [[[The default XML builder is a fresh instance of `Builder::XmlMarkup`. You can configure your own builder via the `:builder` option. The method also accepts options like `:dasherize` and friends, they are forwarded to the builder:]]]
 
 ```ruby
 Contributor.limit(2).order(:rank).to_xml(skip_types: true)

@@ -18,13 +18,11 @@ HTML
       def header(text, header_level)
         # Always increase the heading level by, so we can use h1, h2 heading in the document
         header_level += 1
-
-        # added by Lucius from RORLAB
         if text =~ /^\[.*\]\s(.*)$/
           convert_header_original(text, header_level)
         else
           %(<h#{header_level}>#{text}</h#{header_level}>)
-        end
+        end        
       end
 
       def paragraph(text)
@@ -44,9 +42,16 @@ HTML
 
       private
 
+        def convert_header_original(text, header_level)
+          text.gsub(/^\[(.*)\]\s(.*)$/) do
+            linkback = %(<a href="#" class="original-link" onclick="$(this).parent().prev().toggle();return false;">{원문</a><a href="#" class="original-link">·</a><a href='#' class="original-link" onclick="$('.original-text, .original-text-h').toggle();return false;">전체}</a>)
+            %(<h#{header_level}>#{$2}<span class="original-text-h">#{$1}</span> <sup>#{linkback}</sup></h#{header_level}>)
+          end
+        end
+
         def convert_original(text)
           text.gsub(/^(.*)\[\[\[(.+)\]\]\]$/) do
-            linkback = %(<a href="#" class="original-link" onclick="$(this).parent().parent().next().toggle();return false;">[원문</a>·<a href='#' class="original-link" onclick="$('.original-text').toggle();return false;">전체]</a>)
+            linkback = %(<a href="#" class="original-link" onclick="$(this).parent().parent().next().toggle();return false;">{원문</a><a href="#" class="original-link">·</a><a href='#' class="original-link" onclick="$('.original-text').toggle();return false;">전체}</a>)
             %(<p>#{$1} <sup>#{linkback}</sup></p><p class="original-text">#{$2}</p>)
           end
         end

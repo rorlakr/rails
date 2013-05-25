@@ -63,11 +63,11 @@
   name: Digging Deeper
   documents:
     -
-      name: Active Support Core Extensions
+      name: 액티브서포트 코어 확장
       url: active_support_core_extensions.html
       description: 이 가이드에는 Active Support에 정의되어 있는 루비 코어 확장편이 기록되어 있다.
     -
-      name: Rails Internationalization API
+      name: 레일스 국제화 API
       url: i18n.html
       description: 이 가이드 내용은 어플리케이션에 다국어지원을 추가하는 방법을 다룬다. 어플리케이션에서 컨텐츠를 다른 나라 언어로 번역할 수 있고 복수화 규칙을 변경하고 각 나라별로 올바른 날짜 형식을 사용할 수 있다.
     -
