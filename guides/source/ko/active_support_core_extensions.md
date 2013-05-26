@@ -695,10 +695,9 @@ M.parents       # => [X::Y, X, Object]
 
 NOTE: 이 메소드는 `active_support/core_ext/module/introspection.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/introspection.rb`.]]]
 
-### Constants
+### [Constants] 상수
 
-The method `local_constants` returns the names of the constants that have been
-defined in the receiver module:
+`local_constants` 메소드는 receiver 모듈에 정의되어 있는 상수들의 이름을 반환해 줍니다. [[[The method `local_constants` returns the names of the constants that have been defined in the receiver module:]]]
 
 ```ruby
 module X
@@ -714,19 +713,15 @@ X.local_constants    # => [:X1, :X2, :Y]
 X::Y.local_constants # => [:Y1, :X1]
 ```
 
-The names are returned as symbols. (The deprecated method `local_constant_names` returns strings.)
+이 때 상수명은 심볼로 반환됩니다. (이와 대조적으로, 이제는 더 이상 사용되지 않는 `local_constant_names` 메소드는 문자열을 반환합니다.) [[[The names are returned as symbols. (The deprecated method `local_constant_names` returns strings.)]]]
 
-NOTE: Defined in `active_support/core_ext/module/introspection.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/module/introspection.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/introspection.rb`.]]]
 
-#### Qualified Constant Names
+#### [Qualified Constant Names] 경로를 포함하는 상수명
 
-The standard methods `const_defined?`, `const_get` , and `const_set` accept
-bare constant names. Active Support extends this API to be able to pass
-relative qualified constant names.
+표준 루비 메소드인 `const_defined?`, `const_get`, `const_set`은 상수명만 인수로 받습니다. 그러나 액티브서포트는 이 표준 API의 기능을 확장해서 상대경로를 포함하는 상수명을 넘겨 받을 수 있습니다. [[[The standard methods `const_defined?`, `const_get` , and `const_set` accept bare constant names. Active Support extends this API to be able to pass relative qualified constant names.]]]
 
-The new methods are `qualified_const_defined?`, `qualified_const_get`, and
-`qualified_const_set`. Their arguments are assumed to be qualified constant
-names relative to their receiver:
+이렇게 기능이 확장된 새로운 메소드는 `qualified_const_defined?`, `qualified_const_get`, `qualified_const_set`이 있습니다. 인수는 receiver에 대한 상대경로명을 가지는 상수명이 지정됩니다. (역자주: `qualified_*`로 시작하는 메소드는 receiver로 부터의 상대경로 상의 인수를 받는다고 생각하면 될 것 같습니다.) [[[The new methods are `qualified_const_defined?`, `qualified_const_get`, and `qualified_const_set`. Their arguments are assumed to be qualified constant names relative to their receiver:]]]
 
 ```ruby
 Object.qualified_const_defined?("Math::PI")       # => true
@@ -734,7 +729,7 @@ Object.qualified_const_get("Math::PI")            # => 3.141592653589793
 Object.qualified_const_set("Math::Phi", 1.618034) # => 1.618034
 ```
 
-Arguments may be bare constant names:
+인수는 상수명만으로 지정할 수 있습니다. [[[Arguments may be bare constant names:]]]
 
 ```ruby
 Math.qualified_const_get("E") # => 2.718281828459045
