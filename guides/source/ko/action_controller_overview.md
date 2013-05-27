@@ -1,33 +1,44 @@
-액션 컨트롤러 개요
+[Action Controller Overview] 액션 컨트롤러 개요
 ==========================
 
-본 가이드에서는 컨트롤러의 동작방법과 어플레케이션에서 돌아가는 요청 주기 상에서 컨트롤러가 수행하는 역할에 대해서 알게 될 것입니다. 본 가이드를 읽은 후에는 아래와 같은 내용을 할 수 있을 것입니다. 
+본 가이드에서는 컨트롤러의 동작방법과 어플레케이션에서 돌아가는 요청 주기 상에서 컨트롤러가 수행하는 역할에 대해서 알게 될 것입니다. [[[In this guide you will learn how controllers work and how they fit into the request cycle in your application.]]]
 
-* 컨트롤러가 요청을 처리하는 과정을 추적할 수 있습니다.
-* 데이터를 세션이나 쿠키로 저장하는 이유와 방법에 대해서 알게 됩니다.
-* 요청을 처리하는 과정에서 필터를 이용한 코드 실행을 할 수 있게 됩니다.
-* 액션 컨트롤러의 내장 HTTP 인증을 사용할 수 있게 됩니다.
-* 유저의 브라우저로 데이터를 직접 스트리밍할 수 있게 됩니다.
-* 민감한 파라메터들을 여과과정을 통해서 어플리케이션의 로그에 보이지 않게 할 수 있습니다.
-* 요청 처리 중에 발생할 수 있는 예외를 처리할 수 있게 됩니다. 
+본 가이드를 읽은 후에는 아래와 같은 내용을 할 수 있을 것입니다. [[[After reading this guide, you will know:]]]
+
+* 컨트롤러가 요청을 처리하는 과정을 추적할 수 있습니다. [[[How to follow the flow of a request through a controller.]]]
+
+* 데이터를 세션이나 쿠키로 저장하는 이유와 방법에 대해서 알게 됩니다. [[[How to restrict parameters passed to your controller.]]]
+
+* Why and how to store data in the session or cookies.
+
+* 요청을 처리하는 과정에서 필터를 이용한 코드 실행을 할 수 있게 됩니다. [[[How to work with filters to execute code during request processing.]]]
+
+* 액션 컨트롤러의 내장 HTTP 인증을 사용할 수 있게 됩니다. [[[How to use Action Controller's built-in HTTP authentication.]]]
+
+* 유저의 브라우저로 데이터를 직접 스트리밍할 수 있게 됩니다. [[[How to stream data directly to the user's browser.]]]
+
+* 민감한 파라메터들을 여과과정을 통해서 어플리케이션의 로그에 보이지 않게 할 수 있습니다. [[[How to filter sensitive parameters so they do not appear in the application's log.]]]
+
+* 요청 처리 중에 발생할 수 있는 예외를 처리할 수 있게 됩니다. [[[How to deal with exceptions that may be raised during request processing.]]]
 
 --------------------------------------------------------------------------------
 
 [What Does a Controller Do?] 컨트롤러는 어떤 일을 하는가?
 --------------------------
 
-액션 컨트롤러는 MVC 중에서 C에 해당합니다. 라우팅 작업을 통해 어떤 컨트롤러를 사용하여 요청을 처리할 것인가가 결정된 후, 해당 컨트롤러는 요청을 처리하여 적절한 결과를 만들게 됩니다. 다행스럽게도, 액션 컨트롤러가 기본적인 작업을 대신해 주며, 레일스의 규칙을 이용하여 이러한 작업을 가능한한 쉽게해 줍니다.  
+액션 컨트롤러는 MVC 중에서 C에 해당합니다. 라우팅 작업을 통해 어떤 컨트롤러를 사용하여 요청을 처리할 것인가가 결정된 후, 해당 컨트롤러는 요청을 처리하여 적절한 결과를 만들게 됩니다. 다행스럽게도, 액션 컨트롤러가 기본적인 작업을 대신해 주며, 레일스의 규칙을 이용하여 이러한 작업을 가능한한 쉽게해 줍니다. 
+[[[Action Controller is the C in MVC. After routing has determined which controller to use for a request, your controller is responsible for making sense of the request and producing the appropriate output. Luckily, Action Controller does most of the groundwork for you and uses smart conventions to make this as straightforward as possible.]]]
 
-대부분의 [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer) 방식의 어플리케이션에서는, 개발자 입장에서는 육안적으로 확인할 수는 없지만, 컨트롤러가 요청을 받게 되면, 모델로부터 데이터를 가져와 저장하고, 뷰를 이용해서 HTML 결과를 렌더링하게 됩니다. 컨트롤러의 작업내용을 변경할 때도 문제가 되지 않는데, 이러한 처리과정이 컨트롤러가 작동하는 가장 일반적인 방법이기 때문입니다.
+대부분의 [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer) 방식의 어플리케이션에서는, 개발자 입장에서는 육안적으로 확인할 수는 없지만, 컨트롤러가 요청을 받게 되면, 모델로부터 데이터를 가져와 저장하고, 뷰를 이용해서 HTML 결과를 렌더링하게 됩니다. 컨트롤러의 작업내용을 변경할 때도 문제가 되지 않는데, 이러한 처리과정이 컨트롤러가 작동하는 가장 일반적인 방법이기 때문입니다. [[[For most conventional [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer) applications, the controller will receive the request (this is invisible to you as the developer), fetch or save data from a model and use a view to create HTML output. If your controller needs to do things a little differently, that's not a problem, this is just the most common way for a controller to work.]]]
 
-컨트롤러는 모델과 뷰 사이에 있는 있는 중간자로서 생각할 수 있습니다. 모델 데이터를 뷰에서 사용할 수 있도록 하여, 유저들에게 해당 데이터를 보여줄 수 있고, 반대로 유저로부터 모델로 데이터를 저장하거나 갱신할 수도 있게 합니다.
+컨트롤러는 모델과 뷰 사이에 있는 있는 중간자로서 생각할 수 있습니다. 모델 데이터를 뷰에서 사용할 수 있도록 하여, 유저들에게 해당 데이터를 보여줄 수 있고, 반대로 유저로부터 모델로 데이터를 저장하거나 갱신할 수도 있게 합니다. [[[A controller can thus be thought of as a middle man between models and views. It makes the model data available to the view so it can display that data to the user, and it saves or updates data from the user to the model.]]]
 
-NOTE: 라우팅 과정에 대한 상세한 내용은, [Rails Routing from the Outside In](routing.html)을 참조하기 바랍니다.
+NOTE: 라우팅 과정에 대한 상세한 내용은, [Rails Routing from the Outside In](routing.html)을 참조하기 바랍니다. [[[For more details on the routing process, see [Rails Routing from the Outside In](routing.html).]]]
 
 [Methods and Actions] 메소드와 액션
 -------------------
 
-컨트롤러는 `ApplicationController`로부터 상속받는 하나의 루비 클래스이며, 여느 다른 클래스처럼 메소드를 가집니다. 어플리케이션이 요청을 받게 되면, 라우팅으로부터 어느 컨트롤러와 액션이 실행될지가 결정되며, 이 때 레일스는 해당 컨트롤러의 인스턴스를 만들어 액션과 동일한 이름의 메소드를 실행하게 됩니다.
+컨트롤러는 `ApplicationController`로부터 상속받는 하나의 루비 클래스이며, 여느 다른 클래스처럼 메소드를 가집니다. 어플리케이션이 요청을 받게 되면, 라우팅으로부터 어느 컨트롤러와 액션이 실행될지가 결정되며, 이 때 레일스는 해당 컨트롤러의 인스턴스를 만들어 액션과 동일한 이름의 메소드를 실행하게 됩니다. [[[A controller is a Ruby class which inherits from `ApplicationController` and has methods just like any other class. When your application receives a request, the routing will determine which controller and action to run, then Rails creates an instance of that controller and runs the method with the same name as the action.]]]
 
 ```ruby
 class ClientsController < ApplicationController
@@ -36,7 +47,7 @@ class ClientsController < ApplicationController
 end
 ```
 
-예를 들어, 사용자가 새로운 클라이언트를 추가하기 위해 어플리케이션에서 `/clients/new` 로 가고자 한다면, 레일스는 `ClientsController` 인스턴스를 만들어 `new` 메소드를 실행하게 될 것입니다. 위의 예에서 특별한 작업내용이 없는 메소드도, 액션이 달리 언급하는 내용이 없는한 레일스가 기본적으로 `new.html.erb` 뷰를 렌더링할 것이기 때문에, 훌륭하게 작동할 수 있는 것입니다. `new` 메소드는 새 `Client` 를 만들어서 `@client` 인스턴스 변수가 뷰에서 사용가능하도록 할 수 있습니다
+예를 들어, 사용자가 새로운 클라이언트를 추가하기 위해 어플리케이션에서 `/clients/new` 로 가고자 한다면, 레일스는 `ClientsController` 인스턴스를 만들어 `new` 메소드를 실행하게 될 것입니다. 위의 예에서 특별한 작업내용이 없는 메소드도, 액션이 달리 언급하는 내용이 없는한 레일스가 기본적으로 `new.html.erb` 뷰를 렌더링할 것이기 때문에, 훌륭하게 작동할 수 있는 것입니다. `new` 메소드는 새 `Client` 를 만들어서 `@client` 인스턴스 변수가 뷰에서 사용가능하도록 할 수 있습니다. [[[As an example, if a user goes to `/clients/new` in your application to add a new client, Rails will create an instance of `ClientsController` and run the `new` method. Note that the empty method from the example above would work just fine because Rails will by default render the `new.html.erb` view unless the action says otherwise. The `new` method could make available to the view a `@client` instance variable by creating a new `Client`:]]]
 
 ```ruby
 def new
@@ -44,16 +55,17 @@ def new
 end
 ```
 
-[Layouts & Rendering Guide](layouts_and_rendering.html)는 이러한 부분을 좀 더 자세하게 설명을 해 줍니다.
 
-`ApplicationController`는, 도움이 될만한 많은 메소드를 가지고 있는 `ActionController::Base`로부터 상속을 받습니다. 본 가이드는 이들 중 일부를 다루게 될 것이지만, 그 내용을 알고 싶으면 API 문서나 소스를 보시면 되겠습니다.
+[Layouts & Rendering Guide](layouts_and_rendering.html)는 이러한 부분을 좀 더 자세하게 설명을 해 줍니다. [[[The [Layouts & Rendering Guide](layouts_and_rendering.html) explains this in more detail.]]]
 
-단지 public 메소드만 액션으로 호출할 수 있습니다. 액션으로 사용할 것이 아니라면, 보조 메소드나 필터와 같이 메소드의 가시성을 낮추는 것이 최선의 작업방법인 것입니다.
+`ApplicationController`는, 도움이 될만한 많은 메소드를 가지고 있는 `ActionController::Base`로부터 상속을 받습니다. 본 가이드는 이들 중 일부를 다루게 될 것이지만, 그 내용을 알고 싶으면 API 문서나 소스를 보시면 되겠습니다. [[[`ApplicationController` inherits from `ActionController::Base`, which defines a number of helpful methods. This guide will cover some of these, but if you're curious to see what's in there, you can see all of them in the API documentation or in the source itself.]]]
 
-[Parameters]매개변수
+단지 public 메소드만 액션으로 호출할 수 있습니다. 액션으로 사용할 것이 아니라면, 보조 메소드나 필터와 같이 메소드의 가시성을 낮추는 것이 최선의 작업방법인 것입니다. [[[Only public methods are callable as actions. It is a best practice to lower the visibility of methods which are not intended to be actions, like auxiliary methods or filters.]]]
+
+[Parameters] 매개변수
 ----------
 
-아마도 유저가 보낸 데이터에 접근하거나, 컨트롤러의 액션에서 다른 매개변수에 접근하고자 할 경우가 있습니다. 웹어플리케이션에는 두가지 종류의 매개변수를 사용할 수 있습니다. 첫번째는 URL의 일부분으로 소위 쿼리문자열 매개변수입니다. 쿼리문자열은 URL에서 "?" 문자 다음에 오는 모든 것을 말합니다. 두번째는 대개 POST 데이터라고 하는 것입니다. 대개 이것은 사용자들이 데이터를 입력하는 HTML 폼으로부터 오게 됩니다. 이것은 단지 HTTP POST 요청의 일부분으로만 보내지기 때문에 POST 데이터라고 합니다. 레일스는 이 두가지 매개변수를 구분하지 않으며, 모두 컨트롤러 상에서 `params` 해시로 접근할 수 있습니다. 
+아마도 유저가 보낸 데이터에 접근하거나, 컨트롤러의 액션에서 다른 매개변수에 접근하고자 할 경우가 있습니다. 웹어플리케이션에는 두가지 종류의 매개변수를 사용할 수 있습니다. 첫번째는 URL의 일부분으로 소위 쿼리문자열 매개변수입니다. 쿼리문자열은 URL에서 "?" 문자 다음에 오는 모든 것을 말합니다. 두번째는 대개 POST 데이터라고 하는 것입니다. 대개 이것은 사용자들이 데이터를 입력하는 HTML 폼으로부터 오게 됩니다. 이것은 단지 HTTP POST 요청의 일부분으로만 보내지기 때문에 POST 데이터라고 합니다. 레일스는 이 두가지 매개변수를 구분하지 않으며, 모두 컨트롤러 상에서 `params` 해시로 접근할 수 있습니다. [[[You will probably want to access data sent in by the user or other parameters in your controller actions. There are two kinds of parameters possible in a web application. The first are parameters that are sent as part of the URL, called query string parameters. The query string is everything after "?" in the URL. The second type of parameter is usually referred to as POST data. This information usually comes from an HTML form which has been filled in by the user. It's called POST data because it can only be sent as part of an HTTP POST request. Rails does not make any distinction between query string parameters and POST parameters, and both are available in the `params` hash in your controller:]]]
 
 ```ruby
 class ClientsController < ActionController::Base
@@ -85,19 +97,19 @@ class ClientsController < ActionController::Base
 end
 ```
 
-### [Hash and Array Parameters]해시와 배열 매개변수
+### [Hash and Array Parameters] 해시와 배열 매개변수
 
-`params` 해쉬는 일차원 키-값 구조에 국한되지 않습니다. 배열과 중첩 해쉬를 포함할 수 있습니다. 값을 배열형태로 보내기 위해서는 키 이름에 "[]"를 붙이면 됩니다
+`params` 해쉬는 일차원 키-값 구조에 국한되지 않습니다. 배열과 중첩 해쉬를 포함할 수 있습니다. 값을 배열형태로 보내기 위해서는 키 이름에 "[]"를 붙이면 됩니다. [[[The `params` hash is not limited to one-dimensional keys and values. It can contain arrays and (nested) hashes. To send an array of values, append an empty pair of square brackets "[]" to the key name:]]]
 
 ```
 GET /clients?ids[]=1&ids[]=2&ids[]=3
 ```
 
-NOTE: URL에서는 "[" 와 "]" 문자를 사용할 수 없기 때문에, 이 예에서 실제 URL은 "/clients?ids%5b%5d=1&ids%5b%5d=2&ids%5b%5d=3"와 같이 인코딩될 것입니다. 대개의 경우 브라우저가 이러한 문제를 해결해 주기 때문에 걱정할 필요가 없고 레일스는 이렇게 인코딩된 URL로 요청을 받게 될 때 알아서 디코딩하게 될 것입니다. 그러나 직접 서버로 인코딩된 URL을 보내야할 경우에는 이러한 점을 염두어 두어야 합니다.
+NOTE: URL에서는 "[" 와 "]" 문자를 사용할 수 없기 때문에, 이 예에서 실제 URL은 "/clients?ids%5b%5d=1&ids%5b%5d=2&ids%5b%5d=3"와 같이 인코딩될 것입니다. 대개의 경우 브라우저가 이러한 문제를 해결해 주기 때문에 걱정할 필요가 없고 레일스는 이렇게 인코딩된 URL로 요청을 받게 될 때 알아서 디코딩하게 될 것입니다. 그러나 직접 서버로 인코딩된 URL을 보내야할 경우에는 이러한 점을 염두어 두어야 합니다. [[[The actual URL in this example will be encoded as "/clients?ids%5b%5d=1&ids%5b%5d=2&ids%5b%5d=3" as "[" and "]" are not allowed in URLs. Most of the time you don't have to worry about this because the browser will take care of it for you, and Rails will decode it back when it receives it, but if you ever find yourself having to send those requests to the server manually you have to keep this in mind.]]]
 
-따라서 결과적으로 `params[:ids]` 값은 `["1", "2", "3"]`이 될 것입니다. 주의할 것은 매개변수 값은 항상 문자열이라는 것이며, 레일스는 이 값의 데이터형을 추측하거나 형변환을 하지 않는다는 것입니다.
+따라서 결과적으로 `params[:ids]` 값은 `["1", "2", "3"]`이 될 것입니다. 주의할 것은 매개변수 값은 항상 문자열이라는 것이며, 레일스는 이 값의 데이터형을 추측하거나 형변환을 하지 않는다는 것입니다. [[[The value of `params[:ids]` will now be `["1", "2", "3"]`. Note that parameter values are always strings; Rails makes no attempt to guess or cast the type.]]]
 
-해시 형태로 보내고자 한다면 브래킷([]) 안에 키 이름을 포함해 주어야 합니다.
+해시 형태로 보내고자 한다면 브래킷([]) 안에 키 이름을 포함해 주어야 합니다. [[[To send a hash you include the key name inside the brackets:]]]
 
 ```html
 <form accept-charset="UTF-8" action="/clients" method="post">
@@ -108,50 +120,50 @@ NOTE: URL에서는 "[" 와 "]" 문자를 사용할 수 없기 때문에, 이 예
 </form>
 ```
 
-이 폼을 제출(submit)하면, `params[:client]` 값은 `{"name" => "Acme", "phone" => "12345", "address" => {"postcode" => "12345", "city" => "Carrot City"}}`이 될 것입니다. 여기서 `params[:client][:address]`와 같은 중첩 해시가 사용된 것을 유의하기 바랍니다.
+이 폼을 제출(submit)하면, `params[:client]` 값은 `{"name" => "Acme", "phone" => "12345", "address" => {"postcode" => "12345", "city" => "Carrot City"}}`이 될 것입니다. 여기서 `params[:client][:address]`와 같은 중첩 해시가 사용된 것을 유의하기 바랍니다. [[[When this form is submitted, the value of `params[:client]` will be `{ "name" => "Acme", "phone" => "12345", "address" => { "postcode" => "12345", "city" => "Carrot City" } }`. Note the nested hash in `params[:client][:address]`.]]]
 
-주목할 것은 `params` 해시는 실제로 Active Support 모듈의 `HashWithIndifferentAccess` 클래스의 인스턴스이며, 키를 심볼이나 문자열 형태로 사용할 수 있게해 주는 해시와 같이 동작한다는 것입니다.
+주목할 것은 `params` 해시는 실제로 Active Support 모듈의 `HashWithIndifferentAccess` 클래스의 인스턴스이며, 키를 심볼이나 문자열 형태로 사용할 수 있게해 주는 해시와 같이 동작한다는 것입니다. [[[Note that the `params` hash is actually an instance of `ActiveSupport::HashWithIndifferentAccess`, which acts like a hash but lets you use symbols and strings interchangeably as keys.]]]
 
-### [JSON/XML parameters]JSON/XML 매개변수
+### [JSON/XML parameters] JSON/XML 매개변수
 
-웹(서비스) 어플리케이션을 작성할 때 파라메터를 JSON이나 XML형태로 받는 것이 더 편리할 수도 있습니다. 레일스는 파라메터를 `params` 해쉬로 자동 변환해 주게 되며, 이것은 통상적으로 폼 데이터로 작업하는 것같이 접근하면 될 것입니다.
+웹(서비스) 어플리케이션을 작성할 때 파라메터를 JSON이나 XML형태로 받는 것이 더 편리할 수도 있습니다. 레일스는 파라메터를 `params` 해쉬로 자동 변환해 주게 되며, 이것은 통상적으로 폼 데이터로 작업하는 것같이 접근하면 될 것입니다. [[[If you're writing a web service application, you might find yourself more comfortable accepting parameters in JSON format. Rails will automatically convert your parameters into the `params` hash, which you can access as you would normally.]]]
 
-그래서 예를 들면, 아래의 JSON 매개변수를 보내게 되면:
+그래서 예를 들면, 아래의 JSON 매개변수를 보내게 되면: [[[So for example, if you are sending this JSON content:]]]
 
 ```json
 { "company": { "name": "acme", "address": "123 Carrot Street" } }
 ```
 
-`params[:company]` 값은 `{ :name => "acme", "address" => "123 Carrot Street" }`와 같이 될 것입니다.
+`params[:company]` 값은 `{ :name => "acme", "address" => "123 Carrot Street" }`와 같이 될 것입니다. [[[You'll get `params[:company]` as `{ "name" => "acme", "address" => "123 Carrot Street" }`.]]]
 
-또한, 레일스의 initializer 에 `config.wrap_parameters` 를 "on" 상태로 설정하거나 컨트롤러 내에서 `wrap_parameters` 메소스를 호출하게 되면, JSON/XML 파라메터에서 root 엘리먼트를 생략해도 문제가 없을 것입니다. 이렇게 되면 디폴트로 컨트롤러의 이름에 해당하는 키 이름으로 파라메터들이 복제되어 할당될 것입니다. 따라서 위의 파라메터는 다음과 같이 작성될 수 있습니다.
+또한, 레일스의 initializer 에 `config.wrap_parameters` 를 "on" 상태로 설정하거나 컨트롤러 내에서 `wrap_parameters` 메소스를 호출하게 되면, JSON/XML 파라메터에서 root 엘리먼트를 생략해도 문제가 없을 것입니다. 이렇게 되면 디폴트로 컨트롤러의 이름에 해당하는 키 이름으로 파라메터들이 복제되어 할당될 것입니다. 따라서 위의 파라메터는 다음과 같이 작성될 수 있습니다. [[[Also, if you've turned on `config.wrap_parameters` in your initializer or calling `wrap_parameters` in your controller, you can safely omit the root element in the JSON parameter. The parameters will be cloned and wrapped in the key according to your controller's name by default. So the above parameter can be written as:]]]
 
 ```json
 { "name": "acme", "address": "123 Carrot Street" }
 ```
 
-그리고 `CompaniesController` 컨트롤러로 이 데이터를 보낸다고 가정한다면, 다음과 같이 `:company` 키로 보내지게 될 것입니다.
+그리고 `CompaniesController` 컨트롤러로 이 데이터를 보낸다고 가정한다면, 다음과 같이 `:company` 키로 보내지게 될 것입니다. [[[And assume that you're sending the data to `CompaniesController`, it would then be wrapped in `:company` key like this:]]]
 
 ```ruby
 { :name => "acme", :address => "123 Carrot Street", :company => { :name => "acme", :address => "123 Carrot Street" }}
 ```
 
 [API documentation](http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html)
-를 참조하게 되면 파라메터로 할당받아 오게 될 키 이름이나 특수한 형태의 매개변수로 변경할 수 있습니다.
+를 참조하게 되면 파라메터로 할당받아 오게 될 키 이름이나 특수한 형태의 매개변수로 변경할 수 있습니다. [[[You can customize the name of the key or specific parameters you want to wrap by consulting the [API documentation](http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html)]]]
 
-### [Routing Parameters]라우팅 파라메터
+### [Routing Parameters] 라우팅 파라메터
 
-`params` 해쉬에는 반드시 `:controller` 와 `:action` 키가 포함되어 있지만, 이 값들을 직접 접근하는 대신에, `controller_name` 과 `action_name` 메소드를 사용하여야 합니다. 라우팅이 정의하는 매개변수 중에는 `:id` 키가 이용가능할 것입니다. 예를 들어, 클라이언트의 활성화 상태를 active / inactive 로 보여주는 클라이언트 목록을 가정해 보겠습니다. `config/routes.rb` 파일에 라우트 하나를 추가해서 URL주소에서 `:status` 매개변수를 가져올 수 있게 해 줍니다.
+`params` 해쉬에는 반드시 `:controller` 와 `:action` 키가 포함되어 있지만, 이 값들을 직접 접근하는 대신에, `controller_name` 과 `action_name` 메소드를 사용하여야 합니다. 라우팅이 정의하는 매개변수 중에는 `:id` 키가 이용가능할 것입니다. 예를 들어, 클라이언트의 활성화 상태를 active / inactive 로 보여주는 클라이언트 목록을 가정해 보겠습니다. `config/routes.rb` 파일에 라우트 하나를 추가해서 URL주소에서 `:status` 매개변수를 가져올 수 있게 해 줍니다. [[[The `params` hash will always contain the `:controller` and `:action` keys, but you should use the methods `controller_name` and `action_name` instead to access these values. Any other parameters defined by the routing, such as `:id` will also be available. As an example, consider a listing of clients where the list can show either active or inactive clients. We can add a route which captures the `:status` parameter in a "pretty" URL:]]]
 
 ```ruby
 match '/clients/:status' => 'clients#index', foo: "bar"
 ```
 
-이 예에서, 사용자가 `/clients/active` 주소를 열게 되면, `params[:status]` 는 active 값으로 설정될 것입니다. 위의 라우트를 사용하면, `params[:foo]` 도 마치 쿼리문자열로 넘겨진 것 같이 bar값으로 할당될 것입니다. 같은 식으로 params[:action]` 은 index값을 포함하게 될 것입니다.
+이 예에서, 사용자가 `/clients/active` 주소를 열게 되면, `params[:status]` 는 active 값으로 설정될 것입니다. 위의 라우트를 사용하면, `params[:foo]` 도 마치 쿼리문자열로 넘겨진 것 같이 bar값으로 할당될 것입니다. 같은 식으로 `params[:action]` 은 index값을 포함하게 될 것입니다. [[[In this case, when a user opens the URL `/clients/active`, `params[:status]` will be set to "active". When this route is used, `params[:foo]` will also be set to "bar" just like it was passed in the query string. In the same way `params[:action]` will contain "index".]]]  
 
 ### [default_url_options] `default_url_options`
 
-컨트롤내에 `default_url_options`라는 이름의 메소드를 정의하면 URL을 생성할 때 사용할 수 있는 전역 디폴트 파라메터를 지정할 수 있습니다. 이 메소드는 원하는 디폴트들이 들어 있는 해시를 반환해야 하며, 이 때 키는 반드시 심볼형으로 사용해야 합니다.
+컨트롤내에 `default_url_options`라는 이름의 메소드를 정의하면 URL을 생성할 때 사용할 수 있는 전역 디폴트 파라메터를 지정할 수 있습니다. 이 메소드는 원하는 디폴트들이 들어 있는 해시를 반환해야 하며, 이 때 키는 반드시 심볼형으로 사용해야 합니다. [[[You can set global default parameters for URL generation by defining a method called `default_url_options` in your controller. Such a method must return a hash with the desired defaults, whose keys must be symbols:]]]
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -160,10 +172,158 @@ class ApplicationController < ActionController::Base
   end
 end
 ```
-이 옵션은 URL을 생성할 때 시작점으로 사용되어 `url_for` 호출시에 넘겨주는 옵션들에 의해 변경될 수 있습니다. 
+이 옵션은 URL을 생성할 때 시작점으로 사용되어 `url_for` 호출시에 넘겨주는 옵션들에 의해 변경될 수 있습니다. [[[These options will be used as a starting point when generating URLs, so it's possible they'll be overridden by the options passed in `url_for` calls.]]]
 
-위의 예에서와 같이, `ApplicationController` 내에 `default_url_options`을 정의해 두면, 어플리케이션내 모든 URL 생성시에 적용될 것입니다. 또한 이 메소드를 특정 컨트롤러내에 정의해 둔다면, 해당 컨트롤러내에서 생성되는 URL에 대해서만 적용됩니다.
+위의 예에서와 같이, `ApplicationController` 내에 `default_url_options`을 정의해 두면, 어플리케이션내 모든 URL 생성시에 적용될 것입니다. 또한 이 메소드를 특정 컨트롤러내에 정의해 둔다면, 해당 컨트롤러내에서 생성되는 URL에 대해서만 적용됩니다. [[[If you define `default_url_options` in `ApplicationController`, as in the example above, it would be used for all URL generation. The method can also be defined in one specific controller, in which case it only affects URLs generated there.]]]
 
+### Strong Parameters
+
+[[[With strong parameters, Action Controller parameters are forbidden to be used in Active Model mass assignments until they have been whitelisted. This means you'll have to make a conscious choice about which attributes to allow for mass updating and thus prevent accidentally exposing that which shouldn't be exposed.]]]
+
+In addition, parameters can be marked as required and flow through a
+predefined raise/rescue flow to end up as a 400 Bad Request with no
+effort.
+
+```ruby
+class PeopleController < ActionController::Base
+  # This will raise an ActiveModel::ForbiddenAttributes exception
+  # because it's using mass assignment without an explicit permit
+  # step.
+  def create
+    Person.create(params[:person])
+  end
+
+  # This will pass with flying colors as long as there's a person key
+  # in the parameters, otherwise it'll raise a
+  # ActionController::ParameterMissing exception, which will get
+  # caught by ActionController::Base and turned into that 400 Bad
+  # Request reply.
+  def update
+    person = current_account.people.find(params[:id])
+    person.update_attributes!(person_params)
+    redirect_to person
+  end
+
+  private
+    # Using a private method to encapsulate the permissible parameters
+    # is just a good pattern since you'll be able to reuse the same
+    # permit list between create and update. Also, you can specialize
+    # this method with per-user checking of permissible attributes.
+    def person_params
+      params.require(:person).permit(:name, :age)
+    end
+end
+```
+
+#### Permitted Scalar Values
+
+Given
+
+```ruby
+params.permit(:id)
+```
+
+the key `:id` will pass the whitelisting if it appears in `params` and
+it has a permitted scalar value associated. Otherwise the key is going
+to be filtered out, so arrays, hashes, or any other objects cannot be
+injected.
+
+The permitted scalar types are `String`, `Symbol`, `NilClass`,
+`Numeric`, `TrueClass`, `FalseClass`, `Date`, `Time`, `DateTime`,
+`StringIO`, `IO`, `ActionDispatch::Http::UploadedFile` and
+`Rack::Test::UploadedFile`.
+
+To declare that the value in `params` must be an array of permitted
+scalar values map the key to an empty array:
+
+```ruby
+params.permit(id: [])
+```
+
+To whitelist an entire hash of parameters, the `permit!` method can be
+used:
+
+```ruby
+params.require(:log_entry).permit!
+```
+
+This will mark the `:log_entry` parameters hash and any subhash of it
+permitted.  Extreme care should be taken when using `permit!` as it
+will allow all current and future model attributes to be
+mass-assigned.
+
+#### Nested Parameters
+
+You can also use permit on nested parameters, like:
+
+```ruby
+params.permit(:name, { emails: [] },
+              friends: [ :name,
+                         { family: [ :name ], hobbies: [] }])
+```
+
+This declaration whitelists the `name`, `emails` and `friends`
+attributes. It is expected that `emails` will be an array of permitted
+scalar values and that `friends` will be an array of resources with
+specific attributes : they should have a `name` attribute (any
+permitted scalar values allowed), a `hobbies` attribute as an array of
+permitted scalar values, and a `family` attribute which is restricted
+to having a `name` (any permitted scalar values allowed, too).
+
+#### More Examples
+
+You want to also use the permitted attributes in the `new`
+action. This raises the problem that you can't use `require` on the
+root key because normally it does not exist when calling `new`:
+
+```ruby
+# using `fetch` you can supply a default and use
+# the Strong Parameters API from there.
+params.fetch(:blog, {}).permit(:title, :author)
+```
+
+`accepts_nested_attributes_for` allows you to update and destroy
+associated records. This is based on the `id` and `_destroy`
+parameters:
+
+```ruby
+# permit :id and :_destroy
+params.require(:author).permit(:name, books_attributes: [:title, :id, :_destroy])
+```
+
+Hashes with integer keys are treated differently and you can declare
+the attributes as if they were direct children. You get these kinds of
+parameters when you use `accepts_nested_attributes_for` in combination
+with a `has_many` association:
+
+```ruby
+# To whitelist the following data:
+# {"book" => {"title" => "Some Book",
+#             "chapters_attributes" => { "1" => {"title" => "First Chapter"},
+#                                        "2" => {"title" => "Second Chapter"}}}}
+
+params.require(:book).permit(:title, chapters_attributes: [:title])
+```
+
+#### Outside the Scope of Strong Parameters
+
+The strong parameter API was designed with the most common use cases
+in mind. It is not meant as a silver bullet to handle all your
+whitelisting problems. However you can easily mix the API with your
+own code to adapt to your situation.
+
+Imagine a scenario where you want to whitelist an attribute
+containing a hash with any keys. Using strong parameters you can't
+allow a hash with any keys but you can use a simple assignment to get
+the job done:
+
+```ruby
+def product_params
+  params.require(:product).permit(:name).tap do |whitelisted|
+    whitelisted[:data] = params[:product][:data]
+  end
+end
+```
 
 [Session]세션
 -------

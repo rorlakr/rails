@@ -1410,7 +1410,7 @@ NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 �
 
 NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
 
-### [Inflections] 어미/어형의 변경 메소드 (Inflections)
+### [Inflections] 어미/어형의 변경 메소드
 
 #### `pluralize`
 
@@ -2481,14 +2481,14 @@ TIP: 이전 예여서 주목해서 볼 것은 연속되는 구분자는 빈 배�
 
 NOTE: 이 메소드는 `active_support/core_ext/array/grouping.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/grouping.rb`.]]]
 
-Extensions to `Hash`
+[Extensions to `Hash`] `Hash`형에 대한 확장 메소드
 --------------------
 
-### Conversions
+### [Conversions] 해시 변환메소드
 
 #### `to_xml`
 
-The method `to_xml` returns a string containing an XML representation of its receiver:
+`to_xml` 메소드는 receiver 해시를 XML로 변환하여 문자열로 반환합니다. [[[The method `to_xml` returns a string containing an XML representation of its receiver:]]]
 
 ```ruby
 {"foo" => 1, "bar" => 2}.to_xml
@@ -2500,13 +2500,13 @@ The method `to_xml` returns a string containing an XML representation of its rec
 # </hash>
 ```
 
-To do so, the method loops over the pairs and builds nodes that depend on the _values_. Given a pair `key`, `value`:
+이를 위해서는, 메소드는 해시내 키/값 들에 대해서 루프를 돌면서 _value_ 에 따라 노드를 만들게 됩니다. `key`, `value` 쌍이 주어질 경우, [[[To do so, the method loops over the pairs and builds nodes that depend on the _values_. Given a pair `key`, `value`:]]]
 
-* If `value` is a hash there's a recursive call with `key` as `:root`.
+* `value`가 해시인 경우에는 `key`를 `:root`로 하여 이 메소드를 반복호출하게 됩니다. [[[If `value` is a hash there's a recursive call with `key` as `:root`.]]]
 
-* If `value` is an array there's a recursive call with `key` as `:root`, and `key` singularized as `:children`.
+* `value`가 배열인 경우에는 `key`를 `:root`로 하여 이 메소드를 반복호출하게 되며, 이 때 `key`는 `:children`으로 단수형을 취하게 됩니다. [[[If `value` is an array there's a recursive call with `key` as `:root`, and `key` singularized as `:children`.]]]
 
-* If `value` is a callable object it must expect one or two arguments. Depending on the arity, the callable is invoked with the `options` hash as first argument with `key` as `:root`, and `key` singularized as second argument. Its return value becomes a new node.
+* [[[If `value` is a callable object it must expect one or two arguments. Depending on the arity, the callable is invoked with the `options` hash as first argument with `key` as `:root`, and `key` singularized as second argument. Its return value becomes a new node.]]]
 
 * If `value` responds to `to_xml` the method is invoked with `key` as `:root`.
 
