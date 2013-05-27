@@ -678,7 +678,7 @@ NOTE: 이 메소드는 `active_support/core_ext/module/introspection.rb` 파일�
 
 #### `parents`
 
-`parents` 메소든 receiver에 대해서 `Object`에 도달할 때까지 `parent` 메소드를 호출합니다. 결과 체인은 아래서부터 최상위 순서로 배열에 담겨 반환됩니다. [[[The method `parents` calls `parent` on the receiver and upwards until `Object` is reached. The chain is returned in an array, from bottom to top:]]]
+`parents` 메소드는 receiver에 대해서 (상속계층구조에서) `Object`에 도달할 때까지 `parent` 메소드를 호출합니다. 결과 체인은 아래서부터 최상위 순서로 배열에 담겨 반환됩니다. [[[The method `parents` calls `parent` on the receiver and upwards until `Object` is reached. The chain is returned in an array, from bottom to top:]]]
 
 ```ruby
 module X
@@ -729,19 +729,15 @@ Object.qualified_const_get("Math::PI")            # => 3.141592653589793
 Object.qualified_const_set("Math::Phi", 1.618034) # => 1.618034
 ```
 
-인수는 상수명만으로 지정할 수 있습니다. [[[Arguments may be bare constant names:]]]
+인수를 상수 이름만으로 지정할 수 있습니다. [[[Arguments may be bare constant names:]]]
 
 ```ruby
 Math.qualified_const_get("E") # => 2.718281828459045
 ```
 
-These methods are analogous to their builtin counterparts. In particular,
-`qualified_constant_defined?` accepts an optional second argument to be
-able to say whether you want the predicate to look in the ancestors.
-This flag is taken into account for each constant in the expression while
-walking down the path.
+이 메소드는 루비의 내장 코어의 카운터파트 메소드와 유사합니다. 특히, `qualified_constant_defined?` 메소드는 두번째 인수를 옵션으로 지정하여 상속계층구조상에서 조상모듈을 찾을 것인지를 선택할 수 있습니다. 이 옵션은 계층구조의 경로를 따라 갈 때 표현식에서 각각의 상수에 대해서 고려해야 합니다. [[[These methods are analogous to their builtin counterparts. In particular, `qualified_constant_defined?` accepts an optional second argument to be able to say whether you want the predicate to look in the ancestors. This flag is taken into account for each constant in the expression while walking down the path.]]]
 
-For example, given
+예를 들어, 다음과 같은 모듈구조에서 [[[For example, given]]]
 
 ```ruby
 module M
@@ -755,7 +751,7 @@ module N
 end
 ```
 
-`qualified_const_defined?` behaves this way:
+`qualified_const_defined?` 메소드는 다음과 같이 동작을 하게 됩니다. [[[`qualified_const_defined?` behaves this way:]]]
 
 ```ruby
 N.qualified_const_defined?("C::X", false) # => false
@@ -763,19 +759,17 @@ N.qualified_const_defined?("C::X", true)  # => true
 N.qualified_const_defined?("C::X")        # => true
 ```
 
-As the last example implies, the second argument defaults to true,
-as in `const_defined?`.
+위의 예에서와 같이, 두번째 인수의 디폴트값은, `const_defined?`에서와 같이, true 입니다. [[[As the last example implies, the second argument defaults to true, as in `const_defined?`.]]]
 
-For coherence with the builtin methods only relative paths are accepted.
-Absolute qualified constant names like `::Math::PI` raise `NameError`.
+내장 메소드에 대한 일관성을 유지하기 위해서, 상대경로만을 취하게 됩니다. `::Math::PI`와 같은 절대경로를 사용할 경우에는 `NamedError` 예외가 발생합니다. [[[For coherence with the builtin methods only relative paths are accepted. Absolute qualified constant names like `::Math::PI` raise `NameError`.]]]
 
-NOTE: Defined in `active_support/core_ext/module/qualified_const.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/module/qualified_const.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/qualified_const.rb`.]]]
 
 ### Reachable
 
-A named module is reachable if it is stored in its corresponding constant. It means you can reach the module object via the constant.
+이름이 붙은 모듈이 해당 상수로 저장이 된 경우 그 모듈은 `reachable` 하다라고 말합니다. 다시 말해서, 그 상수를 통해서 모듈 객체에 접근할 수 있다는 의미입니다. [[[A named module is reachable if it is stored in its corresponding constant. It means you can reach the module object via the constant.]]]
 
-That is what ordinarily happens, if a module is called "M", the `M` constant exists and holds it:
+이것은 일반적으로 일어나는 일인데, 하나의 모듈이 "M"으로 호출된다면 `M` 상수가 존재하게 되는 것이고 이 상수는 해당 모듈은 소유하게 되는 것입니다. [[[That is what ordinarily happens, if a module is called "M", the `M` constant exists and holds it:]]]
 
 ```ruby
 module M
@@ -784,7 +778,7 @@ end
 M.reachable? # => true
 ```
 
-But since constants and modules are indeed kind of decoupled, module objects can become unreachable:
+그러나 상수와 모듈이 일종의 분리상태로 된다면 모듈객체는 `unreachable`하게 됩니다. [[[But since constants and modules are indeed kind of decoupled, module objects can become unreachable:]]]
 
 ```ruby
 module M
@@ -792,26 +786,30 @@ end
 
 orphan = Object.send(:remove_const, :M)
 
-# The module object is orphan now but it still has a name.
+#1 모듈 객체는 이제 상수와 모듈자체가 분리되었지만 여전히 모듈 이름을 가지고 있습니다. 
 orphan.name # => "M"
 
-# You cannot reach it via the constant M because it does not even exist.
+#2 상수 M이 더 이상 존재하지 않기 때문에 상수 M을 통해서 접근할 수 없습니다.
 orphan.reachable? # => false
 
-# Let's define a module called "M" again.
+#3 다시 "M"이라는 모듈을 정의해 봅시다.
 module M
 end
 
-# The constant M exists now again, and it stores a module
-# object called "M", but it is a new instance.
+#4 이제 다시 상수 M이 존재하게 되고 이 상수가 "M"이라고 하는 모듈객체를 저장하게 되자만, 이것은 새로운 인스턴스라서 이전 것과 동일한 것을 아닙니다. 
 orphan.reachable? # => false
 ```
 
-NOTE: Defined in `active_support/core_ext/module/reachable.rb`.
+위 코드내의 코멘트 1 [[[The module object is orphan now but it still has a name.]]]
+위 코드내의 코멘트 2 [[[You cannot reach it via the constant M because it does not even exist.]]]
+위 코드내의 코멘트 3 [[[Let's define a module called "M" again.]]]
+위 코드내의 코멘트 4 [[[The constant M exists now again, and it stores a module object called "M", but it is a new instance.]]]
 
-### Anonymous
+NOTE: 이 메소드는 `active_support/core_ext/module/reachable.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/reachable.rb`.]]]
 
-A module may or may not have a name:
+### [Anonymous] 익명 모듈
+
+하나의 모듈은 이름을 가질 수도 있고, 이름이 없을 수도 있습니다. [[[A module may or may not have a name:]]]
 
 ```ruby
 module M
@@ -824,7 +822,7 @@ N.name # => "N"
 Module.new.name # => nil
 ```
 
-You can check whether a module has a name with the predicate `anonymous?`:
+`anonymous?` 메소드를 이용하여 특정 모듈이 이름을 가지고 있는지를 알아볼 수 있습니다. [[[You can check whether a module has a name with the predicate `anonymous?`:]]]
 
 ```ruby
 module M
@@ -834,7 +832,7 @@ M.anonymous? # => false
 Module.new.anonymous? # => true
 ```
 
-Note that being unreachable does not imply being anonymous:
+따라서 주목할 것은 `unreachable`하다는 것이 반드시 `anonymous`하다는 것이 아니라는 것입니다.(역자주: 모듈을 접근하기 위한 상수명을 가지는 것과 모듈객체의 이름을 가지는 것과는 별개의 것입니다. 개념을 이해하기가 까다롭습니다.) [[[Note that being unreachable does not imply being anonymous:]]]
 
 ```ruby
 module M
@@ -846,15 +844,15 @@ m.reachable? # => false
 m.anonymous? # => false
 ```
 
-though an anonymous module is unreachable by definition.
+그러나 반대로, 정의상, 이름이 없는 모듈은 `unreachable` 하긴 합니다. [[[though an anonymous module is unreachable by definition.]]]
 
-NOTE: Defined in `active_support/core_ext/module/anonymous.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/module/anonymous.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/anonymous.rb`.]]]
 
-### Method Delegation
+### [Method Delegation] 메소드의 위임
 
-The macro `delegate` offers an easy way to forward methods.
+`delegate` 매크로는 메소드를 전단하기 위한 손쉬운 방법을 제공해 줍니다. [[[The macro `delegate` offers an easy way to forward methods.]]]
 
-Let's imagine that users in some application have login information in the `User` model but name and other data in a separate `Profile` model:
+어떤 어플리케이션에서 유저가 로그인 정보는 `User` 모델에 가지고 있지만, 이름과 기타 다른 데이터는 별도의 `Profile` 모델에 가지고 있다고 가정해 보겠습니다. [[[Let's imagine that users in some application have login information in the `User` model but name and other data in a separate `Profile` model:]]]
 
 ```ruby
 class User < ActiveRecord::Base
@@ -862,7 +860,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-With that configuration you get a user's name via his profile, `user.profile.name`, but it could be handy to still be able to access such attribute directly:
+이러한 설정에서 유저의 이름은 자신의 프로파일을 통해서(`user.profile.name`) 얻을 수 있지만, 유저 모델에서 직접 속성처럼 접근할 수 있다면 더 편리할 수 있습니다. [[[With that configuration you get a user's name via his profile, `user.profile.name`, but it could be handy to still be able to access such attribute directly:]]]
 
 ```ruby
 class User < ActiveRecord::Base
@@ -874,7 +872,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-That is what `delegate` does for you:
+바로 이것이 `delegate` 매크로가 하는 일입니다. [[[That is what `delegate` does for you:]]]
 
 ```ruby
 class User < ActiveRecord::Base
@@ -884,61 +882,65 @@ class User < ActiveRecord::Base
 end
 ```
 
-It is shorter, and the intention more obvious.
+`delegate` 매크로를 사용하면 코드가 보다 간단해지고, 프로그래머의 의도를 더 직관적으로 알 수 있게 됩니다. [[[It is shorter, and the intention more obvious.]]]
 
-The method must be public in the target.
+메소드는 대상 클래스에서 public 접근자(역자주: `액션`)로 선언되어 있어야 합니다. [[[The method must be public in the target.]]]
 
-The `delegate` macro accepts several methods:
+`delegate` 매크로에 여러개의 메소드를 지정할 수 있습니다. [[[The `delegate` macro accepts several methods:]]]
 
 ```ruby
 delegate :name, :age, :address, :twitter, to: :profile
 ```
 
-When interpolated into a string, the `:to` option should become an expression that evaluates to the object the method is delegated to. Typically a string or symbol. Such an expression is evaluated in the context of the receiver:
+문자열 중간에 삽입될 경우에는, `:to` 옵션은 표현식이 되어야 합니다. 그래서 이 표현식이 메소드가 전달되는 객체에 대해서 평가되어야 합니다. 이 옵션은 대개 문자열 또는 심볼을 취하게 됩니다. 이 표현식은 receiver의 입장에서 평가되어야 합니다. [[[When interpolated into a string, the `:to` option should become an expression that evaluates to the object the method is delegated to. Typically a string or symbol. Such an expression is evaluated in the context of the receiver:]]]
 
 ```ruby
-# delegates to the Rails constant
+#1 레일스 상수로 위임 
 delegate :logger, to: :Rails
 
-# delegates to the receiver's class
+#2 receiver의 클래스로 위임 
 delegate :table_name, to: :class
 ```
 
-WARNING: If the `:prefix` option is `true` this is less generic, see below.
+위 예의 코멘트 #1 [[[delegates to the Rails constant]]]
+위 예의 코멘트 #2 [[[delegates to the receiver's class]]]
 
-By default, if the delegation raises `NoMethodError` and the target is `nil` the exception is propagated. You can ask that `nil` is returned instead with the `:allow_nil` option:
+
+WARNING: `:prefix` 옵션이 `true`인 경우는 일반적이지 않지만 아래를 참조하기 바랍니다. [[[If the `:prefix` option is `true` this is less generic, see below.]]]
+
+디폴트 상태에서, 메소드 위임이 `NoMethodError` 예외를 발생시키고 대상이 `nil`이면 예외가 전달됩니다. 이 때 `:allow_nil` 옵션을 사용하면 대신에 `nil` 값을 반환하도록 할 수 있습니다. [[[By default, if the delegation raises `NoMethodError` and the target is `nil` the exception is propagated. You can ask that `nil` is returned instead with the `:allow_nil` option:]]]
 
 ```ruby
 delegate :name, to: :profile, allow_nil: true
 ```
 
-With `:allow_nil` the call `user.name` returns `nil` if the user has no profile.
+즉, `:allow_nil` 옵션을 사용할 경우, 유저가 프로파일이 없는 경우에라도 `user.name`을 호출하면, 예외를 발생시키지 않고 `nil` 값을 반환하게 됩니다. [[[With `:allow_nil` the call `user.name` returns `nil` if the user has no profile.]]]
 
-The option `:prefix` adds a prefix to the name of the generated method. This may be handy for example to get a better name:
+`:prefix` 옵션은 위임된 메소드의 이름 앞에 전두어를 추가해 줍니다. 이것은 좀 더 좋은 이름을 사용하고자 할 때 편리할 수 있습니다. [[[The option `:prefix` adds a prefix to the name of the generated method. This may be handy for example to get a better name:]]]
 
 ```ruby
 delegate :street, to: :address, prefix: true
 ```
 
-The previous example generates `address_street` rather than `street`.
+위의 예에서는 `street`가 아니고 `address_street`라는 메소드명을 만들어 줍니다. [[[The previous example generates `address_street` rather than `street`.]]]
 
-WARNING: Since in this case the name of the generated method is composed of the target object and target method names, the `:to` option must be a method name.
+WARNING: 이런 경우에 위임 메소드명이 대상 객체와 대상 메소드명의 조합으로 만들어지기 때문에, `:to` 옵션은 메소드명이 되는 것입니다. [[[Since in this case the name of the generated method is composed of the target object and target method names, the `:to` option must be a method name.]]]
 
-A custom prefix may also be configured:
+또한 전두어를 변경할 수 있습니다. [[[A custom prefix may also be configured:]]]
 
 ```ruby
 delegate :size, to: :attachment, prefix: :avatar
 ```
 
-In the previous example the macro generates `avatar_size` rather than `size`.
+위의 예에서, `delegate` 매크로는 `size`가 아니고 `avatar_size`라는 위임 메소드명을 생성하게 됩니다. [[[In the previous example the macro generates `avatar_size` rather than `size`.]]]
 
-NOTE: Defined in `active_support/core_ext/module/delegation.rb`
+NOTE: 이 메소드는 `active_support/core_ext/module/delegation.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/delegation.rb`]]]
 
-### Redefining Methods
+### [Redefining Methods] 메소드 재정의하기
 
-There are cases where you need to define a method with `define_method`, but don't know whether a method with that name already exists. If it does, a warning is issued if they are enabled. No big deal, but not clean either.
+`define_method`를 사용해서 하나의 메소드를 정의해야 할 경우가 있습니다. 그러나 미리 정의할 메소드명이 이미 존재하는 지를 알 수 없습니다. 만약 이미 정의된 메소드명을 지정하게 되면, 해당 메소드가 기능을 하게 될 때 경고메시지가 나타나게 됩니다. 당연한 것이지만, 그렇다고 깔끔하지는 못합니다. [[[There are cases where you need to define a method with `define_method`, but don't know whether a method with that name already exists. If it does, a warning is issued if they are enabled. No big deal, but not clean either.]]]
 
-The method `redefine_method` prevents such a potential warning, removing the existing method before if needed. Rails uses it in a few places, for instance when it generates an association's API:
+이러한 상황에서, `redefine_method` 메소드는 필요할 경우 기존의 메소드를 제거해서 그런 잠재된 경고를 방지해 줍니다. 레일스는 몇군데에서 이 메소드를 사용하는데, 예를 들면 모델 관계를 설정하는 API를 생성할 때 입니다. [[[The method `redefine_method` prevents such a potential warning, removing the existing method before if needed. Rails uses it in a few places, for instance when it generates an association's API:]]]
 
 ```ruby
 redefine_method("#{reflection.name}=") do |new_value|
@@ -953,16 +955,16 @@ redefine_method("#{reflection.name}=") do |new_value|
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/module/remove_method.rb`
+NOTE: 이 메소드는 `active_support/core_ext/module/remove_method.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/remove_method.rb`]]]
 
-Extensions to `Class`
+[Extensions to `Class`] `클래스`에 대한 확장 메소드
 ---------------------
 
-### Class Attributes
+### [Class Attributes] 클래스 속성
 
 #### `class_attribute`
 
-The method `class_attribute` declares one or more inheritable class attributes that can be overridden at any level down the hierarchy.
+`class_attribute` 메소드는 특정 클래스의 상속계층구조상 어느 레벨에서라도 재정의될 수 있는 상속가능한 클래스 속성을 하나 또는 그 이상을 선언해 줍니다. [[[The method `class_attribute` declares one or more inheritable class attributes that can be overridden at any level down the hierarchy.]]]
 
 ```ruby
 class A
@@ -986,7 +988,7 @@ A.x # => :a
 B.x # => :b
 ```
 
-For example `ActionMailer::Base` defines:
+예를 들어, `ActionMailer::Base`는 다음과 같이 정의합니다. [[[For example `ActionMailer::Base` defines:]]]
 
 ```ruby
 class_attribute :default_params
@@ -998,7 +1000,7 @@ self.default_params = {
 }.freeze
 ```
 
-They can be also accessed and overridden at the instance level.
+이 클래스 속성들은 인스턴스 레벨에서도 접근할 수 있고 재정의할 수도 있습니다. [[[They can be also accessed and overridden at the instance level.]]]
 
 ```ruby
 A.x = 1
@@ -1011,7 +1013,7 @@ a1.x # => 1, comes from A
 a2.x # => 2, overridden in a2
 ```
 
-The generation of the writer instance method can be prevented by setting the option `:instance_writer` to `false`.
+이 때 `:instance_writer` 옵션을 `false` 값으로 지정하면 `writer` 인스턴스 메소드를 생성하지 못하게 할 수 있습니다. [[[The generation of the writer instance method can be prevented by setting the option `:instance_writer` to `false`.]]]
 
 ```ruby
 module ActiveRecord
@@ -1022,9 +1024,9 @@ module ActiveRecord
 end
 ```
 
-A model may find that option useful as a way to prevent mass-assignment from setting the attribute.
+모델 입장에서는 이 옵션이 클래스 속성을 mass-assignment로 변경할 수 없도록 하는 유용한 방법이라고 생각할 수 있습니다. [[[A model may find that option useful as a way to prevent mass-assignment from setting the attribute.]]]
 
-The generation of the reader instance method can be prevented by setting the option `:instance_reader` to `false`.
+`:instance_reader` 옵션을 `false` 값으로 지정하여 `reader` 인스턴스 메소드를 생성하지 못하게 할 수 있습니다. [[[The generation of the reader instance method can be prevented by setting the option `:instance_reader` to `false`.]]]
 
 ```ruby
 class A
@@ -1034,17 +1036,17 @@ end
 A.new.x = 1 # NoMethodError
 ```
 
-For convenience `class_attribute` also defines an instance predicate which is the double negation of what the instance reader returns. In the examples above it would be called `x?`.
+편리함을 위해서, `class_attribute` 메소드는 인스턴스 `reader`가 반환하는 것에 대한 논리값을 반환하는 인스턴스 `predicate`를 정의해 줍니다. 위의 예에서는 `x?`을 호출합니다. [[[For convenience `class_attribute` also defines an instance predicate which is the double negation of what the instance reader returns. In the examples above it would be called `x?`.]]]
 
-When `:instance_reader` is `false`, the instance predicate returns a `NoMethodError` just like the reader method.
+`:instance_reader`에 `false`값이 지정되어 있는 상태에서 인스턴스 `predicate`를 호출하면 reader 메소드처럼 `NoMethodError`를 반환하게 됩니다. [[[When `:instance_reader` is `false`, the instance predicate returns a `NoMethodError` just like the reader method.]]]
 
-If you do not want the instance predicate,  pass `instance_predicate: false` and it will not be defined.
+인스턴스 `predicate`가 생성되기를 원치 않는다면, `instance_predicate: false`를 넘겨 주면 됩니다. [[[If you do not want the instance predicate,  pass `instance_predicate: false` and it will not be defined.]]]
 
-NOTE: Defined in `active_support/core_ext/class/attribute.rb`
+NOTE: 이 메소드는 `active_support/core_ext/class/attribute.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/class/attribute.rb`]]]
 
 #### `cattr_reader`, `cattr_writer`, and `cattr_accessor`
 
-The macros `cattr_reader`, `cattr_writer`, and `cattr_accessor` are analogous to their `attr_*` counterparts but for classes. They initialize a class variable to `nil` unless it already exists, and generate the corresponding class methods to access it:
+`cattr_reader`, `cattr_writer`, `cattr_accessor` 매크로는 `attr_*` 카운터파트 매크로와 클래스라는 것만 제외하고 유사합니다. 이 매크로들은 클래스 변수가 이전에 존재하지 않는 것이라면 `nil` 값으로 초기화하고 그 클래스변수를 접근하기 위한 해당 클래스 메소드를 생성해 줍니다. [[[The macros `cattr_reader`, `cattr_writer`, and `cattr_accessor` are analogous to their `attr_*` counterparts but for classes. They initialize a class variable to `nil` unless it already exists, and generate the corresponding class methods to access it:]]]
 
 ```ruby
 class MysqlAdapter < AbstractAdapter
@@ -1054,7 +1056,7 @@ class MysqlAdapter < AbstractAdapter
 end
 ```
 
-Instance methods are created as well for convenience, they are just proxies to the class attribute. So, instances can change the class attribute, but cannot override it as it happens with `class_attribute` (see above). For example given
+편리를 도모하기 위해서 인스턴스 메소드가 만들어 지지만 단지 클래스 속성에 대한 대리자에 불과합니다. 그래서, 인스턴스 객체들이 클래스 속성을 변경할 수 있지만 위에서 언급되었던 `class_attribute` 처럼 재정의할 수는 없습니다. 예를 들어 다음과 같을 때, [[[Instance methods are created as well for convenience, they are just proxies to the class attribute. So, instances can change the class attribute, but cannot override it as it happens with `class_attribute` (see above). For example given]]]
 
 ```ruby
 module ActionView
@@ -1065,9 +1067,9 @@ module ActionView
 end
 ```
 
-we can access `field_error_proc` in views.
+뷰에서 `field_error_proc` 클래스 속성을 접근할 수 있습니다. [[[we can access `field_error_proc` in views.]]]
 
-The generation of the reader instance method can be prevented by setting `:instance_reader` to `false` and the generation of the writer instance method can be prevented by setting `:instance_writer` to `false`. Generation of both methods can be prevented by setting `:instance_accessor` to `false`. In all cases, the value must be exactly `false` and not any false value.
+`:instance_reader` 옵션을 `false`로 지정하여 `reader` 인스턴스 메소드의 생성을 못하게 할 수 있고, `:instance_writer` 옵션을 `false`로 지정하여 `writer` 인스턴스 메소드의 생성을 막을 수 있습니다. `:instance_accessor` 옵션을 `false`로 지정하여 이 두가지 인스턴스 메소드가 만들어지 못하도록 할 수 있습니다. 이 모든 경우에서, 값은 정확하게 `false`로 지정되어야 합니다. [[[The generation of the reader instance method can be prevented by setting `:instance_reader` to `false` and the generation of the writer instance method can be prevented by setting `:instance_writer` to `false`. Generation of both methods can be prevented by setting `:instance_accessor` to `false`. In all cases, the value must be exactly `false` and not any false value.]]]
 
 ```ruby
 module A
@@ -1082,15 +1084,15 @@ module A
 end
 ```
 
-A model may find it useful to set `:instance_accessor` to `false` as a way to prevent mass-assignment from setting the attribute.
+모델에서 `:instance_accessor`를 `false`로 지정하면, mass-assignment를 통해 해당 클래스 속성을 변경할 수 없게 하는 유용한 방법이 될 수 있습니다. [[[A model may find it useful to set `:instance_accessor` to `false` as a way to prevent mass-assignment from setting the attribute.]]]
 
-NOTE: Defined in `active_support/core_ext/class/attribute_accessors.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/class/attribute_accessors.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/class/attribute_accessors.rb`.]]]
 
-### Subclasses & Descendants
+### Subclasses & Descendants 
 
 #### `subclasses`
 
-The `subclasses` method returns the subclasses of the receiver:
+`subclasses` 메소드는 receiver 클래스의 하위클래스들을 반환합니다. [[[The `subclasses` method returns the subclasses of the receiver:]]]
 
 ```ruby
 class C; end
@@ -1106,13 +1108,13 @@ class D < C; end
 C.subclasses # => [B, D]
 ```
 
-The order in which these classes are returned is unspecified.
+이 때 반환되는 클래스의 순서는 명시되지 않습니다. [[[The order in which these classes are returned is unspecified.]]]
 
-NOTE: Defined in `active_support/core_ext/class/subclasses.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/class/subclasses.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/class/subclasses.rb`.]]]
 
 #### `descendants`
 
-The `descendants` method returns all classes that are `<` than its receiver:
+`descendants` 메소드는 receiver 클래스로부터 상속받은 모든 클래스를 반환합니다. [[[The `descendants` method returns all classes that are `<` than its receiver:]]]
 
 ```ruby
 class C; end
@@ -1128,37 +1130,37 @@ class D < C; end
 C.descendants # => [B, A, D]
 ```
 
-The order in which these classes are returned is unspecified.
+이 때 반환되는 클래스의 순서는 명시되지 않습니다. [[[The order in which these classes are returned is unspecified.]]]
 
-NOTE: Defined in `active_support/core_ext/class/subclasses.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/class/subclasses.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/class/subclasses.rb`.]]]
 
-Extensions to `String`
+[Extensions to `String`] `String`형에 대한 확장 메소드
 ----------------------
 
 ### Output Safety
 
 #### Motivation
 
-Inserting data into HTML templates needs extra care. For example, you can't just interpolate `@review.title` verbatim into an HTML page. For one thing, if the review title is "Flanagan & Matz rules!" the output won't be well-formed because an ampersand has to be escaped as "&amp;amp;". What's more, depending on the application, that may be a big security hole because users can inject malicious HTML setting a hand-crafted review title. Check out the section about cross-site scripting in the [Security guide](security.html#cross-site-scripting-xss) for further information about the risks.
+데이터를 HTML템플릿에 삽입할 때는 주의를 기울려야 합니다. 예를 들면, `@review.title`을 HTML 페이지에도 그대로 삽입할 수 없습니다. 한가지는, review title이 "Flanagan & Matz rules!"와 같다면, 문자열에 포함된 "&" 문자가 "&amp;amp;"로 특수문자 처리가 되기 때문에 결과가 제대로 보이지 않게 됩니다. 더우기, 어플리케이션에 따라서는, 유저들이 review title에 악성 HTML코드를 삽입할 수 있기 때문에 심각한 보안상의 결함을 초래할 수 있습니다. 이러한 보안상의 위험에 대해서 자세한 내용을 알고자 한다면 [Security guide](security.html#cross-site-scripting-xss)에 있는 cross-site scripting에 대한 내용을 확인해 보기 바랍니다. [[[Inserting data into HTML templates needs extra care. For example, you can't just interpolate `@review.title` verbatim into an HTML page. For one thing, if the review title is "Flanagan & Matz rules!" the output won't be well-formed because an ampersand has to be escaped as "&amp;amp;". What's more, depending on the application, that may be a big security hole because users can inject malicious HTML setting a hand-crafted review title. Check out the section about cross-site scripting in the [Security guide](security.html#cross-site-scripting-xss) for further information about the risks.]]]
 
-#### Safe Strings
+#### [Safe Strings] 보안상 안전한 문자열
 
-Active Support has the concept of <i>(html) safe</i> strings. A safe string is one that is marked as being insertable into HTML as is. It is trusted, no matter whether it has been escaped or not.
+액티브서포트는 <i>(html) safe</i> 문자열에 관한 개념을 가지고 있습니다. 따라서 안전한 문자열이란 HTML 태그를 있는 그대로 삽입할 수 있는 상태를 말합니다. 이와 같이 안전문자열은 이스케이프 되던 안 되던간에 상관없이 신뢰성을 갖게 됩니다. [[[Active Support has the concept of <i>(html) safe</i> strings. A safe string is one that is marked as being insertable into HTML as is. It is trusted, no matter whether it has been escaped or not.]]]
 
-Strings are considered to be <i>unsafe</i> by default:
+문자열은 디폴트로 <i>비안전(unsafe)</i>한 것으로 간주됩니다. [[[Strings are considered to be <i>unsafe</i> by default:]]]
 
 ```ruby
 "".html_safe? # => false
 ```
 
-You can obtain a safe string from a given one with the `html_safe` method:
+`html_safe` 메소드를 사용하면 안전문자열을 얻을 수 있습니다. [[[You can obtain a safe string from a given one with the `html_safe` method:]]]
 
 ```ruby
 s = "".html_safe
 s.html_safe? # => true
 ```
 
-It is important to understand that `html_safe` performs no escaping whatsoever, it is just an assertion:
+`html_safe`는 receiver 문자열이 무엇인던지 간에 상관없이 <i>특수문자를 무효화(no escaping)</i>시킨다는 것을 이해하는 것이 중요한데, 이것은 그저 하나의 주장에 불과할 뿐입니다. [[[It is important to understand that `html_safe` performs no escaping whatsoever, it is just an assertion:]]]
 
 ```ruby
 s = "<script>...</script>".html_safe
@@ -1166,39 +1168,39 @@ s.html_safe? # => true
 s            # => "<script>...</script>"
 ```
 
-It is your responsibility to ensure calling `html_safe` on a particular string is fine.
+특정 문자열에 대해서 `html_safe`을 호출하는 것은 전적으로 개발자의 몫입니다. [[[It is your responsibility to ensure calling `html_safe` on a particular string is fine.]]]
 
-If you append onto a safe string, either in-place with `concat`/`<<`, or with `+`, the result is a safe string. Unsafe arguments are escaped:
+안전문자열 끝에 `concat`/`<<`, or with `+`를 이용하여 추가한다면 결과는 안전문자열이 됩니다. 비안전 인수에서는 특수문자가 고유의 기능을 하게 됩니다. [[[If you append onto a safe string, either in-place with `concat`/`<<`, or with `+`, the result is a safe string. Unsafe arguments are escaped:]]]
 
 ```ruby
 "".html_safe + "<" # => "&lt;"
 ```
 
-Safe arguments are directly appended:
+안전 인수들은 직접 추가됩니다. [[[Safe arguments are directly appended:]]]
 
 ```ruby
 "".html_safe + "<".html_safe # => "<"
 ```
 
-These methods should not be used in ordinary views. Unsafe values are automatically escaped:
+이 메소드는 평상적인 뷰에서 사용해서는 안됩니다. 비안전 값에 대해서는 자동으로 특수문자가 고유의 기능을 하게 됩니다. [[[These methods should not be used in ordinary views. Unsafe values are automatically escaped:]]]
 
 ```erb
 <%= @review.title %> <%# fine, escaped if needed %>
 ```
 
-To insert something verbatim use the `raw` helper rather than calling `html_safe`:
+따라서 뷰에서는 `html_safe`을 호출하기 보다는 `raw` 헬퍼를 사용하여 있는 그대로 보이게 합니다. [[[To insert something verbatim use the `raw` helper rather than calling `html_safe`:]]]
 
 ```erb
 <%= raw @cms.current_template %> <%# inserts @cms.current_template as is %>
 ```
 
-or, equivalently, use `<%==`:
+또는 `<%==`와 같이 사용해도 동일한 결과를 보여 줍니다. [[[or, equivalently, use `<%==`:]]]
 
 ```erb
 <%== @cms.current_template %> <%# inserts @cms.current_template as is %>
 ```
 
-The `raw` helper calls `html_safe` for you:
+`raw` 헬퍼는 `html_safe`를 호출합니다. [[[The `raw` helper calls `html_safe` for you:]]]
 
 ```ruby
 def raw(stringish)
@@ -1206,57 +1208,57 @@ def raw(stringish)
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/string/output_safety.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/string/output_safety.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/output_safety.rb`.]]]
 
-#### Transformation
+#### [Transformation] 문자열 변형
 
-As a rule of thumb, except perhaps for concatenation as explained above, any method that may change a string gives you an unsafe string. These are `downcase`, `gsub`, `strip`, `chomp`, `underscore`, etc.
+대개, 위에서 설명한 바와 같이 문자열을 연결하는 것을 제외하고, 문자열을 변경하는 메소드는 비안전 문자열을 반환합니다. 이러한 메소드는 `downcase`, `gsub`, `strip`, `chomp`, `underscore` 등이 있습니다. [[[As a rule of thumb, except perhaps for concatenation as explained above, any method that may change a string gives you an unsafe string. These are `downcase`, `gsub`, `strip`, `chomp`, `underscore`, etc.]]]
 
-In the case of in-place transformations like `gsub!` the receiver itself becomes unsafe.
+`gsub!`와 같이 receiver 문자열을 변경하는 경우에, receiver 문자열은 비안전 상태로 됩니다. [[[In the case of in-place transformations like `gsub!` the receiver itself becomes unsafe.]]]
 
-INFO: The safety bit is lost always, no matter whether the transformation actually changed something.
+INFO: 문자열 변형이 실제로 변경하는 것과는 무관하게 안전 상태값은 항상 사라지게 됩니다. [[[The safety bit is lost always, no matter whether the transformation actually changed something.]]]
 
-#### Conversion and Coercion
+#### [Conversion and Coercion] 강제 변환
 
-Calling `to_s` on a safe string returns a safe string, but coercion with `to_str` returns an unsafe string.
+안전 문자열에 대해서 `to_s`를 호출하면 안전 문자열을 반환하지만 `to_str` 메소드로 강제로 변환하면 비안전 문자열을 반환하게 됩니다. [[[Calling `to_s` on a safe string returns a safe string, but coercion with `to_str` returns an unsafe string.]]]
 
-#### Copying
+#### [Copying] 복사하기
 
-Calling `dup` or `clone` on safe strings yields safe strings.
+안전문자열에 대해서 `dup` 또는 `clone`을 호출하면 안전문자열을 만들어 줍니다. [[[Calling `dup` or `clone` on safe strings yields safe strings.]]]
 
 ### `squish`
 
-The method `squish` strips leading and trailing whitespace, and substitutes runs of whitespace with a single space each:
+`squish` 메소드는 문자열 앞뒤에 있는 whitespace를 제거해 주고 중간에 whitespace가 중복되어 나타날 때는 각각에 대해서 하나의 스페이스로 대체해 줍니다. [[[The method `squish` strips leading and trailing whitespace, and substitutes runs of whitespace with a single space each:]]]
 
 ```ruby
 " \n  foo\n\r \t bar \n".squish # => "foo bar"
 ```
 
-There's also the destructive version `String#squish!`.
+또한 !(bang) 버전도 사용할 수 있습니다. [[[There's also the destructive version `String#squish!`.]]]
 
-Note that it handles both ASCII and Unicode whitespace like mongolian vowel separator (U+180E).
+이 메소드는 몽고어 모음 구분자(U+180E)와 같은 ASCII와 유니코드 whitespace도 처리해 줍니다. [[[Note that it handles both ASCII and Unicode whitespace like mongolian vowel separator (U+180E).]]]
 
-NOTE: Defined in `active_support/core_ext/string/filters.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/string/filters.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/filters.rb`.]]]
 
 ### `truncate`
 
-The method `truncate` returns a copy of its receiver truncated after a given `length`:
+`truncate` 메소드는 receiver 문자열을 주어진 길이만큼 잘라서 반환해 줍니다. [[[The method `truncate` returns a copy of its receiver truncated after a given `length`:]]]
 
 ```ruby
 "Oh dear! Oh dear! I shall be late!".truncate(20)
 # => "Oh dear! Oh dear!..."
 ```
 
-Ellipsis can be customized with the `:omission` option:
+생략부호는 `:omission` 옵션으로 변경할 수 있습니다. [[[Ellipsis can be customized with the `:omission` option:]]]
 
 ```ruby
 "Oh dear! Oh dear! I shall be late!".truncate(20, omission: '&hellip;')
 # => "Oh dear! Oh &hellip;"
 ```
 
-Note in particular that truncation takes into account the length of the omission string.
+특히 주목할 것은, 주어진 길이 만큼 문자열을 짜를 때 생략문자열의 길이를 감안한다는 것입니다. [[[Note in particular that truncation takes into account the length of the omission string.]]]
 
-Pass a `:separator` to truncate the string at a natural break:
+`:separator` 옵션을 사용하면 단어의 중간이 아니라 단어의 전후에서 짤리도록 할 수 있습니다. [[[Pass a `:separator` to truncate the string at a natural break:]]]
 
 ```ruby
 "Oh dear! Oh dear! I shall be late!".truncate(18)
@@ -1265,20 +1267,20 @@ Pass a `:separator` to truncate the string at a natural break:
 # => "Oh dear! Oh..."
 ```
 
-The option `:separator` can be a regexp:
+또한 `:separator` 옵션은 정규표현식으로 지정할 수도 있습니다. [[[The option `:separator` can be a regexp:]]]
 
 ```ruby
 "Oh dear! Oh dear! I shall be late!".truncate(18, separator: /\s/)
 # => "Oh dear! Oh..."
 ```
 
-In above examples "dear" gets cut first, but then `:separator` prevents it.
+위의 예에서, "dear" 단어의 중간에서 짤려야 하지만 `:separator` 옵션을 사용하였기 때문에 그 단어 앞에서 짤리는 결과를 보입니다. [[[In above examples "dear" gets cut first, but then `:separator` prevents it.]]]
 
-NOTE: Defined in `active_support/core_ext/string/filters.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/string/filters.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/filters.rb`.]]]
 
 ### `inquiry`
 
-The `inquiry` method converts a string into a `StringInquirer` object making equality checks prettier.
+`inguiry` 메소드는 문자열을 `StringInquirer` 객채로 변환해서 일치함을 좀 더 멋지게 확인할 수 있도록 해 줍니다. [[[The `inquiry` method converts a string into a `StringInquirer` object making equality checks prettier.]]]
 
 ```ruby
 "production".inquiry.production? # => true
@@ -1287,18 +1289,18 @@ The `inquiry` method converts a string into a `StringInquirer` object making equ
 
 ### `starts_with?` and `ends_with?`
 
-Active Support defines 3rd person aliases of `String#start_with?` and `String#end_with?`:
+액티브서포트는 `String#start_with?`와 `String#end_with?` 메소드도 지원해 줍니다. [[[Active Support defines 3rd person aliases of `String#start_with?` and `String#end_with?`:]]]
 
 ```ruby
 "foo".starts_with?("f") # => true
 "foo".ends_with?("o")   # => true
 ```
 
-NOTE: Defined in `active_support/core_ext/string/starts_ends_with.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/string/starts_ends_with.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/starts_ends_with.rb`.]]]
 
 ### `strip_heredoc`
 
-The method `strip_heredoc` strips indentation in heredocs.
+`strip_heredoc` 메소드는 heredoc 내에서 들여쓰기 여백을 제거해 줍니다. [[[The method `strip_heredoc` strips indentation in heredocs.]]]
 
 For example in
 
@@ -1314,16 +1316,15 @@ if options[:usage]
 end
 ```
 
-the user would see the usage message aligned against the left margin.
+이와 같이 하면 사용자는 사용법 메시지를 왼쪽 마진에 정돈되어 보게 됩니다. [[[the user would see the usage message aligned against the left margin.]]]
 
-Technically, it looks for the least indented line in the whole string, and removes
-that amount of leading whitespace.
+기술적으로는, 가장 들여쓰기가 작은 라인을 찾아서 그만큼 전체 들여쓰기를 제거해 줍니다. [[[Technically, it looks for the least indented line in the whole string, and removes that amount of leading whitespace.]]]
 
-NOTE: Defined in `active_support/core_ext/string/strip.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/string/strip.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/strip.rb`.]]]
 
 ### `indent`
 
-Indents the lines in the receiver:
+`indent` 메소드는 receiver의 코드라인을 들여쓰기 합니다. [[[Indents the lines in the receiver:]]]
 
 ```ruby
 <<EOS.indent(2)
@@ -1337,7 +1338,7 @@ EOS
   end
 ```
 
-The second argument, `indent_string`, specifies which indent string to use. The default is `nil`, which tells the method to make an educated guess peeking at the first indented line, and fallback to a space if there is none.
+두번째 인수인 `indent_string`은 들여쓰기 문자로 어떤 것을 사용할 것인지를 지정할 수 있게 해 줍니다. 디폴트는 `nil`이며, 이것은 메소드로 하여금 receiver내에서 제일 처음 들여쓰기된 라인을 찾아보고 학습(들여쓰기 문자로 어떤 것이 쓰였는지를 알도록)을 하도록 하여, 들여쓰기 문자가 없다면 대신 스페이스문자로 들여쓰기를 하게 됩니다. [[[The second argument, `indent_string`, specifies which indent string to use. The default is `nil`, which tells the method to make an educated guess peeking at the first indented line, and fallback to a space if there is none.]]]
 
 ```ruby
 "  foo".indent(2)        # => "    foo"
@@ -1345,22 +1346,22 @@ The second argument, `indent_string`, specifies which indent string to use. The 
 "foo".indent(2, "\t")    # => "\t\tfoo"
 ```
 
-While `indent_string` is typically one space or tab, it may be any string.
+보통은 `indent_string`으로 스페이스나 탭문자를 사용하지만 다른 어떤 문자도 가능합니다. [[[While `indent_string` is typically one space or tab, it may be any string.]]]
 
-The third argument, `indent_empty_lines`, is a flag that says whether empty lines should be indented. Default is false.
+세번째 인수인 `indent_empty_lines`는 빈 라인도 들여쓰기를 할지를 결정하는 표시로 디폴값은 false입니다. [[[The third argument, `indent_empty_lines`, is a flag that says whether empty lines should be indented. Default is false.]]]
 
 ```ruby
 "foo\n\nbar".indent(2)            # => "  foo\n\n  bar"
 "foo\n\nbar".indent(2, nil, true) # => "  foo\n  \n  bar"
 ```
 
-The `indent!` method performs indentation in-place.
+!(bang)버전인 `indent!` 메소드는 receiver 문자열에 직접 들여쓰기를 합니다. [[[The `indent!` method performs indentation in-place.]]]
 
-### Access
+### [Access] 접근 메소드
 
 #### `at(position)`
 
-Returns the character of the string at position `position`:
+이 메소드는 문자열내 특정 `position`에 위치하는 문자를 반환해 줍니다. [[[Returns the character of the string at position `position`:]]]
 
 ```ruby
 "hello".at(0)  # => "h"
@@ -1369,11 +1370,11 @@ Returns the character of the string at position `position`:
 "hello".at(10) # => nil
 ```
 
-NOTE: Defined in `active_support/core_ext/string/access.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
 
 #### `from(position)`
 
-Returns the substring of the string starting at position `position`:
+이 메소드는 문자열내 특정 `position`부터 끝까지의 문자열 일부를 반환합니다. [[[Returns the substring of the string starting at position `position`:]]]
 
 ```ruby
 "hello".from(0)  # => "hello"
@@ -1382,11 +1383,11 @@ Returns the substring of the string starting at position `position`:
 "hello".from(10) # => "" if < 1.9, nil in 1.9
 ```
 
-NOTE: Defined in `active_support/core_ext/string/access.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
 
 #### `to(position)`
 
-Returns the substring of the string up to position `position`:
+이 메소드는 문자열내 특정 `position`까지의 문자열 일부를 반환합니다. [[[Returns the substring of the string up to position `position`:]]]
 
 ```ruby
 "hello".to(0)  # => "h"
@@ -1395,19 +1396,19 @@ Returns the substring of the string up to position `position`:
 "hello".to(10) # => "hello"
 ```
 
-NOTE: Defined in `active_support/core_ext/string/access.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
 
 #### `first(limit = 1)`
 
-The call `str.first(n)` is equivalent to `str.to(n-1)` if `n` > 0, and returns an empty string for `n` == 0.
+`str.first(n)`은 `n`이 0 보다 클 경우, `str.to(n-1)`와 같은 결과를 반환해 주며, 0인 경우에는 빈 문자열을 반환해 줍니다. [[[The call `str.first(n)` is equivalent to `str.to(n-1)` if `n` > 0, and returns an empty string for `n` == 0.]]]
 
-NOTE: Defined in `active_support/core_ext/string/access.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
 
 #### `last(limit = 1)`
 
-The call `str.last(n)` is equivalent to `str.from(-n)` if `n` > 0, and returns an empty string for `n` == 0.
+`str.last(n)`은 `n`이 0보다 클 경우, `str.from(n-1)`와 같은 결과를 반환해 주며, 0인 경우에는 빈 문자열을 반환해 줍니다. [[[The call `str.last(n)` is equivalent to `str.from(-n)` if `n` > 0, and returns an empty string for `n` == 0.]]]
 
-NOTE: Defined in `active_support/core_ext/string/access.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
 
 ### [Inflections] 어미/어형의 변경 메소드 (Inflections)
 
@@ -1808,7 +1809,7 @@ INFO: receiver가 `blank` 인 경우에는 `nil` 값을 반환합니다. [[[The 
 
 NOTE: 이 메소드는 `active_support/core_ext/string/conversions.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/conversions.rb`.]]]
 
-[Extensions to `Numeric`] `Numeric` 형에 대한 확장 메소드
+[Extensions to `Numeric`] `Numeric`형에 대한 확장 메소드
 -----------------------
 
 ### Bytes
