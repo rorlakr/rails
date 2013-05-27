@@ -8,7 +8,7 @@ ease!]]]
 본 가이드를 읽은 후, 다음의 내용들을 알게 될 것입니다. [[[After reading this guide, you will know:]]]
 
 * Ajax의 기초. [[[The basics of Ajax.]]]
-* 겸손한 자바스크립트(Unobtrusive JavaScript). [[[Unobtrusive JavaScript.]]]
+* 분리형 자바스크립트(Unobtrusive JavaScript). [[[Unobtrusive JavaScript.]]]
 * 어떻게 레일스의 내장 헬퍼가 당신을 돕는가. [[[How Rails' built-in helpers assist you.]]]
 * 서버측에서 Ajax를 다루는 법. [[[How to handle Ajax on the server side.]]]
 * Turbolinks gem. [[[The Turbolinks gem.]]]
@@ -63,10 +63,10 @@ technique.]]] 당신은 이 코드를 직접 작성할 필요가 거의 없습�
 will show you how Rails can help you write websites in this way, but it's
 all built on top of this fairly simple technique.]]]
 
-[Unobtrusive JavaScript] 겸손한(Unobtrusive) 자바스크립트 
+[Unobtrusive JavaScript] 분리형(Unobtrusive) 자바스크립트 
 -------------------------------------
 
-레일스는 DOM에 연결된 자바스크립트를 다루기 위해 "겸손한 자바스크립트"라 불리는 기술을 사용합니다. [[[Rails uses a technique called "Unobtrusive JavaScript" to handle attaching
+레일스는 DOM에 연결된 자바스크립트를 다루기 위해 "분리 자바스크립트"라 불리는 기술을 사용합니다. [[[Rails uses a technique called "Unobtrusive JavaScript" to handle attaching
 JavaScript to the DOM.]]]
 이것은 일반적으로 프론트엔드 커뮤니티에서 모범사례로 간주됩니다. 
 하지만 당신은 간혹 다른 방식으로 보여주는 튜토리얼을 볼 수 있습니다. [[[This is generally considered to be a best-practice
@@ -136,7 +136,7 @@ $ ->
 <a href="#" data-background-color="#000099" data-text-color="#FFFFFF">Paint it blue</a>
 ```
 
-우리는 이것을 '겸손한' 자바스크립트라고 부릅니다. 더이상 자바스크립트를 HTML 안에 섞지 않기 때문입니다. [[[We call this 'unobtrusive' JavaScript because we're no longer mixing our
+우리는 이것을 '분리형' 자바스크립트라고 부릅니다. 더이상 자바스크립트를 HTML 안에 섞지 않기 때문입니다. [[[We call this 'unobtrusive' JavaScript because we're no longer mixing our
 JavaScript into our HTML.]]]
 우리는 앞으로 있을 변경을 쉽게 하기 위해 적절하게 우리 고려사항을 분리했습니다. [[[We've properly separated our concerns, making future
 change easy.]]]
@@ -162,7 +162,7 @@ in generating HTML.]]]
 간혹 당신은 요소들에 약간의 Ajax를 추가하기를 원하고, 그러한 경우 레일스는 당신을 도와줄 것입니다. [[[Sometimes, you want to add a little Ajax to those elements,
 and Rails has got your back in those cases.]]]
 
-겸손한 자바스크립트 때문에, 레일스의 "Ajax Helpers"는 사실 두 부분으로 되어 있습니다. 자바스크립트 부분과 루비 부분입니다. [[[Because of Unobtrusive JavaScript, the Rails "Ajax helpers" are actually in two
+분리형 자바스크립트 때문에, 레일스의 "Ajax Helpers"는 사실 두 부분으로 되어 있습니다. 자바스크립트 부분과 루비 부분입니다. [[[Because of Unobtrusive JavaScript, the Rails "Ajax helpers" are actually in two
 parts: the JavaScript half and the Ruby half.]]]
 
 [rails.js](https://github.com/rails/jquery-ujs/blob/master/src/rails.js)는 자바스크립트 부분을 제공하고,
