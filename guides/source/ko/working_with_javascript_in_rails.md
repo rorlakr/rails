@@ -8,6 +8,7 @@ ease!]]]
 본 가이드를 읽은 후, 다음의 내용들을 알게 될 것입니다. [[[After reading this guide, you will know:]]]
 
 * Ajax의 기초. [[[The basics of Ajax.]]]
+
 * 분리형 자바스크립트(Unobtrusive JavaScript). [[[Unobtrusive JavaScript.]]]
 * 어떻게 레일스의 내장 헬퍼가 당신을 돕는가. [[[How Rails' built-in helpers assist you.]]]
 * 서버측에서 Ajax를 다루는 법. [[[How to handle Ajax on the server side.]]]
@@ -20,7 +21,6 @@ ease!]]]
 
 Ajax를 이해하기 위해, 먼저 웹브라우저가 보통 무엇을 하는지 이해해야 합니다. [[[In order to understand Ajax, you must first understand what a web browser does
 normally.]]]
-
 웹브라우저의 주소 막대에 `http://localhost:3000`를 입력하고 'Go'를 누르면, 브라우저('클라이언트')는 서버로 요청을 보냅니다. [[[When you type `http://localhost:3000` into your browser's address bar and hit
 'Go,' the browser (your 'client') makes a request to the server.]]]
 브라우저는 서버로부터의 응답을 분석하고, 자바스크립트 파일들, 스타일시트들 그리고 이미지들과 같은 연관된 모든 자산들을 불러옵니다. [[[It parses the

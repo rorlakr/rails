@@ -176,13 +176,11 @@ end
 
 위의 예에서와 같이, `ApplicationController` 내에 `default_url_options`을 정의해 두면, 어플리케이션내 모든 URL 생성시에 적용될 것입니다. 또한 이 메소드를 특정 컨트롤러내에 정의해 둔다면, 해당 컨트롤러내에서 생성되는 URL에 대해서만 적용됩니다. [[[If you define `default_url_options` in `ApplicationController`, as in the example above, it would be used for all URL generation. The method can also be defined in one specific controller, in which case it only affects URLs generated there.]]]
 
-### Strong Parameters
+### [Strong Parameters] 스트롱파라메터
 
-[[[With strong parameters, Action Controller parameters are forbidden to be used in Active Model mass assignments until they have been whitelisted. This means you'll have to make a conscious choice about which attributes to allow for mass updating and thus prevent accidentally exposing that which shouldn't be exposed.]]]
+스트롱파라메터를 사용하면 액션컨트롤러의 파라메터를 whitelist에 등록하지 않은 이상 액티브모델의 mass assignment에서 사용할 수 없도록 할 수 있습니다. 즉, 외부로 노출되어서는 안되는 속성들이 우연히 노출되는 것을 방지하기 위해서 mass assignment로 업데이트할 속성을 분명히 지정해야 합니다. [[[With strong parameters, Action Controller parameters are forbidden to be used in Active Model mass assignments until they have been whitelisted. This means you'll have to make a conscious choice about which attributes to allow for mass updating and thus prevent accidentally exposing that which shouldn't be exposed.]]]
 
-In addition, parameters can be marked as required and flow through a
-predefined raise/rescue flow to end up as a 400 Bad Request with no
-effort.
+또한, 파라메터는 필수항목으로 표시할 수 있으며, 별다른 노력을 들이지 않고도 이미 정의된 raise/rescue 플로우를 통과하여 400 Bad Request로 마무리할 수 있습니다. [[[In addition, parameters can be marked as required and flow through a predefined raise/rescue flow to end up as a 400 Bad Request with no effort.]]]
 
 ```ruby
 class PeopleController < ActionController::Base
@@ -215,18 +213,18 @@ class PeopleController < ActionController::Base
 end
 ```
 
-#### Permitted Scalar Values
+#### [Permitted Scalar Values] 허용 수치 값
 
-Given
+아래와 같은 상황에서 [[[Given]]]
 
 ```ruby
 params.permit(:id)
 ```
 
-the key `:id` will pass the whitelisting if it appears in `params` and
+`:id` 키가 `params`에 등록되어 있을 때 비로소 허용목록(whitelist)을 통과하게 될 것입니다. [[[the key `:id` will pass the whitelisting if it appears in `params` and
 it has a permitted scalar value associated. Otherwise the key is going
 to be filtered out, so arrays, hashes, or any other objects cannot be
-injected.
+injected.]]]
 
 The permitted scalar types are `String`, `Symbol`, `NilClass`,
 `Numeric`, `TrueClass`, `FalseClass`, `Date`, `Time`, `DateTime`,
