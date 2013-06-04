@@ -221,38 +221,38 @@ end
 params.permit(:id)
 ```
 
-`:id` 키가 `params`에 등록되어 있을 때 비로소 허용목록(whitelist)을 통과하게 될 것입니다. [[[the key `:id` will pass the whitelisting if it appears in `params` and
+`:id` 키가 `params`에 등록되어 있을 때 비로소 허용목록(whitelist)을 통과하게 되며 `params`는 관련된 하나의 허용되는 수치 값을 가집니다. 그렇지 않으면 그 키는 거부되어 배열, 해시, 또는 기타 다른 객체들을 볼 수 없게 됩니다. [[[the key `:id` will pass the whitelisting if it appears in `params` and
 it has a permitted scalar value associated. Otherwise the key is going
 to be filtered out, so arrays, hashes, or any other objects cannot be
 injected.]]]
 
-The permitted scalar types are `String`, `Symbol`, `NilClass`,
+허용되는 수치 형으로는 `String`, `Symbol`, `NilClass`,
+`Numeric`, `TrueClass`, `FalseClass`, `Date`, `Time`, `DateTime`,
+`StringIO`, `IO`, `ActionDispatch::Http::UploadedFile`,
+`Rack::Test::UploadedFile`이 있습니다. [[[The permitted scalar types are `String`, `Symbol`, `NilClass`,
 `Numeric`, `TrueClass`, `FalseClass`, `Date`, `Time`, `DateTime`,
 `StringIO`, `IO`, `ActionDispatch::Http::UploadedFile` and
-`Rack::Test::UploadedFile`.
+`Rack::Test::UploadedFile`.]]]
 
-To declare that the value in `params` must be an array of permitted
-scalar values map the key to an empty array:
+`params`의 값이 허용 수치 값들의 배열이고 그 키가 비 배열로 매핑되기 위해서는 [[[To declare that the value in `params` must be an array of permitted
+scalar values map the key to an empty array:]]]
 
 ```ruby
 params.permit(id: [])
 ```
 
-To whitelist an entire hash of parameters, the `permit!` method can be
-used:
+파라메터의 전체 해시를 허용목록으로 등록하기 위해서는 `permit!` 메소드를 사용할 수 있습니다. [[[To whitelist an entire hash of parameters, the `permit!` method can be
+used:]]]
 
 ```ruby
 params.require(:log_entry).permit!
 ```
 
-This will mark the `:log_entry` parameters hash and any subhash of it
-permitted.  Extreme care should be taken when using `permit!` as it
-will allow all current and future model attributes to be
-mass-assigned.
+이렇게 하면, `:log_entry` 파라메터 해시와 그것의 일부 해시를 허용목록에 등록해 줍니다. `permit!`를 사용할 때는 모든 현재 또는 미래의 모델 속성들이 mass-assignment를 통해서 업데이트될 수 있기 때문에 매우 신중을 기해야 합니다. [[[This will mark the `:log_entry` parameters hash and any subhash of it permitted.  Extreme care should be taken when using `permit!` as it will allow all current and future model attributes to be mass-assigned.]]]
 
-#### Nested Parameters
+#### [Nested Parameters] 중첩 파라메터
 
-You can also use permit on nested parameters, like:
+물론 중첩된 파라메터에 대해서도 다음과 같이 `permit`를 사용할 수 있습니다. [[[You can also use permit on nested parameters, like:]]]
 
 ```ruby
 params.permit(:name, { emails: [] },
@@ -260,19 +260,13 @@ params.permit(:name, { emails: [] },
                          { family: [ :name ], hobbies: [] }])
 ```
 
-This declaration whitelists the `name`, `emails` and `friends`
-attributes. It is expected that `emails` will be an array of permitted
-scalar values and that `friends` will be an array of resources with
-specific attributes : they should have a `name` attribute (any
-permitted scalar values allowed), a `hobbies` attribute as an array of
-permitted scalar values, and a `family` attribute which is restricted
-to having a `name` (any permitted scalar values allowed, too).
+이 선언은 `name`, `emails`, `friends` 속성을 허용목록에 등록합니다. `emails`는 허용된 수치 값들의 배열이 될 것이고 `friends`는 특정 속성들을 가지는 리소스의 배열이 될 것입니다. 그리고 이 리소스는 `name`, `hobbies`, `family` 속성을 가집니다. `name` 속성은 다른 값들을 지정할 수 도 있습니다. `hobbies` 속성은 허용 수치 값에 대한 배열을 가집니다. `family` 속성은 `name` 속성으로 제한되지만 다른 값들도 지정할 수 있습니다. [[[This declaration whitelists the `name`, `emails` and `friends` attributes. It is expected that `emails` will be an array of permitted scalar values and that `friends` will be an array of resources with specific attributes : they should have a `name` attribute (any permitted scalar values allowed), a `hobbies` attribute as an array of permitted scalar values, and a `family` attribute which is restricted to having a `name` (any permitted scalar values allowed, too).]]]
 
-#### More Examples
+#### [More Examples] 더 많은 예
 
-You want to also use the permitted attributes in the `new`
+`new` 액션에서 허용된 속성들을 사용하고할 경우가 있습니다. 이때는 `new` 액션 호출 당시에 보통 루트 키가 존재하지 않기 때문에 루트 키에 대해서 `require`을 사용할 때 문제가 발생하게 됩니다. [[[You want to also use the permitted attributes in the `new`
 action. This raises the problem that you can't use `require` on the
-root key because normally it does not exist when calling `new`:
+root key because normally it does not exist when calling `new`:]]]
 
 ```ruby
 # using `fetch` you can supply a default and use
@@ -280,19 +274,16 @@ root key because normally it does not exist when calling `new`:
 params.fetch(:blog, {}).permit(:title, :author)
 ```
 
-`accepts_nested_attributes_for` allows you to update and destroy
+`accepts_nested_attributes_for` 매크로를 이용하면 관련 레코드를 업데이트하고 삭제할 수 있습니다. 이 때는 `id`와 `_destroy` 파라메터에 근거해서 작업이 이루어집니다. [[[`accepts_nested_attributes_for` allows you to update and destroy
 associated records. This is based on the `id` and `_destroy`
-parameters:
+parameters:]]]
 
 ```ruby
 # permit :id and :_destroy
 params.require(:author).permit(:name, books_attributes: [:title, :id, :_destroy])
 ```
 
-Hashes with integer keys are treated differently and you can declare
-the attributes as if they were direct children. You get these kinds of
-parameters when you use `accepts_nested_attributes_for` in combination
-with a `has_many` association:
+정수 키를 가지는 해시는 다르게 처리되는데, 이 때는 속성들을 마치 자식 속성처럼 선언할 수 있습니다. `has_many` 선언과 함께 `accepts_nested_attributes_for`를 사용할 때 이와 같이 속성들을 처리할 수 있습니다. [[[Hashes with integer keys are treated differently and you can declare the attributes as if they were direct children. You get these kinds of parameters when you use `accepts_nested_attributes_for` in combination with a `has_many` association:]]]
 
 ```ruby
 # To whitelist the following data:
@@ -303,17 +294,17 @@ with a `has_many` association:
 params.require(:book).permit(:title, chapters_attributes: [:title])
 ```
 
-#### Outside the Scope of Strong Parameters
+#### [[[Outside the Scope of Strong Parameters]]] 스트롱파라메터 외부 영역
 
-The strong parameter API was designed with the most common use cases
+스트롱파라메터 API는 가장 흔히 사용하는 예를 염두에 두고 디자인되었습니다. 이것은 허용목록을 다루는 모든 경우를 처리하지는 못합니다. 그러나, 스트롱파라메터 API와 직접코딩을 통해서 쉽게 상황에 따르는 문제를 해결할 수 있도록 도와 줍니다. [[[The strong parameter API was designed with the most common use cases
 in mind. It is not meant as a silver bullet to handle all your
 whitelisting problems. However you can easily mix the API with your
-own code to adapt to your situation.
+own code to adapt to your situation.]]]
 
-Imagine a scenario where you want to whitelist an attribute
+키를 가지는 해시를 허용목록에 등록하고자 할 경우에는 스트롱파라메터를 이용해서는 불가능하지만 간단하게 할당하여 처리할 수 있습니다. [[[Imagine a scenario where you want to whitelist an attribute
 containing a hash with any keys. Using strong parameters you can't
 allow a hash with any keys but you can use a simple assignment to get
-the job done:
+the job done:]]]
 
 ```ruby
 def product_params
@@ -323,27 +314,30 @@ def product_params
 end
 ```
 
-[Session]세션
+[Session] 세션
 -------
 
-어플리케이션에서는 사용자당 하나의 세션을 가질 수 있으며, 여기에는 요청시 마다 유지될 수 있는 소량의 데이터를 저장할 수 있습니다. 이러한 세션은 컨트롤러에서만 사용할 수 있고 여러가지 저장 메카니즘 중에 하나를 이용할 수 있습니다.
+어플리케이션에서는 사용자당 하나의 세션을 가질 수 있으며, 여기에는 요청시 마다 유지될 수 있는 소량의 데이터를 저장할 수 있습니다. 이러한 세션은 컨트롤러에서만 사용할 수 있고 여러가지 저장 메카니즘 중에 하나를 이용할 수 있습니다. [[[Your application has a session for each user in which you can store small amounts of data that will be persisted between requests. The session is only available in the controller and the view and can use one of a number of different storage mechanisms:]]]
 
-* ActionDispatch::Session::CookieStore - 클라이언트에 모든 것을 저장합니다.
-* ActionDispatch::Session::CacheStore - 레일스 캐쉬에 데이터를 저장합니다.
-* ActionDispatch::Session::ActiveRecordStore - 액티브레코드를 이용하여 데이터베이스에 데이터를 저장합니다. (이 때는 `activerecord-session_store` 젬이 필요함).
-* ActionDispatch::Session::MemCacheStore - memcached 클러스터에 데이터를 저장합니다. (이것은 오래된 구현방법이라서 대신에 CacheStore를 사용하기 바랍니다.)
+* ActionDispatch::Session::CookieStore - 클라이언트에 모든 것을 저장합니다. [[[`ActionDispatch::Session::CookieStore` - Stores everything on the client.]]]
 
-세션 저장소로 항상 쿠키를 사용하며 여기에 각 세션에 해당하는 고유 ID값을 저장하게 됩니다(쿠키를 사용해야 합니다, 레일스에서는, 보안이 더 약하기 때문에, URL에 세션 ID값을 넘기지 못하게 되어 있습니다).
+* ActionDispatch::Session::CacheStore - 레일스 캐쉬에 데이터를 저장합니다. [[[`ActionDispatch::Session::CacheStore` - Stores the data in the Rails cache.]]]
 
-대부분의 저장소에 대해서 이 세션 ID값을 이용해서 서버(예를 들면, 데이터베이스 테이블)에 있는 세션 데이터를 조회하기 위해 사용하게 됩니다. 한가지 예외 상황이 있는데, 그것은 기본적으로 추천되는 세션 저장소인 CookieStore로서, 모든 세션 데이터를 쿠키 자체에 저장하게 됩니다(세션 ID값은 필요시 언제든지 사용가능합니다). 이것은 용량이 매우 작다는 장점이 있고 세션을 사용하기 위해 새로운 어플리케이션에서 별도의 설치과정이 필요없습니다. 쿠키 데이터는 암호화되어 있어 변조를 방지할 수 있지만, 코드화가 되지 않아서 아무나 접근해서 내용을 읽을 수 있지만 수정할 수는 없습니다(만약 수정이 될 경우 레일스는 해당 쿠키를 승인하지 않게 될 것입니다).
+* ActionDispatch::Session::ActiveRecordStore - 액티브레코드를 이용하여 데이터베이스에 데이터를 저장합니다. (이 때는 `activerecord-session_store` 젬이 필요함). [[[`ActionDispatch::Session::ActiveRecordStore` - Stores the data in a database using Active Record. (require `activerecord-session_store` gem).]]]
 
-CookieStore는 다른 것에 비해 — 훨씬 용량이 적어 — 대략 4kB 정도의 데이터를 저장할 수 있지만, 이 정도면 대부분의 경우에 충분한 용량입니다. 어떠한 종류의 세션 저장소를 사용하더라도 세션에 대용량의 데이터를 저장하는 것은 권장하고 있지 않습니다. 특히 세션에 복잡한 객체(기본 루비 객체 이외의 다른 것, 가장 흔한 예로, 모델 인스턴스)를 저장하는 것을 피해야 하는데, 서버가 요청 사이에 세션값을 재조합할 수 없어 에러를 발생할 것이기 때문입니다.
+* ActionDispatch::Session::MemCacheStore - memcached 클러스터에 데이터를 저장합니다. (이것은 오래된 구현방법이라서 대신에 CacheStore를 사용하기 바랍니다.) [[[`ActionDispatch::Session::MemCacheStore` - Stores the data in a memcached cluster (this is a legacy implementation; consider using CacheStore instead).]]]
 
-사용자 세션이 중요한 데이터를 저장하지 않거나 오랜 기간동안(예를 들어, 메시지를 보내기 위해 flash를 사용할 경우와 같이) 유지되어야 할 필요가 없는 경우 ActionDispatch::Session::CacheStore를 사용할 것을 고려할 수 있습니다. 이것은 어플리케이션에 대해서 설정해 놓은 캐시를 이용해서 세션정보를 저장하게 될 것입니다. 이것의 장점은 별도의 설치과정이나 관리가 필요없이 세션을 저장하기 위해 기존의 캐시 구조를 바로 사용할 수 있다는 것입니다. 물론, 단점은 세션값들의 수명이 짧아서 언제라도 사라질 수 있다는 것입니다.
+세션 저장소로 항상 쿠키를 사용하며 여기에 각 세션에 해당하는 고유 ID값을 저장하게 됩니다(쿠키를 사용해야 합니다, 레일스에서는, 보안이 더 약하기 때문에, URL에 세션 ID값을 넘기지 못하게 되어 있습니다). [[[All session stores use a cookie to store a unique ID for each session (you must use a cookie, Rails will not allow you to pass the session ID in the URL as this is less secure).]]]
 
-[Security Guide](security.html) 에서 세션 저장에 대한 더 많은 내용을 읽어 보기 바랍니다.
+대부분의 저장소에 대해서 이 세션 ID값을 이용해서 서버(예를 들면, 데이터베이스 테이블)에 있는 세션 데이터를 조회하기 위해 사용하게 됩니다. 한가지 예외 상황이 있는데, 그것은 기본적으로 추천되는 세션 저장소인 CookieStore로서, 모든 세션 데이터를 쿠키 자체에 저장하게 됩니다(세션 ID값은 필요시 언제든지 사용가능합니다). 이것은 용량이 매우 작다는 장점이 있고 세션을 사용하기 위해 새로운 어플리케이션에서 별도의 설치과정이 필요없습니다. 쿠키 데이터는 암호화되어 있어 변조를 방지할 수 있지만, 코드화가 되지 않아서 아무나 접근해서 내용을 읽을 수 있지만 수정할 수는 없습니다(만약 수정이 될 경우 레일스는 해당 쿠키를 승인하지 않게 될 것입니다). [[[For most stores, this ID is used to look up the session data on the server, e.g. in a database table. There is one exception, and that is the default and recommended session store - the CookieStore - which stores all session data in the cookie itself (the ID is still available to you if you need it). This has the advantage of being very lightweight and it requires zero setup in a new application in order to use the session. The cookie data is cryptographically signed to make it tamper-proof, but it is not encrypted, so anyone with access to it can read its contents but not edit it (Rails will not accept it if it has been edited).]]]
 
-다른 종류의 세션 저장 메카니즘을 사용하고자 한다면 `config/initializers/session_store.rb` 파일에서 세션 저장소를 변경할 수 있습니다.
+CookieStore는 다른 것에 비해 — 훨씬 용량이 적어 — 대략 4kB 정도의 데이터를 저장할 수 있지만, 이 정도면 대부분의 경우에 충분한 용량입니다. 어떠한 종류의 세션 저장소를 사용하더라도 세션에 대용량의 데이터를 저장하는 것은 권장하고 있지 않습니다. 특히 세션에 복잡한 객체(기본 루비 객체 이외의 다른 것, 가장 흔한 예로, 모델 인스턴스)를 저장하는 것을 피해야 하는데, 서버가 요청 사이에 세션값을 재조합할 수 없어 에러를 발생할 것이기 때문입니다. [[[The CookieStore can store around 4kB of data — much less than the others — but this is usually enough. Storing large amounts of data in the session is discouraged no matter which session store your application uses. You should especially avoid storing complex objects (anything other than basic Ruby objects, the most common example being model instances) in the session, as the server might not be able to reassemble them between requests, which will result in an error.]]]
+
+사용자 세션이 중요한 데이터를 저장하지 않거나 오랜 기간동안(예를 들어, 메시지를 보내기 위해 flash를 사용할 경우와 같이) 유지되어야 할 필요가 없는 경우 ActionDispatch::Session::CacheStore를 사용할 것을 고려할 수 있습니다. 이것은 어플리케이션에 대해서 설정해 놓은 캐시를 이용해서 세션정보를 저장하게 될 것입니다. 이것의 장점은 별도의 설치과정이나 관리가 필요없이 세션을 저장하기 위해 기존의 캐시 구조를 바로 사용할 수 있다는 것입니다. 물론, 단점은 세션값들의 수명이 짧아서 언제라도 사라질 수 있다는 것입니다. [[[If your user sessions don't store critical data or don't need to be around for long periods (for instance if you just use the flash for messaging), you can consider using ActionDispatch::Session::CacheStore. This will store sessions using the cache implementation you have configured for your application. The advantage of this is that you can use your existing cache infrastructure for storing sessions without requiring any additional setup or administration. The downside, of course, is that the sessions will be ephemeral and could disappear at any time.]]]
+
+[Security Guide](security.html) 에서 세션 저장에 대한 더 많은 내용을 읽어 보기 바랍니다. [[[Read more about session storage in the [Security Guide](security.html).]]]
+
+다른 종류의 세션 저장 메카니즘을 사용하고자 한다면 `config/initializers/session_store.rb` 파일에서 세션 저장소를 변경할 수 있습니다. [[[If you need a different session storage mechanism, you can change it in the `config/initializers/session_store.rb` file:]]]
 
 ```ruby
 # 기본 세션 저장소인 쿠키 대신에 데이터베이스를 사용할 경우, 
@@ -352,20 +346,20 @@ CookieStore는 다른 것에 비해 — 훨씬 용량이 적어 — 대략 4kB �
 # YourApp::Application.config.session_store :active_record_store
 ```
 
-세션 데이터를 보낼때 레일스는 세션 키(쿠키 이름)를 정하게 됩니다. 이것은 `config/initializers/session_store.rb` 파일에서 변경할 수 있습니다.
+세션 데이터를 보낼때 레일스는 세션 키(쿠키 이름)를 정하게 됩니다. 이것은 `config/initializers/session_store.rb` 파일에서 변경할 수 있습니다. [[[Rails sets up a session key (the name of the cookie) when signing the session data. These can also be changed in `config/initializers/session_store.rb`:]]]
 
 ```ruby
 # 이 파일의 내용을 변경하게 될 때 반드시 서버를 재시동해야 합니다.
 YourApp::Application.config.session_store :cookie_store, key: '_your_app_session'
 ```
 
-또한 `:domain` 키를 넘겨 해당 쿠키에 대해서 도메일 이름을 명시할 수도 있습니다
+또한 `:domain` 키를 넘겨 해당 쿠키에 대해서 도메일 이름을 명시할 수도 있습니다. [[[You can also pass a `:domain` key and specify the domain name for the cookie:]]]
 
 ```ruby
 # 이 파일의 내용을 변경하게 될 때 반드시 서버를 재시동해야 합니다.
 YourApp::Application.config.session_store :cookie_store, key: '_your_app_session', domain: ".example.com"
 ```
-레일스는 (CookieStore에 대해서) 세션 데이터에 표식하기 위해 사용할 보안키를 정하게 됩니다. 이것은 `config/initializers/secret_token.rb` 파일에서 변경할 수 있습니다.
+레일스는 (CookieStore에 대해서) 세션 데이터에 표식하기 위해 사용할 보안키를 정하게 됩니다. 이것은 `config/initializers/secret_token.rb` 파일에서 변경할 수 있습니다. [[[Rails sets up (for the CookieStore) a secret key used for signing the session data. This can be changed in `config/initializers/secret_token.rb`]]]
 
 ```ruby
 # 이 파일의 내용을 변경하게 될 때 반드시 서버를 재시동해야 합니다.
@@ -377,15 +371,15 @@ YourApp::Application.config.session_store :cookie_store, key: '_your_app_session
 YourApp::Application.config.secret_key_base = '49d3f3de9ed86c74b94ad6bd0...'
 ```
 
-NOTE: `CookieStore`를 사용할 때 보안키를 변경하게 되면, 기존의 모든 세션들이 무효화될 것입니다.
+NOTE: `CookieStore`를 사용할 때 보안키를 변경하게 되면, 기존의 모든 세션들이 무효화될 것입니다. [[[Changing the secret when using the `CookieStore` will invalidate all existing sessions.]]]
 
-### [Accessing the Session]세션 접근하기
+### [Accessing the Session] 세션 접근하기
 
-컨트롤러에서 `session` 인스턴스 메소드를 이용하면 세션에 접근할 수 있습니다.
+컨트롤러에서 `session` 인스턴스 메소드를 이용하면 세션에 접근할 수 있습니다. [[[In your controller you can access the session through the `session` instance method.]]]
 
-NOTE: 세션은 필요시에 로드됩니다. 즉, 액션 코드에서 세션값을 호출하지 않으면 세션이 로드되지 안는다는 의미입니다. 따라서 세션을 사용하지 못하게 하는 작업이 필요없고 그저 세션에 접근하지 않으면 된다는 것입니다.
+NOTE: 세션은 필요시에 로드됩니다. 즉, 액션 코드에서 세션값을 호출하지 않으면 세션이 로드되지 안는다는 의미입니다. 따라서 세션을 사용하지 못하게 하는 작업이 필요없고 그저 세션에 접근하지 않으면 된다는 것입니다. [[[Sessions are lazily loaded. If you don't access sessions in your action's code, they will not be loaded. Hence you will never need to disable sessions, just not accessing them will do the job.]]]
 
-세션 값은 해쉬와 같이 키/값 쌍의 형태로 저장됩니다.
+세션 값은 해쉬와 같이 키/값 쌍의 형태로 저장됩니다. [[[Session values are stored using key/value pairs like a hash:]]]
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -402,7 +396,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-세션에 어떤 값을 저장하기 위해서는, 해쉬와 같이 특정 키에 할당하면 됩니다.
+세션에 어떤 값을 저장하기 위해서는, 해쉬와 같이 특정 키에 할당하면 됩니다. [[[To store something in the session, just assign it to the key like a hash:]]]
 
 ```ruby
 class LoginsController < ApplicationController
@@ -418,7 +412,7 @@ class LoginsController < ApplicationController
 end
 ```
 
-세션에서 어떤 값을 제거하기 위해서는 해당 키에 `nil` 값을 할당하면 됩니다.
+세션에서 어떤 값을 제거하기 위해서는 해당 키에 `nil` 값을 할당하면 됩니다. [[[To remove something from the session, assign that key to be `nil`:]]]
 
 ```ruby
 class LoginsController < ApplicationController
@@ -431,15 +425,15 @@ class LoginsController < ApplicationController
 end
 ```
 
-세션 전체를 재설정하기 위해서는, `reset_session` 메소드를 사용하면 됩니다.
+세션 전체를 재설정하기 위해서는, `reset_session` 메소드를 사용하면 됩니다. [[[To reset the entire session, use `reset_session`.]]]
 
-### [The Flash]플래시(flash) 메시지
+### [The Flash] 플래시(flash) 메시지
 
-플래시는 요청시마다 사라지는 세션의 특수한 형태입니다. 플래시에 저장된 값은 다음번 요청시에만 사용할 수 있다는 의미이며, 에러 메시지 등을 표시할 때 유용하게 사용할 수 있습니다.
+플래시는 요청시마다 사라지는 세션의 특수한 형태입니다. 플래시에 저장된 값은 다음번 요청시에만 사용할 수 있다는 의미이며, 에러 메시지 등을 표시할 때 유용하게 사용할 수 있습니다. [[[The flash is a special part of the session which is cleared with each request. This means that values stored there will only be available in the next request, which is useful for passing error messages etc.]]]
 
-해쉬형태([FlashHash](http://api.rubyonrails.org/classes/ActionDispatch/Flash/FlashHash.html)의 인스턴스)로, 세션과 똑같은 방식으로 접근할 수 있습니다. 
+해쉬형태([FlashHash](http://api.rubyonrails.org/classes/ActionDispatch/Flash/FlashHash.html)의 인스턴스)로, 세션과 똑같은 방식으로 접근할 수 있습니다. [[[It is accessed in much the same way as the session, as a hash (it's a [FlashHash](http://api.rubyonrails.org/classes/ActionDispatch/Flash/FlashHash.html) instance).]]]
 
-예로서 로그아웃 동작시에, 컨트롤러는 다음번 요청 때 사용자에게 보여줄 메시지를 보낼 수 있습니다.
+예로서 로그아웃 동작시에, 컨트롤러는 다음번 요청 때 사용자에게 보여줄 메시지를 보낼 수 있습니다. [[[Let's use the act of logging out as an example. The controller can send a message which will be displayed to the user on the next request:]]]
 
 ```ruby
 class LoginsController < ApplicationController
@@ -451,7 +445,7 @@ class LoginsController < ApplicationController
 end
 ```
 
-주목한 것은, 요청에 대한 리디렉션시에 플래시 메시지를 설정할 수도 있다는 것입니다. `:notice`, `:alert` 또는 일반적인 목적의 `:flash`에 할당할 수 있습니다.
+주목한 것은, 요청에 대한 리디렉션시에 플래시 메시지를 설정할 수도 있다는 것입니다. `:notice`, `:alert` 또는 일반적인 목적의 `:flash`에 할당할 수 있습니다. [[[Note that it is also possible to assign a flash message as part of the redirection. You can assign `:notice`, `:alert` or the general purpose `:flash`:]]]
 
 ```ruby
 redirect_to root_url, notice: "You have successfully logged out."
@@ -459,7 +453,7 @@ redirect_to root_url, alert: "You're stuck here!"
 redirect_to root_url, flash: { referral_code: 1234 }
 ```
 
-`destroy` 액션은 어플리케이션의 `root_url` 로 리디렉트하며, 플래시 메시지는 리디렉트한 루트 주소에 나타나게 될 것입니다. 이전 액션에서 플래시 메시지로 작성한 것에 대한 처리는 전적으로 다음 액션에 달려있다는 것을 주의해야 합니다. 통상적으로 플래시로 저장된 이벤트성 에러나 알림은 어플리케이션의 레이아웃에 표시하게 될 것입니다.
+`destroy` 액션은 어플리케이션의 `root_url` 로 리디렉트하며, 플래시 메시지는 리디렉트한 루트 주소에 나타나게 될 것입니다. 이전 액션에서 플래시 메시지로 작성한 것에 대한 처리는 전적으로 다음 액션에 달려있다는 것을 주의해야 합니다. 통상적으로 플래시로 저장된 이벤트성 에러나 알림은 어플리케이션의 레이아웃에 표시하게 될 것입니다. [[[The `destroy` action redirects to the application's `root_url`, where the message will be displayed. Note that it's entirely up to the next action to decide what, if anything, it will do with what the previous action put in the flash. It's conventional to display any error alerts or notices from the flash in the application's layout:]]]
 
 ```erb
 <html>
@@ -474,10 +468,10 @@ redirect_to root_url, flash: { referral_code: 1234 }
 </html>
 ```
 
-이런식으로 특정 액션에서 에러나 알림 메시지가 작성되면 자동으로 레이아웃에 보이게 될 것입니다.
+이런식으로 특정 액션에서 에러나 알림 메시지가 작성되면 자동으로 레이아웃에 보이게 될 것입니다. [[[This way, if an action sets a notice or an alert message, the layout will display it automatically.]]]
 
-You can pass anything that the session can store; you're not limited to notices and alerts:
-세션이 저장할 수 있는 어떤 것도 플래시 해시로 넘겨 줄 수 있어서, notice와 alert에만 국한할 필요는 없습니다.
+세션이 저장할 수 있는 어떤 것도 플래시 해시로 넘겨 줄 수 있어서, notice와 alert에만 국한할 필요는 없습니다. [[[You can pass anything that the session can store; you're not limited to notices and alerts:]]]
+
 
 ```erb
 <% if flash[:just_signed_up] %>
@@ -485,7 +479,7 @@ You can pass anything that the session can store; you're not limited to notices 
 <% end %>
 ```
 
-플래시 메시지를 다른 요청으로 넘기고 싶을 때는 `keep` 메소드를 사용하면 됩니다.
+플래시 메시지를 다른 요청으로 넘기고 싶을 때는 `keep` 메소드를 사용하면 됩니다. [[[If you want a flash value to be carried over to another request, use the `keep` method:]]]
 
 ```ruby
 class MainController < ApplicationController
@@ -508,7 +502,7 @@ end
 
 #### `flash.now`
 
-기본적으로, 플래시에 추가한 메시지는 다음 번 요청시에 사용할 수 있지만, 때때로 현재의 요청에서 이 메시지를 사용하기를 원할 수도 있습니다. 예를 들면, `create` 액션이 특정 리소스를 저장하는데 실패할 경우 `new` 템플릿을 바로 렌더링하고자 할 것입니다. 이때, 새로운 요청을 하지 않고도 플래시 메시지를 보이게 할 수 있습니다. 이렇게 하기 위해서는, 일반적인 `flash` 를 사용하듯이 `flash.now` 를 사용하면 됩니다.
+기본적으로, 플래시에 추가한 메시지는 다음 번 요청시에 사용할 수 있지만, 때때로 현재의 요청에서 이 메시지를 사용하기를 원할 수도 있습니다. 예를 들면, `create` 액션이 특정 리소스를 저장하는데 실패할 경우 `new` 템플릿을 바로 렌더링하고자 할 것입니다. 이때, 새로운 요청을 하지 않고도 플래시 메시지를 보이게 할 수 있습니다. 이렇게 하기 위해서는, 일반적인 `flash` 를 사용하듯이 `flash.now` 를 사용하면 됩니다. [[[By default, adding values to the flash will make them available to the next request, but sometimes you may want to access those values in the same request. For example, if the `create` action fails to save a resource and you render the `new` template directly, that's not going to result in a new request, but you may still want to display a message using the flash. To do this, you can use `flash.now` in the same way you use the normal `flash`:]]]
 
 ```ruby
 class ClientsController < ApplicationController
@@ -524,10 +518,10 @@ class ClientsController < ApplicationController
 end
 ```
 
-[Cookies]쿠키
+[Cookies] 쿠키
 -------
 
-어플리케이션은 - 쿠키라고 불리는 - 소량의 데이터를 클라이언트단에 저장할 수 있으며, 요청시마다 심지어 세션간에도 이 값은 사라지지 않고 유지될 것입니다. 레일스는 `cookies` 메소드를 이용해서 쿠키에 쉽게 접근할 수 있게 해 주며, `sessions` 과 같이 하나의 해시처럼 작동하게 됩니다.
+어플리케이션은 - 쿠키라고 불리는 - 소량의 데이터를 클라이언트단에 저장할 수 있으며, 요청시마다 심지어 세션간에도 이 값은 사라지지 않고 유지될 것입니다. 레일스는 `cookies` 메소드를 이용해서 쿠키에 쉽게 접근할 수 있게 해 주며, `sessions` 과 같이 하나의 해시처럼 작동하게 됩니다. [[[Your application can store small amounts of data on the client — called cookies — that will be persisted across requests and even sessions. Rails provides easy access to cookies via the `cookies` method, which — much like the `session` — works like a hash:]]]
 
 ```ruby
 class CommentsController < ApplicationController
@@ -555,13 +549,13 @@ class CommentsController < ApplicationController
 end
 ```
 
-세션 값에 대해서는 키 값을 `nil` 로 할당하는 반면, 쿠키 값을 삭제하기 위해서는 `cookies.delete(:key)` 를 사용해야 함을 주목하기 바랍니다.
+세션 값에 대해서는 키 값을 `nil` 로 할당하는 반면, 쿠키 값을 삭제하기 위해서는 `cookies.delete(:key)` 를 사용해야 함을 주목하기 바랍니다. [[[Note that while for session values you set the key to `nil`, to delete a cookie value you should use `cookies.delete(:key)`.]]]
 
 
-[Rendering xml and json data]xml과 json 데이터 렌더링하기
+[Rendering xml and json data] xml과 json 데이터 렌더링하기
 ---------------------------
 
-액션 컨트롤러는 `xml` 과 `json` 데이터를 매우 쉽게 렌더링하게 해 줍니다. scaffold를 이용해서 액션 컨트롤러를 생성할 경우 해당 컨트롤러는 다음과 같이 보일 것입니다.
+액션 컨트롤러는 `xml` 과 `json` 데이터를 매우 쉽게 렌더링하게 해 줍니다. scaffold를 이용해서 액션 컨트롤러를 생성할 경우 해당 컨트롤러는 다음과 같이 보일 것입니다. ActionController makes it extremely easy to render `XML` or `JSON` data. If you've generated a controller using scaffolding, it would look something like this:
 
 ```ruby
 class UsersController < ApplicationController
@@ -576,16 +570,16 @@ class UsersController < ApplicationController
 end
 ```
 
-위의 경우가 코드가 `render xml: @users.to_xml`이 아니라 `render xml: @users`라는 것을 주목하기 바랍니다. 이것은 입력값이 문자열이 아니기 때문인데, 문자열이 아닌 경우에는 레일스가 자동으로 `to_xml` 을 호출하게 됩니다.
+위의 경우가 코드가 `render xml: @users.to_xml`이 아니라 `render xml: @users`라는 것을 주목하기 바랍니다. 이것은 입력값이 문자열이 아니기 때문인데, 문자열이 아닌 경우에는 레일스가 자동으로 `to_xml` 을 호출하게 됩니다. [[[You may notice in the above code that we're using `render xml: @users`, not `render xml: @users.to_xml`. If the object is not a String, then Rails will automatically invoke `to_xml` for us.]]]
 
-[Filters]필터
+[Filters] 필터
 -------
 
-필터는 컨트롤러 액션 전, 후, 또는 전후("around")에 실행되는 메소드를 말합니다.
+필터는 컨트롤러 액션 전, 후, 또는 전후("around")에 실행되는 메소드를 말합니다. [[[Filters are methods that are run before, after or "around" a controller action.]]]
 
-필터는 상속되기 때문에, 특정 필터를 `ApplicationController` 에 작성해 두면 어플리케이션내의 모든 컨트롤러상에서 실행될 것입니다.
+필터는 상속되기 때문에, 특정 필터를 `ApplicationController` 에 작성해 두면 어플리케이션내의 모든 컨트롤러상에서 실행될 것입니다. [[[Filters are inherited, so if you set a filter on `ApplicationController`, it will be run on every controller in your application.]]]
 
-"before" 필터는 요청 주기를 중단할 수 있습니다. 흔히 사용하는 "before" 필터는 특정 액션이 실행되기 위해서는 사용자가 로그인해야 하는 경우입니다. 이와 같은 필터 메소드를 다음과 같이 정의할 수 있습니다.
+"before" 필터는 요청 주기를 중단할 수 있습니다. 흔히 사용하는 "before" 필터는 특정 액션이 실행되기 위해서는 사용자가 로그인해야 하는 경우입니다. 이와 같은 필터 메소드를 다음과 같이 정의할 수 있습니다. [[["Before" filters may halt the request cycle. A common "before" filter is one which requires that a user is logged in for an action to be run. You can define the filter method this way:]]]
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -610,9 +604,9 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-위의 예에서 require_login 메소드는 에러 메시지를 플래시에 저장하고 사용자가 로그인하지 않은 상태라면 로그인 폼으로 리디렉트하게 됩니다. "before" 필터 메소드가 렌더링을 하거나 리디렉트할 경우 해당 액션은 실행되지 않을 것입니다. 만약 해당 필터이후에 실행되어야할 또 다른 필터가 있는 경우, 그 필터 또한 취소될 것입니다.
+위의 예에서 require_login 메소드는 에러 메시지를 플래시에 저장하고 사용자가 로그인하지 않은 상태라면 로그인 폼으로 리디렉트하게 됩니다. "before" 필터 메소드가 렌더링을 하거나 리디렉트할 경우 해당 액션은 실행되지 않을 것입니다. 만약 해당 필터이후에 실행되어야할 또 다른 필터가 있는 경우, 그 필터 또한 취소될 것입니다. [[[The method simply stores an error message in the flash and redirects to the login form if the user is not logged in. If a "before" filter renders or redirects, the action will not run. If there are additional filters scheduled to run after that filter, they are also cancelled.]]]
 
-위의 예에서, 필터가 `ApplicationController` 에 추가되기 때문에 어플리케이션내에 있는 모든 컨트롤러는 해당 필터를 상속받게 됩니다. 이것은 어플리케이션에 있는 모든 것이 사용자가 그것을 사용하기 위해서는 로그인을 하도록 요구하게 만듭니다. 이런 경우, 최초 사용자가 까지도 로그인을 할 수 없게 되므로 모든 컨트롤러나 액션이 로그인을 요구하게 해서는 안 됩니다. 따라서 `skip_before_filter` 를 사용해서 해당 필터가 특정 before 액션을 실행하지 못하도록 할 수 있습니다.
+위의 예에서, 필터가 `ApplicationController` 에 추가되기 때문에 어플리케이션내에 있는 모든 컨트롤러는 해당 필터를 상속받게 됩니다. 이것은 어플리케이션에 있는 모든 것이 사용자가 그것을 사용하기 위해서는 로그인을 하도록 요구하게 만듭니다. 이런 경우, 최초 사용자가 까지도 로그인을 할 수 없게 되므로 모든 컨트롤러나 액션이 로그인을 요구하게 해서는 안 됩니다. 따라서 `skip_before_filter` 를 사용해서 해당 필터가 특정 before 액션을 실행하지 못하도록 할 수 있습니다. [[[In this example the filter is added to `ApplicationController` and thus all controllers in the application inherit it. This will make everything in the application require the user to be logged in in order to use it. For obvious reasons (the user wouldn't be able to log in in the first place!), not all controllers or actions should require this. You can prevent this filter from running before particular actions with `skip_before_action`:]]]
 
 ```ruby
 class LoginsController < ApplicationController
@@ -620,17 +614,17 @@ class LoginsController < ApplicationController
 end
 ```
 
-이제 `LoginController 컨트롤러의 `new` 액션과 `create` 액션은 사용자들에게 로그인을 요구하지 않고 작업을 수행하게 될 것입니다. `:only` 옵션을 사용하여 특정 액션을 지정하면 이 필터가 적용되지 못하게 할 수 있고, `:except` 옵션을 사용하면, 상반되는 방식으로 작업을 수행하게 됩니다. 이러한 옵션들은 필터를 추가할 때도 사용할 수 있어서 최초에만 해당 액션을 실행할 수 있도록 필터를 추가할 수 있습니다.
+이제 `LoginController 컨트롤러의 `new` 액션과 `create` 액션은 사용자들에게 로그인을 요구하지 않고 작업을 수행하게 될 것입니다. `:only` 옵션을 사용하여 특정 액션을 지정하면 이 필터가 적용되지 못하게 할 수 있고, `:except` 옵션을 사용하면, 상반되는 방식으로 작업을 수행하게 됩니다. 이러한 옵션들은 필터를 추가할 때도 사용할 수 있어서 최초에만 해당 액션을 실행할 수 있도록 필터를 추가할 수 있습니다. [[[Now, the `LoginsController`'s `new` and `create` actions will work as before without requiring the user to be logged in. The `:only` option is used to only skip this filter for these actions, and there is also an `:except` option which works the other way. These options can be used when adding filters too, so you can add a filter which only runs for selected actions in the first place.]]]
 
-### [After Filters and Around Filters]After 필터와 Around 필터
+### [After Filters and Around Filters] After 필터와 Around 필터
 
-"before" 필터 외에도, 액션이 실행된 이후 또는 전후에 필터가 실행될 수 있도록 할 수 있습니다.
+"before" 필터 외에도, 액션이 실행된 이후 또는 전후에 필터가 실행될 수 있도록 할 수 있습니다. [[[In addition to "before" filters, you can also run filters after an action has been executed, or both before and after.]]]
 
-"after" 필터는 "before" 필터와 비슷하지만, 이미 해당 액션이 이미 실행되었기 때문에 액션내에서 클라이언트로 보내게 될 결과 데이터에 접근할 수 있게 됩니다. 분명한 것은, "after" 필터는 액션의 실행을 중단할 수 없는 것입니다.
+"after" 필터는 "before" 필터와 비슷하지만, 이미 해당 액션이 이미 실행되었기 때문에 액션내에서 클라이언트로 보내게 될 결과 데이터에 접근할 수 있게 됩니다. 분명한 것은, "after" 필터는 액션의 실행을 중단할 수 없는 것입니다. [[["After" filters are similar to "before" filters, but because the action has already been run they have access to the response data that's about to be sent to the client. Obviously, "after" filters cannot stop the action from running.]]]
 
-"around" 필터는, Rack 미들웨어가 동작하는 방법과 비슷하게, 필터 내부에서 액션결과를 yield하여 관련 액션을 실행하도록 합니다.
+"around" 필터는, Rack 미들웨어가 동작하는 방법과 비슷하게, 필터 내부에서 액션결과를 yield하여 관련 액션을 실행하도록 합니다. [[["Around" filters are responsible for running their associated actions by yielding, similar to how Rack middlewares work.]]]
 
-예를 들면, 변경내용에 대해서, 관리자만이 그 변경내용을 쉽게 검토할 수 있는 승인 절차가 필요한 웹사이트에서는, 그 변경내역을 하나의 트랜잭션내에서 적용해야 합니다.
+예를 들면, 변경내용에 대해서, 관리자만이 그 변경내용을 쉽게 검토할 수 있는 승인 절차가 필요한 웹사이트에서는, 그 변경내역을 하나의 트랜잭션내에서 적용해야 합니다. [[[For example, in a website where changes have an approval workflow an administrator could be able to preview them easily, just apply them within a transaction:]]]
 
 ```ruby
 class ChangesController < ActionController::Base
@@ -650,16 +644,16 @@ class ChangesController < ActionController::Base
 end
 ```
 
-"around" 필터가 렌더링을 감싸고 있는 것을 주목해서 보기 바랍니다. 특히, 위의 예에서 뷰 템플릿 자체가 (scope와 같은 것을 통해서) 데이터베이스로부터 읽어 올 경우에는, 트랜잭션 내에서 렌더링하여 미리보기 할 수 있게 해 줍니다.
+"around" 필터가 렌더링을 감싸고 있는 것을 주목해서 보기 바랍니다. 특히, 위의 예에서 뷰 템플릿 자체가 (scope와 같은 것을 통해서) 데이터베이스로부터 읽어 올 경우에는, 트랜잭션 내에서 렌더링하여 미리보기 할 수 있게 해 줍니다. [[[Note that an "around" filter also wraps rendering. In particular, if in the example above, the view itself reads from the database (e.g. via a scope), it will do so within the transaction and thus present the data to preview.]]]
 
-요청에 대해서 응답을 렌더링하지 않도록 할 수 있는데, 이 때는 해당 액션이 실행되지 않습니다.
+요청에 대해서 응답을 렌더링하지 않도록 할 수 있는데, 이 때는 해당 액션이 실행되지 않습니다. [[[You can choose not to yield and build the response yourself, in which case the action will not be run.]]]
 
 
-### [Other Ways to Use Filters]필터를 사용하는 다른 방법들
+### [Other Ways to Use Filters] 필터를 사용하는 다른 방법들
 
-필터를 사용할 때 private 메소드를 작성해서 *_filter에 추가하는 것이 가장 일반적인 방법이지만, 여기에는 두가지 방법이 더 있습니다.
+필터를 사용할 때 private 메소드를 작성해서 *_filter에 추가하는 것이 가장 일반적인 방법이지만, 여기에는 두가지 방법이 더 있습니다. [[[While the most common way to use filters is by creating private methods and using *_action to add them, there are two other ways to do the same thing.]]]
 
-첫번째 방법은 *_filter 메소드에 직접 블록을 사용하는 것입니다. 그 블록은 컨트롤러를 인수로 받게 되는데 위에서 언급했던 `require_login` 필터는 블록을 사용해서 다음과 같이 다시 작성할 수 있습니다:
+첫번째 방법은 *_filter 메소드에 직접 블록을 사용하는 것입니다. 그 블록은 컨트롤러를 인수로 받게 되는데 위에서 언급했던 `require_login` 필터는 블록을 사용해서 다음과 같이 다시 작성할 수 있습니다: [[[The first is to use a block directly with the *_action methods. The block receives the controller as an argument, and the `require_login` filter from above could be rewritten to use a block:]]]
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -669,9 +663,9 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-이 경우에서 필터가 `send` 메소드를 이용하게 되는데, `logged_in?` 메소드가 private으로 선언되어 있어서 해당 필터가 현재의 컨트롤러의 영역에서 실행되지 않기 때문이라는 것을 주목하기 바랍니다. 이렇게 특별한 필터를 수행하기 위해서 이와 같이 하는 것은 그리 추천할 만한 방법은 아니지만 좀 더 간단한 경우에는 도움이 될 수도 있습니다.
+이 경우에서 필터가 `send` 메소드를 이용하게 되는데, `logged_in?` 메소드가 private으로 선언되어 있어서 해당 필터가 현재의 컨트롤러의 영역에서 실행되지 않기 때문이라는 것을 주목하기 바랍니다. 이렇게 특별한 필터를 수행하기 위해서 이와 같이 하는 것은 그리 추천할 만한 방법은 아니지만 좀 더 간단한 경우에는 도움이 될 수도 있습니다. [[[Note that the filter in this case uses `send` because the `logged_in?` method is private and the filter is not run in the scope of the controller. This is not the recommended way to implement this particular filter, but in more simple cases it might be useful.]]]
 
-두번째 방법은 하나의 클래스(실제로는 메소드에 대해서 응답을 하는 어떠한 객체라도 가능함)를 이용해서 필터링 작업을 하는 것입니다. 이것은 좀 더 복잡하고, 다른 두가지 메소드를 이용해서 가독성 있고 재사용 가능한 방법으로 수행할 수 없는 경우에 도움이 됩니다. 예를 들어, 클래스를 사용해서 login 필터를 다음과 같이 다시 작성해 볼 수 있습니다.
+두번째 방법은 하나의 클래스(실제로는 메소드에 대해서 응답을 하는 어떠한 객체라도 가능함)를 이용해서 필터링 작업을 하는 것입니다. 이것은 좀 더 복잡하고, 다른 두가지 메소드를 이용해서 가독성 있고 재사용 가능한 방법으로 수행할 수 없는 경우에 도움이 됩니다. 예를 들어, 클래스를 사용해서 login 필터를 다음과 같이 다시 작성해 볼 수 있습니다. [[[The second way is to use a class (actually, any object that responds to the right methods will do) to handle the filtering. This is useful in cases that are more complex and can not be implemented in a readable and reusable way using the two other methods. As an example, you could rewrite the login filter again to use a class:]]]
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -688,18 +682,18 @@ class LoginFilter
 end
 ```
 
-또한, 이것은 해당 컨트롤러의 영역에서 실행되지 않고 그 컨트롤러를 인수로서 받기 때문에 그렇게 이상적인 예라고 볼 수는 없습니다. 필터 클래스는 `filter` 클래스 메소드를 가지는데 그것이 before 또는 after 필터인 여부에 따라 액션 전 또는 후에 실행됩니다. around 필터로 사용되는 클래스도 같은 `filter` 메소드를 사용할 수 있는데, 동일한 방식으로 실행될 것입니다. 그러나 이 때는 해당 액션을 실행하여 `yield` 를 해야 합니다. 다른 방법으로, `before` 와 `after` 메소드를 작성해서 액션 전후에 실행되도록 할 수도 있습니다.
+또한, 이것은 해당 컨트롤러의 영역에서 실행되지 않고 그 컨트롤러를 인수로서 받기 때문에 그렇게 이상적인 예라고 볼 수는 없습니다. 필터 클래스는 `filter` 클래스 메소드를 가지는데 그것이 before 또는 after 필터인 여부에 따라 액션 전 또는 후에 실행됩니다. around 필터로 사용되는 클래스도 같은 `filter` 메소드를 사용할 수 있는데, 동일한 방식으로 실행될 것입니다. 그러나 이 때는 해당 액션을 실행하여 `yield` 를 해야 합니다. 다른 방법으로, `before` 와 `after` 메소드를 작성해서 액션 전후에 실행되도록 할 수도 있습니다. [[[Again, this is not an ideal example for this filter, because it's not run in the scope of the controller but gets the controller passed as an argument. The filter class has a class method `filter` which gets run before or after the action, depending on if it's a before or after filter. Classes used as around filters can also use the same `filter` method, which will get run in the same way. The method must `yield` to execute the action. Alternatively, it can have both a `before` and an `after` method that are run before and after the action.]]]
 
-[Request Forgery Protection]요청 위조방지
+[Request Forgery Protection] 요청 위조방지
 --------------------------
 
-크로스-사이트 요청위조(Cross-site request forgery:CSRF)이란 웹사이트 공격의 한 형태로서 특정 사이트가 특정 사용자를 속여서 다른 사이트에 요청을 하게 하여 해당 사용자 몰래 또는 허락 없이 해당 사이트에서 데이터를 추가, 수정 삭제할 수 있게 하는 것을 말합니다.
+크로스-사이트 요청위조(Cross-site request forgery:CSRF)이란 웹사이트 공격의 한 형태로서 특정 사이트가 특정 사용자를 속여서 다른 사이트에 요청을 하게 하여 해당 사용자 몰래 또는 허락 없이 해당 사이트에서 데이터를 추가, 수정 삭제할 수 있게 하는 것을 말합니다. [[[Cross-site request forgery is a type of attack in which a site tricks a user into making requests on another site, possibly adding, modifying or deleting data on that site without the user's knowledge or permission.]]]
 
-이러한 공격을 피하는 첫번째 조치는 create, update, destroy와 같은 모든 "파괴적인" 액션들을 non-GET 요청으로만 접근하도록 했는지 확인하는 것입니다. RESTful 방식을 준수하고 있다면 이미 이러한 조치를 하고 있는 것입니다. 그러나, 특정 사이트가 악의적으로 본인의 사이트에 대해서 non-GET 방식으로도 여전히 요청을 손쉽게 보낼 수 있습니다. 따라서 요청위조에 대한 보호가 필요하게 되는 것입니다. 이름에서 알 수 있듯이, 이것은 위조된 요청으로부터 자신을 보호하게 됩니다.
+이러한 공격을 피하는 첫번째 조치는 create, update, destroy와 같은 모든 "파괴적인" 액션들을 non-GET 요청으로만 접근하도록 했는지 확인하는 것입니다. RESTful 방식을 준수하고 있다면 이미 이러한 조치를 하고 있는 것입니다. 그러나, 특정 사이트가 악의적으로 본인의 사이트에 대해서 non-GET 방식으로도 여전히 요청을 손쉽게 보낼 수 있습니다. 따라서 요청위조에 대한 보호가 필요하게 되는 것입니다. 이름에서 알 수 있듯이, 이것은 위조된 요청으로부터 자신을 보호하게 됩니다. [[[The first step to avoid this is to make sure all "destructive" actions (create, update and destroy) can only be accessed with non-GET requests. If you're following RESTful conventions you're already doing this. However, a malicious site can still send a non-GET request to your site quite easily, and that's where the request forgery protection comes in. As the name says, it protects from forged requests.]]]
 
-이를 구현하기 위한 방법은 서버에서만 알 수 있고 어느 누구도 생각해 낼 수 없는 토큰을 각 요청에 대해서 추가해 주는 것입니다. 따라서, 적당한 토큰이 없이 특정 요청이 들어오게 되면 이런식으로 접근이 거부당하게 되는 것입니다.
+이를 구현하기 위한 방법은 서버에서만 알 수 있고 어느 누구도 생각해 낼 수 없는 토큰을 각 요청에 대해서 추가해 주는 것입니다. 따라서, 적당한 토큰이 없이 특정 요청이 들어오게 되면 이런식으로 접근이 거부당하게 되는 것입니다. [[[The way this is done is to add a non-guessable token which is only known to your server to each request. This way, if a request comes in without the proper token, it will be denied access.]]]
 
-다음과 같이 폼을 만들 경우라면,
+다음과 같이 폼을 만들 경우라면, [[[If you generate a form like this:]]]
 
 ```erb
 <%= form_for @user do |f| %>
@@ -719,20 +713,20 @@ end
 </form>
 ```
 
-레일스는 [폼 헬퍼메소드](form_helpers.html)를 이용하여 만드는 모든 폼에 대해서 이 토큰을 추가합니다. 따라서 대부분의 경우 이것에 대한 걱정을 할 필요가 없습니다. 직접 폼을 작성한다던지, 다른 어떤 이유로 토큰을 추가할 필요가 있을 때는, `form_authenticity_token` 메소드를 이용하면 토큰을 추가할 수 있습니다
+레일스는 [폼 헬퍼메소드](form_helpers.html)를 이용하여 만드는 모든 폼에 대해서 이 토큰을 추가합니다. 따라서 대부분의 경우 이것에 대한 걱정을 할 필요가 없습니다. 직접 폼을 작성한다던지, 다른 어떤 이유로 토큰을 추가할 필요가 있을 때는, `form_authenticity_token` 메소드를 이용하면 토큰을 추가할 수 있습니다. [[[Rails adds this token to every form that's generated using the [form helpers](form_helpers.html), so most of the time you don't have to worry about it. If you're writing a form manually or need to add the token for another reason, it's available through the method `form_authenticity_token`:]]]
 
-`form_authenticity_token` 메소드는 유효한 인증 토큰을 생성해 줍니다. 특히나, 개발자가 작성한 Ajax 호출시와 같이 레일스가 알아서 추가해 주지 않는 경우에 이 메소드를 유용하게 사용할 수 있습니다.
+`form_authenticity_token` 메소드는 유효한 인증 토큰을 생성해 줍니다. 특히나, 개발자가 작성한 Ajax 호출시와 같이 레일스가 알아서 추가해 주지 않는 경우에 이 메소드를 유용하게 사용할 수 있습니다. [[[The `form_authenticity_token` generates a valid authentication token. That's useful in places where Rails does not add it automatically, like in custom Ajax calls.]]]
 
-[Security Guide](security.html)에는, 이에 대해서 뿐만 아니라 웹 개발시 알아야 할 다른 보안관련 문제에 대해서도 자세하게 기술되어 있습니다.
+[Security Guide](security.html)에는, 이에 대해서 뿐만 아니라 웹 개발시 알아야 할 다른 보안관련 문제에 대해서도 자세하게 기술되어 있습니다. [[[The [Security Guide](security.html) has more about this and a lot of other security-related issues that you should be aware of when developing a web application.]]]
 
-[The Request and Response Objects]요청 및 응답객체
+[The Request and Response Objects] 요청 및 응답객체
 --------------------------------
 
-모든 컨트롤러에서는 현재 진행되고 있는 요청 사이클과 연관된 요청 및 응답 객체를 반환해 주는 2개의 접근자 메소드를 사용할 수 있습니다. `request` 메소드는 `AbstractRequest` 클래스의 인스턴스를 가지고 있고 `response` 메소드는 클라이언트로 보낼 응답 객체를 반환해 줍니다.
+모든 컨트롤러에서는 현재 진행되고 있는 요청 사이클과 연관된 요청 및 응답 객체를 반환해 주는 2개의 접근자 메소드를 사용할 수 있습니다. `request` 메소드는 `AbstractRequest` 클래스의 인스턴스를 가지고 있고 `response` 메소드는 클라이언트로 보낼 응답 객체를 반환해 줍니다. [[[In every controller there are two accessor methods pointing to the request and the response objects associated with the request cycle that is currently in execution. The `request` method contains an instance of `AbstractRequest` and the `response` method returns a response object representing what is going to be sent back to the client.]]]
 
 ### [The `request` Object]`request` 객체
 
-요청 객체는 클라이언트로부터 들어오는 요청에 대한 많은 유용한 정보를 포함하고 있습니다. 사용할 수 있는 모든 리스트를 보기 위해서는 [API documentation](http://api.rubyonrails.org/classes/ActionDispatch/Request.html) 를 참고하기 바랍니다. 이 요청 객체에 대해서 접근할 수 있는 속성들은 다음과 같습니다.
+요청 객체는 클라이언트로부터 들어오는 요청에 대한 많은 유용한 정보를 포함하고 있습니다. 사용할 수 있는 모든 리스트를 보기 위해서는 [API documentation](http://api.rubyonrails.org/classes/ActionDispatch/Request.html) 를 참고하기 바랍니다. 이 요청 객체에 대해서 접근할 수 있는 속성들은 다음과 같습니다. [[[The request object contains a lot of useful information about the request coming in from the client. To get a full list of the available methods, refer to the [API documentation](http://api.rubyonrails.org/classes/ActionDispatch/Request.html). Among the properties that you can access on this object are:]]]
 
 | `request` 속성                    | 설명                                                                          |
 | ----------------------------------------- | -------------------------------------------------------------------------------- |
@@ -748,13 +742,13 @@ end
 | remote_ip                                 | 클라이언트의 IP 주소.                                                    |
 | url                                       | 요청시 사용한 전체 URL.                                             |
 
-#### [`path_parameters`, `query_parameters`, and `request_parameters`]`path_parameters`, `query_parameters`, 그리고 `request_parameters`
+#### [`path_parameters`, `query_parameters`, and `request_parameters`] `path_parameters`, `query_parameters`, 그리고 `request_parameters`
 
-레일스는 쿼리스트링이든, POST의 일부로 보내졌던 상관없이 요청시에 보내진 모든 파라메터를 `params` 해쉬에 담아 둡니다. 요청 객체는 3개의 접근자를 가지고 해당 파라메터에 대해 접근할 수 있습니다. `query_parameters` 해쉬는 쿼리스트링으로 보내진 파라메터를 포함하고 있고 `request_parameters` 해쉬는 POST로 보내진 파라메터를 포함하게 됩니다. `path_parameters` 해쉬는 이 특정 컨트롤러와 액션으로 연결되는 경로 중 일부를 파라메터로 포함하게 됩니다.
+레일스는 쿼리스트링이든, POST의 일부로 보내졌던 상관없이 요청시에 보내진 모든 파라메터를 `params` 해쉬에 담아 둡니다. 요청 객체는 3개의 접근자를 가지고 해당 파라메터에 대해 접근할 수 있습니다. `query_parameters` 해쉬는 쿼리스트링으로 보내진 파라메터를 포함하고 있고 `request_parameters` 해쉬는 POST로 보내진 파라메터를 포함하게 됩니다. `path_parameters` 해쉬는 이 특정 컨트롤러와 액션으로 연결되는 경로 중 일부를 파라메터로 포함하게 됩니다. [[[Rails collects all of the parameters sent along with the request in the `params` hash, whether they are sent as part of the query string or the post body. The request object has three accessors that give you access to these parameters depending on where they came from. The `query_parameters` hash contains parameters that were sent as part of the query string while the `request_parameters` hash contains parameters sent as part of the post body. The `path_parameters` hash contains parameters that were recognized by the routing as being part of the path leading to this particular controller and action.]]]
 
-### [The `response` Object]`response` 객체
+### [The `response` Object] `response` 객체
 
-응답 객체는 대개는 직접 사용되지 않지만, 액션이 실행될 때 만들어져서 사용자에게 보내질 데이터를 렌더링하게 됩니다. 그러나 때때로, after 필터와 같이, 응답을 직접 접근하는 것이 유용할 경우가 있습니다. 이러한 접근자 메소드 중에는 setter 메소드를 가지고 있어서 직접 그 값을 변경할 수 있게 해 줍니다.
+응답 객체는 대개는 직접 사용되지 않지만, 액션이 실행될 때 만들어져서 사용자에게 보내질 데이터를 렌더링하게 됩니다. 그러나 때때로, after 필터와 같이, 응답을 직접 접근하는 것이 유용할 경우가 있습니다. 이러한 접근자 메소드 중에는 setter 메소드를 가지고 있어서 직접 그 값을 변경할 수 있게 해 줍니다. [[[The response object is not usually used directly, but is built up during the execution of the action and rendering of the data that is being sent back to the user, but sometimes - like in an after filter - it can be useful to access the response directly. Some of these accessor methods also have setters, allowing you to change their values.]]]
 
 | `response` 속성 | 설명                                                                                             |
 | ---------------------- | --------------------------------------------------------------------------------------------------- |
@@ -765,27 +759,28 @@ end
 | charset                | 응답에 사용하게 될 문자셋. 기본값은 "utf-8"입니다.                                  |
 | headers                | 응답에 사용하게 될 헤더.                                                                      |
 
-#### [Setting Custom Headers]커스텀 헤더 셋팅하기
+#### [Setting Custom Headers] 커스텀 헤더 셋팅하기
 
-응답에 대해서 커스텀 헤더를 설정하고자 할 때는, `response.headers` 에서 작업하면 됩니다. `headers` 속성은 헤더이름과 값을 연결하는 해시구조로 되어 있으며 레일스는 이 중에 몇가지를 알아서 셋팅해 줍니다. 헤더를 추가하거나 변경하고자 한다면, 다음과 같이 `response.headers` 에 할당하기 하면 됩니다.
+응답에 대해서 커스텀 헤더를 설정하고자 할 때는, `response.headers` 에서 작업하면 됩니다. `headers` 속성은 헤더이름과 값을 연결하는 해시구조로 되어 있으며 레일스는 이 중에 몇가지를 알아서 셋팅해 줍니다. 헤더를 추가하거나 변경하고자 한다면, 다음과 같이 `response.headers` 에 할당하기 하면 됩니다. [[[If you want to set custom headers for a response then `response.headers` is the place to do it. The headers attribute is a hash which maps header names to their values, and Rails will set some of them automatically. If you want to add or change a header, just assign it to `response.headers` this way:]]]
 
 ```ruby
 response.headers["Content-Type"] = "application/pdf"
 ```
 
-NOTE: 위의 예에서는, `content_type` setter 메소드를 직접사용하는 것이 더 이해가 잘 될 것입니다.
+NOTE: 위의 예에서는, `content_type` setter 메소드를 직접사용하는 것이 더 이해가 잘 될 것입니다. [[[in the above case it would make more sense to use the `content_type` setter directly.]]]
 
-[HTTP Authentications]HTTP 인증
+[HTTP Authentications] HTTP 인증
 --------------------
 
-레일스에는 2개의 HTTP 인증 메카니즘이 내장되어 있습니다:
+레일스에는 2개의 HTTP 인증 메카니즘이 내장되어 있습니다: [[[Rails comes with two built-in HTTP authentication mechanisms:]]]
 
-* 기본 인증
-* Digest 인증
+* 기본 인증 [[[Basic Authentication]]]
 
-### [HTTP Basic Authentication]HTTP 기본 인증
+* Digest 인증 [[[Digest Authentication]]]
 
-HTTP 기본 인증은 대부분의 브라우저와 기타 HTTP 클라이언트에서 지원하는 인증 스키마입니다. 예를 들어, 사용자명과 비밀번호를 브라우저의 HTTP 기본 다이알로그 창에 입력하여 접근할 수 있는 관리자 페이지를 생각해 보겠습니다. 이 때 `http_basic_authenticate_with` 메소드만을 이용하여 내장된 인증 시스템을 매우 쉽게 사용할 수 있습니다.
+### [HTTP Basic Authentication] HTTP 기본 인증
+
+HTTP 기본 인증은 대부분의 브라우저와 기타 HTTP 클라이언트에서 지원하는 인증 스키마입니다. 예를 들어, 사용자명과 비밀번호를 브라우저의 HTTP 기본 다이알로그 창에 입력하여 접근할 수 있는 관리자 페이지를 생각해 보겠습니다. 이 때 `http_basic_authenticate_with` 메소드만을 이용하여 내장된 인증 시스템을 매우 쉽게 사용할 수 있습니다. [[[HTTP basic authentication is an authentication scheme that is supported by the majority of browsers and other HTTP clients. As an example, consider an administration section which will only be available by entering a username and a password into the browser's HTTP basic dialog window. Using the built-in authentication is quite easy and only requires you to use one method, `http_basic_authenticate_with`.]]]
 
 ```ruby
 class AdminController < ApplicationController
@@ -793,11 +788,11 @@ class AdminController < ApplicationController
 end
 ```
 
-이 상태에서 `AdminController` 로부터 상속받는 네이스페이스를 가지는 컨트롤러를 만들 수 있습니다. 이 기본 인증 필터는 해당 컨트롤러의 모든 액션에 대해서 적용이 되어 인증을 보호하게 될 것입니다.
+이 상태에서 `AdminController` 로부터 상속받는 네이스페이스를 가지는 컨트롤러를 만들 수 있습니다. 이 기본 인증 필터는 해당 컨트롤러의 모든 액션에 대해서 적용이 되어 인증을 보호하게 될 것입니다. [[[With this in place, you can create namespaced controllers that inherit from `AdminController`. The filter will thus be run for all actions in those controllers, protecting them with HTTP basic authentication.]]]
 
-### [HTTP Digest Authentication]HTTP Digest 인증
+### [HTTP Digest Authentication] HTTP Digest 인증
 
-HTTP digest 인증은 기본 인증보다 더 우수해서 클라이언트로 하여금 네트워크상에서 암호화되지 않는 비밀번호를 보내도록 요구하지 않습니다(물론 HTTP 기본 인증이 HTTPS 보다 안전하기 하지만). 레일스에서 digest 인증을 사용하는 것을 매우 쉬워서 `authenticate_or_request_with_http_digest` 메소드만 필요로 합니다.
+HTTP digest 인증은 기본 인증보다 더 우수해서 클라이언트로 하여금 네트워크상에서 암호화되지 않는 비밀번호를 보내도록 요구하지 않습니다(물론 HTTP 기본 인증이 HTTPS 보다 안전하기 하지만). 레일스에서 digest 인증을 사용하는 것을 매우 쉬워서 `authenticate_or_request_with_http_digest` 메소드만 필요로 합니다. HTTP digest authentication is superior to the basic authentication as it does not require the client to send an unencrypted password over the network (though HTTP basic authentication is safe over HTTPS). Using digest authentication with Rails is quite easy and only requires using one method, `authenticate_or_request_with_http_digest`.
 
 ```ruby
 class AdminController < ApplicationController
@@ -815,14 +810,14 @@ class AdminController < ApplicationController
 end
 ```
 
-위의 예에서와 같이 `authenticate_or_request_with_http_digest` 블록은 하나의 인수(username)만을 취합니다. 이 때 블록은 비밀번호를 반환해 주게 됩니다. `authenticate_or_request_with_http_digest` 으로부터 `false` 또는 `nil` 값을 반환하게 되면 인증 실패를 유발하게 될 것입니다.
+위의 예에서와 같이 `authenticate_or_request_with_http_digest` 블록은 하나의 인수(username)만을 취합니다. 이 때 블록은 비밀번호를 반환해 주게 됩니다. `authenticate_or_request_with_http_digest` 으로부터 `false` 또는 `nil` 값을 반환하게 되면 인증 실패를 유발하게 될 것입니다. [[[As seen in the example above, the `authenticate_or_request_with_http_digest` block takes only one argument - the username. And the block returns the password. Returning `false` or `nil` from the `authenticate_or_request_with_http_digest` will cause authentication failure.]]]
 
-[Streaming and File Downloads]스트리밍과 파일 다운로드
+[Streaming and File Downloads] 스트리밍과 파일 다운로드
 ----------------------------
 
-때때로 HTML 페이지를 렌더링하는 대신 사용자에게 파일을 보내고 싶어할 수 있습니다. 레일스에 있는 모든 컨트롤러는 `send_data` 와 `send_file` 메소드를 가지고 있어서 둘 다 클라이언트에게 데이터를 스트리밍하게 됩니다. `send_file` 메소드는 디스크상의 파일이름을 넘겨 주면 해당 파일의 컨텐츠를 스크리밍해 주는 편리한 메소드입니다.
+때때로 HTML 페이지를 렌더링하는 대신 사용자에게 파일을 보내고 싶어할 수 있습니다. 레일스에 있는 모든 컨트롤러는 `send_data` 와 `send_file` 메소드를 가지고 있어서 둘 다 클라이언트에게 데이터를 스트리밍하게 됩니다. `send_file` 메소드는 디스크상의 파일이름을 넘겨 주면 해당 파일의 컨텐츠를 스크리밍해 주는 편리한 메소드입니다. [[[Sometimes you may want to send a file to the user instead of rendering an HTML page. All controllers in Rails have the `send_data` and the `send_file` methods, which will both stream data to the client. `send_file` is a convenience method that lets you provide the name of a file on the disk and it will stream the contents of that file for you.]]]
 
-클라이언트에게 데이터를 스트리밍하기 위해서는 `send_data` 메소드를 사용하면 됩니다:
+클라이언트에게 데이터를 스트리밍하기 위해서는 `send_data` 메소드를 사용하면 됩니다: [[[To stream data to the client, use `send_data`:]]]
 
 ```ruby
 require "prawn"
@@ -848,9 +843,9 @@ class ClientsController < ApplicationController
 end
 ```
 
-위의 예에서 `download_pdf` 액션은, PDF 문서를 만들어서 문자열로 반환하는 private 메소드를 호출하게 됩니다. 그 때 반환된 문자열은 파일 다운로드시 클라이언트로 스트리밍되며 파일명이 사용자에게 제시될 것입니다. 파일이 사용자에게 스트리밍될 때, 때로는, 파일로 다운로드되기를 원치않을 수 있습니다. 예를 들면 이미지를 받아서 HTML 페이지에 삽입할 수도 있습니다. 브라우저에게 파일을 다운로드하지 않도록 알려주기 위해서, `:disposition` 옵션을 "inline"으로 설정할 수도 있습니다. 이 옵션에 대한 상반되는 값이면서 디폴트값은 "attachement"입니다.
+위의 예에서 `download_pdf` 액션은, PDF 문서를 만들어서 문자열로 반환하는 private 메소드를 호출하게 됩니다. 그 때 반환된 문자열은 파일 다운로드시 클라이언트로 스트리밍되며 파일명이 사용자에게 제시될 것입니다. 파일이 사용자에게 스트리밍될 때, 때로는, 파일로 다운로드되기를 원치않을 수 있습니다. 예를 들면 이미지를 받아서 HTML 페이지에 삽입할 수도 있습니다. 브라우저에게 파일을 다운로드하지 않도록 알려주기 위해서, `:disposition` 옵션을 "inline"으로 설정할 수도 있습니다. 이 옵션에 대한 상반되는 값이면서 디폴트값은 "attachement"입니다. [[[The `download_pdf` action in the example above will call a private method which actually generates the PDF document and returns it as a string. This string will then be streamed to the client as a file download and a filename will be suggested to the user. Sometimes when streaming files to the user, you may not want them to download the file. Take images, for example, which can be embedded into HTML pages. To tell the browser a file is not meant to be downloaded, you can set the `:disposition` option to "inline". The opposite and default value for this option is "attachment".]]]
 
-### [Sending Files]파일 보내기
+### [Sending Files] 파일 보내기
 
 디스크상에 이미 존재하는 파일을 보내고자 할 때는 `send_file` 메소드를 사용하면 됩니다.
 
@@ -866,17 +861,17 @@ class ClientsController < ApplicationController
 end
 ```
 
-이것은 한번에 전체 파일을 메모리로 로드하지 않고 4kB씩 읽어서 스트리밍할 것입니다. 이 때, `:stream` 옵션을 사용하여 스트리밍을 해제하거나 `:buffer_size` 옵션을 사용하여 블록 크기를 조절할 수 있습니다.
+이것은 한번에 전체 파일을 메모리로 로드하지 않고 4kB씩 읽어서 스트리밍할 것입니다. 이 때, `:stream` 옵션을 사용하여 스트리밍을 해제하거나 `:buffer_size` 옵션을 사용하여 블록 크기를 조절할 수 있습니다. [[[This will read and stream the file 4kB at the time, avoiding loading the entire file into memory at once. You can turn off streaming with the `:stream` option or adjust the block size with the `:buffer_size` option.]]]
 
-`:type` 옵션을 별도로 명시하지 않으면, `:filename` 에 명시된 파일 확장자로부터 컨텐츠 유형을 유추하여 판단하게 될 것입니다. 만약 확장자에 대한 컨텐츠 유형이 등록되어 있지 않으면 `application/octet-stream` 이 사용될 것입니다.
+`:type` 옵션을 별도로 명시하지 않으면, `:filename` 에 명시된 파일 확장자로부터 컨텐츠 유형을 유추하여 판단하게 될 것입니다. 만약 확장자에 대한 컨텐츠 유형이 등록되어 있지 않으면 `application/octet-stream` 이 사용될 것입니다. [[[If `:type` is not specified, it will be guessed from the file extension specified in `:filename`. If the content type is not registered for the extension, `application/octet-stream` will be used.]]]
 
-WARNING: (params, cookies 등과 같이) 클라이언트로부터 데이터를 가져와서 디스크상의 파일을 찾고자할 때 조심해야 합니다. 왜냐하면, 의도한 바는 아니지만 누군가가 해당 파일들에 대해서 접근권한을 가질 수 있으므로, 보안상의 위험을 초래할 수 있기 때문입니다.
+WARNING: (params, cookies 등과 같이) 클라이언트로부터 데이터를 가져와서 디스크상의 파일을 찾고자할 때 조심해야 합니다. 왜냐하면, 의도한 바는 아니지만 누군가가 해당 파일들에 대해서 접근권한을 가질 수 있으므로, 보안상의 위험을 초래할 수 있기 때문입니다. [[[Be careful when using data coming from the client (params, cookies, etc.) to locate the file on disk, as this is a security risk that might allow someone to gain access to files they are not meant to.]]]
 
-TIP: 웹서버상의 public 폴더에 파일이 있을 때는, 레일스를 통해서 정적 파일을 스트리밍하는 것은 권할만한 일을 아닙니다. 왜냐하면, 요청시 불필요하게 전체 레일스 스택을 찾아보지 않고 바로 아파치나 다른 웹서버를 이용하여 사용자가 직접 파일을 다운로드하도록 하는 것이 훨씬 더 효율적이기 때문입니다.
+TIP: 웹서버상의 public 폴더에 파일이 있을 때는, 레일스를 통해서 정적 파일을 스트리밍하는 것은 권할만한 일을 아닙니다. 왜냐하면, 요청시 불필요하게 전체 레일스 스택을 찾아보지 않고 바로 아파치나 다른 웹서버를 이용하여 사용자가 직접 파일을 다운로드하도록 하는 것이 훨씬 더 효율적이기 때문입니다. [[[It is not recommended that you stream static files through Rails if you can instead keep them in a public folder on your web server. It is much more efficient to let the user download the file directly using Apache or another web server, keeping the request from unnecessarily going through the whole Rails stack.]]]
 
-### [RESTful Downloads]REST방식 다운로드
+### [RESTful Downloads] REST방식 다운로드
 
-`send_data` 메소드가 문제없이 작동한다면, REST방식의 어플리케이션을 만들 때, 보통은 파일 다운로드을 위해 별도의 액션을 가질 필요는 없습니다. 왜냐하면, REST 용어상에서 볼 때, 위의 예에서 PDF 파일은 클라이언트 리소스의 또 다른 표현방법에 불과하기 때문입니다. 레일스는 이와 같은 "REST방식 다운로드"를 하기 위한 손쉽고 매우 산뜻한 방법을 제공해 줍니다. 아래는, PDF 다운로드를 스트리밍을 하지 않고 `show` 액션의 일부분이 되도록 다시 코딩하여 보여 줍니다
+`send_data` 메소드가 문제없이 작동한다면, REST방식의 어플리케이션을 만들 때, 보통은 파일 다운로드을 위해 별도의 액션을 가질 필요는 없습니다. 왜냐하면, REST 용어상에서 볼 때, 위의 예에서 PDF 파일은 클라이언트 리소스의 또 다른 표현방법에 불과하기 때문입니다. 레일스는 이와 같은 "REST방식 다운로드"를 하기 위한 손쉽고 매우 산뜻한 방법을 제공해 줍니다. 아래는, PDF 다운로드를 스트리밍을 하지 않고 `show` 액션의 일부분이 되도록 다시 코딩하여 보여 줍니다. [[[While `send_data` works just fine, if you are creating a RESTful application having separate actions for file downloads is usually not necessary. In REST terminology, the PDF file from the example above can be considered just another representation of the client resource. Rails provides an easy and quite sleek way of doing "RESTful downloads". Here's how you can rewrite the example so that the PDF download is a part of the `show` action, without any streaming:]]]
 
 ```ruby
 class ClientsController < ApplicationController
@@ -892,30 +887,47 @@ class ClientsController < ApplicationController
 end
 ```
 
-위의 코드가 작동하기 위해서는, 레일스에게 PDF MIME 형을 추가해 주어야 합니다. 이것은 `config/initializers/mime_types.rb` 파일에 아래의 코드라인을 추가해 주면 됩니다.
+위의 코드가 작동하기 위해서는, 레일스에게 PDF MIME 형을 추가해 주어야 합니다. 이것은 `config/initializers/mime_types.rb` 파일에 아래의 코드라인을 추가해 주면 됩니다. [[[In order for this example to work, you have to add the PDF MIME type to Rails. This can be done by adding the following line to the file `config/initializers/mime_types.rb`:]]]
 
 ```ruby
 Mime::Type.register "application/pdf", :pdf
 ```
 
-NOTE: 레일스의 구성 파일(configuration file)은 매 요청시마다 다시 로드되지 않기 때문에, 변경내용이 반영되기 위해서는 서버를 다시 시작해야 합니다.
+NOTE: 레일스의 구성 파일(configuration file)은 매 요청시마다 다시 로드되지 않기 때문에, 변경내용이 반영되기 위해서는 서버를 다시 시작해야 합니다. [[[Configuration files are not reloaded on each request, so you have to restart the server in order for their changes to take effect.]]]
 
-이제 사용자의 요청시, URL 끝에 ".pdf"를 추가해 주기만 하면 클라이언트에 대한 PDF 버전을 다운로드 받을 수 있게 됩니다:
+이제 사용자의 요청시, URL 끝에 ".pdf"를 추가해 주기만 하면 클라이언트에 대한 PDF 버전을 다운로드 받을 수 있게 됩니다: [[[Now the user can request to get a PDF version of a client just by adding ".pdf" to the URL:]]]
 
 ```bash
 GET /clients/1.pdf
 ```
 
-[Parameter Filtering]파라메터 필터하기
+[Parameter Filtering] 파라메터 필터하기
 -------------------
 
-레일스는 `log` 폴더에 해당 환경에 대한 로그 파일을 유지합니다. 이것은 어플리케이션에서 실제로 일어나는 일을 디버깅할 때 매우 유용하지만, 운영환경에서는 모든 정보를 로그파일에 저장하기를 원치 않을 수 있습니다. 이 때 어플리케이션 구성 파일 내의 `config.filter_parameters` 에 요청하는 파라메터를 지정해 두면 로그파일에 해당 파라메터를 필터할 수 있게 됩니다. 즉, 이 파라메터는 로그파일에서 [FILTERED]로 표기될 것입니다.
+레일스는 `log` 폴더에 해당 환경에 대한 로그 파일을 유지합니다. 이것은 어플리케이션에서 실제로 일어나는 일을 디버깅할 때 매우 유용하지만, 운영환경에서는 모든 정보를 로그파일에 저장하기를 원치 않을 수 있습니다. 이 때 어플리케이션 구성 파일 내의 `config.filter_parameters` 에 요청하는 파라메터를 지정해 두면 로그파일에 해당 파라메터를 필터할 수 있게 됩니다. 즉, 이 파라메터는 로그파일에서 [FILTERED]로 표기될 것입니다. [[[Rails keeps a log file for each environment in the `log` folder. These are extremely useful when debugging what's actually going on in your application, but in a live application you may not want every bit of information to be stored in the log file.]]]
 
 ```ruby
 config.filter_parameters << :password
 ```
 
-[Rescue]예외처리
+### Redirects Filtering
+
+Sometimes it's desirable to filter out from log files some sensible locations your application is redirecting to.
+You can do that by using the `config.filter_redirect` configuration option:
+
+```ruby
+config.filter_redirect << 's3.amazonaws.com'
+```
+
+You can set it to a String, a Regexp, or an array of both.
+
+```ruby
+config.filter_redirect.concat ['s3.amazonaws.com', /private_path/]
+```
+
+Matching URLs will be marked as '[FILTERED]'.
+
+[Rescue] 예외처리
 ------
 
 어플리케이션은, 처리해 주어야 하는, 버그나 예외가 발생할 가능이 많습니다. 예를 들어, 사용자가 데이터베이스에서 더 이상 존재하지 않는 데이터 리소스를 찾고자 한다면, 액티브 레코드는 `ActiveRecord::RecordNotFound` 예외를 발생시킬 것입니다.

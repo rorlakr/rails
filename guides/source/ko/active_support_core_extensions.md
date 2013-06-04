@@ -2055,14 +2055,14 @@ NOTE: 이 메소드는 `active_support/core_ext/enumerable.rb` 파일내에 정�
 
 `index_by` 메소드는 열거형 receiver의 각 요소를 임의의 키로 인덱싱하여 해시를 생성해 줍니다. [[[The method `index_by` generates a hash with the elements of an enumerable indexed by some key.]]]
 
-이 메소드는 receiver 컬렉션의 각요소를 반복해서 블록으로 넘겨 줍니다. 이 때 반화되는 해시의 각 요소는 블록에서 반환하는 값을 키로 사용하게 됩니다. [[[It iterates through the collection and passes each element to a block. The element will be keyed by the value returned by the block:]]]
+이 메소드는 receiver 컬렉션의 각요소를 반복해서 블록으로 넘겨 줍니다. 이 때 반환되는 해시의 각 요소는 블록에서 반환하는 값을 키로 사용하게 됩니다. [[[It iterates through the collection and passes each element to a block. The element will be keyed by the value returned by the block:]]]
 
 ```ruby
 invoices.index_by(&:number)
 # => {'2009-032' => <Invoice ...>, '2009-008' => <Invoice ...>, ...}
 ```
 
-WARNING. 키들은 일반적으로 유일해야 합니다. 블록이 각기 다른 요소에 대해서 동일한 키 값을 반환하다면 해당 키에 대해서 또 다시 컬렉션이 생성되지 않고 대신에 마지막으로 키/값이 쌍이 생성될 것입니다. [[[Keys should normally be unique. If the block returns the same value for different elements no collection is built for that key. The last item will win.]]]
+WARNING. 키들은 일반적으로 유일해야 합니다. 블록이 각기 다른 요소에 대해서 동일한 키 값을 반환하다면 해당 키에 대해서 또 다시 컬렉션이 생성되지 않을 것입니다. [[[Keys should normally be unique. If the block returns the same value for different elements no collection is built for that key. The last item will win.]]]
 
 NOTE: 이 메소드는 `active_support/core_ext/enumerable.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/enumerable.rb`.]]]
 
@@ -2086,7 +2086,7 @@ NOTE: 이 메소드는 `active_support/core_ext/enumerable.rb` 파일내에 정�
 
 ### `exclude?`
 
-`exclude?` 메소드는 특정 객체가 receiver 컬렉션에 폼함되지 **않았음**을 확인해 줍니다. 이것은 `include?` 메소드의 반대되는 기능입니다. [[[The predicate `exclude?` tests whether a given object does **not** belong to the collection. It is the negation of the built-in `include?`:]]]
+`exclude?` 메소드는 특정 객체가 receiver 컬렉션에 포함되지 **않았음**을 확인해 줍니다. 이것은 `include?` 메소드의 반대되는 기능입니다. [[[The predicate `exclude?` tests whether a given object does **not** belong to the collection. It is the negation of the built-in `include?`:]]]
 
 ```ruby
 to_visit << node if visited.exclude?(node)
@@ -2099,14 +2099,14 @@ NOTE: 이 메소드는 `active_support/core_ext/enumerable.rb` 파일내에 정�
 
 ### [Accessing] 접근하기
 
-액티블서포트는 배열에 대한 접근법을 용이하게 하기 위해 배열 API의 기능을 보강해 줍니다. 예를 들면, `to` 메소드는 넘겨준 값의 위치에 있는 요소까지의 배열일부를 반환해 줍니다. [[[Active Support augments the API of arrays to ease certain ways of accessing them. For example, `to` returns the subarray of elements up to the one at the passed index:]]]
+액티브서포트는 배열에 대한 접근법을 용이하게 하기 위해 배열 API의 기능을 보강해 줍니다. 예를 들면, `to` 메소드는 넘겨준 값의 위치에 있는 요소까지의 배열일부를 반환해 줍니다. [[[Active Support augments the API of arrays to ease certain ways of accessing them. For example, `to` returns the subarray of elements up to the one at the passed index:]]]
 
 ```ruby
 %w(a b c d).to(2) # => %w(a b c)
 [].to(7)          # => []
 ```
 
-비슷한 방법으로, `from` 메소드는 넘겨준 값의 위치에 있는 요소부터 마지막 요소까지를 반환해 줍니다. 넘겨 준 값이 배열 길이보다는 큰 경우에는 비 배열을 반환하게 됩니다. [[[Similarly, `from` returns the tail from the element at the passed index to the end. If the index is greater than the length of the array, it returns an empty array.]]]
+비슷한 방법으로, `from` 메소드는 넘겨준 값의 위치에 있는 요소부터 마지막 요소까지를 반환해 줍니다. 넘겨 준 값이 배열 길이보다는 큰 경우에는 빈 배열을 반환하게 됩니다. [[[Similarly, `from` returns the tail from the element at the passed index to the end. If the index is greater than the length of the array, it returns an empty array.]]]
 
 ```ruby
 %w(a b c d).from(2)  # => %w(c d)
@@ -2157,11 +2157,11 @@ User.exists?(email: params[:email])
 
 이러한 문법상의 달콤함은 레일스에서 많이 사용되고 있는데, 이것은 메소드로 넘겨주는 인수가 너무 많은 경우 정확한 위치에 해당 인수를 넘겨 주는 것이 힘들게 되어 대신에 파라메터에 이름을 붙여서 사용(named parameters)할 수 있도록 인터페이스를 제공해 주기 위함입니다. 특히나, 옵션을 해시 형태로 사용하는 것은 매우 흔한 일입니다. [[[That syntactic sugar is used a lot in Rails to avoid positional arguments where there would be too many, offering instead interfaces that emulate named parameters. In particular it is very idiomatic to use a trailing hash for options.]]]
 
-메소드의 인수의 갯수가 유동적일 경우에는 메소드 인수 선언시에 `*`를 사용합니다. 그러나, 이 때는 해시형태로 옵션을 지정할 때 마지막에 인수들의 배열을 마지막 항목으로 지정할 때 제대로 작동하지 않게 됩니다. [[[If a method expects a variable number of arguments and uses `*` in its declaration, however, such an options hash ends up being an item of the array of arguments, where it loses its role.]]]
+메소드의 인수의 갯수가 유동적일 경우에는 메소드 인수 선언시에 `*`를 사용합니다. 그러나, 인수 배열의 마지막 항목으로 해시형태의 옵션을 지정할 때는 제대로 작동하지 않게 됩니다. [[[If a method expects a variable number of arguments and uses `*` in its declaration, however, such an options hash ends up being an item of the array of arguments, where it loses its role.]]]
 
 이 때는 옵션 해시에 대해서 `extract_options!` 메소드로 처리해 주면 됩니다. 이 메소드는 배열의 마지막 요소를 점검하여 그것이 해시이면 꺼내서 반환해 주고 그렇지 않으면 빈 해시를 반환해 줍니다. [[[In those cases, you may give an options hash a distinguished treatment with `extract_options!`. This method checks the type of the last item of an array. If it is a hash it pops it and returns it, otherwise it returns an empty hash.]]]
 
-Let's see for example the definition of the `caches_action` controller macro:
+예를 들어 `caches_action` 컨트롤러 매크로의 정의를 살펴 봅시다. [[[Let's see for example the definition of the `caches_action` controller macro:]]]
 
 ```ruby
 def caches_action(*actions)

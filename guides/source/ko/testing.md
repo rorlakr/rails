@@ -1,39 +1,41 @@
-A Guide to Testing Rails Applications
+[A Guide to Testing Rails Applications] 레일스 어플리케이션 테스트 가이드
 =====================================
 
-This guide covers built-in mechanisms in Rails for testing your application.
+본 가이드는 어플리케이션을 테스트하기 위한 레일스의 내장 메카니즘에 대해서 다룹니다. [[[This guide covers built-in mechanisms in Rails for testing your application.]]]
 
-After reading this guide, you will know:
+본 가이드를 읽은 후에 아래의 내용을 알게 될 것입니다. [[[After reading this guide, you will know:]]]
 
-* Rails testing terminology.
-* How to write unit, functional, and integration tests for your application.
-* Other popular testing approaches and plugins.
+* 레일스 테스트 용어 [[[Rails testing terminology.]]]
+
+* 어플리케이션에 대한 유닛, 기능, 통합 테스트를 작성하는 방법 [[[How to write unit, functional, and integration tests for your application.]]]
+
+* 기타 인기있는 테스트 방법과 플러그인 [[[Other popular testing approaches and plugins.]]]
 
 --------------------------------------------------------------------------------
 
-Why Write Tests for your Rails Applications?
+[Why Write Tests for your Rails Applications?] 레일스 어플리케이션에 대한 테스트를 왜 작성해야 하는가?
 --------------------------------------------
 
-Rails makes it super easy to write your tests. It starts by producing skeleton test code while you are creating your models and controllers.
+레일스는 테스트를 매우 쉽게 작성할 수 있게 해 줍니다. 모델과 컨트롤러를 생성할 때 테스트 코드의 기본 골격을 만들어 주어 테스트를 쉽게 시작할 수 있도록 해 줍니다. [[[Rails makes it super easy to write your tests. It starts by producing skeleton test code while you are creating your models and controllers.]]]
 
-By simply running your Rails tests you can ensure your code adheres to the desired functionality even after some major code refactoring.
+단순히 레일스 테스트를 실행만 하면, 주요 코드를 리팩토링한 후에도 원래의 기능이 제대로 유지되는 지를 확인할 수 있습니다. [[[By simply running your Rails tests you can ensure your code adheres to the desired functionality even after some major code refactoring.]]]
 
-Rails tests can also simulate browser requests and thus you can test your application's response without having to test it through your browser.
+또한 레일스 테스트는 브라우저 요청을 시뮬레이션할 수 있어서 브라우저에서 직접 테스트해 보지 않고도 어플리케이션의 반응을 테스트해 볼 수 있습니다. [[[Rails tests can also simulate browser requests and thus you can test your application's response without having to test it through your browser.]]]
 
-Introduction to Testing
+[Introduction to Testing] 테스트에 대한 소개
 -----------------------
 
-Testing support was woven into the Rails fabric from the beginning. It wasn't an "oh! let's bolt on support for running tests because they're new and cool" epiphany. Just about every Rails application interacts heavily with a database and, as a result, your tests will need a database to interact with as well. To write efficient tests, you'll need to understand how to set up this database and populate it with sample data.
+테스트에 대한 지원은 처음부터 레일스에 잘 짜여져 있었습니다. 따라서 "오~, 테스트하는 것이 새로운 것이고 멋진 것이니까 테스트에 대한 지원을 추가하자"와 같이 갑작스러운 것은 아니었습니다. 모든 레일스 어플리케이션이 데이터베이스와 잘 연동되기 때문에 결과적으로 테스트 작성시에도 데이터베이스가 필요하게 됩니다. 효과적인 테스트를 작성하기 위해서는 이와 같은 데이터베이스를 준비해서 샘플 데이터를 이식하는 방법에 대해서 잘 알고 있어야 합니다. [[[Testing support was woven into the Rails fabric from the beginning. It wasn't an "oh! let's bolt on support for running tests because they're new and cool" epiphany. Just about every Rails application interacts heavily with a database and, as a result, your tests will need a database to interact with as well. To write efficient tests, you'll need to understand how to set up this database and populate it with sample data.]]]
 
-### The Test Environment
+### [The Test Environment] 테스트 환경
 
-By default, every Rails application has three environments: development, test, and production. The database for each one of them is configured in `config/database.yml`.
+디폴트로, 모든 레일스 어플리케이션은 3개의 환경을 가집니다. 즉, 개발, 테스트, 운영 환경입니다. 따라서 각각에 대한 데이터베이스 설정이 `config/database.yml` 파일에 정의되어 있습니다. [[[By default, every Rails application has three environments: development, test, and production. The database for each one of them is configured in `config/database.yml`.]]]
 
-A dedicated test database allows you to set up and interact with test data in isolation. Tests can mangle test data with confidence, that won't touch the data in the development or production databases.
+테스트 전용 데이터베이스를 이용하면 별도로 테스트용 데이터를 준비해서 사용할 수 있습니다. 테스트 상에서 마음껏 테스트 데이터를 가지고 조작을 해도, 결코 개발 또는 운영 데이터베이스에 있는 데이터를 건드리지 않게 됩니다. [[[A dedicated test database allows you to set up and interact with test data in isolation. Tests can mangle test data with confidence, that won't touch the data in the development or production databases.]]]
 
-### Rails Sets up for Testing from the Word Go
+### [Rails Sets up for Testing from the Word Go] 테스트를 위한 레일스 준비 작업
 
-Rails creates a `test` folder for you as soon as you create a Rails project using `rails new` _application_name_. If you list the contents of this folder then you shall see:
+`rails new` _application_name_ 을 실행해서 레일스 프로젝트를 생성하자마자 레일스는 `test` 폴더를 생성해 줍니다. 이 폴더의 내용을 보면 다음과 같습니다. [[[Rails creates a `test` folder for you as soon as you create a Rails project using `rails new` _application_name_. If you list the contents of this folder then you shall see:]]]
 
 ```bash
 $ ls -F test
@@ -41,27 +43,27 @@ controllers/    helpers/        mailers/        test_helper.rb
 fixtures/       integration/    models/
 ```
 
-The `models` directory is meant to hold tests for your models, the `controllers` directory is meant to hold tests for your controllers and the `integration` directory is meant to hold tests that involve any number of controllers interacting.
+`models` 디렉토리에는 모델을 위한 테스트들이 위치하고, `controllers` 디렉토리에는 컨트롤러를 위한 테스트들이, 그리고 `integration` 디렉토리에는 컨트롤러들의 상호작용에 대한 테스트들이 위치하게 됩니다. [[[The `models` directory is meant to hold tests for your models, the `controllers` directory is meant to hold tests for your controllers and the `integration` directory is meant to hold tests that involve any number of controllers interacting.]]]
 
-Fixtures are a way of organizing test data; they reside in the `fixtures` folder.
+Fixtures는 테스트용 데이터를 관리하는 방법이며 `fixtures` 폴더에 위치합니다. [[[Fixtures are a way of organizing test data; they reside in the `fixtures` folder.]]]
 
-The `test_helper.rb` file holds the default configuration for your tests.
+`test_helper.rb` 파일에는 테스트를 위한 디폴트 설정이 정의되어 있습니다. [[[The `test_helper.rb` file holds the default configuration for your tests.]]]
 
-### The Low-Down on Fixtures
+### [The Low-Down on Fixtures] Fixture에 대한 숨은 이야기
 
-For good tests, you'll need to give some thought to setting up test data. In Rails, you can handle this by defining and customizing fixtures.
+훌륭한 테스트가 되기 위해서는 테스트 데이터를 준비하는 것을 고려해야 합니다. 레일스에서는 fixtures를 정의하고 변경할 수 있습니다. [[[For good tests, you'll need to give some thought to setting up test data. In Rails, you can handle this by defining and customizing fixtures.]]]
 
-#### What Are Fixtures?
+#### [What Are Fixtures?] Fixture란 무엇인가?
 
-_Fixtures_ is a fancy word for sample data. Fixtures allow you to populate your testing database with predefined data before your tests run. Fixtures are database independent written in YAML. There is one file per model.
+_Fixtures_ 란 샘플 데이터에 대한 멋진 단어입니다. Fixtures를 이용하면 테스트를 실행하기 전에 테스트용 데이터베이스에 사전에 준비된 데이터를 이식할 수 있습니다. Fixtures는 YAML 포맷으로 작성되며 데이터베이스에 독립적입니다. 모델당 하나의 Fixture 파일이 존재합니다. [[[_Fixtures_ is a fancy word for sample data. Fixtures allow you to populate your testing database with predefined data before your tests run. Fixtures are database independent written in YAML. There is one file per model.]]]
 
-You'll find fixtures under your `test/fixtures` directory. When you run `rails generate model` to create a new model fixture stubs will be automatically created and placed in this directory.
+`test/fixtures` 디렉토리에서 fixtures를 찾아 볼 수 있습니다. `rails generate mode` 명령을 실행하여 새로운 모델을 하나 만들게 되면 fixtures가 이 디렉토리에 자동으로 생성되어 위치하게 됩니다. [[[You'll find fixtures under your `test/fixtures` directory. When you run `rails generate model` to create a new model fixture stubs will be automatically created and placed in this directory.]]]
 
 #### YAML
 
-YAML-formatted fixtures are a very human-friendly way to describe your sample data. These types of fixtures have the **.yml** file extension (as in `users.yml`).
+YAML 포맷으로 작성된 fixtures는 매우 인간 친화적인 방법으로 샘플 데이터를 기술합니다. 이와 같은 fixture의 파일 타입은 `users.yml`과 같이 **.yml** 파일 확장자를 가집니다. [[[YAML-formatted fixtures are a very human-friendly way to describe your sample data. These types of fixtures have the **.yml** file extension (as in `users.yml`).]]]
 
-Here's a sample YAML fixture file:
+아래에 샘플용 YAML fixture 파일이 있습니다. [[[Here's a sample YAML fixture file:]]]
 
 ```yaml
 # lo & behold!  I am a YAML comment!
@@ -76,11 +78,11 @@ steve:
  profession: guy with keyboard
 ```
 
-Each fixture is given a name followed by an indented list of colon-separated key/value pairs. Records are typically separated by a blank space. You can place comments in a fixture file by using the # character in the first column. Keys which resemble YAML keywords such as 'yes' and 'no' are quoted so that the YAML Parser correctly interprets them.
+각 fixture에 대해서 하나의 이름이 주어지고 다음에 콜론(:)으로 구분되는 키/값 쌍 목록이 들여쓰기 상태로 위치하게 됩니다. 각각의 레코드는 빈 줄로 구분됩니다. fixture 파일의 각 라인 첫번째 컬럼에 # 문자를 사용해서 코멘트를 작성할 수 있습니다. `yes`, `no`와 같은 YAML 키워드와 같은 키들은 인용구로 둘러싸서 YAML 파서가 정확하게 해석할 수 있도록 해 주어야 합니다. [[[Each fixture is given a name followed by an indented list of colon-separated key/value pairs. Records are typically separated by a blank space. You can place comments in a fixture file by using the # character in the first column. Keys which resemble YAML keywords such as 'yes' and 'no' are quoted so that the YAML Parser correctly interprets them.]]]
 
-#### ERB'in It Up
+#### [ERB'in It Up] Fixture 파일에 ERB 코드 삽입하기
 
-ERB allows you to embed Ruby code within templates. The YAML fixture format is pre-processed with ERB when Rails loads fixtures. This allows you to use Ruby to help you generate some sample data. For example, the following code generates a thousand users:
+ERB는 Fixure 테블릿 파일내에 루비코드를 삽입할 수 있게 합니다. 레일스가 fixtures를 로드할 때 YAML fixture 포맷은 ERB엔진에 의해서 사전 처리과정을 밟게 됩니다. 따라서 루비를 사용하면 샘플 데이터를 쉽게 생성할 수 있습니다. 예를 들면, 다음의 코드는 천개의 사용자를 생성해 줍니다. [[[ERB allows you to embed Ruby code within templates. The YAML fixture format is pre-processed with ERB when Rails loads fixtures. This allows you to use Ruby to help you generate some sample data. For example, the following code generates a thousand users:]]]
 
 ```erb
 <% 1000.times do |n| %>
@@ -90,17 +92,19 @@ user_<%= n %>:
 <% end %>
 ```
 
-#### Fixtures in Action
+#### [Fixtures in Action] Fixtures 데이터의 동작방법
 
-Rails by default automatically loads all fixtures from the `test/fixtures` folder for your unit and functional test. Loading involves three steps:
+레일스는 디폴트로 유닛 및 기능 테스트를 위해서 `test/fixtures` 폴더의 모든 fixtures들을 자동으로 로드합니다. 로딩과정은 다음 3단계 과정을 밟게 됩니다. [[[Rails by default automatically loads all fixtures from the `test/fixtures` folder for your unit and functional test. Loading involves three steps:]]]
 
-* Remove any existing data from the table corresponding to the fixture
-* Load the fixture data into the table
-* Dump the fixture data into a variable in case you want to access it directly
+* 테이블로부터 fixture 파일에 있는 데이터와 일치하는 기존 데이터를 제거합니다. [[[Remove any existing data from the table corresponding to the fixture]]]
 
-#### Fixtures are Active Record objects
+* 테이블로 fixture 데이터를 로드합니다. [[[Load the fixture data into the table]]]
 
-Fixtures are instances of Active Record. As mentioned in point #3 above, you can access the object directly because it is automatically setup as a local variable of the test case. For example:
+* 직접 fixture 데이터로 접근할 경우를 위해서 fixture 데이터를 하나의 변수로 덤프합니다. [[[Dump the fixture data into a variable in case you want to access it directly]]]
+
+#### [Fixtures are Active Record objects] Fixtures는 액티브레코드 객체들이다
+
+Fixtures는 액티브레코드의 인스턴스들로 생각할 수 있습니다. 위에서 3번째 언급했던 바와 같이, fixture 데이터가 자동으로 테스트 케이스의 로컬 변수로 준비되기 때문에 직접 액티브레코드 객체를 접근할 수 있게 됩니다. 예를 들면, [[[Fixtures are instances of Active Record. As mentioned in point #3 above, you can access the object directly because it is automatically setup as a local variable of the test case. For example:]]]
 
 ```ruby
 # this will return the User object for the fixture named david
@@ -113,16 +117,16 @@ users(:david).id
 email(david.girlfriend.email, david.location_tonight)
 ```
 
-Unit Testing your Models
+[Unit Testing your Models] 모델에 대한 유닛 테스트하기
 ------------------------
 
-In Rails, unit tests are what you write to test your models.
+레일스에서 유닛 테스트라 함은 모델을 테스트하기 위해서 작성한 것들을 말합니다. [[[In Rails, unit tests are what you write to test your models.]]]
 
-For this guide we will be using Rails _scaffolding_. It will create the model, a migration, controller and views for the new resource in a single operation. It will also create a full test suite following Rails best practices. I will be using examples from this generated code and will be supplementing it with additional examples where necessary.
+본 가이드의 이해를 돕기 위해서, 레일스의 _scaffolding_ 을 이용할 것입니다. 이것은 한번의 조작으로 새로운 리소스에 대한 모델, 마이그레이션 파일, 컨트롤러, 뷰 파일을 생성해 줄 것입니다. 또한 레일스의 우수사례에 따라 테스트를 모든 파일을 생성해 줄 것입니다. 이와 같이 생성된 테스트 코드로부터 예시를 사용할 것이고 필요하다면 예시를 추가할 것입니다. [[[For this guide we will be using Rails _scaffolding_. It will create the model, a migration, controller and views for the new resource in a single operation. It will also create a full test suite following Rails best practices. I will be using examples from this generated code and will be supplementing it with additional examples where necessary.]]]
 
-NOTE: For more information on Rails <i>scaffolding</i>, refer to [Getting Started with Rails](getting_started.html)
+NOTE: 레일스의 <i>scaffolding</i>에 대한 더 자세한 내용은 [레일스 입문하기](getting_started.html)를 참고하기 바랍니다. [[[For more information on Rails <i>scaffolding</i>, refer to [Getting Started with Rails](getting_started.html)]]]
 
-When you use `rails generate scaffold`, for a resource among other things it creates a test stub in the `test/models` folder:
+`rails generate scaffold` 명령을 사용하면, 해당 리소스에 대해서 `test/models` 폴더에 테스트를 위한 파일들이 생성될 것입니다. [[[When you use `rails generate scaffold`, for a resource among other things it creates a test stub in the `test/models` folder:]]]
 
 ```bash
 $ rails generate scaffold post title:string body:text
@@ -133,7 +137,7 @@ create  test/fixtures/posts.yml
 ...
 ```
 
-The default test stub in `test/models/post_test.rb` looks like this:
+`test/models/post_test.rb` 파일내의 디폴트 테스트 내용을 보면 다음과 같습니다. [[[The default test stub in `test/models/post_test.rb` looks like this:]]]
 
 ```ruby
 require 'test_helper'
@@ -145,7 +149,7 @@ class PostTest < ActiveSupport::TestCase
 end
 ```
 
-A line by line examination of this file will help get you oriented to Rails testing code and terminology.
+이 파일에 대해서 한줄 한줄씩 살펴보면 레일스 테스트를 위한 코드와 용어에 대한 감을 잡는데 도움이 될 것입니다. [[[A line by line examination of this file will help get you oriented to Rails testing code and terminology.]]]
 
 ```ruby
 require 'test_helper'
