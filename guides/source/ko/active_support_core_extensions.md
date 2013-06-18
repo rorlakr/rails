@@ -2439,7 +2439,7 @@ NOTE: 이 메소드는 `active_support/core_ext/array/grouping.rb` 파일내에 
 ["6", "7", nil]
 ```
 
-위의 예에서는 `in_groups` 메소드가 필요한 수만큼의 `nil` 요소로 그룹을 채워 줍니다. 하나의 그룹은 기껏해야 마직막 요소로 하나의 채움값을 가질 수 있습니다. 그리고 채움값을 가지는 그룹은 항상 마지막에 위치합니다. [[[The examples above show that `in_groups` fills some groups with a trailing `nil` element as needed. A group can get at most one of these extra elements, the rightmost one if any. And the groups that have them are always the last ones.]]]
+위의 예에서는 `in_groups` 메소드가 필요한 수만큼의 `nil` 요소로 그룹을 채워 줍니다. 하나의 그룹은 기껏해야 마지막 요소로 하나의 채움값을 가질 수 있습니다. 그리고 채움값을 가지는 그룹은 항상 마지막에 위치합니다. [[[The examples above show that `in_groups` fills some groups with a trailing `nil` element as needed. A group can get at most one of these extra elements, the rightmost one if any. And the groups that have them are always the last ones.]]]
 
 두번째 옵션을 이용하면 그룹을 채우는 값을 변경할 수 있습니다.[[[You can change this padding value using the second optional argument:]]]
 
@@ -2506,11 +2506,11 @@ NOTE: 이 메소드는 `active_support/core_ext/array/grouping.rb` 파일내에 
 
 * `value`가 배열인 경우에는 `key`를 `:root`로 하여 이 메소드를 반복호출하게 되며, 이 때 `key`는 `:children`으로 단수형을 취하게 됩니다. [[[If `value` is an array there's a recursive call with `key` as `:root`, and `key` singularized as `:children`.]]]
 
-* [[[If `value` is a callable object it must expect one or two arguments. Depending on the arity, the callable is invoked with the `options` hash as first argument with `key` as `:root`, and `key` singularized as second argument. Its return value becomes a new node.]]]
+* `value`가 호출가능한 객체일 경우에는 하나 또는 2개의 인수를 넘겨주어야 합니다. 인수의 갯수에 따라 객체는, `:root`를 `key`로 하는 첫번째 인수와, 단수형 `key`를 두번째 인수로 하는 `options` 해시를 넘겨주어 호출됩니다. 이 때 반환되는 결과가 새로운 노트가 됩니다. [[[If `value` is a callable object it must expect one or two arguments. Depending on the arity, the callable is invoked with the `options` hash as first argument with `key` as `:root`, and `key` singularized as second argument. Its return value becomes a new node.]]]
 
-* If `value` responds to `to_xml` the method is invoked with `key` as `:root`.
+* `value`가 `to_xml`에 반응하면 `key`를 `:root`로 해서 호출됩니다.[[[If `value` responds to `to_xml` the method is invoked with `key` as `:root`.]]]
 
-* Otherwise, a node with `key` as tag is created with a string representation of `value` as text node. If `value` is `nil` an attribute "nil" set to "true" is added. Unless the option `:skip_types` exists and is true, an attribute "type" is added as well according to the following mapping:
+* 그렇지 않을 경우에는, `key`를 태그명으로 하는 노드가 생성되고 이 때 `value`가 텍스트 노드로써 표시됩니다. `value`가 `nil`인 경우에는 "true"값을 가지는 "nil"이라는 속성이 추가됩니다. `:skip_types`라는 옵션이 true값으로 지정되지 않는 이상, "type"이라는 속성이 아래와 같은 규칙에 따라 추가됩니다. [[[Otherwise, a node with `key` as tag is created with a string representation of `value` as text node. If `value` is `nil` an attribute "nil" set to "true" is added. Unless the option `:skip_types` exists and is true, an attribute "type" is added as well according to the following mapping:]]]
 
 ```ruby
 XML_TYPE_NAMES = {
@@ -2527,73 +2527,73 @@ XML_TYPE_NAMES = {
 }
 ```
 
-By default the root node is "hash", but that's configurable via the `:root` option.
+디폴트로 루트 노드명은 "hash"이지만, `:root` 옵션을 이용해서 변경할 수 있습니다. [[[By default the root node is "hash", but that's configurable via the `:root` option.]]]
 
-The default XML builder is a fresh instance of `Builder::XmlMarkup`. You can configure your own builder with the `:builder` option. The method also accepts options like `:dasherize` and friends, they are forwarded to the builder.
+디폴트 XML 빌더는 `Builder::XmlMarkup`의 인스턴스입니다. `:builder` 옵션을 사용하면 특화된 빌더를 설정할 수 있습니다. 또한 이 메소드는 `:dasherize`류의 옵션을 취해서 빌더로 전달해 줍니다. [[[The default XML builder is a fresh instance of `Builder::XmlMarkup`. You can configure your own builder with the `:builder` option. The method also accepts options like `:dasherize` and friends, they are forwarded to the builder.]]]
 
-NOTE: Defined in `active_support/core_ext/hash/conversions.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/conversions.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/conversions.rb`.]]]
 
-### Merging
+### [Merging] 해시 머지하기
 
-Ruby has a built-in method `Hash#merge` that merges two hashes:
+루비는 두개의 해시를 머지하는 `Hash#merge`라는 내장 메소드를 가지고 있습니다. [[[Ruby has a built-in method `Hash#merge` that merges two hashes:]]]
 
 ```ruby
 {a: 1, b: 1}.merge(a: 0, c: 2)
 # => {:a=>0, :b=>1, :c=>2}
 ```
 
-Active Support defines a few more ways of merging hashes that may be convenient.
+액티브서포트는 편리하게 사용할 수 있는 해시 머지 방법을 더 제공해 줍니다. [[[Active Support defines a few more ways of merging hashes that may be convenient.]]]
 
-#### `reverse_merge` and `reverse_merge!`
+#### [`reverse_merge` and `reverse_merge!`] `reverse_merge`와 `reverse_merge!`
 
-In case of collision the key in the hash of the argument wins in `merge`. You can support option hashes with default values in a compact way with this idiom:
+충돌이 있는 경우 인수 해시에 있는 키가 우선됩니다. 따라서 디폴트 값을 가지는 옵션 해시를 이와 같이 간결하게 지원할 수 있게 됩니다.  [[[In case of collision the key in the hash of the argument wins in `merge`. You can support option hashes with default values in a compact way with this idiom:]]]
 
 ```ruby
 options = {length: 30, omission: "..."}.merge(options)
 ```
 
-Active Support defines `reverse_merge` in case you prefer this alternative notation:
+액티브서포트는 선호도에 따라 사용할 수 있는 대체 메소드로 `reverse_merge`를 정의합니다. [[[Active Support defines `reverse_merge` in case you prefer this alternative notation:]]]
 
 ```ruby
 options = options.reverse_merge(length: 30, omission: "...")
 ```
 
-And a bang version `reverse_merge!` that performs the merge in place:
+그리고 `reverse_merge!`와 같이 !(bang) 버전도 있습니다. [[[And a bang version `reverse_merge!` that performs the merge in place:]]]
 
 ```ruby
 options.reverse_merge!(length: 30, omission: "...")
 ```
 
-WARNING. Take into account that `reverse_merge!` may change the hash in the caller, which may or may not be a good idea.
+WARNING. 주의할 것은, 좋은 아이디어일지 아닐지는 모르지만, `reverse_merge!`는 호출자의 해시를 변경한다는 것을 염두에 두어야 합니다. [[[Take into account that `reverse_merge!` may change the hash in the caller, which may or may not be a good idea.]]]
 
-NOTE: Defined in `active_support/core_ext/hash/reverse_merge.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/reverse_merge.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/reverse_merge.rb`.]]]
 
 #### `reverse_update`
 
-The method `reverse_update` is an alias for `reverse_merge!`, explained above.
+`reverse_update` 메소드는 `reverse_merge!`와 동일한 메소드입니다. [[[The method `reverse_update` is an alias for `reverse_merge!`, explained above.]]]
 
-WARNING. Note that `reverse_update` has no bang.
+WARNING. 주의할 것은 `reverse_update` 메소드는 !(bang) 버전이 없다는 것입니다. [[[Note that `reverse_update` has no bang.]]]
 
-NOTE: Defined in `active_support/core_ext/hash/reverse_merge.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/reverse_merge.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/reverse_merge.rb`.]]]
 
 #### `deep_merge` and `deep_merge!`
 
-As you can see in the previous example if a key is found in both hashes the value in the one in the argument wins.
+이전 예에서 알 수 있듯이, 하나의 키가 양쪽 해시내에서 발견될 경우 인수에 있는 값이 우선합니다. [[[As you can see in the previous example if a key is found in both hashes the value in the one in the argument wins.]]]
 
-Active Support defines `Hash#deep_merge`. In a deep merge, if a key is found in both hashes and their values are hashes in turn, then their _merge_ becomes the value in the resulting hash:
+액티브서포트는 `Hash#deep_merge`를 정의합니다. 특정 키가 양쪽 해시에 있고 해당 값이 해시일 경우 _머지_ 결과는 해당 해시의 값이 됩니다. [[[Active Support defines `Hash#deep_merge`. In a deep merge, if a key is found in both hashes and their values are hashes in turn, then their _merge_ becomes the value in the resulting hash:]]]
 
 ```ruby
 {a: {b: 1}}.deep_merge(a: {c: 2})
 # => {:a=>{:b=>1, :c=>2}}
 ```
 
-The method `deep_merge!` performs a deep merge in place.
+`deep_merge!` 메소드는 receiver의 해시를 결과로 변경합니다. [[[The method `deep_merge!` performs a deep merge in place.]]]
 
-NOTE: Defined in `active_support/core_ext/hash/deep_merge.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/deep_merge.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/deep_merge.rb`.]]]
 
 ### Deep duplicating
 
-The method `Hash.deep_dup` duplicates itself and all keys and values inside recursively with ActiveSupport method `Object#deep_dup`. It works like `Enumerator#each_with_object` with sending `deep_dup` method to each pair inside.
+`Hash.deep_dup` 메소드는 자신 뿐만아니라 해시내의 모든 키와 값을 액티브서포트 `Object#deep_dup` 메소드를 이용하여 반복적으로 복제합니다. 마치 `Enumerator#each_with_object`와 같이 작동하여 해시내의 각 쌍에 대해서 `deep_dup` 메소드를 실행하게 됩니다. [[[The method `Hash.deep_dup` duplicates itself and all keys and values inside recursively with ActiveSupport method `Object#deep_dup`. It works like `Enumerator#each_with_object` with sending `deep_dup` method to each pair inside.]]]
 
 ```ruby
 hash = { a: 1, b: { c: 2, d: [3, 4] } }
@@ -2606,17 +2606,17 @@ hash[:b][:e] == nil      # => true
 hash[:b][:d] == [3, 4]   # => true
 ```
 
-NOTE: Defined in `active_support/core_ext/hash/deep_dup.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/deep_dup.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/deep_dup.rb`.]]]
 
 ### Diffing
 
-The method `diff` returns a hash that represents a diff of the receiver and the argument with the following logic:
+`diff` 메소드는 다음의 규칙에 근거해서 receiver와 인수의 차이를 해시로 반환해 줍니다. [[[The method `diff` returns a hash that represents a diff of the receiver and the argument with the following logic:]]]
 
-* Pairs `key`, `value` that exist in both hashes do not belong to the diff hash.
+* 양쪽 해시에 동일한 키와 값이 존재할 경우는 diff 해시에 포함되지 않습니다. [[[Pairs `key`, `value` that exist in both hashes do not belong to the diff hash.]]]
 
-* If both hashes have `key`, but with different values, the pair in the receiver wins.
+* 양쪽 해시에서 동일한 키를 가지고 있으나 값이 다른 경우에는 receiver에 있는 키/값이 포함됩니다. [[[If both hashes have `key`, but with different values, the pair in the receiver wins.]]]
 
-* The rest is just merged.
+* 나머지 경우는 단지 머지됩니다. [[[The rest is just merged.]]]
 
 ```ruby
 {a: 1}.diff(a: 1)
@@ -2636,54 +2636,54 @@ The method `diff` returns a hash that represents a diff of the receiver and the 
 {}.diff(a: 1)      # => {:a=>1}
 ```
 
-An important property of this diff hash is that you can retrieve the original hash by applying `diff` twice:
+이러한 diff 해시의 중요한 특징은 `diff` 메소드를 두번 적용할 경우 원본 해시를 반환해 주게 됩니다. [[[An important property of this diff hash is that you can retrieve the original hash by applying `diff` twice:]]]
 
 ```ruby
 hash.diff(hash2).diff(hash2) == hash
 ```
 
-Diffing hashes may be useful for error messages related to expected option hashes for example.
+diff 해시는 예를 들어, 옵션 해시 중에서 빠진 것에 대한 에러 메시지를 보여줄 때 유용하게 사용할 수 있습니다. [[[Diffing hashes may be useful for error messages related to expected option hashes for example.]]]
 
-NOTE: Defined in `active_support/core_ext/hash/diff.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/diff.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/diff.rb`.]]]
 
-### Working with Keys
+### [Working with Keys] 키로 작업하기
 
-#### `except` and `except!`
+#### [`except` and `except!`] `except` 와 `except!`
 
-The method `except` returns a hash with the keys in the argument list removed, if present:
+`except` 메소드는 인수 목록에 있는 키가 존재할 경우 제거한 후에 해시를 반환해 줍니다. [[[The method `except` returns a hash with the keys in the argument list removed, if present:]]]
 
 ```ruby
 {a: 1, b: 2}.except(:a) # => {:b=>2}
 ```
 
-If the receiver responds to `convert_key`, the method is called on each of the arguments. This allows `except` to play nice with hashes with indifferent access for instance:
+receiver 객체가 `convert_key` 메소드에 반응할 경우, 각 인수에 대해서 `except` 메소드가 호출됩니다. 따라서 예를 들어 `except` 메소드가 해시와 잘 동작할 수 있게 됩니다. [[[If the receiver responds to `convert_key`, the method is called on each of the arguments. This allows `except` to play nice with hashes with indifferent access for instance:]]]
 
 ```ruby
 {a: 1}.with_indifferent_access.except(:a)  # => {}
 {a: 1}.with_indifferent_access.except("a") # => {}
 ```
 
-There's also the bang variant `except!` that removes keys in the very receiver.
+receiver의 키를 바로 제거하는 bang 버전인 `except!` 메소드도 있습니다. [[[There's also the bang variant `except!` that removes keys in the very receiver.]]]
 
-NOTE: Defined in `active_support/core_ext/hash/except.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/except.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/except.rb`.]]]
 
-#### `transform_keys` and `transform_keys!`
+#### [`transform_keys` and `transform_keys!`] `transform_keys` 와 `transform_keys!`
 
-The method `transform_keys` accepts a block and returns a hash that has applied the block operations to each of the keys in the receiver:
+`transform_keys` 메소드는 하나의 블록을 받아서 receiver에 있는 각 키에 대해서 블록을 수행한 후 결과 해시를 반환해 줍니다. [[[The method `transform_keys` accepts a block and returns a hash that has applied the block operations to each of the keys in the receiver:]]]
 
 ```ruby
 {nil => nil, 1 => 1, a: :a}.transform_keys{ |key| key.to_s.upcase }
 # => {"" => nil, "A" => :a, "1" => 1}
 ```
 
-The result in case of collision is undefined:
+키 충돌이 발생할 경우에는 결과가 정의되지 않게 됩니다. [[[The result in case of collision is undefined:]]]
 
 ```ruby
 {"a" => 1, a: 2}.transform_keys{ |key| key.to_s.upcase }
 # => {"A" => 2}, in my test, can't rely on this result though
 ```
 
-This method may be useful for example to build specialized conversions. For instance `stringify_keys` and `symbolize_keys` use `transform_keys` to perform their key conversions:
+이 메소드는 예를 들어 특수한 변환을 하고자 할 때 유용합니다. 예를들어 `stringify_keys`와 `symbolize_keys` 메소드는 키변환을 위해서 `transform_keys` 메소드를 사용합니다. [[[This method may be useful for example to build specialized conversions. For instance `stringify_keys` and `symbolize_keys` use `transform_keys` to perform their key conversions:]]]
 
 ```ruby
 def stringify_keys
@@ -2695,34 +2695,34 @@ def symbolize_keys
 end
 ```
 
-There's also the bang variant `transform_keys!` that applies the block operations to keys in the very receiver.
+물론 bang 버전인 `transform_keys!` 메소드는 블록 실행 후에 receiver의 키를 변경하게 됩니다. [[[There's also the bang variant `transform_keys!` that applies the block operations to keys in the very receiver.]]]
 
-Besides that, one can use `deep_transform_keys` and `deep_transform_keys!` to perform the block operation on all the keys in the given hash and all the hashes nested into it. An example of the result is:
+이 외에도, 해시내의 모든 키와 해당 키의 중첩된 해시에 있는 모든 키까지도 변형할 수 있는 `deep_transform_keys`와 `deep_transform_keys!` 메소드도 있습니다. [[[Besides that, one can use `deep_transform_keys` and `deep_transform_keys!` to perform the block operation on all the keys in the given hash and all the hashes nested into it. An example of the result is:]]]
 
 ```ruby
 {nil => nil, 1 => 1, nested: {a: 3, 5 => 5}}.deep_transform_keys{ |key| key.to_s.upcase }
 # => {""=>nil, "1"=>1, "NESTED"=>{"A"=>3, "5"=>5}}
 ```
 
-NOTE: Defined in `active_support/core_ext/hash/keys.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/keys.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/keys.rb`.]]]
 
-#### `stringify_keys` and `stringify_keys!`
+#### [`stringify_keys` and `stringify_keys!`] `stringify_keys` 와 `stringify_keys!`
 
-The method `stringify_keys` returns a hash that has a stringified version of the keys in the receiver. It does so by sending `to_s` to them:
+`stringify_keys` 메소드는 receiver 개첵에 있는 키들을 문자열로 변환한 해시를 반환합니다. 각 키에 대해서 `to_s` 메소드를 호출하여 문자열로 만들어 줍니다. [[[The method `stringify_keys` returns a hash that has a stringified version of the keys in the receiver. It does so by sending `to_s` to them:]]]
 
 ```ruby
 {nil => nil, 1 => 1, a: :a}.stringify_keys
 # => {"" => nil, "a" => :a, "1" => 1}
 ```
 
-The result in case of collision is undefined:
+이 때 키 충돌이 발생하면 결과가 정의되지 않게 됩니다. [[[The result in case of collision is undefined:]]]
 
 ```ruby
 {"a" => 1, a: 2}.stringify_keys
 # => {"a" => 2}, in my test, can't rely on this result though
 ```
 
-This method may be useful for example to easily accept both symbols and strings as options. For instance `ActionView::Helpers::FormHelper` defines:
+이 메소드는 예를 들어 심볼과 문자열을 모두 옵션으로 사용할 수 있게 할 때 유용합니다. 예를 들어, `ActionView::Helpers::FormHelper`에서 다음과 같은 정의를 볼 수 있습니다. [[[This method may be useful for example to easily accept both symbols and strings as options. For instance `ActionView::Helpers::FormHelper` defines:]]]
 
 ```ruby
 def to_check_box_tag(options = {}, checked_value = "1", unchecked_value = "0")
@@ -2732,38 +2732,38 @@ def to_check_box_tag(options = {}, checked_value = "1", unchecked_value = "0")
 end
 ```
 
-The second line can safely access the "type" key, and let the user to pass either `:type` or "type".
+`:type` 이나 "type" 중 어떤 것을 넘겨 받아도 두번째 코드라인과 같이 "type" 키를 안전하게 접근할 수 있게 됩니다. [[[The second line can safely access the "type" key, and let the user to pass either `:type` or "type".]]]
 
-There's also the bang variant `stringify_keys!` that stringifies keys in the very receiver.
+bang 버전인 `stringify_keys!` 메소드는 receiver의 키를 직접 문자열로 변환하게 됩니다. [[[There's also the bang variant `stringify_keys!` that stringifies keys in the very receiver.]]]
 
-Besides that, one can use `deep_stringify_keys` and `deep_stringify_keys!` to stringify all the keys in the given hash and all the hashes nested into it. An example of the result is:
+이 외에도, 해시에 있는 모든 키와 특정 키에 할당된 중첩된 해시 내의 모든 키에 대해서도 문자열로 변환해 주는 `deep_stringify_keys`와 `deep_stringify_keys!` 메소드도 있습니다. 결과에 대한 예를 다음에서 볼 수 있습니다. [[[Besides that, one can use `deep_stringify_keys` and `deep_stringify_keys!` to stringify all the keys in the given hash and all the hashes nested into it. An example of the result is:]]]
 
 ```ruby
 {nil => nil, 1 => 1, nested: {a: 3, 5 => 5}}.deep_stringify_keys
 # => {""=>nil, "1"=>1, "nested"=>{"a"=>3, "5"=>5}}
 ```
 
-NOTE: Defined in `active_support/core_ext/hash/keys.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/keys.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/keys.rb`.]]]
 
-#### `symbolize_keys` and `symbolize_keys!`
+#### [`symbolize_keys` and `symbolize_keys!`] `symbolize_keys` 와 `symbolize_keys!`
 
-The method `symbolize_keys` returns a hash that has a symbolized version of the keys in the receiver, where possible. It does so by sending `to_sym` to them:
+`symbolize_keys` 메소드는 receiver 객체에 있는 키를 가능한한 심볼로 변환한 해시를 반환합니다. 이 때 각 키에 대해서 `to_sym` 메소드를 호출하여 변환작업을 하게 됩니다. [[[The method `symbolize_keys` returns a hash that has a symbolized version of the keys in the receiver, where possible. It does so by sending `to_sym` to them:]]]
 
 ```ruby
 {nil => nil, 1 => 1, "a" => "a"}.symbolize_keys
 # => {1=>1, nil=>nil, :a=>"a"}
 ```
 
-WARNING. Note in the previous example only one key was symbolized.
+WARNING. 위 예제 코드에서와 단지 하나의 키만 심볼로 변환된 것을 주목하기 바랍니다. [[[Note in the previous example only one key was symbolized.]]]
 
-The result in case of collision is undefined:
+이 때 키 충돌이 있는 경우 결과는 정의되지 않게 됩니다. [[[The result in case of collision is undefined:]]]
 
 ```ruby
 {"a" => 1, a: 2}.symbolize_keys
 # => {:a=>2}, in my test, can't rely on this result though
 ```
 
-This method may be useful for example to easily accept both symbols and strings as options. For instance `ActionController::UrlRewriter` defines
+예를 들어 이 메소드는 옵션으로 심볼과 문자열을 모두 사용할 때 유용합니다. 예를 들어 `ActionController::UrlRewriter`에서는 아래와 같은 메소드를 정의하고 있습니다. [[[This method may be useful for example to easily accept both symbols and strings as options. For instance `ActionController::UrlRewriter` defines]]]
 
 ```ruby
 def rewrite_path(options)
@@ -2773,41 +2773,41 @@ def rewrite_path(options)
 end
 ```
 
-The second line can safely access the `:params` key, and let the user to pass either `:params` or "params".
+두번째 코드라인에서와 같이 `:params` 또는 "params" 중 어떤 것을 넘겨 주어도 안전하게 `:params` 키를 접근할 수 있게 됩니다. [[[The second line can safely access the `:params` key, and let the user to pass either `:params` or "params".]]]
 
-There's also the bang variant `symbolize_keys!` that symbolizes keys in the very receiver.
+또한 bang 버전인 `symbolize_keys!` 메소드는 receiver 객체의 키를 직접 변경하게 됩니다. [[[There's also the bang variant `symbolize_keys!` that symbolizes keys in the very receiver.]]]
 
-Besides that, one can use `deep_symbolize_keys` and `deep_symbolize_keys!` to symbolize all the keys in the given hash and all the hashes nested into it. An example of the result is:
+이외에도, 해시내의 모든 키와 특정에 할당된 해시내의 모든 키에 대해서 심볼로 변경할 수 있는 `deep_symbolize_keys` 와 `deep_symbolize_keys!` 메소드도 있습니다. 아래에 결과에 대한 예가 있습니다. [[[Besides that, one can use `deep_symbolize_keys` and `deep_symbolize_keys!` to symbolize all the keys in the given hash and all the hashes nested into it. An example of the result is:]]]
 
 ```ruby
 {nil => nil, 1 => 1, "nested" => {"a" => 3, 5 => 5}}.deep_symbolize_keys
 # => {nil=>nil, 1=>1, nested:{a:3, 5=>5}}
 ```
 
-NOTE: Defined in `active_support/core_ext/hash/keys.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/keys.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/keys.rb`.]]]
 
-#### `to_options` and `to_options!`
+#### [`to_options` and `to_options!`] `to_options` 와 `to_options!`
 
-The methods `to_options` and `to_options!` are respectively aliases of `symbolize_keys` and `symbolize_keys!`.
+`to_options` 와 `to_options!` 메소드는 각각 `symbolize_keys` 와 `symbolize_keys!` 메소드에 대한 별칭입니다. [[[The methods `to_options` and `to_options!` are respectively aliases of `symbolize_keys` and `symbolize_keys!`.]]]
 
-NOTE: Defined in `active_support/core_ext/hash/keys.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/keys.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/keys.rb`.]]]
 
 #### `assert_valid_keys`
 
-The method `assert_valid_keys` receives an arbitrary number of arguments, and checks whether the receiver has any key outside that white list. If it does `ArgumentError` is raised.
+이 메소드는 인수를 임의의 갯수로 취해서 receiver 해시에 해당 키가 있는지를 검사해서 없는 경우 `ArgumentError` 예외를 발생하게 됩니다. [[[The method `assert_valid_keys` receives an arbitrary number of arguments, and checks whether the receiver has any key outside that white list. If it does `ArgumentError` is raised.]]]
 
 ```ruby
 {a: 1}.assert_valid_keys(:a)  # passes
 {a: 1}.assert_valid_keys("a") # ArgumentError
 ```
 
-Active Record does not accept unknown options when building associations, for example. It implements that control via `assert_valid_keys`.
+예를 들면, 액티브레코드는 관계를 생성할 때 알려지지 않은 옵션을 사용할 경우 받아들이지 않습니다. 이 때 바로 `assert_valid_keys` 메소드를 호출하여 작성을 수행하게 됩니다. [[[Active Record does not accept unknown options when building associations, for example. It implements that control via `assert_valid_keys`.]]]
 
-NOTE: Defined in `active_support/core_ext/hash/keys.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/keys.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/keys.rb`.]]]
 
 ### Slicing
 
-Ruby has built-in support for taking slices out of strings and arrays. Active Support extends slicing to hashes:
+루비는 문자열과 배열의 일부를 반환하는 내장 메소드를 가지고 있습니다. 액티브서포트는 이러한 기능을 해시에 대해서도 지원합니다. [[[Ruby has built-in support for taking slices out of strings and arrays. Active Support extends slicing to hashes:]]]
 
 ```ruby
 {a: 1, b: 2, c: 3}.slice(:a, :c)
@@ -2817,16 +2817,16 @@ Ruby has built-in support for taking slices out of strings and arrays. Active Su
 # => {:b=>2} # non-existing keys are ignored
 ```
 
-If the receiver responds to `convert_key` keys are normalized:
+receiver가 `convert_key`에 반등할 경우 키들은 정상화됩니다. [[[If the receiver responds to `convert_key` keys are normalized:]]]
 
 ```ruby
 {a: 1, b: 2}.with_indifferent_access.slice("a")
 # => {:a=>1}
 ```
 
-NOTE. Slicing may come in handy for sanitizing option hashes with a white list of keys.
+NOTE. 이 메소드는 옵션 해시 중에서 인식가능한 키 목록을 알아내는데 편리할 수 있습니다. [[[Slicing may come in handy for sanitizing option hashes with a white list of keys.]]]
 
-There's also `slice!` which in addition to perform a slice in place returns what's removed:
+bang 버전인 `slice!` 메소드는 receiver에 대해서 직접 slice 작업할 뿐 아나리 제거된 키/값을 반환해 줍니다. [[[There's also `slice!` which in addition to perform a slice in place returns what's removed:]]]
 
 ```ruby
 hash = {a: 1, b: 2}
@@ -2834,11 +2834,11 @@ rest = hash.slice!(:a) # => {:b=>2}
 hash                   # => {:a=>1}
 ```
 
-NOTE: Defined in `active_support/core_ext/hash/slice.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/slice.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/slice.rb`.]]]
 
 ### Extracting
 
-The method `extract!` removes and returns the key/value pairs matching the given keys.
+`extract!` 메소드는 해당 키에 일치하는 키/값 쌍을 제거하여 반환해 줍니다. [[[The method `extract!` removes and returns the key/value pairs matching the given keys.]]]
 
 ```ruby
 hash = {a: 1, b: 2}
@@ -2846,7 +2846,7 @@ rest = hash.extract!(:a) # => {:a=>1}
 hash                     # => {:b=>2}
 ```
 
-The method `extract!` returns the same subclass of Hash, that the receiver is.
+`extract!` 메소드는 receiver와 동일한 해시 클래스를 반환합니다. [[[The method `extract!` returns the same subclass of Hash, that the receiver is.]]]
 
 ```ruby
 hash = {a: 1, b: 2}.with_indifferent_access
@@ -2854,24 +2854,24 @@ rest = hash.extract!(:a).class
 # => ActiveSupport::HashWithIndifferentAccess
 ```
 
-NOTE: Defined in `active_support/core_ext/hash/slice.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/slice.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/slice.rb`.]]]
 
 ### Indifferent Access
 
-The method `with_indifferent_access` returns an `ActiveSupport::HashWithIndifferentAccess` out of its receiver:
+`with_indifferent_access` 메소드는 receiver로부터 `ActiveSupport::HashWithIndifferentAccess`를 반환합니다. [[[The method `with_indifferent_access` returns an `ActiveSupport::HashWithIndifferentAccess` out of its receiver:]]]
 
 ```ruby
 {a: 1}.with_indifferent_access["a"] # => 1
 ```
 
-NOTE: Defined in `active_support/core_ext/hash/indifferent_access.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/hash/indifferent_access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/indifferent_access.rb`.]]]
 
-Extensions to `Regexp`
+[Extensions to `Regexp`] `Regexp`의 확장메소드 
 ----------------------
 
 ### `multiline?`
 
-The method `multiline?` says whether a regexp has the `/m` flag set, that is, whether the dot matches newlines.
+`multiline?` 메소드는 정규표현식이 `/m` 플래그 설정이 되었는지를 즉, dot가 개행문자에 해당하는지를 알려 줍니다. [[[The method `multiline?` says whether a regexp has the `/m` flag set, that is, whether the dot matches newlines.]]]
 
 ```ruby
 %r{.}.multiline?  # => false
@@ -2881,7 +2881,7 @@ Regexp.new('.').multiline?                    # => false
 Regexp.new('.', Regexp::MULTILINE).multiline? # => true
 ```
 
-Rails uses this method in a single place, also in the routing code. Multiline regexps are disallowed for route requirements and this flag eases enforcing that constraint.
+레일스는 딱 한 곳, 라우팅 코드에서만 이 메소드를 사용합니다. 다중라인 정규표현식은 라우트 requirements에서 사용할 수 없기 때문에 이 플래그를 사용하면 해당 규칙을 강제로 하는 것을 덜어 주게 됩니다. [[[Rails uses this method in a single place, also in the routing code. Multiline regexps are disallowed for route requirements and this flag eases enforcing that constraint.]]]
 
 ```ruby
 def assign_route_options(segments, defaults, requirements)
@@ -2893,14 +2893,14 @@ def assign_route_options(segments, defaults, requirements)
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/regexp.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/regexp.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/regexp.rb`.]]]
 
-Extensions to `Range`
+[Extensions to `Range`] `Range`형에 대한 확장메소드
 ---------------------
 
 ### `to_s`
 
-Active Support extends the method `Range#to_s` so that it understands an optional format argument. As of this writing the only supported non-default format is `:db`:
+액티브서포트는 `Range#to_s` 메소드를 확장해서 포맷 인수를 옵션으로 지정할 수 있습니다. 본 가이드를 작성하는 현 시점에서 지정할 수 있는 유일한 옵션은 `:db` 입니다. [[[Active Support extends the method `Range#to_s` so that it understands an optional format argument. As of this writing the only supported non-default format is `:db`:]]]
 
 ```ruby
 (Date.today..Date.tomorrow).to_s
@@ -2910,19 +2910,19 @@ Active Support extends the method `Range#to_s` so that it understands an optiona
 # => "BETWEEN '2009-10-25' AND '2009-10-26'"
 ```
 
-As the example depicts, the `:db` format generates a `BETWEEN` SQL clause. That is used by Active Record in its support for range values in conditions.
+위의 예제 코드에서 기술하는 바와 같이, `:db` 포맷은 SQL 구문인 `BETWEEN`을 만들어 줍니다. 이것은 조건절에서 범주형 값을 이용할 수 있도록 지원하여 액티브레코드에서 사용하게 됩니다. [[[As the example depicts, the `:db` format generates a `BETWEEN` SQL clause. That is used by Active Record in its support for range values in conditions.]]]
 
-NOTE: Defined in `active_support/core_ext/range/conversions.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/range/conversions.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/range/conversions.rb`.]]]
 
 ### `include?`
 
-The methods `Range#include?` and `Range#===` say whether some value falls between the ends of a given instance:
+`Range#include?`와 `Range#===` 메소드는 주어진 범주 객체의 시작과 끝 값 사이에 임의의 값이 존재하는지를 알려 줍니다. [[[The methods `Range#include?` and `Range#===` say whether some value falls between the ends of a given instance:]]]
 
 ```ruby
 (2..3).include?(Math::E) # => true
 ```
 
-Active Support extends these methods so that the argument may be another range in turn. In that case we test whether the ends of the argument range belong to the receiver themselves:
+액티브서포트는 이 메소드를 확장하여 인수로 다른 범주객체를 지정할 수 있도록 해 줍니다. 이와 같은 경우, 인술 지정된 범주객체가 receiver 범주내에 존재하는지를 테스트해 볼 수 있습니다. [[[Active Support extends these methods so that the argument may be another range in turn. In that case we test whether the ends of the argument range belong to the receiver themselves:]]]
 
 ```ruby
 (1..10).include?(3..7)  # => true
@@ -2936,11 +2936,11 @@ Active Support extends these methods so that the argument may be another range i
 (1...9) === (3..9)  # => false
 ```
 
-NOTE: Defined in `active_support/core_ext/range/include_range.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/range/include_range.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/range/include_range.rb`.]]]
 
 ### `overlaps?`
 
-The method `Range#overlaps?` says whether any two given ranges have non-void intersection:
+`Range#overlaps?` 메소드는 두개의 범주형 데이터가 서로 겹치는 부분이 있는지를 알려 줍니다. [[[The method `Range#overlaps?` says whether any two given ranges have non-void intersection:]]]
 
 ```ruby
 (1..10).overlaps?(7..11)  # => true
@@ -2948,37 +2948,37 @@ The method `Range#overlaps?` says whether any two given ranges have non-void int
 (1..10).overlaps?(11..27) # => false
 ```
 
-NOTE: Defined in `active_support/core_ext/range/overlaps.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/range/overlaps.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/range/overlaps.rb`.]]]
 
-Extensions to `Proc`
+[Extensions to `Proc`] `Proc`형에 대한 확장메소드
 --------------------
 
 ### `bind`
 
-As you surely know Ruby has an `UnboundMethod` class whose instances are methods that belong to the limbo of methods without a self. The method `Module#instance_method` returns an unbound method for example:
+알다시피, 루비는 `UnboundMethod`라는 클래스를 가지고 있습니다. 이 클래스의 인스턴스는 self 객체가 존재하지 않는 애매한 상태의 메소드들에 속합니다. `Module#instance_method` 메소드는 예를 들어 unbound 메소드를 반환합니다. [[[As you surely know Ruby has an `UnboundMethod` class whose instances are methods that belong to the limbo of methods without a self. The method `Module#instance_method` returns an unbound method for example:]]]
 
 ```ruby
 Hash.instance_method(:delete) # => #<UnboundMethod: Hash#delete>
 ```
 
-An unbound method is not callable as is, you need to bind it first to an object with `bind`:
+unbound 메소드는 그 자체로는 호출할 수 없기 때문에, `bind` 메소드를 이용하여 특정 객체에 먼저 bind할 필요가 있습니다. [[[An unbound method is not callable as is, you need to bind it first to an object with `bind`:]]]
 
 ```ruby
 clear = Hash.instance_method(:clear)
 clear.bind({a: 1}).call # => {}
 ```
 
-Active Support defines `Proc#bind` with an analogous purpose:
+액티브서포트는 동일한 목적으로 `Proc#bind` 메소드를 정의합니다. [[[Active Support defines `Proc#bind` with an analogous purpose:]]]
 
 ```ruby
 Proc.new { size }.bind([]).call # => 0
 ```
 
-As you see that's callable and bound to the argument, the return value is indeed a `Method`.
+아는 바와 같이, 인수에 bind되어 호출가능하게 되어 반환값은 비로서 하나의 `Method`가 되는 것입니다. [[[As you see that's callable and bound to the argument, the return value is indeed a `Method`.]]]
 
-NOTE: To do so `Proc#bind` actually creates a method under the hood. If you ever see a method with a weird name like `__bind_1256598120_237302` in a stack trace you know now where it comes from.
+NOTE: 이를 위해서 `Proc#bind` 메소드는 실제로 백그라운드에서 하나의 메소드를 생성합니다. `__bind_1256598120_237302`와 같은 이상한 이름을 스택 상에서 보게 될 경우 이 메소드가 어디로부터 유래한 것인지를 알 수 있을 것입니다. [[[To do so `Proc#bind` actually creates a method under the hood. If you ever see a method with a weird name like `__bind_1256598120_237302` in a stack trace you know now where it comes from.]]]
 
-Action Pack uses this trick in `rescue_from` for example, which accepts the name of a method and also a proc as callbacks for a given rescued exception. It has to call them in either case, so a bound method is returned by `handler_for_rescue`, thus simplifying the code in the caller:
+예를 들어 액션팩은 이러한 기법을 `rescue_from`에서 사용하는데, 이 메소드는 메소드명과 해당 예외를 처리할 콜백으로 하나의 Proc객체를 받게 됩니다. 이러한 예외를 처리하기 위해서는 해당 메소드와 콜백을 호출해야 하며 `handler_for_rescue` 메소드는 하나의 bound 메소드를 반환하여 호출자에서 코드를 간소화해 줍니다. [[[Action Pack uses this trick in `rescue_from` for example, which accepts the name of a method and also a proc as callbacks for a given rescued exception. It has to call them in either case, so a bound method is returned by `handler_for_rescue`, thus simplifying the code in the caller:]]]
 
 ```ruby
 def handler_for_rescue(exception)
@@ -2995,28 +2995,28 @@ def handler_for_rescue(exception)
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/proc.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/proc.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/proc.rb`.]]]
 
-Extensions to `Date`
+[Extensions to `Date`] `Date`형에 대한 확장메소드
 --------------------
 
-### Calculations
+### [Calculations] 날짜계산
 
-NOTE: All the following methods are defined in `active_support/core_ext/date/calculations.rb`.
+NOTE: 다음에 나오는 모든 메소드는 `active_support/core_ext/date/calculations.rb` 파일내에 정의되어 있습니다. [[[All the following methods are defined in `active_support/core_ext/date/calculations.rb`.]]]
 
-INFO: The following calculation methods have edge cases in October 1582, since days 5..14 just do not exist. This guide does not document their behavior around those days for brevity, but it is enough to say that they do what you would expect. That is, `Date.new(1582, 10, 4).tomorrow` returns `Date.new(1582, 10, 15)` and so on. Please check `test/core_ext/date_ext_test.rb` in the Active Support test suite for expected behavior.
+INFO: 다음의 날짜 연산 메소드들은 1582년 10월에 대해서 5..14 사이의 날짜가 존재하지 않기 때문에 극단적인 경우를 보여 줍니다. 본 가이드는 지면을 절약하기 위해 이 날짜들에 대한 이상한 동적에 대해서 기술하지 않지만 예상대로 동적한다고 말하기에 충분합니다. 즉, `Date.new(1582, 10, 4).tomorrow`는 `Date.new(1582, 10, 15)` 등과 같이 반환하게 되는데, 자세한 것을 `test/core_ext/date_ext_test.rb` 파일을 검토해 보기 바랍니다. [[[The following calculation methods have edge cases in October 1582, since days 5..14 just do not exist. This guide does not document their behavior around those days for brevity, but it is enough to say that they do what you would expect. That is, `Date.new(1582, 10, 4).tomorrow` returns `Date.new(1582, 10, 15)` and so on. Please check `test/core_ext/date_ext_test.rb` in the Active Support test suite for expected behavior.]]]
 
 #### `Date.current`
 
-Active Support defines `Date.current` to be today in the current time zone. That's like `Date.today`, except that it honors the user time zone, if defined. It also defines `Date.yesterday` and `Date.tomorrow`, and the instance predicates `past?`, `today?`, and `future?`, all of them relative to `Date.current`.
+액티브서포트는 현재 시간대역의 금일 날짜를 알려주는 `Date.current` 메소드를 지원합니다. 사용자 시간대역(정의되어 있다면)을 고려하는 것만 제외하고는 `Date.today` 메소드와 비슷합니다. 한편 `Date.yesterday`와 `Date.tomorrow` 메소드도 지원하고 기타 `past?`, `today?`, `future?` 메소드도 지원합니다. 이 모든 메소드는 `Date.current`에 대한 상대적인 결과를 반환해 줍니다. [[[Active Support defines `Date.current` to be today in the current time zone. That's like `Date.today`, except that it honors the user time zone, if defined. It also defines `Date.yesterday` and `Date.tomorrow`, and the instance predicates `past?`, `today?`, and `future?`, all of them relative to `Date.current`.]]]
 
-When making Date comparisons using methods which honor the user time zone, make sure to use `Date.current` and not `Date.today`. There are cases where the user time zone might be in the future compared to the system time zone, which `Date.today` uses by default. This means `Date.today` may equal `Date.yesterday`.
+사용자 시간대역을 고려하는 메소드를 이용하여 날짜 비교를 할 때 `Date.today`보다는 `Date.current` 메소드를 사용해야 합니다. 그러나 사용자 시간대역을 시스템 시간역과 비교해야 할 경우도 있을 것입니다. 이 때 시스템 시간대역은 `Date.today` 메소드가 디폴트로 사용합니다. 이 말은 `Date.today`와 `Date.yesterday` 결과 값이 같을 수 있다는 것을 의미합니다. [[[When making Date comparisons using methods which honor the user time zone, make sure to use `Date.current` and not `Date.today`. There are cases where the user time zone might be in the future compared to the system time zone, which `Date.today` uses by default. This means `Date.today` may equal `Date.yesterday`.]]]
 
-#### Named dates
+#### [Named dates] 이름을 가지는 날짜들
 
 ##### `prev_year`, `next_year`
 
-In Ruby 1.9 `prev_year` and `next_year` return a date with the same day/month in the last or next year:
+루비 1.9에서, `prev_year`와 `next_year` 메소드는 각각 지난해 또는 다음해의 동일한 일자를 가지는 날짜를 반환합니다. [[[In Ruby 1.9 `prev_year` and `next_year` return a date with the same day/month in the last or next year:]]]
 
 ```ruby
 d = Date.new(2010, 5, 8) # => Sat, 08 May 2010
@@ -3024,7 +3024,7 @@ d.prev_year              # => Fri, 08 May 2009
 d.next_year              # => Sun, 08 May 2011
 ```
 
-If date is the 29th of February of a leap year, you obtain the 28th:
+만역 윤년 2월 29일일 경우에는 각 메소드의 반환값은 28일자가 될 것입니다. [[[If date is the 29th of February of a leap year, you obtain the 28th:]]]
 
 ```ruby
 d = Date.new(2000, 2, 29) # => Tue, 29 Feb 2000
@@ -3032,11 +3032,11 @@ d.prev_year               # => Sun, 28 Feb 1999
 d.next_year               # => Wed, 28 Feb 2001
 ```
 
-`prev_year` is aliased to `last_year`.
+`prev_year`와 같은 기능을 하는 메소드로 `last_year`가 있습니다. [[[`prev_year` is aliased to `last_year`.]]]
 
 ##### `prev_month`, `next_month`
 
-In Ruby 1.9 `prev_month` and `next_month` return the date with the same day in the last or next month:
+루비 1.9에서, `prev_month`와 `next_month` 메소드는 각각 이전달 또는 다음달의 동일 일자를 가지는 날짜를 반환합니다. [[[In Ruby 1.9 `prev_month` and `next_month` return the date with the same day in the last or next month:]]]
 
 ```ruby
 d = Date.new(2010, 5, 8) # => Sat, 08 May 2010
@@ -3044,7 +3044,7 @@ d.prev_month             # => Thu, 08 Apr 2010
 d.next_month             # => Tue, 08 Jun 2010
 ```
 
-If such a day does not exist, the last day of the corresponding month is returned:
+만약 해당 일자가 존재하지 않을 경우 해당 월의 마지막 날짜 값이 반환됩니다. [[[If such a day does not exist, the last day of the corresponding month is returned:]]]
 
 ```ruby
 Date.new(2000, 5, 31).prev_month # => Sun, 30 Apr 2000
@@ -3053,11 +3053,11 @@ Date.new(2000, 5, 31).next_month # => Fri, 30 Jun 2000
 Date.new(2000, 1, 31).next_month # => Tue, 29 Feb 2000
 ```
 
-`prev_month` is aliased to `last_month`.
+`prev_month` 와 동일한 기능을 하는 메소드로 `last_month` 가 있습니다. [[[`prev_month` is aliased to `last_month`.]]]
 
 ##### `prev_quarter`, `next_quarter`
 
-Same as `prev_month` and `next_month`. It returns the date with the same day in the previous or next quarter:
+`prev_month`와 `next_month`의 경우와 같습니다. 이전 분기 또는 다음 분기의 동일한 일자를 가지는 날짜를 반환합니다. [[[Same as `prev_month` and `next_month`. It returns the date with the same day in the previous or next quarter:]]]
 
 ```ruby
 t = Time.local(2010, 5, 8) # => Sat, 08 May 2010
@@ -3065,7 +3065,7 @@ t.prev_quarter             # => Mon, 08 Feb 2010
 t.next_quarter             # => Sun, 08 Aug 2010
 ```
 
-If such a day does not exist, the last day of the corresponding month is returned:
+해당 일자가 존재하지 않는 경우에는, 해당 월의 마지막 일자가 반환됩니다. [[[If such a day does not exist, the last day of the corresponding month is returned:]]]
 
 ```ruby
 Time.local(2000, 7, 31).prev_quarter  # => Sun, 30 Apr 2000
@@ -3074,14 +3074,11 @@ Time.local(2000, 10, 31).prev_quarter # => Mon, 30 Oct 2000
 Time.local(2000, 11, 31).next_quarter # => Wed, 28 Feb 2001
 ```
 
-`prev_quarter` is aliased to `last_quarter`.
+`prev_quarter`와 동일한 기능을 하는 메소드로 `last_quarter`가 있습니다. [[[`prev_quarter` is aliased to `last_quarter`.]]]
 
 ##### `beginning_of_week`, `end_of_week`
 
-The methods `beginning_of_week` and `end_of_week` return the dates for the
-beginning and end of the week, respectively. Weeks are assumed to start on
-Monday, but that can be changed passing an argument, setting thread local
-`Date.beginning_of_week` or `config.beginning_of_week`.
+`beginning_of_week`와 `end_of_week` 메소드는 각각 해당 중의 시작일과 종료일을 반환합니다. 일주일의 시작은 월요일이지만 인수(start_day)를 넘겨주어 변경할 수 있습니다. 즉, `Date.beginning_of_week` 또는 `config.beginning_of_week`에 지정해 주면 됩니다. [[[The methods `beginning_of_week` and `end_of_week` return the dates for the beginning and end of the week, respectively. Weeks are assumed to start on Monday, but that can be changed passing an argument, setting thread local `Date.beginning_of_week` or `config.beginning_of_week`.]]]
 
 ```ruby
 d = Date.new(2010, 5, 8)     # => Sat, 08 May 2010
@@ -3091,12 +3088,11 @@ d.end_of_week                # => Sun, 09 May 2010
 d.end_of_week(:sunday)       # => Sat, 08 May 2010
 ```
 
-`beginning_of_week` is aliased to `at_beginning_of_week` and `end_of_week` is aliased to `at_end_of_week`.
+`beginning_of_week`은 `at_beginning_of_week`와 같은 메소드이고 `end_of_week`은 `at_end_of_week`와 같은 메소드입니다. [[[`beginning_of_week` is aliased to `at_beginning_of_week` and `end_of_week` is aliased to `at_end_of_week`.]]]
 
 ##### `monday`, `sunday`
 
-The methods `monday` and `sunday` return the dates for the previous Monday and
-next Sunday, respectively.
+아래의 예제 코드에서, `monday`와 `sunday` 메소드는 각각 지난 월요일과 다가올 일요일에 해당하는 날짜를 반환합니다. [[[The methods `monday` and `sunday` return the dates for the previous Monday and next Sunday, respectively.]]]
 
 ```ruby
 d = Date.new(2010, 5, 8)     # => Sat, 08 May 2010
@@ -3112,7 +3108,7 @@ d.sunday                     # => Sun, 16 Sep 2012
 
 ##### `prev_week`, `next_week`
 
-The method `next_week` receives a symbol with a day name in English (default is the thread local `Date.beginning_of_week`, or `config.beginning_of_week`, or `:monday`) and it returns the date corresponding to that day.
+`next_week` 메소드는 영어로 요일명에 대한 심볼명을 인수로 받아서 해당 일자를 반환합니다. 여기서 디폴트 인수는 `Date.beginning_of_week`, `config.beginning_of_week`, 또는 `:monday` 입니다. [[[The method `next_week` receives a symbol with a day name in English (default is the thread local `Date.beginning_of_week`, or `config.beginning_of_week`, or `:monday`) and it returns the date corresponding to that day.]]]
 
 ```ruby
 d = Date.new(2010, 5, 9) # => Sun, 09 May 2010
@@ -3120,7 +3116,7 @@ d.next_week              # => Mon, 10 May 2010
 d.next_week(:saturday)   # => Sat, 15 May 2010
 ```
 
-The method `prev_week` is analogous:
+`prev_week` 메소드도 동일하게 적용됩니다. [[[The method `prev_week` is analogous:]]]
 
 ```ruby
 d.prev_week              # => Mon, 26 Apr 2010
@@ -3128,13 +3124,13 @@ d.prev_week(:saturday)   # => Sat, 01 May 2010
 d.prev_week(:friday)     # => Fri, 30 Apr 2010
 ```
 
-`prev_week` is aliased to `last_week`.
+`prev_week`와 동일한 기능을 하는 메소드로 `last_week`가 있습니다. [[[`prev_week` is aliased to `last_week`.]]]
 
-Both `next_week` and `prev_week` work as expected when `Date.beginning_of_week` or `config.beginning_of_week` are set.
+`next_week`와 `prev_week`는 `Date.beginning_of_week` 또는 `config.beginning_of_week`가 설정이 된 상태에서만 제대로 동작하게 됩니다. [[[Both `next_week` and `prev_week` work as expected when `Date.beginning_of_week` or `config.beginning_of_week` are set.]]]
 
 ##### `beginning_of_month`, `end_of_month`
 
-The methods `beginning_of_month` and `end_of_month` return the dates for the beginning and end of the month:
+`beginning_of_month` 와 `end_of_month` 메소드는 해당 월의 시작일과 종료일을 반환합니다. [[[The methods `beginning_of_month` and `end_of_month` return the dates for the beginning and end of the month:]]]
 
 ```ruby
 d = Date.new(2010, 5, 9) # => Sun, 09 May 2010
@@ -3142,11 +3138,11 @@ d.beginning_of_month     # => Sat, 01 May 2010
 d.end_of_month           # => Mon, 31 May 2010
 ```
 
-`beginning_of_month` is aliased to `at_beginning_of_month`, and `end_of_month` is aliased to `at_end_of_month`.
+`beginning_of_month`와 동일한 기능을 하는 메소드로 `at_beginning_of_month`가 있고, `end_of_month`에 대해서는 `at_end_of_month` 메소드가 있습니다. [[[`beginning_of_month` is aliased to `at_beginning_of_month`, and `end_of_month` is aliased to `at_end_of_month`.]]]
 
 ##### `beginning_of_quarter`, `end_of_quarter`
 
-The methods `beginning_of_quarter` and `end_of_quarter` return the dates for the beginning and end of the quarter of the receiver's calendar year:
+`beginning_of_quarter`와 `end_of_quarter` 메소드는 각각 receiver 칼렌더 년도의 시작과 종료 분기에 해당하는 일자를 반환합니다. [[[The methods `beginning_of_quarter` and `end_of_quarter` return the dates for the beginning and end of the quarter of the receiver's calendar year:]]]
 
 ```ruby
 d = Date.new(2010, 5, 9) # => Sun, 09 May 2010
@@ -3154,11 +3150,11 @@ d.beginning_of_quarter   # => Thu, 01 Apr 2010
 d.end_of_quarter         # => Wed, 30 Jun 2010
 ```
 
-`beginning_of_quarter` is aliased to `at_beginning_of_quarter`, and `end_of_quarter` is aliased to `at_end_of_quarter`.
+`beginning_of_quarter`와 동일한 기능을 하는 메소드로 `at_beginning_of_quarter`가 있고, `end_of_quarter`에 대해서는 `at_end_of_quarter`가 있습니다. [[[`beginning_of_quarter` is aliased to `at_beginning_of_quarter`, and `end_of_quarter` is aliased to `at_end_of_quarter`.]]]
 
 ##### `beginning_of_year`, `end_of_year`
 
-The methods `beginning_of_year` and `end_of_year` return the dates for the beginning and end of the year:
+`beginning_of_year`와 `end_of_year` 메소드는 각각 해당 년도의 시작과 종료일에 해당하는 날짜를 반환합니다. [[[The methods `beginning_of_year` and `end_of_year` return the dates for the beginning and end of the year:]]]
 
 ```ruby
 d = Date.new(2010, 5, 9) # => Sun, 09 May 2010
@@ -3166,27 +3162,27 @@ d.beginning_of_year      # => Fri, 01 Jan 2010
 d.end_of_year            # => Fri, 31 Dec 2010
 ```
 
-`beginning_of_year` is aliased to `at_beginning_of_year`, and `end_of_year` is aliased to `at_end_of_year`.
+`beginning_of_year`와 동일한 기능을 하는 메소드로 `at_beginning_of_year`가 있고, `end_of_year`에 대해서는 `at_end_of_year`가 있습니다. [[[`beginning_of_year` is aliased to `at_beginning_of_year`, and `end_of_year` is aliased to `at_end_of_year`.]]]
 
-#### Other Date Computations
+#### [Other Date Computations] 기타 날짜 연산
 
 ##### `years_ago`, `years_since`
 
-The method `years_ago` receives a number of years and returns the same date those many years ago:
+`years_ago` 메소드는 년도 수를 인수로 받아서 해당 년도 이전의 동일한 일자를 반환합니다. [[[The method `years_ago` receives a number of years and returns the same date those many years ago:]]]
 
 ```ruby
 date = Date.new(2010, 6, 7)
 date.years_ago(10) # => Wed, 07 Jun 2000
 ```
 
-`years_since` moves forward in time:
+`year_since` 메소드는 년도 수를 인수로 받아서 해당 년도 이후의 동일한 일자를 반환합니다. [[[`years_since` moves forward in time:]]]
 
 ```ruby
 date = Date.new(2010, 6, 7)
 date.years_since(10) # => Sun, 07 Jun 2020
 ```
 
-If such a day does not exist, the last day of the corresponding month is returned:
+해당 일자가 존재하지 않을 경우에는 해당 월의 마지막 일자를 반환합니다. [[[If such a day does not exist, the last day of the corresponding month is returned:]]]
 
 ```ruby
 Date.new(2012, 2, 29).years_ago(3)     # => Sat, 28 Feb 2009
@@ -3195,14 +3191,14 @@ Date.new(2012, 2, 29).years_since(3)   # => Sat, 28 Feb 2015
 
 ##### `months_ago`, `months_since`
 
-The methods `months_ago` and `months_since` work analogously for months:
+`months_ago`와 `months_since` 메소드는 월에 대해서 동일하게 동작합니다. [[[The methods `months_ago` and `months_since` work analogously for months:]]]
 
 ```ruby
 Date.new(2010, 4, 30).months_ago(2)   # => Sun, 28 Feb 2010
 Date.new(2010, 4, 30).months_since(2) # => Wed, 30 Jun 2010
 ```
 
-If such a day does not exist, the last day of the corresponding month is returned:
+해당 일자가 존재하지 않을 경우 해당 월의 마지막 일자를 반환합니다. [[[If such a day does not exist, the last day of the corresponding month is returned:]]]
 
 ```ruby
 Date.new(2010, 4, 30).months_ago(2)    # => Sun, 28 Feb 2010
@@ -3211,7 +3207,7 @@ Date.new(2009, 12, 31).months_since(2) # => Sun, 28 Feb 2010
 
 ##### `weeks_ago`
 
-The method `weeks_ago` works analogously for weeks:
+`weeks_ago` 메소드는 주에 대해서 동일하게 동작합니다. [[[The method `weeks_ago` works analogously for weeks:]]]
 
 ```ruby
 Date.new(2010, 5, 24).weeks_ago(1)    # => Mon, 17 May 2010
@@ -3220,7 +3216,7 @@ Date.new(2010, 5, 24).weeks_ago(2)    # => Mon, 10 May 2010
 
 ##### `advance`
 
-The most generic way to jump to other days is `advance`. This method receives a hash with keys `:years`, `:months`, `:weeks`, `:days`, and returns a date advanced as much as the present keys indicate:
+다른 일자로 이동하는 가장 일반적인 방법은 `advance` 메소드를 사용하는 것입니다. 이 메소드는 `:years`, `:months`, `:weeks`, `:days` 키를 가지는 해시를 인수로 받아서 현재의 키값만큼 이동한 일자를 반환합니다. [[[The most generic way to jump to other days is `advance`. This method receives a hash with keys `:years`, `:months`, `:weeks`, `:days`, and returns a date advanced as much as the present keys indicate:]]]
 
 ```ruby
 date = Date.new(2010, 6, 6)
@@ -3228,34 +3224,34 @@ date.advance(years: 1, weeks: 2)  # => Mon, 20 Jun 2011
 date.advance(months: 2, days: -2) # => Wed, 04 Aug 2010
 ```
 
-Note in the previous example that increments may be negative.
+이전 예제 코드에서 음수 값을 지정할 수 있음을 주목하기 바랍니다. [[[Note in the previous example that increments may be negative.]]]
 
-To perform the computation the method first increments years, then months, then weeks, and finally days. This order is important towards the end of months. Say for example we are at the end of February of 2010, and we want to move one month and one day forward.
+날짜 연산을 위해서 메소드는 먼저 년도를 증가시키고 이후에 월, 주, 마지막에 일수를 증가시키게 됩니다. 이 순서는 월 말일에 대한 연산시에 중요한데, 예를 들어 2010년 2월 말일에서 1달 1일만큼 추가한다고 가정해 보겠습니다. [[[To perform the computation the method first increments years, then months, then weeks, and finally days. This order is important towards the end of months. Say for example we are at the end of February of 2010, and we want to move one month and one day forward.]]]
 
-The method `advance` advances first one month, and then one day, the result is:
+`advance` 메소드는 먼저 1달을 추가한 후에 1일 추가하여 결과(2010년 3월 29일)는 다음과 같습니다. [[[The method `advance` advances first one month, and then one day, the result is:]]]
 
 ```ruby
 Date.new(2010, 2, 28).advance(months: 1, days: 1)
 # => Sun, 29 Mar 2010
 ```
 
-While if it did it the other way around the result would be different:
+순서를 달리할 경우에는 아래와 같이 다른 결과를 얻게 될 것입니다. [[[While if it did it the other way around the result would be different:]]]
 
 ```ruby
 Date.new(2010, 2, 28).advance(days: 1).advance(months: 1)
 # => Thu, 01 Apr 2010
 ```
 
-#### Changing Components
+#### [Changing Components] 년/월/일 요소 변경하기
 
-The method `change` allows you to get a new date which is the same as the receiver except for the given year, month, or day:
+`change` 메소드는 receiver 날짜 객체의 년, 월, 일 값을 변경할 때 사용할 수 있습니다. [[[The method `change` allows you to get a new date which is the same as the receiver except for the given year, month, or day:]]]
 
 ```ruby
 Date.new(2010, 12, 23).change(year: 2011, month: 11)
 # => Wed, 23 Nov 2011
 ```
 
-This method is not tolerant to non-existing dates, if the change is invalid `ArgumentError` is raised:
+이 메소드는 존재하지 않는 일자에 대해서 매끄럽게 처리하지 못합니다. 그래서 변경할 일자가 유효하지 않을 경우, `ArgumentError` 예외를 발생시키게 됩니다. [[[This method is not tolerant to non-existing dates, if the change is invalid `ArgumentError` is raised:]]]
 
 ```ruby
 Date.new(2010, 1, 31).change(month: 2)
@@ -3264,7 +3260,7 @@ Date.new(2010, 1, 31).change(month: 2)
 
 #### Durations
 
-Durations can be added to and subtracted from dates:
+일자에서 일정 기간을 더하고 뺄 수 있습니다. [[[Durations can be added to and subtracted from dates:]]]
 
 ```ruby
 d = Date.current
@@ -3275,103 +3271,103 @@ d - 3.hours
 # => Sun, 08 Aug 2010 21:00:00 UTC +00:00
 ```
 
-They translate to calls to `since` or `advance`. For example here we get the correct jump in the calendar reform:
+이러한 연산을 위해서 `since` 또는 `advance` 메소드를 적절하게 호출하게 됩니다. 예를 들어, [[[They translate to calls to `since` or `advance`. For example here we get the correct jump in the calendar reform:]]]
 
 ```ruby
 Date.new(1582, 10, 4) + 1.day
 # => Fri, 15 Oct 1582
 ```
 
-#### Timestamps
+#### [Timestamps] 타임스탬프
 
-INFO: The following methods return a `Time` object if possible, otherwise a `DateTime`. If set, they honor the user time zone.
+INFO: 다음의 메소드들은 가능한한 `Time` 객체를 반환하지만, 그렇지 못할 경우에는 `DateTime` 객체를 반환할 것입니다. 시간대역이 설정되어 있을 때는 사용자의 시간대역이 반영되어 표시될 것입니다. [[[The following methods return a `Time` object if possible, otherwise a `DateTime`. If set, they honor the user time zone.]]]
 
 ##### `beginning_of_day`, `end_of_day`
 
-The method `beginning_of_day` returns a timestamp at the beginning of the day (00:00:00):
+`beginning_of_day` 메소드는 하루의 시작 시점(00:00:00)을 반환합니다. [[[The method `beginning_of_day` returns a timestamp at the beginning of the day (00:00:00):]]]
 
 ```ruby
 date = Date.new(2010, 6, 7)
 date.beginning_of_day # => Mon Jun 07 00:00:00 +0200 2010
 ```
 
-The method `end_of_day` returns a timestamp at the end of the day (23:59:59):
+`end_of_day` 메소드는 하루의 종료 시점(23:59:59)을 반환합니다. [[[The method `end_of_day` returns a timestamp at the end of the day (23:59:59):]]]
 
 ```ruby
 date = Date.new(2010, 6, 7)
 date.end_of_day # => Mon Jun 07 23:59:59 +0200 2010
 ```
 
-`beginning_of_day` is aliased to `at_beginning_of_day`, `midnight`, `at_midnight`.
+`beginning_of_day`와 동일한 기능을 하는 메소드로 `at_beginning_of_day`, `midnight`, `at_midnight`가 있습니다. [[[`beginning_of_day` is aliased to `at_beginning_of_day`, `midnight`, `at_midnight`.]]]
 
 ##### `beginning_of_hour`, `end_of_hour`
 
-The method `beginning_of_hour` returns a timestamp at the beginning of the hour (hh:00:00):
+`beginning_of_hour` 메소드는 한시간의 시작(hh:00:00) 시점의 타임스탬프를 반환합니다. [[[The method `beginning_of_hour` returns a timestamp at the beginning of the hour (hh:00:00):]]]
 
 ```ruby
 date = DateTime.new(2010, 6, 7, 19, 55, 25)
 date.beginning_of_hour # => Mon Jun 07 19:00:00 +0200 2010
 ```
 
-The method `end_of_hour` returns a timestamp at the end of the hour (hh:59:59):
+`end_of_hour` 메소드는 한시간의 종료(hh:59:59) 시점의 타임스탬프를 반환합니다. [[[The method `end_of_hour` returns a timestamp at the end of the hour (hh:59:59):]]]
 
 ```ruby
 date = DateTime.new(2010, 6, 7, 19, 55, 25)
 date.end_of_hour # => Mon Jun 07 19:59:59 +0200 2010
 ```
 
-`beginning_of_hour` is aliased to `at_beginning_of_hour`.
+`beginning_of_hour`와 동일한 기능을 가지는 메소드로 `at_beginning_of_hour`가 있습니다. [[[`beginning_of_hour` is aliased to `at_beginning_of_hour`.]]]
 
 ##### `beginning_of_minute`, `end_of_minute`
 
-The method `beginning_of_minute` returns a timestamp at the beginning of the minute (hh:mm:00):
+`beginning_of_minute` 메소드는 일분의 시작(hh:mm:00) 시점에 해당하는 타임스탬프를 반환합니다. [[[The method `beginning_of_minute` returns a timestamp at the beginning of the minute (hh:mm:00):]]]
 
 ```ruby
 date = DateTime.new(2010, 6, 7, 19, 55, 25)
 date.beginning_of_minute # => Mon Jun 07 19:55:00 +0200 2010
 ```
 
-The method `end_of_minute` returns a timestamp at the end of the minute (hh:mm:59):
+`end_of_minute` 메소드는 일분의 종료(hh:mm:59) 시점에 해당하는 타임스탬프를 반환합니다. [[[The method `end_of_minute` returns a timestamp at the end of the minute (hh:mm:59):]]]
 
 ```ruby
 date = DateTime.new(2010, 6, 7, 19, 55, 25)
 date.end_of_minute # => Mon Jun 07 19:55:59 +0200 2010
 ```
 
-`beginning_of_minute` is aliased to `at_beginning_of_minute`.
+`beginning_of_minute`와 동일한 기능을 가지는 메소드는 `at_beginning_of_minute`가 있습니다. [[[`beginning_of_minute` is aliased to `at_beginning_of_minute`.]]]
 
-INFO: `beginning_of_hour`, `end_of_hour`, `beginning_of_minute` and `end_of_minute` are implemented for `Time` and `DateTime` but **not** `Date` as it does not make sense to request the beginning or end of an hour or minute on a `Date` instance.
+INFO: `beginning_of_hour`, `end_of_hour`, `beginning_of_minute`, `end_of_minute`  메소드는 `Time`과 `DateTime`에 대해서 실행되지만 `Date` 객체에 대해서 시간이나 분에 대한 시작 또는 종료 시점을 요구시에는 **실행되지 않습니다**. [[[`beginning_of_hour`, `end_of_hour`, `beginning_of_minute` and `end_of_minute` are implemented for `Time` and `DateTime` but **not** `Date` as it does not make sense to request the beginning or end of an hour or minute on a `Date` instance.]]]
 
 ##### `ago`, `since`
 
-The method `ago` receives a number of seconds as argument and returns a timestamp those many seconds ago from midnight:
+`ago` 메소드는 인수로 초단위의 숫자를 받아서 자정에서 해당 초만큼을 뺀 시간을 타임스탬프로 반환해 줍니다. [[[The method `ago` receives a number of seconds as argument and returns a timestamp those many seconds ago from midnight:]]]
 
 ```ruby
 date = Date.current # => Fri, 11 Jun 2010
 date.ago(1)         # => Thu, 10 Jun 2010 23:59:59 EDT -04:00
 ```
 
-Similarly, `since` moves forward:
+위와 같이, `since` 메소드는 초단위 숫자만큼을 더한 결과를 타임스탬프형으로 반환합니다. [[[Similarly, `since` moves forward:]]]
 
 ```ruby
 date = Date.current # => Fri, 11 Jun 2010
 date.since(1)       # => Fri, 11 Jun 2010 00:00:01 EDT -04:00
 ```
 
-#### Other Time Computations
+#### [Other Time Computations] 기타 시간 계산
 
 ### Conversions
 
-Extensions to `DateTime`
+[Extensions to `DateTime`] `DateTime`형에 대한 확장메소드
 ------------------------
 
-WARNING: `DateTime` is not aware of DST rules and so some of these methods have edge cases when a DST change is going on. For example `seconds_since_midnight` might not return the real amount in such a day.
+WARNING: `DateTime`은 DST(Daylight Saving Time)을 알지 못해서 DST가 변경될 때 일부 메소드는 극단의 상황을 맞을 수 있습니다. 예를 들면, `seconds_since_midmight` 메소드는 그러한 경우에는 실제 시간만큼을 반영하지 못할 수 있습니다. [[[`DateTime` is not aware of DST rules and so some of these methods have edge cases when a DST change is going on. For example `seconds_since_midnight` might not return the real amount in such a day.]]]
 
-### Calculations
+### [Calculations] 계산
 
-NOTE: All the following methods are defined in `active_support/core_ext/date_time/calculations.rb`.
+NOTE: 다음의 모든 메소드는 `active_support/core_ext/date_time/calculations.rb` 파일내에 정의되어 있습니다. [[[All the following methods are defined in `active_support/core_ext/date_time/calculations.rb`.]]]
 
-The class `DateTime` is a subclass of `Date` so by loading `active_support/core_ext/date/calculations.rb` you inherit these methods and their aliases, except that they will always return datetimes:
+`DateTime` 클래스는 `Date`의 하위 클래스이기 때문에 `active_support/core_ext/date/calculations.rb`를 로딩하면 이러한 메소드(와 기타 별칭메소드)를 그대로 상속받아 사용할 수 있습니다. 이때 이들 메소드가 반환하는 것을 datetime형이 될 것입니다. [[[The class `DateTime` is a subclass of `Date` so by loading `active_support/core_ext/date/calculations.rb` you inherit these methods and their aliases, except that they will always return datetimes:]]]
 
 ```ruby
 yesterday
@@ -3399,7 +3395,7 @@ prev_year (last_year)
 next_year
 ```
 
-The following methods are reimplemented so you do **not** need to load `active_support/core_ext/date/calculations.rb` for these ones:
+다음의 메소드들은 (내부적으로 to_time 메소드가 실행되어) 재구현 되기 때문에 이들 메소드를 실행하기 위해 `active_support/core_ext/date/calculations.rb` 파일을 로드할 **필요가 없습니다**. [[[The following methods are reimplemented so you do **not** need to load `active_support/core_ext/date/calculations.rb` for these ones:]]]
 
 ```ruby
 beginning_of_day (midnight, at_midnight, at_beginning_of_day)
@@ -3408,26 +3404,26 @@ ago
 since (in)
 ```
 
-On the other hand, `advance` and `change` are also defined and support more options, they are documented below.
+한편, `advance`와 `change` 메소드도 정의되어 있고 더 많은 옵션을 지원하며 아래에 문서화 되어 있습니다. [[[On the other hand, `advance` and `change` are also defined and support more options, they are documented below.]]]
 
-The following methods are only implemented in `active_support/core_ext/date_time/calculations.rb` as they only make sense when used with a `DateTime` instance:
+다음의 메소드들은 `active_support/core_ext/date_time/calculations.rb` 파일내에서만 구현되어 있어서 `DateTime` 객체에 대해서 사용할 때만 실행될 것입니다. [[[The following methods are only implemented in `active_support/core_ext/date_time/calculations.rb` as they only make sense when used with a `DateTime` instance:]]]
 
 ```ruby
 beginning_of_hour (at_beginning_of_hour)
 end_of_hour
 ```
 
-#### Named Datetimes
+#### [Named Datetimes] 이름이 붙은 DateTime형의 확장메소드
 
 ##### `DateTime.current`
 
-Active Support defines `DateTime.current` to be like `Time.now.to_datetime`, except that it honors the user time zone, if defined. It also defines `DateTime.yesterday` and `DateTime.tomorrow`, and the instance predicates `past?`, and `future?` relative to `DateTime.current`.
+액티브서포트는 `Time.now.to_datetime`과 같이 `DateTime.current` 메소드를 정의합니다. 단, 이 때는 정의가 된 경우 사용자 시간대역을 반영하게 됩니다. 또한, `DateTime.current` 메소드의 반환값에 대해 상대적인 값을 반환하는 `DateTime.yesterday`와 `DateTime,tomorrow`, 그리고 서술형 메소드인 `past?`, `future?` 메소드도 정의합니다. [[[Active Support defines `DateTime.current` to be like `Time.now.to_datetime`, except that it honors the user time zone, if defined. It also defines `DateTime.yesterday` and `DateTime.tomorrow`, and the instance predicates `past?`, and `future?` relative to `DateTime.current`.]]]
 
-#### Other Extensions
+#### [Other Extensions] 기타 확장메소드
 
 ##### `seconds_since_midnight`
 
-The method `seconds_since_midnight` returns the number of seconds since midnight:
+`seconds_since_midnight` 메소드는 자정이후의 경과시간을 초단위로 반환합니다. [[[The method `seconds_since_midnight` returns the number of seconds since midnight:]]]
 
 ```ruby
 now = DateTime.current     # => Mon, 07 Jun 2010 20:26:36 +0000
@@ -3436,18 +3432,18 @@ now.seconds_since_midnight # => 73596
 
 ##### `utc`
 
-The method `utc` gives you the same datetime in the receiver expressed in UTC.
+`utc` 메소드는 receiver의 datetime 시간을 UTC로 변환해서 반환합니다. [[[The method `utc` gives you the same datetime in the receiver expressed in UTC.]]]
 
 ```ruby
 now = DateTime.current # => Mon, 07 Jun 2010 19:27:52 -0400
 now.utc                # => Mon, 07 Jun 2010 23:27:52 +0000
 ```
 
-This method is also aliased as `getutc`.
+이 메소드는 또한 `getutc` 메소드로도 호출할 수 있습니다. [[[This method is also aliased as `getutc`.]]]
 
 ##### `utc?`
 
-The predicate `utc?` says whether the receiver has UTC as its time zone:
+기술형 메소드인 `utc?`는 receiver가 UTC 시간대역을 가지는지를 알려 줍니다. [[[The predicate `utc?` says whether the receiver has UTC as its time zone:]]]
 
 ```ruby
 now = DateTime.now # => Mon, 07 Jun 2010 19:30:47 -0400
@@ -3457,7 +3453,7 @@ now.utc.utc?       # => true
 
 ##### `advance`
 
-The most generic way to jump to another datetime is `advance`. This method receives a hash with keys `:years`, `:months`, `:weeks`, `:days`, `:hours`, `:minutes`, and `:seconds`, and returns a datetime advanced as much as the present keys indicate.
+다른 datetime으로 이동하는 가장 일반적인 방법은 `advance` 메소드를 사용하는 것입니다. 이 메소드는 `:years`, `:months`, `:weeks`, `:days`, `:hours`, `:minutes`, `:seconds` 키를 가지는 해시를 인수로 받아서 현재 키 값만큼 datetime을 이동하여 반환합니다. [[[The most generic way to jump to another datetime is `advance`. This method receives a hash with keys `:years`, `:months`, `:weeks`, `:days`, `:hours`, `:minutes`, and `:seconds`, and returns a datetime advanced as much as the present keys indicate.]]]
 
 ```ruby
 d = DateTime.current
@@ -3466,9 +3462,9 @@ d.advance(years: 1, months: 1, days: 1, hours: 1, minutes: 1, seconds: 1)
 # => Tue, 06 Sep 2011 12:34:32 +0000
 ```
 
-This method first computes the destination date passing `:years`, `:months`, `:weeks`, and `:days` to `Date#advance` documented above. After that, it adjusts the time calling `since` with the number of seconds to advance. This order is relevant, a different ordering would give different datetimes in some edge-cases. The example in `Date#advance` applies, and we can extend it to show order relevance related to the time bits.
+이 메소드는 먼저 위에서 언급했던 `Date#advance` 메소드로 `:years`, `:months`, `:weeks`, `:days` 키를 넘겨 주어 결과 일자를 계산하게 됩니다. 이후에, 초단위 시간을 인수로 받아 `since` 메소드를 호출하므로써 시간을 조절하게 됩니다. 옵션의 적용 순서가 연관되기 때문에, 적용순서를 달리하면 몇몇 극단적인 상황에서는 datetime이 다른 값을 가지게 될 것입니다. `Date#advance`에서의 예를 적용해서 기능 확장을 하면 시간과 관련해서 순서에 따른 연관성을 보여 줄 수 있습니다. [[[This method first computes the destination date passing `:years`, `:months`, `:weeks`, and `:days` to `Date#advance` documented above. After that, it adjusts the time calling `since` with the number of seconds to advance. This order is relevant, a different ordering would give different datetimes in some edge-cases. The example in `Date#advance` applies, and we can extend it to show order relevance related to the time bits.]]]
 
-If we first move the date bits (that have also a relative order of processing, as documented before), and then the time bits we get for example the following computation:
+먼저 날짜 값만큼 이동한 후 시간 값을 이동하면 (예를 들어) 아래와 같은 연산결과를 얻게 될 것입니다. [[[If we first move the date bits (that have also a relative order of processing, as documented before), and then the time bits we get for example the following computation:]]]
 
 ```ruby
 d = DateTime.new(2010, 2, 28, 23, 59, 59)
@@ -3477,18 +3473,18 @@ d.advance(months: 1, seconds: 1)
 # => Mon, 29 Mar 2010 00:00:00 +0000
 ```
 
-but if we computed them the other way around, the result would be different:
+그러나 다른 식으로 계산할 경우, 결과 달라지게 될 것입니다. [[[but if we computed them the other way around, the result would be different:]]]
 
 ```ruby
 d.advance(seconds: 1).advance(months: 1)
 # => Thu, 01 Apr 2010 00:00:00 +0000
 ```
 
-WARNING: Since `DateTime` is not DST-aware you can end up in a non-existing point in time with no warning or error telling you so.
+WARNING: `DateTime` 클래스는 DST를 인식하지 못하기 때문에 존재하지 않는 시점에서 경고나 에러 없이 연산처리가 종료될 수 있습니다. [[[Since `DateTime` is not DST-aware you can end up in a non-existing point in time with no warning or error telling you so.]]]
 
 #### Changing Components
 
-The method `change` allows you to get a new datetime which is the same as the receiver except for the given options, which may include `:year`, `:month`, `:day`, `:hour`, `:min`, `:sec`, `:offset`, `:start`:
+`:year`, `:month`, `:day`, `:hour`, `:min`, `:sec`, `:offset`, `:start` 옵션을 지정하여 `change` 메소드를 이용하면, receiver와 같은 새로운 datetime형 객체를 생성할 수 있습니다. [[[The method `change` allows you to get a new datetime which is the same as the receiver except for the given options, which may include `:year`, `:month`, `:day`, `:hour`, `:min`, `:sec`, `:offset`, `:start`:]]]
 
 ```ruby
 now = DateTime.current
@@ -3497,30 +3493,30 @@ now.change(year: 2011, offset: Rational(-6, 24))
 # => Wed, 08 Jun 2011 01:56:22 -0600
 ```
 
-If hours are zeroed, then minutes and seconds are too (unless they have given values):
+`:hour` 옵션을 0로 지정하여 호출하면 분과 초 값도 별도로 지정하지 않는 한 0로 설정됩니다. [[[If hours are zeroed, then minutes and seconds are too (unless they have given values):]]]
 
 ```ruby
 now.change(hour: 0)
 # => Tue, 08 Jun 2010 00:00:00 +0000
 ```
 
-Similarly, if minutes are zeroed, then seconds are too (unless it has given a value):
+분을 0으로 지정하여 호출할 경우에도, 별도로 지정하지 않는 한, 초 값도 0로 설정됩니다. [[[Similarly, if minutes are zeroed, then seconds are too (unless it has given a value):]]]
 
 ```ruby
 now.change(min: 0)
 # => Tue, 08 Jun 2010 01:00:00 +0000
 ```
 
-This method is not tolerant to non-existing dates, if the change is invalid `ArgumentError` is raised:
+이 메소드의 실행결과, 존재하지 않는 일자를 반환할 경우 `Arguement Error` 예외를 발생시킬 것입니다.[[[This method is not tolerant to non-existing dates, if the change is invalid `ArgumentError` is raised:]]]
 
 ```ruby
 DateTime.current.change(month: 2, day: 30)
 # => ArgumentError: invalid date
 ```
 
-#### Durations
+#### [Durations] 기간연산
 
-Durations can be added to and subtracted from datetimes:
+datetime으로부터 일정 기간을 더하거나 뺄 수 있습니다. [[[Durations can be added to and subtracted from datetimes:]]]
 
 ```ruby
 now = DateTime.current
@@ -3531,21 +3527,21 @@ now - 1.week
 # => Mon, 02 Aug 2010 23:15:17 +0000
 ```
 
-They translate to calls to `since` or `advance`. For example here we get the correct jump in the calendar reform:
+이 때 기간연산을 위해 `since`와 `advance` 메소드를 호출하게 됩니다. 예를 들어, 아래와 같이 정확히 시간 이동을 할 수 있게 됩니다. [[[They translate to calls to `since` or `advance`. For example here we get the correct jump in the calendar reform:]]]
 
 ```ruby
 DateTime.new(1582, 10, 4, 23) + 1.hour
 # => Fri, 15 Oct 1582 00:00:00 +0000
 ```
 
-Extensions to `Time`
+[Extensions to `Time`] `Time`형에 대한 확장메소드
 --------------------
 
-### Calculations
+### [Calculations] 시간계산
 
-NOTE: All the following methods are defined in `active_support/core_ext/time/calculations.rb`.
+NOTE: 다음의 모든 메소드는 `active_support/core_ext/time/calculations.rb` 파일내에 정의되어 있습니다. [[[All the following methods are defined in `active_support/core_ext/time/calculations.rb`.]]]
 
-Active Support adds to `Time` many of the methods available for `DateTime`:
+액티브서포트는 `DateTime` 클래스에 정의되어 있는 많은 메소드를 `Time` 클래스에도 정의해 두었습니다. [[[Active Support adds to `Time` many of the methods available for `DateTime`:]]]
 
 ```ruby
 past?
@@ -3585,10 +3581,10 @@ prev_year (last_year)
 next_year
 ```
 
-They are analogous. Please refer to their documentation above and take into account the following differences:
+이 메소드들은 유사하게 동작합니다. 이미 소개한 바 있는 각각에 대한 문서화 내용을 참고하고 다음의 차이점을 고려하기 바랍니다. [[[They are analogous. Please refer to their documentation above and take into account the following differences:]]]
 
-* `change` accepts an additional `:usec` option.
-* `Time` understands DST, so you get correct DST calculations as in
+* `change` 메소드는 `:usec`라는 추가 옵션을 지정할 수 있습니다. [[[`change` accepts an additional `:usec` option.]]]
+* `Time` 클래스는 DST를 인식하기 때문에, DST가 정확하게 계산된 결과를 얻을 수 있게 됩니다. [[[`Time` understands DST, so you get correct DST calculations as in]]]
 
 ```ruby
 Time.zone_default
@@ -3601,7 +3597,7 @@ t.advance(seconds: 1)
 # => Sun Mar 28 03:00:00 +0200 2010
 ```
 
-* If `since` or `ago` jump to a time that can't be expressed with `Time` a `DateTime` object is returned instead.
+* `since`와 `age` 메소드의 실행결과 `Time` 객체로 표현할 수 없는 시간을 반환할 경우에는 대신에 `DateTime` 객체를 반환할 것입니다. [[[If `since` or `ago` jump to a time that can't be expressed with `Time` a `DateTime` object is returned instead.]]]
 
 #### `Time.current`
 
