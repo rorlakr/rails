@@ -1,73 +1,78 @@
-The Asset Pipeline
+[The Asset Pipeline] Asset Pipeline
 ==================
 
-This guide covers the asset pipeline.
+본 가이드에서는 asset pipeline에 대해서 다룹니다. [[[This guide covers the asset pipeline.]]]
 
-After reading this guide, you will know:
+본 가이드를 읽은 후, 아래의 내용을 알게 될 것입니다. [[[After reading this guide, you will know:]]]
 
-* How to understand what the asset pipeline is and what it does.
-* How to properly organize your application assets.
-* How to understand the benefits of the asset pipeline.
-* How to add a pre-processor to the pipeline.
-* How to package assets with a gem.
+* asset pipeline의 개념과 하는 일을 이해하는 방법 [[[How to understand what the asset pipeline is and what it does.]]]
+
+* 어플리케이션 자원을 적절하게 구성하는 방법 [[[How to properly organize your application assets.]]]
+
+* appet pipeline의 잇점을 이해하는 방법 [[[How to understand the benefits of the asset pipeline.]]]
+
+* pipeline에 전처리기를 추가하는 방법 [[[How to add a pre-processor to the pipeline.]]]
+
+* 웹 자원을 하나의 젬으로 포장하는 방법 [[[How to package assets with a gem.]]]
 
 --------------------------------------------------------------------------------
 
-What is the Asset Pipeline?
+[What is the Asset Pipeline?] Asset Pipeline이란 무엇인가?
 ---------------------------
 
-The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages such as CoffeeScript, Sass and ERB.
+asset pipeline은 자바스크립트와 CSS 자원을 합치고 최소화 또는 압출하기 위한 프레임워크를 제공해 줍니다. 또한 Coffeescript, Sass, ERB와 같은 언어로 이러한 자원을 작성할 수 있도록 해 줍니다. [[[The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages such as CoffeeScript, Sass and ERB.]]]
 
-Making the asset pipeline a core feature of Rails means that all developers can benefit from the power of having their assets pre-processed, compressed and minified by one central library, Sprockets. This is part of Rails' "fast by default" strategy as outlined by DHH in his keynote at RailsConf 2011.
+asset piepline을 레일스의 핵심 기능으로 만든 것은 모든 개발자들이 Sprockets라는 라이브러리를 이용하여 자원을 전처리하고 압축하고 최소화할 수 있는 잇점을 가질 수 있게 해 줍니다. 이것은 RailsConf 2011에서 DHH가 자신의 키노드에서 소개한 "fast by default" 전략의 일부분입니다. [[[Making the asset pipeline a core feature of Rails means that all developers can benefit from the power of having their assets pre-processed, compressed and minified by one central library, Sprockets. This is part of Rails' "fast by default" strategy as outlined by DHH in his keynote at RailsConf 2011.]]]
 
-The asset pipeline is enabled by default. It can be disabled in `config/application.rb` by putting this line inside the application class definition:
+asset pipeline은 디폴트 상태에서 별다른 조치없이 바로 사용할 수 있습니다. 그러나 `config/application.rb` 파일에서 application 클래스 정의내에 아래의 코드라인을 추가하여 asset pipeline을 사용하지 않도록 설정할 수 있습니다. [[[The asset pipeline is enabled by default. It can be disabled in `config/application.rb` by putting this line inside the application class definition:]]]
 
 ```ruby
 config.assets.enabled = false
 ```
 
-You can also disable the asset pipeline while creating a new application by passing the `--skip-sprockets` option.
+또한 레일스 프로젝트를 새로 만들 때 아래와 같이 `--skip-sprockets` 옵션을 추가하여 asset pipeline을 사용하지 않도록 할 수 있습니다. [[[You can also disable the asset pipeline while creating a new application by passing the `--skip-sprockets` option.]]]
 
 ```bash
 rails new appname --skip-sprockets
 ```
 
-You should use the defaults for all new applications unless you have a specific reason to avoid the asset pipeline.
+의도적으로 asset pipeline을 사용하지 않을 것이 아니라면 새로 생성하는 모든 어플리케이션에 대해서 디폴트 상태를 사용해야만 합니다. [[[You should use the defaults for all new applications unless you have a specific reason to avoid the asset pipeline.]]]
 
 
-### Main Features
+### [Main Features] 주요 특징
 
-The first feature of the pipeline is to concatenate assets. This is important in a production environment, because it can reduce the number of requests that a browser makes to render a web page. Web browsers are limited in the number of requests that they can make in parallel, so fewer requests can mean faster loading for your application.
+첫번째 특징은 자원을 합치는 것입니다. 이것은, 브라우저가 웹페이지를 보여주기 위해 서버에 요청하는 수를 줄일 수 있기 때문에, 운영환경에서 중요한 기능입니다. 웹브라우저는 동시에 요청할 수 있는 수가 제한되어 있어서 요청을 적게한다는 것은 어플리케이션의 로딩 속도를 보다 빠르게 할 수 있다는 것을 의미합니다. [[[The first feature of the pipeline is to concatenate assets. This is important in a production environment, because it can reduce the number of requests that a browser makes to render a web page. Web browsers are limited in the number of requests that they can make in parallel, so fewer requests can mean faster loading for your application.]]]
 
-Rails 2.x introduced the ability to concatenate JavaScript and CSS assets by placing `cache: true` at the end of the `javascript_include_tag` and `stylesheet_link_tag` methods. But this technique has some limitations. For example, it cannot generate the caches in advance, and it is not able to transparently include assets provided by third-party libraries.
+레일스 2.x 에서는 `javascript_include_tag`와 `stylesheet_link_tag` 메소드에 `cache: true` 옵션을 추가하여 자바스크립트와 CSS 자원을 합칠 수 있도록 했습니다. 그러나 이러한 방법은 몇가지 제한점이 있습니다. 예를 들어, 캐시를 미리 만들 수 없고 다른 라이브러리에서 제공하는 자원들을 분명하게 포함할 수 없다는 것입니다. [[[Rails 2.x introduced the ability to concatenate JavaScript and CSS assets by placing `cache: true` at the end of the `javascript_include_tag` and `stylesheet_link_tag` methods. But this technique has some limitations. For example, it cannot generate the caches in advance, and it is not able to transparently include assets provided by third-party libraries.]]]
 
-Starting with version 3.1, Rails defaults to concatenating all JavaScript files into one master `.js` file and all CSS files into one master `.css` file. As you'll learn later in this guide, you can customize this strategy to group files any way you like. In production, Rails inserts an MD5 fingerprint into each filename so that the file is cached by the web browser. You can invalidate the cache by altering this fingerprint, which happens automatically whenever you change the file contents.
+3.1 버전부터는, 모든 자바스크립트를 하나의 총괄 `.js` 파일로, 모든 CSS 파일을 하나의 총괄 `.css` 파일로 합치는 것을 디폴트로 지원합니다. 나중에 알게 되겠지만, 이러한 전략을 변경해서 선호하는 방식으로 파일들을 그룹화할 수 있습니다. 운영환경에서, 레일스는 각 파일명에 MD5 fingerprint를 삽입하여 해당 파일이 웹브라우저에서 캐시상태로 만들어 지도록 합니다. 이 fingerprint를 변경하여 해당 캐시 파일을 무효화할 수 있는데, 이것은 파일 컨텐츠를 변경할 때마다 자동으로 발생하게 됩니다. [[[Starting with version 3.1, Rails defaults to concatenating all JavaScript files into one master `.js` file and all CSS files into one master `.css` file. As you'll learn later in this guide, you can customize this strategy to group files any way you like. In production, Rails inserts an MD5 fingerprint into each filename so that the file is cached by the web browser. You can invalidate the cache by altering this fingerprint, which happens automatically whenever you change the file contents.]]]
 
-The second feature of the asset pipeline is asset minification or compression. For CSS files, this is done by removing whitespace and comments. For JavaScript, more complex processes can be applied. You can choose from a set of built in options or specify your own.
+asset pipeline의 두번째 특징은, 자원을 최소화 또는 압축하는 것입니다. CSS 파일에 대해서는, 코멘트 내용과 whitespace를 제거하므로써 CSS 파일의 크기를 줄이게 됩니다. 자바스크리브에서는, 좀 더 복잡한 과정이 필요할 데, 다양한 내장 옵션을 지정하거나 자신의 것으로 지정할 수 있습니다. 
+[[[The second feature of the asset pipeline is asset minification or compression. For CSS files, this is done by removing whitespace and comments. For JavaScript, more complex processes can be applied. You can choose from a set of built in options or specify your own.]]]
 
-The third feature of the asset pipeline is that it allows coding assets via a higher-level language, with precompilation down to the actual assets. Supported languages include Sass for CSS, CoffeeScript for JavaScript, and ERB for both by default.
+asset pipeline의 세번째 특징은, 보다 높은 차원의 언어를 사용하여 자원을 코딩할 수 있도록 해 주는데, 이것은 사전 컴파일 과정을 거쳐서 실제 사용가능한 자원으로 만들어지게 됩니다. 지원되는 언어로는 CSS에 대해서는 Sass, 자바스크립트에 대해서는 Coffeescript, 그리고 CSS와 자바스크립트 모두에 대해서 ERB가 있습니다. [[[The third feature of the asset pipeline is that it allows coding assets via a higher-level language, with precompilation down to the actual assets. Supported languages include Sass for CSS, CoffeeScript for JavaScript, and ERB for both by default.]]]
 
-### What is Fingerprinting and Why Should I Care?
+### [What is Fingerprinting and Why Should I Care?] Fingerprinting의 정의와  유념해야할 이유
 
-Fingerprinting is a technique that makes the name of a file dependent on the contents of the file. When the file contents change, the filename is also changed. For content that is static or infrequently changed, this provides an easy way to tell whether two versions of a file are identical, even across different servers or deployment dates.
+Fingerprinting이라는 것은 파일이름을 파일의 내용에 의존해서 만드는 기술을 말합니다. 따라서 파일 내용이 변경될 때 파일이름 또한 변경됩니다. 그러나, 내용이 정해져 있거나 거의 변화지 않는 경우에는, 다른 서버에 위치하거나 배포 날짜가 다른 경우에도 해당 파일의 두가지 버전이 일치하는지를 쉽게 알려 주게 됩니다. [[[Fingerprinting is a technique that makes the name of a file dependent on the contents of the file. When the file contents change, the filename is also changed. For content that is static or infrequently changed, this provides an easy way to tell whether two versions of a file are identical, even across different servers or deployment dates.]]]
 
-When a filename is unique and based on its content, HTTP headers can be set to encourage caches everywhere (whether at CDNs, at ISPs, in networking equipment, or in web browsers) to keep their own copy of the content. When the content is updated, the fingerprint will change. This will cause the remote clients to request a new copy of the content. This is generally known as _cache busting_.
+특정 파일명이 유일하고 파일내용에 근거하여 만들어질 때, HTTP 헤더를 설정하여 캐시가 어느 곳에 위치하더라도 자신만의 파일 복사본을 유지하도록 할 수 있습니다. 해당 파일의 내용이 업데이트될 때 fingerprint는 변경될 것입니다. 이것은 원격상의 클라이언트가 해당 파일의 새로운 복사본을 요청하도록 할 것입니다. 이러한 것을 일반적으로 _cache busting_ 이라고 합니다. [[[When a filename is unique and based on its content, HTTP headers can be set to encourage caches everywhere (whether at CDNs, at ISPs, in networking equipment, or in web browsers) to keep their own copy of the content. When the content is updated, the fingerprint will change. This will cause the remote clients to request a new copy of the content. This is generally known as _cache busting_.]]]
 
-The technique that Rails uses for fingerprinting is to insert a hash of the content into the name, usually at the end. For example a CSS file `global.css` could be renamed with an MD5 digest of its contents:
+fingerprinting에 대해서 레일스가 사용하는 기술은 파일내용의 해시값을 대개 파일명의 끝에 삽입하는 것입니다. 예를 들어, `global.css`라는 CSS 파일은 해당 파일내용의 MD5 digest값이 삽입되어 파일명이 변경될 것입니다. [[[The technique that Rails uses for fingerprinting is to insert a hash of the content into the name, usually at the end. For example a CSS file `global.css` could be renamed with an MD5 digest of its contents:]]]
 
 ```
 global-908e25f4bf641868d8683022a5b62f54.css
 ```
 
-This is the strategy adopted by the Rails asset pipeline.
+이러한 것이 바로 레일스 asset pipeline이 채택한 전략입니다. [[[This is the strategy adopted by the Rails asset pipeline.]]]
 
-Rails' old strategy was to append a date-based query string to every asset linked with a built-in helper. In the source the generated code looked like this:
+레일스의 예전 전략은 날짜를 근거로 한 쿼리문자열을 내장 헬퍼에 연결되는 모든 자원에 추가하는 것이었습니다. [[[Rails' old strategy was to append a date-based query string to every asset linked with a built-in helper. In the source the generated code looked like this:]]]
 
 ```
 /stylesheets/global.css?1309495796
 ```
 
-The query string strategy has several disadvantages:
+쿼리문자열 전략은 몇가지 단점이 있습니다. [[[The query string strategy has several disadvantages:]]]
 
 1. **Not all caches will reliably cache content where the filename only differs by query parameters**<br />
     [Steve Souders recommends](http://www.stevesouders.com/blog/2008/08/23/revving-filenames-dont-use-querystring/), "...avoiding a querystring for cacheable resources". He found that in this case 5-20% of requests will not be cached. Query strings in particular do not work at all with some CDNs for cache invalidation.
@@ -416,7 +421,7 @@ You can call this task on the server during deployment to create compiled versio
 The rake task is:
 
 ```bash
-$ bundle exec rake assets:precompile
+$ RAILS_ENV=production bundle exec rake assets:precompile
 ```
 
 For faster asset precompiles, you can partially load your application by setting
@@ -430,7 +435,7 @@ in scope in development mode regardless of the value of this flag. Changing this
 engines. Engines can define assets for precompilation as well. Since the complete environment is not loaded,
 engines (or other gems) will not be loaded, which can cause missing assets.
 
-Capistrano (v2.8.0 and above) includes a recipe to handle this in deployment. Add the following line to `Capfile`:
+Capistrano (v2.15.1 and above) includes a recipe to handle this in deployment. Add the following line to `Capfile`:
 
 ```ruby
 load 'deploy/assets'
@@ -815,18 +820,16 @@ end
 If you use the `assets` group with Bundler, please make sure that your `config/application.rb` has the following Bundler require statement:
 
 ```ruby
-if defined?(Bundler)
-  # If you precompile assets before deploying to production, use this line
-  Bundler.require *Rails.groups(:assets => %w(development test))
-  # If you want your assets lazily compiled in production, use this line
-  # Bundler.require(:default, :assets, Rails.env)
-end
+# If you precompile assets before deploying to production, use this line
+Bundler.require *Rails.groups(:assets => %w(development test))
+# If you want your assets lazily compiled in production, use this line
+# Bundler.require(:default, :assets, Rails.env)
 ```
 
-Instead of the old Rails 3.0 version:
+Instead of the generated version:
 
 ```ruby
-# If you have a Gemfile, require the gems listed there, including any gems
+# Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
-Bundler.require(:default, Rails.env) if defined?(Bundler)
+Bundler.require(:default, Rails.env)
 ```

@@ -98,7 +98,8 @@ HTML
                           $1.downcase
                         end
             original_text = $2
-            if original_text =~ /^(.*)\[\[\[(.+)\]\]\]$/ 
+            if original_text =~ /\n*(.+?)\s*\[{3}(.+?)\]{3}\s*/ 
+            # if original_text =~ /^(.*)\[\[\[(.+)\]\]\]$/ 
               original_text = convert_original(original_text) 
             else
               original_text = "<p>#{original_text}</p>"

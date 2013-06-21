@@ -3584,7 +3584,10 @@ next_year
 이 메소드들은 유사하게 동작합니다. 이미 소개한 바 있는 각각에 대한 문서화 내용을 참고하고 다음의 차이점을 고려하기 바랍니다. [[[They are analogous. Please refer to their documentation above and take into account the following differences:]]]
 
 * `change` 메소드는 `:usec`라는 추가 옵션을 지정할 수 있습니다. [[[`change` accepts an additional `:usec` option.]]]
+
 * `Time` 클래스는 DST를 인식하기 때문에, DST가 정확하게 계산된 결과를 얻을 수 있게 됩니다. [[[`Time` understands DST, so you get correct DST calculations as in]]]
+
+* `since`와 `age` 메소드의 실행결과 `Time` 객체로 표현할 수 없는 시간을 반환할 경우에는 대신에 `DateTime` 객체를 반환할 것입니다.  [[[If `since` or `ago` jump to a time that can't be expressed with `Time` a `DateTime` object is returned instead.]]]
 
 ```ruby
 Time.zone_default
@@ -3597,17 +3600,15 @@ t.advance(seconds: 1)
 # => Sun Mar 28 03:00:00 +0200 2010
 ```
 
-* `since`와 `age` 메소드의 실행결과 `Time` 객체로 표현할 수 없는 시간을 반환할 경우에는 대신에 `DateTime` 객체를 반환할 것입니다. [[[If `since` or `ago` jump to a time that can't be expressed with `Time` a `DateTime` object is returned instead.]]]
-
 #### `Time.current`
 
-Active Support defines `Time.current` to be today in the current time zone. That's like `Time.now`, except that it honors the user time zone, if defined. It also defines `Time.yesterday` and `Time.tomorrow`, and the instance predicates `past?`, `today?`, and `future?`, all of them relative to `Time.current`.
+액티브서포트는 현재 시간대역에서 금일을 표시하는 `Time.current` 메소드를 정의합니다. `Time.now`와 같아 보이지만, `Time.current`의 경우, 정의되어 있을 경우, 사용자의 시간대역을 반영한다는 차이가 있습니다. `Time.current`를 기준으로 상대적인 값을 반환하는 메소드로, `Time.yesterday`, `Time.tomorrow`, 서술형 메소드인 `past?`, `today?`, `future?`도 정의되어 있습니다. [[[Active Support defines `Time.current` to be today in the current time zone. That's like `Time.now`, except that it honors the user time zone, if defined. It also defines `Time.yesterday` and `Time.tomorrow`, and the instance predicates `past?`, `today?`, and `future?`, all of them relative to `Time.current`.]]]
 
-When making Time comparisons using methods which honor the user time zone, make sure to use `Time.current` and not `Time.now`. There are cases where the user time zone might be in the future compared to the system time zone, which `Time.today` uses by default. This means `Time.now` may equal `Time.yesterday`.
+사용자 시간대역을 반영하는 메소드를 사용하여 시간을 비교할 때는 `Time.now` 대신에 `Time.current` 메소드를 사용해야 합니다. 사용자 시간대역을 `Time.today` 메소드가 디폴트로 사용하는 시스템 시간대역과 비교할 경우가 있을 것입니다. 즉, `Time.now`가 `Time.yesterday`의 결과값과 같을 수가 있다는 것입니다. [[[When making Time comparisons using methods which honor the user time zone, make sure to use `Time.current` and not `Time.now`. There are cases where the user time zone might be in the future compared to the system time zone, which `Time.today` uses by default. This means `Time.now` may equal `Time.yesterday`.]]]
 
 #### `all_day`, `all_week`, `all_month`, `all_quarter` and `all_year`
 
-The method `all_day` returns a range representing the whole day of the current time.
+`all_day` 메소드는 현재 시간의 하루를 표시하는 범위형 객체를 반환합니다. [[[The method `all_day` returns a range representing the whole day of the current time.]]]
 
 ```ruby
 now = Time.current
@@ -3616,7 +3617,7 @@ now.all_day
 # => Mon, 09 Aug 2010 00:00:00 UTC +00:00..Mon, 09 Aug 2010 23:59:59 UTC +00:00
 ```
 
-Analogously, `all_week`, `all_month`, `all_quarter` and `all_year` all serve the purpose of generating time ranges.
+이와 유사하게, `all_week`, `all_month`, `all_quarter`, `all_year` 메소드들도 시간 범위형 객체를 생성하게 됩니다. [[[Analogously, `all_week`, `all_month`, `all_quarter` and `all_year` all serve the purpose of generating time ranges.]]]
 
 ```ruby
 now = Time.current
@@ -3635,7 +3636,7 @@ now.all_year
 
 ### Time Constructors
 
-Active Support defines `Time.current` to be `Time.zone.now` if there's a user time zone defined, with fallback to `Time.now`:
+액티브서포트는 사용자 시간대역이 정의되어 있는 경우 `Time.current`가 `Time.zone.now` 결과값을 반환하도록 정의합니다. 그렇지 못할 경우에는 `Time.now` 값을 반환합니다. [[[Active Support defines `Time.current` to be `Time.zone.now` if there's a user time zone defined, with fallback to `Time.now`:]]]
 
 ```ruby
 Time.zone_default
@@ -3644,13 +3645,13 @@ Time.current
 # => Fri, 06 Aug 2010 17:11:58 CEST +02:00
 ```
 
-Analogously to `DateTime`, the predicates `past?`, and `future?` are relative to `Time.current`.
+`DateTime`과 유사하게, 서술형 메소드인 `past?`와 `future?`는 `Time.current` 값에 대한 상대적인 결과를 반환합니다. [[[Analogously to `DateTime`, the predicates `past?`, and `future?` are relative to `Time.current`.]]]
 
-If the time to be constructed lies beyond the range supported by `Time` in the runtime platform, usecs are discarded and a `DateTime` object is returned instead.
+운영 플랫폼에서 `Time` 클래스가 지원하는 범위 밖의 값을 가지게 될 때 usec 값은 버려지고 `DateTime` 객체가 대신 반환됩니다. [[[If the time to be constructed lies beyond the range supported by `Time` in the runtime platform, usecs are discarded and a `DateTime` object is returned instead.]]]
 
-#### Durations
+#### [Durations] 기간계산
 
-Durations can be added to and subtracted from time objects:
+타임 객체로부터 기간을 더하거나 뺄 수 있습니다. [[[Durations can be added to and subtracted from time objects:]]]
 
 ```ruby
 now = Time.current
@@ -3661,23 +3662,23 @@ now - 1.week
 # => Mon, 02 Aug 2010 23:21:11 UTC +00:00
 ```
 
-They translate to calls to `since` or `advance`. For example here we get the correct jump in the calendar reform:
+이 메소드들은 `since` 또는 `advance` 메소드를 적절하게 호출하게 되는데, 아래의 예와 같이 달력상에서 정확하게 이동할 수 있게 됩니다. [[[They translate to calls to `since` or `advance`. For example here we get the correct jump in the calendar reform:]]]
 
 ```ruby
 Time.utc(1582, 10, 3) + 5.days
 # => Mon Oct 18 00:00:00 UTC 1582
 ```
 
-Extensions to `File`
+[Extensions to `File`] `File`형에 대한 확장메소드
 --------------------
 
 ### `atomic_write`
 
-With the class method `File.atomic_write` you can write to a file in a way that will prevent any reader from seeing half-written content.
+`File.atomic_write` 클래스 메소드를 사용하면 사용자가 일부만 작성된 내용을 볼 수 없게 파일을 작성할 수 있습니다. [[[With the class method `File.atomic_write` you can write to a file in a way that will prevent any reader from seeing half-written content.]]]
 
-The name of the file is passed as an argument, and the method yields a file handle opened for writing. Once the block is done `atomic_write` closes the file handle and completes its job.
+파일명을 인수로 넘겨 주면 메소드가 파일쓰기용 파일 핸들을 만들어 줍니다. 코드블록이 실행된 후에 `atomic_write`는 파일핸들을 닫고 작업을 완료합니다. [[[The name of the file is passed as an argument, and the method yields a file handle opened for writing. Once the block is done `atomic_write` closes the file handle and completes its job.]]]
 
-For example, Action Pack uses this method to write asset cache files like `all.css`:
+예를 들어, 액션팩은 이 메소드를 이용해서 `all.css`와 같은 asset 캐시를 작성하게 됩니다. [[[For example, Action Pack uses this method to write asset cache files like `all.css`:]]]
 
 ```ruby
 File.atomic_write(joined_asset_path) do |cache|
@@ -3685,41 +3686,41 @@ File.atomic_write(joined_asset_path) do |cache|
 end
 ```
 
-To accomplish this `atomic_write` creates a temporary file. That's the file the code in the block actually writes to. On completion, the temporary file is renamed, which is an atomic operation on POSIX systems. If the target file exists `atomic_write` overwrites it and keeps owners and permissions. However there are a few cases where `atomic_write` cannot change the file ownership or permissions, this error is caught and skipped over trusting in the user/filesystem to ensure the file is accessible to the processes that need it.
+`atomic_write` 메소드가 작업을 수행하기 위해서는 임시파일이 생성한 후에 실제로 코드블록의 작업결과를 이 파일에 기록하게 됩니다. 작업이 완료되면, 임시파일의 이름이 변경되는데, 바로 이것을 POSIX 시스템 상에서 atomic 작업이라고 합니다. 대상 파일이 이미 존재할 경우에는 해당 파일을 덮어쓰기하고 파일 소유자와 퍼미션은 그대로 유지하게 됩니다. 그러나, 어떤 경우에는, 해당 파일의 소유권이나 퍼미션을 변경하지 못할 수 있습니다. 이러한 에러는 발생하더라도 무시되고 사용자 파일시스템을 신뢰하여 해당 파일을 필요로 하는 프로세스에서 자유롭게 접근할 수 있도록 합니다. [[[To accomplish this `atomic_write` creates a temporary file. That's the file the code in the block actually writes to. On completion, the temporary file is renamed, which is an atomic operation on POSIX systems. If the target file exists `atomic_write` overwrites it and keeps owners and permissions. However there are a few cases where `atomic_write` cannot change the file ownership or permissions, this error is caught and skipped over trusting in the user/filesystem to ensure the file is accessible to the processes that need it.]]]
 
-NOTE. Due to the chmod operation `atomic_write` performs, if the target file has an ACL set on it this ACL will be recalculated/modified.
+NOTE. `atomic_write`가 수행하는 chomod 명령으로 인하여, 대상 파일이 ACL 설정이 되어 있는 경우 이 ACL 설정은 다시 계산되고 변경될 것입니다. [[[Due to the chmod operation `atomic_write` performs, if the target file has an ACL(Access Control List) set on it this ACL will be recalculated/modified.]]]
 
-WARNING. Note you can't append with `atomic_write`.
+WARNING. `atomic_write` 메소드를 이용하여 append 작업을 할 수 없다는 것을 주목하기 바랍니다. [[[Note you can't append with `atomic_write`.]]]
 
-The auxiliary file is written in a standard directory for temporary files, but you can pass a directory of your choice as second argument.
+임시 파일을 만들기 위해서 보조 파일이 표준 디렉토리에서 작성되지만, 두번째 인수로 원하는 디렉토리를 지정할 수 있습니다. [[[The auxiliary file is written in a standard directory for temporary files, but you can pass a directory of your choice as second argument.]]]
 
-NOTE: Defined in `active_support/core_ext/file/atomic.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/file/atomic.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/file/atomic.rb`.]]]
 
-Extensions to `Marshal`
+[Extensions to `Marshal`] `Marshal` 클래스 확장메소드
 -----------------------
 
 ### `load`
 
-Active Support adds constant autoloading support to `load`.
+액티브서포트는 마샬 `load` 메소드에 대해서 상수 자동로딩 지원을 추가합니다. [[[Active Support adds constant autoloading support to `load`.]]]
 
-For example, the file cache store deserializes this way:
+예를 들어, 해당 파일 캐시 저장소는 다음과 같이 파일을 비직렬화(로드)합니다. [[[For example, the file cache store deserializes this way:]]]
 
 ```ruby
 File.open(file_name) { |f| Marshal.load(f) }
 ```
 
-If the cached data refers to a constant that is unknown at that point, the autoloading mechanism is triggered and if it succeeds the deserialization is retried transparently.
+캐시 데이터가 그 순간에 알려지지 않은 상수를 참조할 경우에는 자동로딩 기전이 작동하게 되고, 성공할 경우에, 비직렬화과정이 명확하게 재시도됩니다. [[[If the cached data refers to a constant that is unknown at that point, the autoloading mechanism is triggered and if it succeeds the deserialization is retried transparently.]]]
 
-WARNING. If the argument is an `IO` it needs to respond to `rewind` to be able to retry. Regular files respond to `rewind`.
+WARNING. 인수가 `IO`일 경우, 재시도시에 `rewind` 메소드에 반응할 필요가 있습니다. [[[If the argument is an `IO` it needs to respond to `rewind` to be able to retry. Regular files respond to `rewind`.]]]
 
-NOTE: Defined in `active_support/core_ext/marshal.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/marshal.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/marshal.rb`.]]]
 
-Extensions to `Logger`
+[Extensions to `Logger`] `Logger` 클래스 확장메소드
 ----------------------
 
 ### `around_[level]`
 
-Takes two arguments, a `before_message` and `after_message` and calls the current level method on the `Logger` instance, passing in the `before_message`, then the specified message, then the `after_message`:
+두개의 인수(`before_message`와 `after_message`)를 받아서 `Logger` 인스턴스에 대해서 현재의 level 메소드(`debug`, `info`, `warn`, `error`, `fatal`)를 호출하여 `before_message`, 특정 메시지, 그리고 최종적으로 `after_message`를 순차적으로 넘겨주게 됩니다. [[[Takes two arguments, a `before_message` and `after_message` and calls the current level method on the `Logger` instance, passing in the `before_message`, then the specified message, then the `after_message`:]]]
 
 ```ruby
 logger = Logger.new("log/development.log")
@@ -3728,7 +3729,7 @@ logger.around_info("before", "after") { |logger| logger.info("during") }
 
 ### `silence`
 
-Silences every log level lesser to the specified one for the duration of the given block. Log level orders are: debug, info, error and fatal.
+코드블록을 실행하는 동안 특정 레벨로 모든 로그 레벨을 낮추어 줍니다. 로그 레벨 순서는 debug, info, error, fatal 순입니다. [[[Silences every log level lesser to the specified one for the duration of the given block. Log level orders are: debug, info, error and fatal.]]]
 
 ```ruby
 logger = Logger.new("log/development.log")
@@ -3740,7 +3741,7 @@ end
 
 ### `datetime_format=`
 
-Modifies the datetime format output by the formatter class associated with this logger. If the formatter class does not have a `datetime_format` method then this is ignored.
+이 로거와 연과된 formatter 클래스를 이용하여 datetime 포맷을 변경합니다. 해당 formatter 클래스가 `datetime_format` 메소드를 가지고 있지 않으면, 이것은 무시됩니다. [[[Modifies the datetime format output by the formatter class associated with this logger. If the formatter class does not have a `datetime_format` method then this is ignored.]]]
 
 ```ruby
 class Logger::FormatWithTime < Logger::Formatter
@@ -3756,18 +3757,18 @@ logger.formatter = Logger::FormatWithTime
 logger.info("<- is the current time")
 ```
 
-NOTE: Defined in `active_support/core_ext/logger.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/logger.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/logger.rb`.]]]
 
-Extensions to `NameError`
+[Extensions to `NameError`] `NameError` 클래스 확장메소드
 -------------------------
 
-Active Support adds `missing_name?` to `NameError`, which tests whether the exception was raised because of the name passed as argument.
+액티브서포트는 `NameError` 클래스에 `missing_name?` 메소드를 추가해 줍니다. 이 메소드는 인수로 넘겨준 해당 이름으로 인하여 예외가 발생했는지를 점검해 줍니다. [[[Active Support adds `missing_name?` to `NameError`, which tests whether the exception was raised because of the name passed as argument.]]]
 
-The name may be given as a symbol or string. A symbol is tested against the bare constant name, a string is against the fully-qualified constant name.
+이 이름은 심볼이나 문자열로 지정할 수 있습니다. 심볼명은 상수명에 대해서, 문자열은 절대 경로를 포함한 상수명에 대해서 점검하게 됩니다. [[[The name may be given as a symbol or string. A symbol is tested against the bare constant name, a string is against the fully-qualified constant name.]]]
 
-TIP: A symbol can represent a fully-qualified constant name as in `:"ActiveRecord::Base"`, so the behavior for symbols is defined for convenience, not because it has to be that way technically.
+TIP: 심볼은 `:"ActiveRecord::Base`와 같이 절대경로를 포함한 상수명으로 표시할 수 있습니다. 따라서 심볼에 대한 기능은 기술적인 문제가 아니라 편리함 때문에 정의하여 사용합니다. [[[A symbol can represent a fully-qualified constant name as in `:"ActiveRecord::Base"`, so the behavior for symbols is defined for convenience, not because it has to be that way technically.]]]
 
-For example, when an action of `PostsController` is called Rails tries optimistically to use `PostsHelper`. It is OK that the helper module does not exist, so if an exception for that constant name is raised it should be silenced. But it could be the case that `posts_helper.rb` raises a `NameError` due to an actual unknown constant. That should be reraised. The method `missing_name?` provides a way to distinguish both cases:
+예를 들면, `PostsController`의 임의의 액션이 호출될 때, 레일스는 `PostHelper`를 사용하고자 할 것입니다. 이 helper 모듈이 존재하지 않아서 문제가 없기 때문에, 해당 상수명에 대한 예외가 발생하더라도 무시되어야 합니다. 그러나, 실제로 존재하지 않는 상수로 인하여 `posts_helper.rb`가 `NameError` 예외를 발생시키게 되는 경우가 있을 수 있습니다. 그러한 경우는 다시금 예외를 발생시켜주어야 하는데 바로 `missing_name?` 메소드가 이러한 두 경우를 구분하는 방법을 제공해 주게 되는 것입니다. [[[For example, when an action of `PostsController` is called Rails tries optimistically to use `PostsHelper`. It is OK that the helper module does not exist, so if an exception for that constant name is raised it should be silenced. But it could be the case that `posts_helper.rb` raises a `NameError` due to an actual unknown constant. That should be reraised. The method `missing_name?` provides a way to distinguish both cases:]]]
 
 ```ruby
 def default_helper_module!
@@ -3781,16 +3782,16 @@ rescue NameError => e
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/name_error.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/name_error.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/name_error.rb`.]]]
 
-Extensions to `LoadError`
+[Extensions to `LoadError`] `LoadError` 클래스 확장메소드
 -------------------------
 
-Active Support adds `is_missing?` to `LoadError`, and also assigns that class to the constant `MissingSourceFile` for backwards compatibility.
+액티브서포트는 `LoadError` 클래스에 `is_messing?` 메소드를 추가해 줍니다. 그리고 이전 버전과의 호환성을 위해서 이 클래스에 `MissingSourceFile` 상수를 할당해 줍니다. [[[Active Support adds `is_missing?` to `LoadError`, and also assigns that class to the constant `MissingSourceFile` for backwards compatibility.]]]
 
-Given a path name `is_missing?` tests whether the exception was raised due to that particular file (except perhaps for the ".rb" extension).
+경로명이 주어질 때 `is_missing`? 메소드는 ".rb" 확장자를 제외한 특정 파일에 기인한 예외가 발생했는지를 알려 줍니다. [[[Given a path name `is_missing?` tests whether the exception was raised due to that particular file (except perhaps for the ".rb" extension).]]]
 
-For example, when an action of `PostsController` is called Rails tries to load `posts_helper.rb`, but that file may not exist. That's fine, the helper module is not mandatory so Rails silences a load error. But it could be the case that the helper module does exist and in turn requires another library that is missing. In that case Rails must reraise the exception. The method `is_missing?` provides a way to distinguish both cases:
+예를 들면, `PostsController`의 특정 액션이 호출될 때 레일스는 `post_helper.rb` 파일을 로드하기 위한 시도를 합니다. 그러나, 이 파일이 존재하지 않을 수 있습니다. 그래도 별 문제는 발생하지 않는데, 헬퍼 모듈이 반드시 있어야 하는 것이 아니기 때문에 레일스는 파일 로드시 발생하는 에러를 묵인하고 넘어갑니다. 그러나, 헬퍼 모듈이 존재하는 경우 존재하지 않는 또 다른 라이브러리를 요구할 수 있습니다. 이런 경우에 레일스는 예외를 재발생시켜야만 합니다. `is_missing?` 메소드는 이 둘 경우를 구분할 수 있는 방법을 제공해 줍니다. [[[For example, when an action of `PostsController` is called Rails tries to load `posts_helper.rb`, but that file may not exist. That's fine, the helper module is not mandatory so Rails silences a load error. But it could be the case that the helper module does exist and in turn requires another library that is missing. In that case Rails must reraise the exception. The method `is_missing?` provides a way to distinguish both cases:]]]
 
 ```ruby
 def default_helper_module!
@@ -3804,4 +3805,4 @@ rescue NameError => e
 end
 ```
 
-NOTE: Defined in `active_support/core_ext/load_error.rb`.
+NOTE: 이 메소드는 `active_support/core_ext/load_error.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/load_error.rb`.]]]
