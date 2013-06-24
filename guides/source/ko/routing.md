@@ -64,7 +64,7 @@ get '/patients/:id', to: 'patients#show', as: 'patient'
 [Resource Routing: the Rails Default] 리소스 라우팅: 레일스 디폴트
 -----------------------------------
 
-리소스 라우팅은 주어진 리소스풀 컨트롤러를 위한 모든 일반적인 라우트를 빠르게 선언할 수 있게 해줍니다.[[[Resource routing allows you to quickly declare all of the common routes for a given resourceful controller.]]]
+리소스풀 라우팅은 주어진 리소스풀 컨트롤러를 위한 모든 일반적인 라우트를 빠르게 선언할 수 있게 해줍니다.[[[Resource routing allows you to quickly declare all of the common routes for a given resourceful controller.]]]
 `index`, `show`, `new`, `edit`, `create`, `update` 그리고 `destroy`를 위한 라우트를 개별적으로 선언하는 대신, 리소스풀 라우트는 한 줄의 코드로 모두를 선언합니다. [[[Instead of declaring separate routes for your `index`, `show`, `new`, `edit`, `create`, `update` and `destroy` actions, a resourceful route declares them in a single line of code.]]]
 
 ### [Resources on the Web] 웹상의 리소스
@@ -143,29 +143,29 @@ resources :books
 resources :videos
 ```
 
-### [Singular Resources] 단일 자원
+### [Singular Resources] 단수형 리소스
 
 간혹, 당신의 클라이언트가 언제나 ID를 참조하지 않고 조회하는 자원이 있습니다.[[[Sometimes, you have a resource that clients always look up without referencing an ID.]]]
 예를 들어, `/profile`로 항상 현재 로그인 된 사용자의 프로파일을 보여주고 싶을 것입니다.[[[For example, you would like `/profile` to always show the profile of the currently logged in user.]]]
-이런 경우, `show` 액션에 `profile`(`/profile/:id`을 사용하는 대신)을 매핑하고자 단일 자원을 사용할 수 있습니다.[[[In this case, you can use a singular resource to map `/profile` (rather than `/profile/:id`) to the `show` action:]]]
+이런 경우, `show` 액션에 `profile`(`/profile/:id`을 사용하는 대신)을 매핑하고자 단수형 리소스를 사용할 수 있습니다.[[[In this case, you can use a singular resource to map `/profile` (rather than `/profile/:id`) to the `show` action:]]]
 
 ```ruby
 get 'profile', to: 'users#show'
 ```
 
-Passing a `String` to `match` will expect a `controller#action` format, while passing a `Symbol` will map directly to an action:
+`String`을 `match`에 전달하면 `controller#action` 형식을 기대할 수 있지만, `Symbol`을 전달하면 직접 액션에 매핑될 것입니다. [[[Passing a `String` to `match` will expect a `controller#action` format, while passing a `Symbol` will map directly to an action:]]]
 
 ```ruby
 get 'profile', to: :show
 ```
 
-This resourceful route:
+다음 리소스풀 라우트는: [[[This resourceful route:]]]
 
 ```ruby
 resource :geocoder
 ```
 
-creates six different routes in your application, all mapping to the `Geocoders` controller:
+응용프로그램에 여섯 개의 다른 라우트를 생성하고, 들은 모두 `Geocoders` 컨트롤러에 매핑됩니다. [[[creates six different routes in your application, all mapping to the `Geocoders` controller:]]]
 
 | HTTP Verb | Path           | Action  | Used for                                      |
 | --------- | -------------- | ------- | --------------------------------------------- |
@@ -176,19 +176,22 @@ creates six different routes in your application, all mapping to the `Geocoders`
 | PATCH/PUT | /geocoder      | update  | update the one and only geocoder resource     |
 | DELETE    | /geocoder      | destroy | delete the geocoder resource                  |
 
-NOTE: Because you might want to use the same controller for a singular route (`/account`) and a plural route (`/accounts/45`), singular resources map to plural controllers. So that, for example, `resource :photo` and `resources :photos` creates both singular and plural routes that map to the same controller (`PhotosController`).
+노트: 단수형 라우트 (`/account`)와 복수형 라우트 (`/accounts/45`)를 위해 동일 컨트롤러를 사용하고자 할 수 있기 때문에, 단수형 리소스는 복수 컨트롤러에 매핑됩니다. [[[NOTE: Because you might want to use the same controller for a singular route (`/account`) and a plural route (`/accounts/45`), singular resources map to plural controllers.]]]
+그래서, 예를 들어, `resource :photo` 와 `resources :photos`는 동일 컨트롤러 (`PhotosController`)에 매핑되는 단수형과 복수형 라우트를 함께 생성합니다. [[[So that, for example, `resource :photo` and `resources :photos` creates both singular and plural routes that map to the same controller (`PhotosController`).]]]
 
-A singular resourceful route generates these helpers:
+단수형 리소스풀 라우트는 다음과 같은 헬퍼들을 생성합니다. [[[A singular resourceful route generates these helpers:]]]
 
-* `new_geocoder_path` returns `/geocoder/new`
-* `edit_geocoder_path` returns `/geocoder/edit`
-* `geocoder_path` returns `/geocoder`
+* `new_geocoder_path`는 `/geocoder/new`를 반환합니다. [[[`new_geocoder_path` returns `/geocoder/new`]]]
+* `edit_geocoder_path`는 `/geocoder/edit`를 반환합니다. [[[`edit_geocoder_path` returns `/geocoder/edit`]]]
+* `geocoder_path`는 `/geocoder`를 반환합니다. [[[`geocoder_path` returns `/geocoder`]]]
 
-As with plural resources, the same helpers ending in `_url` will also include the host, port and path prefix.
+복수형 리소스와 같이, `_url`로 끝나는 동일한 헬퍼들은 호스트, 포트 그리고 경로 접두사를 포함합니다. [[[As with plural resources, the same helpers ending in `_url` will also include the host, port and path prefix.]]]
 
-### Controller Namespaces and Routing
+### [Controller Namespaces and Routing] 컨트롤러 네임스페이스와 라우팅
 
-You may wish to organize groups of controllers under a namespace. Most commonly, you might group a number of administrative controllers under an `Admin::` namespace. You would place these controllers under the `app/controllers/admin` directory, and you can group them together in your router:
+컨트롤러의 묶음을 네임스페이스 아래 정리하고 싶을 경우가 있습니다. [[[You may wish to organize groups of controllers under a namespace.]]]
+일반적으로 관리 용도의 컨트롤러 묶음은 `Admin::` 네임스페이스 아래 두고 싶을 것입니다.[[[Most commonly, you might group a number of administrative controllers under an `Admin::` namespace.]]]
+이러한 컨트롤러들을 `app/controllers/admin` 디렉터리 아래 위치시키고, 라우터에서 이들을 그룹으로 묶을 수 있습니다.[[[You would place these controllers under the `app/controllers/admin` directory, and you can group them together in your router:]]]
 
 ```ruby
 namespace :admin do
@@ -196,7 +199,8 @@ namespace :admin do
 end
 ```
 
-This will create a number of routes for each of the `posts` and `comments` controller. For `Admin::PostsController`, Rails will create:
+이것은 `posts`와 `comments` 컨트롤러를 위한 여러 개의 라우트를 생성합니다.[[[This will create a number of routes for each of the `posts` and `comments` controller.]]]
+`Admin::PostsController`를 위해, 레일스는 다음의 라우트를 만들것입니다.[[[For `Admin::PostsController`, Rails will create:]]]
 
 | HTTP Verb | Path                  | Action  | Used for                  |
 | --------- | --------------------- | ------- | ------------------------- |
@@ -208,7 +212,7 @@ This will create a number of routes for each of the `posts` and `comments` contr
 | PATCH/PUT | /admin/posts/:id      | update  | admin_post_path(:id)      |
 | DELETE    | /admin/posts/:id      | destroy | admin_post_path(:id)      |
 
-If you want to route `/posts` (without the prefix `/admin`) to `Admin::PostsController`, you could use:
+만약 `Admin::PostsController`에 (`/admin` 접두사 없이) `/posts`로 라우트하고 싶다면, 다음과 같이 사용할 수 있습니다. '/[[[If you want to route `/posts` (without the prefix `/admin`) to `Admin::PostsController`, you could use:]]]
 
 ```ruby
 scope module: 'admin' do
@@ -216,13 +220,13 @@ scope module: 'admin' do
 end
 ```
 
-or, for a single case:
+아니면 단일 케이스로:[[[or, for a single case:]]]
 
 ```ruby
 resources :posts, module: 'admin'
 ```
 
-If you want to route `/admin/posts` to `PostsController` (without the `Admin::` module prefix), you could use:
+만약 (`Admin::` 모듈 접두사 없이) `PostsController`에 `/admin/posts`로 라우트하고 싶다면, 다음과 같이 사용할 수 있습니다.[[[If you want to route `/admin/posts` to `PostsController` (without the `Admin::` module prefix), you could use:]]]
 
 ```ruby
 scope '/admin' do
@@ -230,13 +234,14 @@ scope '/admin' do
 end
 ```
 
-or, for a single case:
+혹은 단일 케이스로:[[[or, for a single case:]]]
 
 ```ruby
 resources :posts, path: '/admin/posts'
 ```
 
-In each of these cases, the named routes remain the same as if you did not use `scope`. In the last case, the following paths map to `PostsController`:
+이러한 각각의 사례에, 명명된 라우트는 `scope`를 사용하지 않은 것과 동일하게 유지됩니다.[[[In each of these cases, the named routes remain the same as if you did not use `scope`.]]]
+마지막 사례에 있어, 각각의 경로는 `PostController`에 다음과 같이 매핑됩니다.[[[In the last case, the following paths map to `PostsController`:]]]
 
 | HTTP Verb | Path                  | Action  | Named Helper        |
 | --------- | --------------------- | ------- | ------------------- |
