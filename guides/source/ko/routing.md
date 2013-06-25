@@ -320,7 +320,8 @@ end
 
 #### Shallow Nesting
 
-One way to avoid deep nesting (as recommended above) is to generate the collection actions scoped under the parent, so as to get a sense of the hierarchy, but to not nest the member actions. In other words, to only build routes with the minimal amount of information to uniquely identify the resource, like this:
+(위에서 추천한 바와 같이) 깊은 중첩을 피하는 한 가지 방법은 부모 아래 범주화된(scoped) 액션의 컬렉션을 생성하여 멤버 액션을 중첩하지 않고, 계층의 의미를 갖는 것입니다.[[[One way to avoid deep nesting (as recommended above) is to generate the collection actions scoped under the parent, so as to get a sense of the hierarchy, but to not nest the member actions.]]]
+[[[In other words, to only build routes with the minimal amount of information to uniquely identify the resource, like this:]]]
 
 ```ruby
 resources :posts do
