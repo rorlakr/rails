@@ -253,9 +253,10 @@ resources :posts, path: '/admin/posts'
 | PATCH/PUT | /admin/posts/:id      | update  | post_path(:id)      |
 | DELETE    | /admin/posts/:id      | destroy | post_path(:id)      |
 
-### Nested Resources
+### [Nested Resources] 중첩 리소스
 
-It's common to have resources that are logically children of other resources. For example, suppose your application includes these models:
+논리적으로 다른 리소스의 자식인 리소스를 갖는 것은 일반적인 일입니다. [[[It's common to have resources that are logically children of other resources.]]]
+예를 들어, 응용프로그램이 다음과 같은 모델을 포함하고 있다고 가정합니다.[[[For example, suppose your application includes these models:]]]
 
 ```ruby
 class Magazine < ActiveRecord::Base
@@ -267,7 +268,8 @@ class Ad < ActiveRecord::Base
 end
 ```
 
-Nested routes allow you to capture this relationship in your routing. In this case, you could include this route declaration:
+중첩 라우트는 라우팅의 관계를 캡쳐할 수 있게 해줍니다. [[[Nested routes allow you to capture this relationship in your routing.]]]
+이 경우, 다음과 같은 라우트선언을 포함할 수 있습니다. [[[In this case, you could include this route declaration:]]]
 
 ```ruby
 resources :magazines do
@@ -275,7 +277,8 @@ resources :magazines do
 end
 ```
 
-In addition to the routes for magazines, this declaration will also route ads to an `AdsController`. The ad URLs require a magazine:
+magazines를 위한 라우트일 뿐 아니라, 이 선언은 또한 `AdsController`에 ads를 라우트해 줄 것입니다. [[[In addition to the routes for magazines, this declaration will also route ads to an `AdsController`.]]]
+ad URL은 magazine을 필요로 합니다.[[[The ad URLs require a magazine:]]]
 
 | HTTP Verb | Path                                 | Action  | Used for                                                                   |
 | --------- | ------------------------------------ | ------- | -------------------------------------------------------------------------- |
@@ -287,11 +290,13 @@ In addition to the routes for magazines, this declaration will also route ads to
 | PATCH/PUT | /magazines/:magazine_id/ads/:id      | update  | update a specific ad belonging to a specific magazine                      |
 | DELETE    | /magazines/:magazine_id/ads/:id      | destroy | delete a specific ad belonging to a specific magazine                      |
 
-This will also create routing helpers such as `magazine_ads_url` and `edit_magazine_ad_path`. These helpers take an instance of Magazine as the first parameter (`magazine_ads_url(@magazine)`).
+이것은 또한 `magazine_ads_url`와 `edit_magazine_ad_path` 같은 라우팅 펠퍼를 생성할 것입니다. [[[This will also create routing helpers such as `magazine_ads_url` and `edit_magazine_ad_path`.]]] 
+이러한 헬퍼들은 첫 번째 파라미터로서 Magazine의 인스턴스를 갖습니다. (`magazine_ads_url(@magazine)`)[[[These helpers take an instance of Magazine as the first parameter (`magazine_ads_url(@magazine)`).]]]
 
-#### Limits to Nesting
+#### [[[Limits to Nesting]]] 중첨의 제한
 
-You can nest resources within other nested resources if you like. For example:
+만약 원한다면, 다른 충첩된 리소스 안에 리소스를 중첩할 수 있습니다. [[[You can nest resources within other nested resources if you like.]]]
+예를 들면: [[[For example:]]]
 
 ```ruby
 resources :publishers do
@@ -301,15 +306,17 @@ resources :publishers do
 end
 ```
 
-Deeply-nested resources quickly become cumbersome. In this case, for example, the application would recognize paths such as:
+깊게-중첩된 리소스는 급속도로 복잡해집니다. [[[Deeply-nested resources quickly become cumbersome.]]]
+이 경우, 예를 들면, 응용프로그램은 경로를 다음과 같이 인식할 것입니다.[[[In this case, for example, the application would recognize paths such as:]]]
 
 ```
 /publishers/1/magazines/2/photos/3
 ```
 
-The corresponding route helper would be `publisher_magazine_photo_url`, requiring you to specify objects at all three levels. Indeed, this situation is confusing enough that a popular [article](http://weblog.jamisbuck.org/2007/2/5/nesting-resources) by Jamis Buck proposes a rule of thumb for good Rails design:
+이에 대응하는 라우트 헬퍼는 `publisher_magazine_photo_url`가 될 것이고, 이 헬퍼는 세 레벨의 객체 모두를 지정해야  합니다. [[[The corresponding route helper would be `publisher_magazine_photo_url`, requiring you to specify objects at all three levels.]]]
+실제로 이 상황은 유명한 [article](http://weblog.jamisbuck.org/2007/2/5/nesting-resources)에서 제이미스 벅이 제안한 좋은 레일스 디자인을 위한 주먹구구식 방법만큼이나 혼란스럽습니다. [[[[Indeed, this situation is confusing enough that a popular [article](http://weblog.jamisbuck.org/2007/2/5/nesting-resources) by Jamis Buck proposes a rule of thumb for good Rails design:]]]
 
-TIP: _Resources should never be nested more than 1 level deep._
+팁: 리소스는 1 레벨 이상으로 중첩되어서는 안됩니다. [[[TIP: _Resources should never be nested more than 1 level deep._]]]
 
 #### Shallow Nesting
 
