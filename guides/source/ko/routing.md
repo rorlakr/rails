@@ -330,7 +330,7 @@ end
 #### Shallow Nesting
 
 (위에서 추천한 바와 같이) 깊은 중첩을 피하는 한 가지 방법은 부모 아래 범주화된(scoped) 액션의 컬렉션을 생성하여 멤버 액션을 중첩하지 않고, 계층의 의미를 갖는 것입니다.[[[One way to avoid deep nesting (as recommended above) is to generate the collection actions scoped under the parent, so as to get a sense of the hierarchy, but to not nest the member actions.]]]
-[[[In other words, to only build routes with the minimal amount of information to uniquely identify the resource, like this:]]]
+다시 말해, 단지 최소한의 정보로 고유하게 리소스를 식별하는 라우트를 만들는 방법은 다음과 같습니다:[[[In other words, to only build routes with the minimal amount of information to uniquely identify the resource, like this:]]]
 
 ```ruby
 resources :posts do
@@ -339,7 +339,8 @@ end
 resources :comments, only: [:show, :edit, :update, :destroy]
 ```
 
-This idea strikes a balance between descriptive routes and deep nesting. There exists shorthand syntax to achieve just that, via the `:shallow` option:
+본 아이디어는 기술적인 라우트(descriptive routes)와 깊은 중첩 사이에서 절충합니다. [[[This idea strikes a balance between descriptive routes and deep nesting.]]]
+그렇게 하기 위한 축약 문법이 있는데, `:shallow` 옵션으로 할 수 있습니다.[[[There exists shorthand syntax to achieve just that, via the `:shallow` option:]]]
 
 ```ruby
 resources :posts do
@@ -347,7 +348,8 @@ resources :posts do
 end
 ```
 
-This will generate the exact same routes as the first example. You can also specify the `:shallow` option in the parent resource, in which case all of the nested resources will be shallow:
+이 코드는 첫 번째 예제와 완전히 동일한 라우트를 생성할 것입니다. [[[This will generate the exact same routes as the first example.]]] 
+또한 `:shallow` 옵션을 부모 리소스에 지정할 수 있는데, 이 경우 모든 중첩된 리소스들은 얕아지게 됩니다:[[[You can also specify the `:shallow` option in the parent resource, in which case all of the nested resources will be shallow:]]]
 
 ```ruby
 resources :posts, shallow: true do
@@ -357,7 +359,8 @@ resources :posts, shallow: true do
 end
 ```
 
-The `shallow` method of the DSL creates a scope inside of which every nesting is shallow. This generates the same routes as the previous example:
+[[[The `shallow` method of the DSL creates a scope inside of which every nesting is shallow.]]]
+This generates the same routes as the previous example:
 
 ```ruby
 shallow do
