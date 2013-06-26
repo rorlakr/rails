@@ -6,10 +6,14 @@
 본 가이드를 읽은 후 다음 내용을 알게 됩니다.[[[After reading this guide, you will know:]]]
 
 * `routes.rb`의 코드를 해석하는 방법. [[[How to interpret the code in `routes.rb`.]]]
-* 적절한 리소스풀 스타일(resourceful style) 혹은 `match` 메서드를 사용하여 자신만의 라우트를 구축하는 방법.[[[How to construct your own routes, using either the preferred resourceful style or the `match` method.]]]
+
+* 적절한 리소스풀 스타일(resourceful style) 혹은 `match` 메서드를 사용하여 자신만의 라우트를 구축하는 방법. [[[How to construct your own routes, using either the preferred resourceful style or the `match` method.]]]
+
 * 수신 액션에 요구되는 매개변수. [[[What parameters to expect an action to receive.]]]
-* 라우트 헬퍼를 사용, 경로와 URL을 만드는 방법. [[[How to automatically create paths and URLs using route helpers.]]]
-* 제약, Rack 엔드포인트와 같은 고급 기술.[[[Advanced techniques such as constraints and Rack endpoints.]]]
+
+* 라우트 헬퍼를 사용, 경로와 URL을 만드는 방법.[[[How to automatically create paths and URLs using route helpers.]]]
+
+* 제약, Rack 엔드포인트와 같은 고급 기술. [[[Advanced techniques such as constraints and Rack endpoints.]]]
 
 --------------------------------------------------------------------------------
 
@@ -70,7 +74,7 @@ get '/patients/:id', to: 'patients#show', as: 'patient'
 ### [Resources on the Web] 웹상의 리소스
 
 브라우저는 `GET`, `POST`, `PATCH`, `PUT` 와 `DELETE`와 같은 특정 HTTP 메서드를 사용하여 만들어진 요청으로 레일스에 페이지를 요청합니다. [[[Browsers request pages from Rails by making a request for a URL using a specific HTTP method, such as `GET`, `POST`, `PATCH`, `PUT` and `DELETE`. ]]]
-각각의 메서드는 리소스에 대한 작업을 수행할 수 있는 요청입니다.[[[Each method is a request to perform an operation on the resource.]]]]
+각각의 메서드는 리소스에 대한 작업을 수행할 수 있는 요청입니다.[[[Each method is a request to perform an operation on the resource.]]]
 리소스 라우트는 단일 컨트롤러상 액션에 연관되는 요청의 수를 매핑합니다. [[[A resource route maps a number of related requests to actions in a single controller.]]]
 
 다음과 같이 들어오는 요청을 레일스가 받았다면:[[[When your Rails application receives an incoming request for:]]]
@@ -86,7 +90,7 @@ DELETE /photos/17
 resources :photos
 ```
 
-레일스는 `params`안에 `{ id: '17' }`를 넣어  `photos` 컨트롤러의 `destroy` 메서드에 보냅니다.[[[Rails would dispatch that request to the `destroy` method on the `photos` controller with `{ id: '17' }` in `params`.
+레일스는 `params`안에 `{ id: '17' }`를 넣어  `photos` 컨트롤러의 `destroy` 메서드에 보냅니다.[[[Rails would dispatch that request to the `destroy` method on the `photos` controller with `{ id: '17' }` in `params`.]]]
 
 ### CRUD, Verbs, and Actions
 
@@ -120,10 +124,13 @@ resources :photos
 리소스풀 라우트를 만들면 응용프로그램의 컨트롤러에 여러 개의 헬퍼를 노출하게 됩니다.[[[Creating a resourceful route will also expose a number of helpers to the controllers in your application.]]]
 `resources :photos`의 경우라면:[[[In the case of `resources :photos`:]]]
 
-* `photos_path`는 `/photos`를 반환합니다.[[[`photos_path` returns `/photos`]]]
-* `new_photo_path`는 `/photos/new`를 반환합니다.[[[`new_photo_path` returns `/photos/new`]]]
-* `edit_photo_path(:id)`는 `/photos/:id/edit`를 반환합니다. (예를 들어, `edit_photo_path(10)`는 `/photos/10/edit`를 반환합니다.)[[[`edit_photo_path(:id)` returns `/photos/:id/edit` (for instance, `edit_photo_path(10)` returns `/photos/10/edit`)]]]
-* `photo_path(:id)`는 `/photos/:id`를 반환합니다. (예를 들어, `photo_path(10)`는 `/photos/10`를 반환합니다.)[[[`photo_path(:id)` returns `/photos/:id` (for instance, `photo_path(10)` returns `/photos/10`)]]]
+* `photos_path`는 `/photos`를 반환합니다. [[[`photos_path` returns `/photos`]]]
+
+* `new_photo_path`는 `/photos/new`를 반환합니다. [[[`new_photo_path` returns `/photos/new`]]]
+
+* `edit_photo_path(:id)`는 `/photos/:id/edit`를 반환합니다. (예를 들어, `edit_photo_path(10)`는 `/photos/10/edit`를 반환합니다.) [[[`edit_photo_path(:id)` returns `/photos/:id/edit` (for instance, `edit_photo_path(10)` returns `/photos/10/edit`)]]]
+
+* `photo_path(:id)`는 `/photos/:id`를 반환합니다. (예를 들어, `photo_path(10)`는 `/photos/10`를 반환합니다.) [[[`photo_path(:id)` returns `/photos/:id` (for instance, `photo_path(10)` returns `/photos/10`)]]]
 
 이들 핼퍼는 각각 그에 상응하는 `_url` 헬퍼(`photos_url` 같은)를 갖는데, 현재의 호스트, 포트 그리고 경로 접두사와 같은 경로 접두사를 반환합니다. [[[Each of these helpers has a corresponding `_url` helper (such as `photos_url`) which returns the same path prefixed with the current host, port and path prefix.]]]
 
@@ -182,7 +189,9 @@ resource :geocoder
 단수형 리소스풀 라우트는 다음과 같은 헬퍼들을 생성합니다. [[[A singular resourceful route generates these helpers:]]]
 
 * `new_geocoder_path`는 `/geocoder/new`를 반환합니다. [[[`new_geocoder_path` returns `/geocoder/new`]]]
+
 * `edit_geocoder_path`는 `/geocoder/edit`를 반환합니다. [[[`edit_geocoder_path` returns `/geocoder/edit`]]]
+
 * `geocoder_path`는 `/geocoder`를 반환합니다. [[[`geocoder_path` returns `/geocoder`]]]
 
 복수형 리소스와 같이, `_url`로 끝나는 동일한 헬퍼들은 호스트, 포트 그리고 경로 접두사를 포함합니다. [[[As with plural resources, the same helpers ending in `_url` will also include the host, port and path prefix.]]]
