@@ -359,8 +359,8 @@ resources :posts, shallow: true do
 end
 ```
 
-[[[The `shallow` method of the DSL creates a scope inside of which every nesting is shallow.]]]
-This generates the same routes as the previous example:
+DSL의 `shallow` 메서드는 모든 중첩이 얕아진 범위를 내부에 만듭니다. [[[The `shallow` method of the DSL creates a scope inside of which every nesting is shallow.]]]
+이것은 이전 예제와 같은 라우트를 생성합니다. [[[This generates the same routes as the previous example:]]]
 
 ```ruby
 shallow do
@@ -372,7 +372,8 @@ shallow do
 end
 ```
 
-There exists two options for `scope` to customize shallow routes. `:shallow_path` prefixes member paths with the specified parameter:
+얕은 라우트를 지정하는 `scope`에 대한 두 가지 옵션이 있습니다. [[[There exists two options for `scope` to customize shallow routes.]]]
+`:shallow_path`는 명시 파라미터를 갖는 멤버 경로 앞에 옵니다. [[[`:shallow_path` prefixes member paths with the specified parameter:]]]
 
 ```ruby
 scope shallow_path: "sekret" do
@@ -382,7 +383,7 @@ scope shallow_path: "sekret" do
 end
 ```
 
-The comments resource here will have the following routes generated for it:
+이 comments 리소스는 다음과 같이 생성된 라우트를 가질 것입니다. [[[The comments resource here will have the following routes generated for it:]]]
 
 | HTTP Verb | Path                                   | Named Helper        |
 | --------- | -------------------------------------- | ------------------- |
@@ -394,7 +395,7 @@ The comments resource here will have the following routes generated for it:
 | PATCH/PUT | /sekret/comments/:id(.:format)         | comment             |
 | DELETE    | /sekret/comments/:id(.:format)         | comment             |
 
-The `:shallow_prefix` option adds the specified parameter to the named helpers:
+`:shallow_prefix` 옵션은 명시된 파라미터를 명명될 헬퍼에 추가합니다. [[[The `:shallow_prefix` option adds the specified parameter to the named helpers:]]]
 
 ```ruby
 scope shallow_prefix: "sekret" do
@@ -404,7 +405,7 @@ scope shallow_prefix: "sekret" do
 end
 ```
 
-The comments resource here will have the following routes generated for it:
+이 comments 리소스는 다음과 같이 생성된 라우트를 가질 것입니다. [[[The comments resource here will have the following routes generated for it:]]]
 
 | HTTP Verb | Path                                   | Named Helper        |
 | --------- | -------------------------------------- | ------------------- |
@@ -416,9 +417,10 @@ The comments resource here will have the following routes generated for it:
 | PATCH/PUT | /comments/:id(.:format)                | sekret_comment      |
 | DELETE    | /comments/:id(.:format)                | sekret_comment      |
 
-### Routing concerns
+### [Routing concerns] 라우팅 배려
 
-Routing Concerns allows you to declare common routes that can be reused inside others resources and routes. To define a concern:
+라우팅 배려는 일반 라우트를 선언하여 다른 리소스와 라우트 내에서 재사용될 수 있도록 해줍니다. [[[Routing Concerns allows you to declare common routes that can be reused inside others resources and routes.]]]
+배려(concern)를 정의하개 위해서는: [[[To define a concern:]]]
 
 ```ruby
 concern :commentable do
@@ -430,7 +432,7 @@ concern :image_attachable do
 end
 ```
 
-These concerns can be used in resources to avoid code duplication and share behavior across routes:
+이러한 배려들(concerns)은 코드 중복을 피하고 라우크간 행동을 공유하기 위해서 리소스 내부에 사용할 수 있습니다.[[[These concerns can be used in resources to avoid code duplication and share behavior across routes:]]]
 
 ```ruby
 resources :messages, concerns: :commentable
@@ -438,7 +440,7 @@ resources :messages, concerns: :commentable
 resources :posts, concerns: [:commentable, :image_attachable]
 ```
 
-The above is equivalent to:
+위의 코드는 아래의 것과 동일합니다. [[[The above is equivalent to:]]]
 
 ```ruby
 resources :messages do
@@ -451,7 +453,7 @@ resources :posts do
 end
 ```
 
-Also you can use them in any place that you want inside the routes, for example in a scope or namespace call:
+또한 그것들을 라우트 안에 넣고자 하는 어떤 곳에서든 사용할 수 있습니다. 예를 들어 범위 안이나 네임스페이스 호출의 경우에: [[[Also you can use them in any place that you want inside the routes, for example in a scope or namespace call:]]]
 
 ```ruby
 namespace :posts do
