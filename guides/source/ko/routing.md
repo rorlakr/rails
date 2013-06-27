@@ -453,7 +453,7 @@ resources :posts do
 end
 ```
 
-또한 그것들을 라우트 안에 넣고자 하는 어떤 곳에서든 사용할 수 있습니다. 예를 들어 범위 안이나 네임스페이스 호출의 경우에: [[[Also you can use them in any place that you want inside the routes, for example in a scope or namespace call:]]]
+또한 그것들을 라우트 안에 넣고자 하는-예를 들어 범위 안이나 네임스페이스 호출의 경우- 어떤 곳에서든 사용할 수 있습니다: [[[Also you can use them in any place that you want inside the routes, for example in a scope or namespace call:]]]
 
 ```ruby
 namespace :posts do
