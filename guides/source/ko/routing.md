@@ -461,9 +461,10 @@ namespace :posts do
 end
 ```
 
-### Creating Paths and URLs From Objects
+### [Creating Paths and URLs From Objects] 객체로부터 경로와 URL 생성하기
 
-In addition to using the routing helpers, Rails can also create paths and URLs from an array of parameters. For example, suppose you have this set of routes:
+라우팅 헬퍼를 사용하는 것 이외에도, 레일스는 또한 매개변수의 배열로부터 경로와 URL을 생성할 수 있습니다. [[[In addition to using the routing helpers, Rails can also create paths and URLs from an array of parameters.]]]
+예를 들어, 다음과 같은 라우트 집합이 있다고 가정합니다: [[[For example, suppose you have this set of routes:]]]
 
 ```ruby
 resources :magazines do
@@ -471,45 +472,47 @@ resources :magazines do
 end
 ```
 
-When using `magazine_ad_path`, you can pass in instances of `Magazine` and `Ad` instead of the numeric IDs:
+`magazine_ad_path`를 사용할 때, 숫자 ID 대신 `Magazine`과 `Ad`의 인스턴스를 전달할 수 있습니다. [[[When using `magazine_ad_path`, you can pass in instances of `Magazine` and `Ad` instead of the numeric IDs:]]]
 
 ```erb
 <%= link_to 'Ad details', magazine_ad_path(@magazine, @ad) %>
 ```
 
-You can also use `url_for` with a set of objects, and Rails will automatically determine which route you want:
+또한 객체의 집합과 함께 `url_for`를 사용할 수 있고, 레일스는 자동으로 어떤 라우트를 원하는지 알아낼 것입니다. [[[You can also use `url_for` with a set of objects, and Rails will automatically determine which route you want:]]]
 
 ```erb
 <%= link_to 'Ad details', url_for([@magazine, @ad]) %>
 ```
 
-In this case, Rails will see that `@magazine` is a `Magazine` and `@ad` is an `Ad` and will therefore use the `magazine_ad_path` helper. In helpers like `link_to`, you can specify just the object in place of the full `url_for` call:
+이 경우, 레일스는 `@magazine`이 `Magazine`이고 `@ad`가 `Ad`라고 이해하기 때문에 `magazine_ad_path` 헬퍼를 사용할 것입니다. [[[In this case, Rails will see that `@magazine` is a `Magazine` and `@ad` is an `Ad` and will therefore use the `magazine_ad_path` helper.]]]
+`link_to`와 같은 헬퍼에서 전체 `url_for` 호출을 하는 위치에 객체를 지정하기만 해도 됩니다. [[[In helpers like `link_to`, you can specify just the object in place of the full `url_for` call:]]]
 
 ```erb
 <%= link_to 'Ad details', [@magazine, @ad] %>
 ```
 
-If you wanted to link to just a magazine:
+만약 magazine에 링크를 하고 싶을 뿐이라면: [[[If you wanted to link to just a magazine:]]]
 
 ```erb
 <%= link_to 'Magazine details', @magazine %>
 ```
 
-For other actions, you just need to insert the action name as the first element of the array:
+다른 액션을 위해서는, 배열의 첫 번째 요소로 액션 명을 넣어주기만 하면 됩니다. [[[For other actions, you just need to insert the action name as the first element of the array:]]]
 
 ```erb
 <%= link_to 'Edit Ad', [:edit, @magazine, @ad] %>
 ```
 
-This allows you to treat instances of your models as URLs, and is a key advantage to using the resourceful style.
+이것은 모델의 인스턴스를 URL로 취급할 수 있게 해 주며, 이것이 리소스풀 스타일을 사용하는 주요 장점입니다. [[[This allows you to treat instances of your models as URLs, and is a key advantage to using the resourceful style.]]]
 
-### Adding More RESTful Actions
+### [Adding More RESTful Actions] 더 많은 레스트풀 액션 추가하기
 
-You are not limited to the seven routes that RESTful routing creates by default. If you like, you may add additional routes that apply to the collection or individual members of the collection.
+기본으로 레스트풀 라우팅이 만들어내는 일곱 개의 라우팅이 제한되는 것입니다. [[[You are not limited to the seven routes that RESTful routing creates by default.]]]
+원한다면, 컬렉션이나 컬렉션의 개별 멤버에 적용할 더 많은 라우트를 추가할 수 있습니다. [[[If you like, you may add additional routes that apply to the collection or individual members of the collection.]]]
 
-#### Adding Member Routes
+#### [Adding Member Routes] 멤버 라우트 추가하기
 
-To add a member route, just add a `member` block into the resource block:
+멤버 라우트를 추가하려면, 리소스 블록 안에 `member` 블록을 추가하기만 하면 됩니다: [[[To add a member route, just add a `member` block into the resource block:]]]
 
 ```ruby
 resources :photos do
@@ -519,9 +522,12 @@ resources :photos do
 end
 ```
 
-This will recognize `/photos/1/preview` with GET, and route to the `preview` action of `PhotosController`, with the resource id value passed in `params[:id]`. It will also create the `preview_photo_url` and `preview_photo_path` helpers.
+이것은 GET 방식으로 `/photos/1/preview`를 인식하고 `params[:id]`로 전달된 값의 리소스 id를 `PhotosController`의 `preview` 액션으로 라우트합니다. [[[This will recognize `/photos/1/preview` with GET, and route to the `preview` action of `PhotosController`, with the resource id value passed in `params[:id]`.]]]
+이것은 또한 `preview_photo_url`과 `preview_photo_path` 헬퍼를 생성합니다. [[[It will also create the `preview_photo_url` and `preview_photo_path` helpers.]]]
 
-Within the block of member routes, each route name specifies the HTTP verb that it will recognize. You can use `get`, `patch`, `put`, `post`, or `delete` here. If you don't have multiple `member` routes, you can also pass `:on` to a route, eliminating the block:
+member 라우트의 블록 내에서, 각 라우트명은 인식할 HTTP verb를 지정합니다. [[[Within the block of member routes, each route name specifies the HTTP verb that it will recognize.]]]
+여기에는 `get`, `patch`, `put`, `post`, 혹은 `delete`를 사용할 수 있습니다. [[[You can use `get`, `patch`, `put`, `post`, or `delete` here.]]]
+만약 중복된 `member` 라우트가 없다면, 블록을 제거하고 `:on`을 라우트에 전달할 수 있습니다. [[[If you don't have multiple `member` routes, you can also pass `:on` to a route, eliminating the block:]]]
 
 ```ruby
 resources :photos do
@@ -529,7 +535,7 @@ resources :photos do
 end
 ```
 
-You can leave out the `:on` option, this will create the same member route except that the resource id value will be available in `params[:photo_id]` instead of `params[:id]`.
+`:on` 옵션을 생략할 수 있는데, 이것은 리소스 id 값이 `params[:id]` 대신 `params[:photo_id]` 안에서 사용될 것이라는 점을 제외하면 동일한 멤버 라우트를 생성할 것입니다. [[[You can leave out the `:on` option, this will create the same member route except that the resource id value will be available in `params[:photo_id]` instead of `params[:id]`.]]]
 
 #### Adding Collection Routes
 
