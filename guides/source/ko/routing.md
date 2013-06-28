@@ -537,9 +537,9 @@ end
 
 `:on` 옵션을 생략할 수 있는데, 이것은 리소스 id 값이 `params[:id]` 대신 `params[:photo_id]` 안에서 사용될 것이라는 점을 제외하면 동일한 멤버 라우트를 생성할 것입니다. [[[You can leave out the `:on` option, this will create the same member route except that the resource id value will be available in `params[:photo_id]` instead of `params[:id]`.]]]
 
-#### Adding Collection Routes
+#### [Adding Collection Routes] 컬렉션 라우트 추가하기
 
-To add a route to the collection:
+컬렉션에 라우트를 추가하고자 한다면: [[[To add a route to the collection:]]]
 
 ```ruby
 resources :photos do
@@ -549,9 +549,10 @@ resources :photos do
 end
 ```
 
-This will enable Rails to recognize paths such as `/photos/search` with GET, and route to the `search` action of `PhotosController`. It will also create the `search_photos_url` and `search_photos_path` route helpers.
+이것은 레일스가 GET 방식으로 `/photos/search`와 같은 경로를 인식할 수 있게 해 주고, `PhotosController`의 `search` 액션으로 라우트할 수 있게 해줍니다. [[[This will enable Rails to recognize paths such as `/photos/search` with GET, and route to the `search` action of `PhotosController`.]]]
+또한 `search_photos_url`과 `search_photos_path` 라우트 헬퍼를 생성할 것입니다. [[[It will also create the `search_photos_url` and `search_photos_path` route helpers.]]]
 
-Just as with member routes, you can pass `:on` to a route:
+멤버 라우트에서와 같이, 라우트에 `:on`을 전달할 수 있습니다. [[[Just as with member routes, you can pass `:on` to a route:]]]
 
 ```ruby
 resources :photos do
