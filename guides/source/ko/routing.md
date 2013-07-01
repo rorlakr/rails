@@ -560,9 +560,9 @@ resources :photos do
 end
 ```
 
-#### Adding Routes for Additional New Actions
+#### [Adding Routes for Additional New Actions] 부가적인 새 액션을 위한 라우트 추가하기
 
-To add an alternate new action using the `:on` shortcut:
+`:on` 숏컷을 이용하여 다른 새 액션을 추가하고자 한다면: [[[To add an alternate new action using the `:on` shortcut:]]]
 
 ```ruby
 resources :comments do
@@ -570,9 +570,10 @@ resources :comments do
 end
 ```
 
-This will enable Rails to recognize paths such as `/comments/new/preview` with GET, and route to the `preview` action of `CommentsController`. It will also create the `preview_new_comment_url` and `preview_new_comment_path` route helpers.
+이것은 레일스가 GET 방식으로 `/comments/new/preview`와 같은 경로를 인식할 수 있게 해 주고, `CommentsController`의 `preview` 액션으로 라우트할 수 있게 해 줍니다. [[[This will enable Rails to recognize paths such as `/comments/new/preview` with GET, and route to the `preview` action of `CommentsController`.]]]
+또한 `preview_new_comment_url`과 `preview_new_comment_path` 라우트 헬퍼를 생성할 것입니다. [[[It will also create the `preview_new_comment_url` and `preview_new_comment_path` route helpers.]]]
 
-TIP: If you find yourself adding many extra actions to a resourceful route, it's time to stop and ask yourself whether you're disguising the presence of another resource.
+팁: 만약 리소스풀 라우트에 많은 추가 액션을 추가하고 있다면, 그것을 중단하고 다른 리소스를 숨기고 있는지 반문해야 합니다. [[[TIP: If you find yourself adding many extra actions to a resourceful route, it's time to stop and ask yourself whether you're disguising the presence of another resource.]]]
 
 Non-Resourceful Routes
 ----------------------
