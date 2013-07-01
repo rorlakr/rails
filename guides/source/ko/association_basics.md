@@ -1,17 +1,17 @@
-Active Record Associations
+[Active Record Associations] 액티브레코드 Associations
 ==========================
 
-This guide covers the association features of Active Record.
+본 가이드에서는 액티브레코드의 Association(관계) 에 관해 다룹니다. [[[This guide covers the association features of Active Record.]]]
 
-After reading this guide, you will know:
+본 가이드를 읽고나면 아래 사항을 알게 될것입니다. [[[After reading this guide, you will know:]]]
 
-* How to declare associations between Active Record models.
-* How to understand the various types of Active Record associations.
-* How to use the methods added to your models by creating associations.
+* 액티브레코드 모델간의 Association 설정하는 방법 [[[How to declare associations between Active Record models.]]]
+* 액티브레코드 Association의 다양한 종류에 대한 이해 [[[How to understand the various types of Active Record associations.]]]
+* Association 모델에 메서드를 추가하는 방법 [[[How to use the methods added to your models by creating associations.]]]
 
 --------------------------------------------------------------------------------
 
-Why Associations?
+[Why Associations?] Associations은 왜 필요한가?
 -----------------
 
 Why do we need associations between models? Because they make common operations simpler and easier in your code. For example, consider a simple Rails application that includes a model for customers and a model for orders. Each customer can have many orders. Without associations, the model declarations would look like this:
@@ -66,7 +66,7 @@ Deleting a customer and all of its orders is *much* easier:
 
 To learn more about the different types of associations, read the next section of this guide. That's followed by some tips and tricks for working with associations, and then by a complete reference to the methods and options for associations in Rails.
 
-The Types of Associations
+[The Types of Associations] Associations의 종류
 -------------------------
 
 In Rails, an _association_ is a connection between two Active Record models. Associations are implemented using macro-style calls, so that you can declaratively add features to your models. For example, by declaring that one model `belongs_to` another, you instruct Rails to maintain Primary Key–Foreign Key information between instances of the two models, and you also get a number of utility methods added to your model. Rails supports six types of associations:
@@ -487,7 +487,7 @@ end
 
 With this setup, you can retrieve `@employee.subordinates` and `@employee.manager`.
 
-Tips, Tricks, and Warnings
+[Tips, Tricks, and Warnings] 팁, 속임수, 주의
 --------------------------
 
 Here are a few things you should know to make efficient use of Active Record associations in your Rails applications:
@@ -693,33 +693,32 @@ There are a few limitations to `inverse_of` support:
 * They do not work with `:as` associations.
 * For `belongs_to` associations, `has_many` inverse associations are ignored.
 
-Detailed Association Reference
+[Detailed Association Reference] Association에 대한 자세한 참조
 ------------------------------
 
-The following sections give the details of each type of association, including the methods that they add and the options that you can use when declaring an association.
+이제부터 association 종류별로 association을 사용할때 추가할수 있는 메서드, 옵션에 대해서 자세하게 이야기합니다. [[[The following sections give the details of each type of association, including the methods that they add and the options that you can use when declaring an association.]]]
 
 ### `belongs_to` Association Reference
 
-The `belongs_to` association creates a one-to-one match with another model. In database terms, this association says that this class contains the foreign key. If the other class contains the foreign key, then you should use `has_one` instead.
+`belongs_to` 관계형은 다른 모델과 일대일 연결을 만들어 줍니다. 데이터베이스 용어로는, 해당 클래스가 foreign key 를 가지게 된다고 말합니다. 다른 클래스가 foreign key 를 가지게 되면, has_one 관계형을 사용해야 합니다. [[[The `belongs_to` association creates a one-to-one match with another model. In database terms, this association says that this class contains the foreign key. If the other class contains the foreign key, then you should use `has_one` instead.]]]
 
-#### Methods Added by `belongs_to`
+#### [Methods Added by `belongs_to`] `belongs_to`에 의해 추가된 메소드
 
-When you declare a `belongs_to` association, the declaring class automatically gains four methods related to the association:
+`belongs_to` 관계선언을 하게 되면, 선언하는 클래스는 자동으로 다음의 4가지 메소드를 사용할 수 있게 됩니다. [[[When you declare a `belongs_to` association, the declaring class automatically gains four methods related to the association:]]]
 
 * `association(force_reload = false)`
 * `association=(associate)`
 * `build_association(attributes = {})`
 * `create_association(attributes = {})`
 
-In all of these methods, `association` is replaced with the symbol passed as the first argument to `belongs_to`. For example, given the declaration:
+위의 모든 메소드에서 `association` 을 `belongs_to` 의 첫번째 인수로 받은 심볼로 바꾸면 됩니다. 예를 들어, 다음과 같이 선언하면, [[[In all of these methods, `association` is replaced with the symbol passed as the first argument to `belongs_to`. For example, given the declaration:]]]
 
 ```ruby
 class Order < ActiveRecord::Base
   belongs_to :customer
 end
 ```
-
-Each instance of the order model will have these methods:
+Order 모델의 각 인스턴스는 다음과 같은 메소드를 가지게 될 것입니다. [[[Each instance of the order model will have these methods:]]]
 
 ```ruby
 customer
@@ -728,21 +727,21 @@ build_customer
 create_customer
 ```
 
-NOTE: When initializing a new `has_one` or `belongs_to` association you must use the `build_` prefix to build the association, rather than the `association.build` method that would be used for `has_many` or `has_and_belongs_to_many` associations. To create one, use the `create_` prefix.
+NOTE: `has_one` 또는 `belongs_to` 관계형을 새로 생성해서 초기화할 때는, `has_many` 또는 `has_and_belongs_to_many` 관계형에 대해서 사용되는 `association.build` 메소드보다는, 관계형을 만들 때 선언시 넘겨주는 첫번째 인수에 `build_` 를 붙여서 사용해야 합니다. 초기화가 아니라 생성할 때는 create_ 를 붙여서 사용합니다. [[[When initializing a new `has_one` or `belongs_to` association you must use the `build_` prefix to build the association, rather than the `association.build` method that would be used for `has_many` or `has_and_belongs_to_many` associations. To create one, use the `create_` prefix.]]]
 
 ##### `association(force_reload = false)`
 
-The `association` method returns the associated object, if any. If no associated object is found, it returns `nil`.
+`association` 메소드는 연결된 객체가 있을 경우 그것을 반환합니다. 연결된 객체가 없는 경우에는, nil 값을 반환하게 됩니다. [[[The `association` method returns the associated object, if any. If no associated object is found, it returns `nil`.]]]
 
 ```ruby
 @customer = @order.customer
 ```
 
-If the associated object has already been retrieved from the database for this object, the cached version will be returned. To override this behavior (and force a database read), pass `true` as the `force_reload` argument.
+연관된 객체가 이미 이 객체에 대해서 데이터베이스로부터 데이터를 가져온 상태라면 캐시된 버전이 반환될 것입니다. 이 때 강제로 데이터베이스로부터 데이터를 다시 불러오고자 할 경우에는, `force_reload` 값으로 `true` 값을 넘겨주어야 합니다. [[[If the associated object has already been retrieved from the database for this object, the cached version will be returned. To override this behavior (and force a database read), pass `true` as the `force_reload` argument.]]]
 
 ##### `association=(associate)`
 
-The `association=` method assigns an associated object to this object. Behind the scenes, this means extracting the primary key from the associate object and setting this object's foreign key to the same value.
+`association=` 메소드는 이 객체에 연관된 객체를 할당합니다. 보이지 않는곳에서 이루어지는 작업을 살펴보면 연관된 객체로부터 primary key 값을 가져와서 이 객체의 foreign key 로 할당하게 되는 것입니다. [[[The `association=` method assigns an associated object to this object. Behind the scenes, this means extracting the primary key from the associate object and setting this object's foreign key to the same value.]]]
 
 ```ruby
 @order.customer = @customer
@@ -750,7 +749,7 @@ The `association=` method assigns an associated object to this object. Behind th
 
 ##### `build_association(attributes = {})`
 
-The `build_association` method returns a new object of the associated type. This object will be instantiated from the passed attributes, and the link through this object's foreign key will be set, but the associated object will _not_ yet be saved.
+`build_association` 메소드는 해당 관계형의 새로운 객체를 반환해 줍니다. 그리고, 이 객체는 매개변수로 넘어온 속성값으로 초기화되며, 이 객체의 foreign key 값은 설정될 것이지만, 연관된 객체는 _아직_ 저장되지 않은 상태입니다. [[[The `build_association` method returns a new object of the associated type. This object will be instantiated from the passed attributes, and the link through this object's foreign key will be set, but the associated object will _not_ yet be saved.]]]
 
 ```ruby
 @customer = @order.build_customer(customer_number: 123,
@@ -759,7 +758,7 @@ The `build_association` method returns a new object of the associated type. This
 
 ##### `create_association(attributes = {})`
 
-The `create_association` method returns a new object of the associated type. This object will be instantiated from the passed attributes, the link through this object's foreign key will be set, and, once it passes all of the validations specified on the associated model, the associated object _will_ be saved.
+`create_association` 메소드는 해당 관계형의 새로운 객체를 반환해 줍니다. 이 객체는 넘어온 속성으로 초기화되며, 이 객체의 foreign key 값이 설정됩니다. 또한, 연관된 객체의 모든 유효성 검증을 통과하면 저장될 것입니다. [[[The `create_association` method returns a new object of the associated type. This object will be instantiated from the passed attributes, the link through this object's foreign key will be set, and, once it passes all of the validations specified on the associated model, the associated object _will_ be saved.]]]
 
 ```ruby
 @customer = @order.create_customer(customer_number: 123,
@@ -767,9 +766,9 @@ The `create_association` method returns a new object of the associated type. Thi
 ```
 
 
-#### Options for `belongs_to`
+#### [Options for `belongs_to`] `belongs_to` 옵션
 
-While Rails uses intelligent defaults that will work well in most situations, there may be times when you want to customize the behavior of the `belongs_to` association reference. Such customizations can easily be accomplished by passing options and scope blocks when you create the association. For example, this association uses two such options:
+대부분의 경우 레일스의 기본설정값은 잘 작동하지만, `belongs_to` 의 동작을 커스터마이징하고 싶을때가 있을것입니다. association을 설정할때 옵션, scope block 을 추가해서 쉽게 커스터마이제이션 할 수 있습니다. 예를 들어, 몇가지 옵션을 가지는 관계설정은 다음과 같습니다. [[[While Rails uses intelligent defaults that will work well in most situations, there may be times when you want to customize the behavior of the `belongs_to` association reference. Such customizations can easily be accomplished by passing options and scope blocks when you create the association. For example, this association uses two such options:]]]
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -778,7 +777,7 @@ class Order < ActiveRecord::Base
 end
 ```
 
-The `belongs_to` association supports these options:
+`belongs_to` 메소드는 다음과 같은 옵션을 사용할 수 있습니다. [[[The `belongs_to` association supports these options:]]]
 
 * `:autosave`
 * `:class_name`
@@ -792,11 +791,11 @@ The `belongs_to` association supports these options:
 
 ##### `:autosave`
 
-If you set the `:autosave` option to `true`, Rails will save any loaded members and destroy members that are marked for destruction whenever you save the parent object.
+`:autosave` 옵션을 `true` 값으로 설정하면, 레일스는 모객체가 저장될 때마다 모든 로딩된 멤버를 저장하고 삭제표시된 멤버를 삭제할 것입니다. [[[If you set the `:autosave` option to `true`, Rails will save any loaded members and destroy members that are marked for destruction whenever you save the parent object.]]]
 
 ##### `:class_name`
 
-If the name of the other model cannot be derived from the association name, you can use the `:class_name` option to supply the model name. For example, if an order belongs to a customer, but the actual name of the model containing customers is `Patron`, you'd set things up this way:
+다른 모델의 이름을 관계선언이름으로부터 알 수 없을 경우에는 `:class_name` 옵션을 이용해서 모델명을 명시할 수 있습니다. 예를 들면, order 가 customer 모델에 속하지만, customers 를 포함하는 모델의 실제 이름이 `Patron` 이라면 다음과 같이 설정해야 합니다. [[[If the name of the other model cannot be derived from the association name, you can use the `:class_name` option to supply the model name. For example, if an order belongs to a customer, but the actual name of the model containing customers is `Patron`, you'd set things up this way:]]]
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -806,7 +805,7 @@ end
 
 ##### `:counter_cache`
 
-The `:counter_cache` option can be used to make finding the number of belonging objects more efficient. Consider these models:
+`:counter_cache` 옵션은 속하는 객체의 숫자를 계산하는 일을 보다 효율적으로 하도록 해 줍니다. 다음 모델을 살펴 보겠습니다. [[[The `:counter_cache` option can be used to make finding the number of belonging objects more efficient. Consider these models:]]]
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -817,7 +816,7 @@ class Customer < ActiveRecord::Base
 end
 ```
 
-With these declarations, asking for the value of `@customer.orders.size` requires making a call to the database to perform a `COUNT(*)` query. To avoid this call, you can add a counter cache to the _belonging_ model:
+이렇게 선언하면 @customer.orders.size 값을 요청할 때 데이터베이스에서 COUNT(*) 쿼리문을 호출하게 됩니다. 이러한 호출을 방지하기 위해서 _귀속되는_ 모델에 counter_cache 옵션을 추가할 수 있습니다. [[[With these declarations, asking for the value of `@customer.orders.size` requires making a call to the database to perform a `COUNT(*)` query. To avoid this call, you can add a counter cache to the _belonging_ model:]]]
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -828,9 +827,9 @@ class Customer < ActiveRecord::Base
 end
 ```
 
-With this declaration, Rails will keep the cache value up to date, and then return that value in response to the `size` method.
+이렇게 선언하면, 레일스가 캐시값을 최신값으로 유지하게 되고 size 메소드를 호출할 때 그 값을 반환하게 되는 것입니다. [[[With this declaration, Rails will keep the cache value up to date, and then return that value in response to the `size` method.]]]
 
-Although the `:counter_cache` option is specified on the model that includes the `belongs_to` declaration, the actual column must be added to the _associated_ model. In the case above, you would need to add a column named `orders_count` to the `Customer` model. You can override the default column name if you need to:
+`:counter_cache` 옵션을 `belongs_to` 선언을 가지고 있는 모델에 명시했지만 실제 컬럼은 _연관된_ 모델에 추가해 주어야 합니다. 위의 예에서, `Customer` 모델에 `orders_count` 컬럼을 추가해 주어야 합니다. 필요하다면 기본 컬럼명을 변경할 수 있습니다. [[[Although the `:counter_cache` option is specified on the model that includes the `belongs_to` declaration, the actual column must be added to the _associated_ model. In the case above, you would need to add a column named `orders_count` to the `Customer` model. You can override the default column name if you need to:]]]
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -841,17 +840,17 @@ class Customer < ActiveRecord::Base
 end
 ```
 
-Counter cache columns are added to the containing model's list of read-only attributes through `attr_readonly`.
+Counter cache 컴럼은 `attr_readonly` 옵션을 이용해서 해당 모델의 읽기전용 속성 목록에 추가됩니다. [[[Counter cache columns are added to the containing model's list of read-only attributes through `attr_readonly`.]]]
 
 ##### `:dependent`
 
-If you set the `:dependent` option to `:destroy`, then deleting this object will call the `destroy` method on the associated object to delete that object. If you set the `:dependent` option to `:delete`, then deleting this object will delete the associated object _without_ calling its `destroy` method. If you set the `:dependent` option to `:restrict`, then attempting to delete this object will result in a `ActiveRecord::DeleteRestrictionError` if there are any associated objects.
+`:dependent` 옵션을 `:destroy` 값으로 설정하면 객체를 삭제할 때 연관된 객체도 삭제하기 위해 `destroy` 메소드를 호출할 것입니다. `:dependent` 옵션을 `:delete` 로 설정하면, `destroy` 메소드를 호출하지 _않고_ 연관된 객체를 삭제할 것입니다. `:dependent` 옵션을 `:restrict` 로 설정하면 객체를 삭제하고자 할때 연관된 객체가 존재하는경우 `ActiveRecord::DeleteRestrictionError` 에러를 발생합니다. [[[If you set the `:dependent` option to `:destroy`, then deleting this object will call the `destroy` method on the associated object to delete that object. If you set the `:dependent` option to `:delete`, then deleting this object will delete the associated object _without_ calling its `destroy` method. If you set the `:dependent` option to `:restrict`, then attempting to delete this object will result in a `ActiveRecord::DeleteRestrictionError` if there are any associated objects.]]]
 
-WARNING: You should not specify this option on a `belongs_to` association that is connected with a `has_many` association on the other class. Doing so can lead to orphaned records in your database.
+WARNING: `belongs_to`로 연관된 객체에 `has_many` 관계형이 설정되어 있는경우 이 옵션을 사용해서는 안됩니다. 사용하게 된다면 데이터베이스에 모 객체가 없이 자 객체만 남는 경우가 생길수있습니다. [[[You should not specify this option on a `belongs_to` association that is connected with a `has_many` association on the other class. Doing so can lead to orphaned records in your database.]]]
 
 ##### `:foreign_key`
 
-By convention, Rails assumes that the column used to hold the foreign key on this model is the name of the association with the suffix `_id` added. The `:foreign_key` option lets you set the name of the foreign key directly:
+관례에 의해, 레일스는 foreign key 컬럼명을 연관된 모델명에 `_id` 를 추가한 이름으로 간주합니다. 이 때 `:foreign_key` 옵션을 이용하여 직접 foreign key 이름을 설정할 수 있게 해 줍니다. [[[By convention, Rails assumes that the column used to hold the foreign key on this model is the name of the association with the suffix `_id` added. The `:foreign_key` option lets you set the name of the foreign key directly:]]]
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -860,11 +859,11 @@ class Order < ActiveRecord::Base
 end
 ```
 
-TIP: In any case, Rails will not create foreign key columns for you. You need to explicitly define them as part of your migrations.
+TIP: 어떠한 경우에라도, 레일스가 개발자를 대신해서 foreign key 컬럼을 만들어 주지 않습니다. 마이그레이션 파일에 명시적으로 정의해 주어야 합니다. [[[In any case, Rails will not create foreign key columns for you. You need to explicitly define them as part of your migrations.]]]
 
 ##### `:inverse_of`
 
-The `:inverse_of` option specifies the name of the `has_many` or `has_one` association that is the inverse of this association. Does not work in combination with the `:polymorphic` options.
+`:inverse_of` 옵션은 `has_many` 또는 `has_one` association에 대해 이 객체를 다시 참조하도록 이름을 지정한다.(현재는 `:has_many` 옵션에 대해 동작하지 않는것으로 되어있다) `:polymorphic` 옵션이 설정된경우 동작하지 않는다.  [[[The `:inverse_of` option specifies the name of the `has_many` or `has_one` association that is the inverse of this association. Does not work in combination with the `:polymorphic` options.]]]
 
 ```ruby
 class Customer < ActiveRecord::Base
@@ -878,11 +877,11 @@ end
 
 ##### `:polymorphic`
 
-Passing `true` to the `:polymorphic` option indicates that this is a polymorphic association. Polymorphic associations were discussed in detail <a href="#polymorphic-associations">earlier in this guide</a>.
+`:polymorphic` 옵션에 `true` 값을 할당하면, 이 관계는 다형성 관계형을 가지게 됩니다. 이에 대해서는 이미 <a href="#polymorphic-associations">이전</a>에 설명한 바 있습니다. [[[Passing `true` to the `:polymorphic` option indicates that this is a polymorphic association. Polymorphic associations were discussed in detail <a href="#polymorphic-associations">earlier in this guide</a>.]]]
 
 ##### `:touch`
 
-If you set the `:touch` option to `:true`, then the `updated_at` or `updated_on` timestamp on the associated object will be set to the current time whenever this object is saved or destroyed:
+`:touch` 옵션을 `true` 로 설정하면 연관된 객체가 저장되거나 삭제(destroyed)될 때 그 객체의 `updated_at` 또는 `updated_on` 타임스탬프 컬럼이 현재의 시간으로 설정됩니다. [[[If you set the `:touch` option to `:true`, then the `updated_at` or `updated_on` timestamp on the associated object will be set to the current time whenever this object is saved or destroyed:]]]
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -894,7 +893,7 @@ class Customer < ActiveRecord::Base
 end
 ```
 
-In this case, saving or destroying an order will update the timestamp on the associated customer. You can also specify a particular timestamp attribute to update:
+이 경우에, order를 저장하거나 삭제할 때 이와 연관된 customer 객체의 타임스탬프가 현재의 시간으로 업데이트될 것입니다. 이 때, 물론 업데이트할 타임스탬프 속성명을 명시해 줄 수 있습니다. [[[In this case, saving or destroying an order will update the timestamp on the associated customer. You can also specify a particular timestamp attribute to update:]]]
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -904,11 +903,11 @@ end
 
 ##### `:validate`
 
-If you set the `:validate` option to `true`, then associated objects will be validated whenever you save this object. By default, this is `false`: associated objects will not be validated when this object is saved.
+`:validate` 옵션을 `true` 값으로 설정하면, 이 객체를 저장할 때 마다 연관된 객체의 유효성 검증과정이 수행될 것입니다. 기본값은 `false` 로 지정되어 있으며 객체가 저장될 때 연관된 객체의 유효성 검증이 수행되지 않을 것입니다. [[[If you set the `:validate` option to `true`, then associated objects will be validated whenever you save this object. By default, this is `false`: associated objects will not be validated when this object is saved.]]]
 
 #### Scopes for `belongs_to`
 
-There may be times when you wish to customize the query used by `belongs_to`. Such customizations can be achieved via a scope block. For example:
+쿼리를 이용해 `belongs_to`를 커스터마이즈할때 자주 scope block를 사용하려고 합니다. 예를 들자면 [[[There may be times when you wish to customize the query used by `belongs_to`. Such customizations can be achieved via a scope block. For example:]]]
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -917,7 +916,7 @@ class Order < ActiveRecord::Base
 end
 ```
 
-You can use any of the standard [querying methods](active_record_querying.html) inside the scope block. The following ones are discussed below:
+[querying methods](active_record_querying.html) 를 scope block 내부에 사용할수 있습니다. 다음과 같은것들은 아래에 설명되어 있습니다. [[[You can use any of the standard [querying methods](active_record_querying.html) inside the scope block. The following ones are discussed below:]]]
 
 * `where`
 * `includes`
@@ -926,7 +925,7 @@ You can use any of the standard [querying methods](active_record_querying.html) 
 
 ##### `where`
 
-The `where` method lets you specify the conditions that the associated object must meet.
+`where` 메서드는 지정된 조건에 해당할때만 객체와 연관되도록 합니다. [[[The `where` method lets you specify the conditions that the associated object must meet.]]]
 
 ```ruby
 class Order < ActiveRecord::Base
@@ -936,7 +935,7 @@ end
 
 ##### `includes`
 
-You can use the `includes` method let you specify second-order associations that should be eager-loaded when this association is used. For example, consider these models:
+eager-loaded를 사용하고자 할때 `includes` 메서드를 사용합니다. 예를들어 다음과 같은 모델들이 있다고 가정하고 [[[You can use the `includes` method let you specify second-order associations that should be eager-loaded when this association is used. For example, consider these models:]]]
 
 ```ruby
 class LineItem < ActiveRecord::Base
@@ -953,7 +952,7 @@ class Customer < ActiveRecord::Base
 end
 ```
 
-If you frequently retrieve customers directly from line items (`@line_item.order.customer`), then you can make your code somewhat more efficient by including customers in the association from line items to orders:
+customers 모델로부터 line items 를 조회(`@line_item.order.customer`)하는 경우가 자주 있다면, 코드를 좀더 효율적으로 하기 위해 line item 의 orders 관계설정에 customer를 포함하도록 할수 있습니다. [[[If you frequently retrieve customers directly from line items (`@line_item.order.customer`), then you can make your code somewhat more efficient by including customers in the association from line items to orders:]]]
 
 ```ruby
 class LineItem < ActiveRecord::Base
@@ -970,21 +969,21 @@ class Customer < ActiveRecord::Base
 end
 ```
 
-NOTE: There's no need to use `includes` for immediate associations - that is, if you have `Order belongs_to :customer`, then the customer is eager-loaded automatically when it's needed.
+NOTE: 직접 관계가 설정되어 있는경우에는 `includes` 메서드를 사용할 필요가 없습니다. `Order belongs_to :customer` 관계설정의 경우 Order를 로딩할때 customer 객체는 필요할때 자동으로 eager-loaded 됩니다. [[[There's no need to use `includes` for immediate associations - that is, if you have `Order belongs_to :customer`, then the customer is eager-loaded automatically when it's needed.]]]
 
 ##### `readonly`
 
-If you use `readonly`, then the associated object will be read-only when retrieved via the association.
+`readonly`를 사용하면 연관된 객체는 관계를 통해 검색될 때 읽기전용으로 설정됩니다. [[[If you use `readonly`, then the associated object will be read-only when retrieved via the association.]]]
 
 ##### `select`
 
-The `select` method lets you override the SQL `SELECT` clause that is used to retrieve data about the associated object. By default, Rails retrieves all columns.
+`select` 메서드는 관계를 통해 데이터를 검색할때 `SELECT` 구문을 재정의 할 수 있도록 합니다. 레일스 기본설정은 모든 컬럼을 반환합니다. [[[The `select` method lets you override the SQL `SELECT` clause that is used to retrieve data about the associated object. By default, Rails retrieves all columns.]]]
 
-TIP: If you use the `select` method on a `belongs_to` association, you should also set the `:foreign_key` option to guarantee the correct results.
+TIP: `belongs_to` 관계설정에 `select`를 사용하는경우 `:foreign_key` 옵션을 설정해야 정확한 결과를 얻을수 있다. [[[If you use the `select` method on a `belongs_to` association, you should also set the `:foreign_key` option to guarantee the correct results.]]]
 
-#### Do Any Associated Objects Exist?
+#### [Do Any Associated Objects Exist?] 연관된 객체의 존재유무를 알 수 있는 방법
 
-You can see if any associated objects exist by using the `association.nil?` method:
+연관된 객체가 존재하는지 알기 위해서는 `association.nil?` 메서드로 확인하면 됩니다. [[[You can see if any associated objects exist by using the `association.nil?` method:]]]
 
 ```ruby
 if @order.customer.nil?
@@ -992,9 +991,9 @@ if @order.customer.nil?
 end
 ```
 
-#### When are Objects Saved?
+#### [When are Objects Saved?] 객체는 언제 저장되는가?
 
-Assigning an object to a `belongs_to` association does _not_ automatically save the object. It does not save the associated object either.
+특정 객체를 `belongs_to` 관계형으로 지정한다고 해서 자동으로 그 객체를 저장하지 _않습니다._ 또한, 연관된 객체도 저장하지 않습니다. [[[Assigning an object to a `belongs_to` association does _not_ automatically save the object. It does not save the associated object either.]]]
 
 ### `has_one` Association Reference
 
