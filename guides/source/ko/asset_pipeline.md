@@ -20,7 +20,7 @@
 [What is the Asset Pipeline?] Asset Pipeline이란 무엇인가?
 ---------------------------
 
-asset pipeline은 자바스크립트와 CSS 자원을 합치고 최소화 또는 압출하기 위한 프레임워크를 제공해 줍니다. 또한 Coffeescript, Sass, ERB와 같은 언어로 이러한 자원을 작성할 수 있도록 해 줍니다. [[[The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages such as CoffeeScript, Sass and ERB.]]]
+asset pipeline은 자바스크립트와 CSS 자원을 합치고 최소화 또는 압축하기 위한 프레임워크를 제공해 줍니다. 또한 Coffeescript, Sass, ERB와 같은 언어로 이러한 자원을 작성할 수 있도록 해 줍니다. [[[The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages such as CoffeeScript, Sass and ERB.]]]
 
 asset piepline을 레일스의 핵심 기능으로 만든 것은 모든 개발자들이 Sprockets라는 라이브러리를 이용하여 자원을 전처리하고 압축하고 최소화할 수 있는 잇점을 가질 수 있게 해 줍니다. 이것은 RailsConf 2011에서 DHH가 자신의 키노드에서 소개한 "fast by default" 전략의 일부분입니다. [[[Making the asset pipeline a core feature of Rails means that all developers can benefit from the power of having their assets pre-processed, compressed and minified by one central library, Sprockets. This is part of Rails' "fast by default" strategy as outlined by DHH in his keynote at RailsConf 2011.]]]
 
@@ -92,28 +92,28 @@ More reading:
 * [Revving Filenames: don’t use querystring](http://www.stevesouders.com/blog/2008/08/23/revving-filenames-dont-use-querystring/)
 
 
-How to Use the Asset Pipeline
+[How to Use the Asset Pipeline] Asset Pipeline 사용법
 -----------------------------
 
-In previous versions of Rails, all assets were located in subdirectories of `public` such as `images`, `javascripts` and `stylesheets`. With the asset pipeline, the preferred location for these assets is now the `app/assets` directory. Files in this directory are served by the Sprockets middleware included in the sprockets gem.
+레일스 이전 버전에서는, 모든 자원이 `public` 디렉토리의 하위 디렉토리인 `images`, `javascripts`, `stylesheets`에 위치했었습니다. Asset pipeline을 사용하게 되면, `app/assets` 디렉토리에 자원들이 위치하게 됩니다. 이 디렉토리 상의 파일들은 sprockets 젬을 설치할 경우 Sprockets 미들웨어에 의해서 처리됩니다. [[[In previous versions of Rails, all assets were located in subdirectories of `public` such as `images`, `javascripts` and `stylesheets`. With the asset pipeline, the preferred location for these assets is now the `app/assets` directory. Files in this directory are served by the Sprockets middleware included in the sprockets gem.]]]
 
-Assets can still be placed in the `public` hierarchy. Any assets under `public` will be served as static files by the application or web server. You should use `app/assets` for files that must undergo some pre-processing before they are served.
+Asset pipeline을 사용할 때도 자원들을 `public` 디렉토리에 둘 수 있습니다. `public` 디렉토리사의 모든 자원들은 어플리케이션이나 웹서버에 의해서 static 파일로서 사용될 것입니다. 따라서 사용하기 전에 어떤 전처리과정이 필요한 파일들은 `app/assets` 디렉토리에 두어야 합니다. [[[Assets can still be placed in the `public` hierarchy. Any assets under `public` will be served as static files by the application or web server. You should use `app/assets` for files that must undergo some pre-processing before they are served.]]]
 
-In production, Rails precompiles these files to `public/assets` by default. The precompiled copies are then served as static assets by the web server. The files in `app/assets` are never served directly in production.
+운영환경에서는, 레일스가 디폴트로 이러한 자원 파일들을 사전 컴파일해서 `public/assets` 디렉토리에 둡니다. 이 사전 컴파일된 파일들은 웹서버가 static 자원으로 사용하게 됩니다. `app/assets` 디렉토리에 있는 파일들은 운영환경에서 절대로 직접 사용되지 않습니다. [[[In production, Rails precompiles these files to `public/assets` by default. The precompiled copies are then served as static assets by the web server. The files in `app/assets` are never served directly in production.]]]
 
-### Controller Specific Assets
+### [Controller Specific Assets] 컨트롤러 전용 자원
 
-When you generate a scaffold or a controller, Rails also generates a JavaScript file (or CoffeeScript file if the `coffee-rails` gem is in the `Gemfile`) and a Cascading Style Sheet file (or SCSS file if `sass-rails` is in the `Gemfile`) for that controller.
+임의의 scaffold 또는 컨트롤러를 생성할 때 레일스는 해당 컨트롤러 전용 자바스크립 파일(또는 `Gemfile`에 `coffeescript-rails` 젬이 있다면 CoffeeScript 파일)과 CSS 파일(`Gemfile` 내에 `sass-rails`젬이 있다면 SCSS 파일)도 동시에 생성해 줍니다. [[[When you generate a scaffold or a controller, Rails also generates a JavaScript file (or CoffeeScript file if the `coffee-rails` gem is in the `Gemfile`) and a Cascading Style Sheet file (or SCSS file if `sass-rails` is in the `Gemfile`) for that controller.]]]
 
-For example, if you generate a `ProjectsController`, Rails will also add a new file at `app/assets/javascripts/projects.js.coffee` and another at `app/assets/stylesheets/projects.css.scss`. By default these files will be ready to use by your application immediately using the `require_tree` directive. See [Manifest Files and Directives](#manifest-files-and-directives) for more details on require_tree.
+예를 들어, `ProjectsController`를 생성한다면, 레일스는 동시에 `app/assets/javascripts/projects.js.coffee`와 `app/assets/stylesheets/projects.css.scss` 파일을 생성해 줍니다. 디폴트 상태에서, 이러한 파일들은 `require_tree` 명령어를 사용한 후에 어플리케이션에서 사용할 수 있게 됩니다. require_tree에 대한 자세한 내용은 [Manifest Files and Directives](#manifest-files-and-directives)를 보기 바랍니다. [[[For example, if you generate a `ProjectsController`, Rails will also add a new file at `app/assets/javascripts/projects.js.coffee` and another at `app/assets/stylesheets/projects.css.scss`. By default these files will be ready to use by your application immediately using the `require_tree` directive. See [Manifest Files and Directives](#manifest-files-and-directives) for more details on require_tree.]]]
 
-You can also opt to include controller specific stylesheets and JavaScript files only in their respective controllers using the following: `<%= javascript_include_tag params[:controller] %>` or `<%= stylesheet_link_tag params[:controller] %>`. Ensure that you are not using the `require_tree` directive though, as this will result in your assets being included more than once.
+또한 `<%= javascript_include_tag params[:controller] %>` 또는 `<%= stylesheet_link_tag params[:controller] %>`를 사용하게 되면 전용 CSS와 자바스크립트를 각각의 컨트롤러에서만 사용할 수 있습니다. 주의할 것은 `require_tree` 명령을 사용하지 않았는지를 확인해야 합니다. 왜냐하면 결과적으로 자원이 한번이상 포함될 것이기 때문입니다. [[[You can also opt to include controller specific stylesheets and JavaScript files only in their respective controllers using the following: `<%= javascript_include_tag params[:controller] %>` or `<%= stylesheet_link_tag params[:controller] %>`. Ensure that you are not using the `require_tree` directive though, as this will result in your assets being included more than once.]]]
 
-WARNING: When using asset precompilation (the production default), you will need to ensure that your controller assets will be precompiled when loading them on a per page basis. By default .coffee and .scss files will not be precompiled on their own. This will result in false positives during development as these files will work just fine since assets will be compiled on the fly. When running in production however, you will see 500 errors since live compilation is turned off by default. See [Precompiling Assets](#precompiling-assets) for more information on how precompiling works.
+WARNING: (운영환경의 디폴트 상태에서는) 자원을 사전 컴파일할 때는, 컨트롤러 전용 자원이 해당 페이지가 로딩될 때마다 사전 컴파일되는 것을 확인할 필요가 있습니다. 디폴트로, .coffee 와 .scss 파일은 사전 컴파일되지 않습니다. 개발환경에서는 이러한 파일들이 임시로 컴파일되기 때문에 사전 컴파일될 듯한 효과를 보이게 되어 제대로 동작할 것입니다. 그러나 운영환경에서 실행할 때는, 디폴트로 실시간 컴파일작업이 꺼진 상태이므로 500 에러가 발생하게 될 것입니다. 사전 컴파일 작업이 어떻게 동작하는지에 대한 자셍한 내용은 [Precompiling Assets](#precompiling-assets)를 보기 바랍니다. [[[When using asset precompilation (the production default), you will need to ensure that your controller assets will be precompiled when loading them on a per page basis. By default .coffee and .scss files will not be precompiled on their own. This will result in false positives during development as these files will work just fine since assets will be compiled on the fly. When running in production however, you will see 500 errors since live compilation is turned off by default. See [Precompiling Assets](#precompiling-assets) for more information on how precompiling works.]]]
 
-NOTE: You must have an ExecJS supported runtime in order to use CoffeeScript. If you are using Mac OS X or Windows you have a JavaScript runtime installed in your operating system. Check [ExecJS](https://github.com/sstephenson/execjs#readme) documentation to know all supported JavaScript runtimes.
+NOTE: CoffeeScript를 사용하기 위해서는 ExecJS를 지원하는 런타임 라이브러리가 설치되어 있어야 합니다. Mac OS X 또는 윈도우즈를 사용하는 경우라면, 해당 운영 시스템에 자바스크립트 런타임 라이브러리를 설치해 주어야 합니다. 지원 가능한 모든 자바스크립트 런타임 라이브러리를 알기를 원하면 [ExecJS](https://github.com/sstephenson/execjs#readme) 문서를 참고하기 바랍니다. [[[You must have an ExecJS supported runtime in order to use CoffeeScript. If you are using Mac OS X or Windows you have a JavaScript runtime installed in your operating system. Check [ExecJS](https://github.com/sstephenson/execjs#readme) documentation to know all supported JavaScript runtimes.]]]
 
-You can also disable the generation of asset files when generating a controller by adding the following to your `config/application.rb` configuration:
+물론, `config/application.rb` 설정 파일에 아래의 코드라인을 추가해서 컨트롤러가 생성될 때 자원 파일들의 생성을 방지할 수 있습니다. [[[You can also disable the generation of asset files when generating a controller by adding the following to your `config/application.rb` configuration:]]]
 
 ```ruby
 config.generators do |g|
@@ -121,23 +121,23 @@ config.generators do |g|
 end
 ```
 
-### Asset Organization
+### [Asset Organization] 자원의 구성
 
-Pipeline assets can be placed inside an application in one of three locations: `app/assets`, `lib/assets` or `vendor/assets`.
+Pipeline 자원들은 어플리케이션내의 `app/assets`, `lib/assets`, `vendor/assets` 디렉토리 중의 하나에 위치할 수 있습니다. [[[Pipeline assets can be placed inside an application in one of three locations: `app/assets`, `lib/assets` or `vendor/assets`.]]]
 
-* `app/assets` is for assets that are owned by the application, such as custom images, JavaScript files or stylesheets.
+* `app/assets` 디렉토리에는, 예를 들어, 개발자가 어플리케이션에서 사용하기 위해서는 추가하는 이미지 파일, 자바스크립트 파일 또는 스타일시트 파일들을 둘 수 있습니다. [[[`app/assets` is for assets that are owned by the application, such as custom images, JavaScript files or stylesheets.]]]
 
-* `lib/assets` is for your own libraries' code that doesn't really fit into the scope of the application or those libraries which are shared across applications.
+* `lib/assets` 디렉토리에는, 어플리케이션의 영역을 벗어나는 라이브러리나, 어플케이션 간에 공유할 수 있는 라이브러리를 위한 자원들을 둘 수 있습니다. [[[`lib/assets` is for your own libraries' code that doesn't really fit into the scope of the application or those libraries which are shared across applications.]]]
 
-* `vendor/assets` is for assets that are owned by outside entities, such as code for JavaScript plugins and CSS frameworks.
+* `vendor/assets` 디렉토리에는, 자바스크립트 프러그인과 CSS 프레임워크와 같은 외부에서 사용하는 자원들을 둘 수 있습니다. [[[`vendor/assets` is for assets that are owned by outside entities, such as code for JavaScript plugins and CSS frameworks.]]]
 
-#### Search Paths
+#### [Search Paths] 검색 경로
 
-When a file is referenced from a manifest or a helper, Sprockets searches the three default asset locations for it.
+임의의 manifest 파일이나 헬퍼 파일이 특정 파일을 참조할 때 Sprockets는 3개의 디폴트 위치를 검색하게 됩니다. [[[When a file is referenced from a manifest or a helper, Sprockets searches the three default asset locations for it.]]]
 
-The default locations are: `app/assets/images` and the subdirectories `javascripts` and `stylesheets` in all three asset locations, but these subdirectories are not special. Any path under `assets/*` will be searched.
+디폴트 위치는 `app/assets/images`와 3개의 모든 위치에서 `javascripts`, `stylesheets` 라는 하위디렉토리입니다. 그러나 이러한 하위디렉토리는 특별한 의미가 있는 것은 아닙니다. `assets/*` 아래의 모든 경로를 찾게 될 것입니다. [[[The default locations are: `app/assets/images` and the subdirectories `javascripts` and `stylesheets` in all three asset locations, but these subdirectories are not special. Any path under `assets/*` will be searched.]]]
 
-For example, these files:
+예를 들어, 아래의 파일들은 [[[For example, these files:]]]
 
 ```
 app/assets/javascripts/home.js
@@ -146,7 +146,7 @@ vendor/assets/javascripts/slider.js
 vendor/assets/somepackage/phonebox.js
 ```
 
-would be referenced in a manifest like this:
+아래의 manifest 파일에서 각각 참조될 것입니다. [[[would be referenced in a manifest like this:]]]
 
 ```js
 //= require home
@@ -155,29 +155,29 @@ would be referenced in a manifest like this:
 //= require phonebox
 ```
 
-Assets inside subdirectories can also be accessed.
+하위디렉토리에 위치하는 자원들도 검색할 수 있습니다. [[[Assets inside subdirectories can also be accessed.]]]
 
 ```
 app/assets/javascripts/sub/something.js
 ```
 
-is referenced as:
+위의 파일은 아래와 같이 참조할 수 있습니다. [[[is referenced as:]]]
 
 ```js
 //= require sub/something
 ```
 
-You can view the search path by inspecting `Rails.application.config.assets.paths` in the Rails console.
+레일스 콘솔에서 `Rails.application.config.assets.paths`로 Sprockets의 검색경로를 확인할 수 있습니다. [[[You can view the search path by inspecting `Rails.application.config.assets.paths` in the Rails console.]]]
 
-Besides the standard `assets/*` paths, additional (fully qualified) paths can be added to the pipeline in `config/application.rb`. For example:
+레일스 디폴트 경로인 `assets/*` 뿐만아니라, `config/application.rb` 파일에 아래와 같이 코드라인을 추가하여, 특정 경로(절대경로)를 pipleline에 추가할 수도 있습니다. 예를 들면, [[[Besides the standard `assets/*` paths, additional (fully qualified) paths can be added to the pipeline in `config/application.rb`. For example:]]]
 
 ```ruby
 config.assets.paths << Rails.root.join("lib", "videoplayer", "flash")
 ```
 
-Paths are traversed in the order that they occur in the search path. By default, this means the files in `app/assets` take precedence, and will mask corresponding paths in `lib` and `vendor`.
+검색경로상에 나타나는 순서대로 경로 탐색이 실행됩니다. 디폴트 상태에서는 `app/assets` 경로가 우선적으로 검색되고 동일한 파일이 `lib`과 `vendor` 디렉토리상에 있을 때는 검색되지 않게 됩니다. [[[Paths are traversed in the order that they occur in the search path. By default, this means the files in `app/assets` take precedence, and will mask corresponding paths in `lib` and `vendor`.]]]
 
-It is important to note that files you want to reference outside a manifest must be added to the precompile array or they will not be available in the production environment.
+[[[It is important to note that files you want to reference outside a manifest must be added to the precompile array or they will not be available in the production environment.]]]
 
 #### Using Index Files
 

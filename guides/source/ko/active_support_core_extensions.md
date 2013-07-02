@@ -2974,11 +2974,11 @@ clear.bind({a: 1}).call # => {}
 Proc.new { size }.bind([]).call # => 0
 ```
 
-아는 바와 같이, 인수에 bind되어 호출가능하게 되어 반환값은 비로서 하나의 `Method`가 되는 것입니다. [[[As you see that's callable and bound to the argument, the return value is indeed a `Method`.]]]
+인수에 bind되어 호출가능하게 되면 알다시피, 그 반환값은 비로서 하나의 `Method`가 되는 것입니다. [[[As you see that's callable and bound to the argument, the return value is indeed a `Method`.]]]
 
 NOTE: 이를 위해서 `Proc#bind` 메소드는 실제로 백그라운드에서 하나의 메소드를 생성합니다. `__bind_1256598120_237302`와 같은 이상한 이름을 스택 상에서 보게 될 경우 이 메소드가 어디로부터 유래한 것인지를 알 수 있을 것입니다. [[[To do so `Proc#bind` actually creates a method under the hood. If you ever see a method with a weird name like `__bind_1256598120_237302` in a stack trace you know now where it comes from.]]]
 
-예를 들어 액션팩은 이러한 기법을 `rescue_from`에서 사용하는데, 이 메소드는 메소드명과 해당 예외를 처리할 콜백으로 하나의 Proc객체를 받게 됩니다. 이러한 예외를 처리하기 위해서는 해당 메소드와 콜백을 호출해야 하며 `handler_for_rescue` 메소드는 하나의 bound 메소드를 반환하여 호출자에서 코드를 간소화해 줍니다. [[[Action Pack uses this trick in `rescue_from` for example, which accepts the name of a method and also a proc as callbacks for a given rescued exception. It has to call them in either case, so a bound method is returned by `handler_for_rescue`, thus simplifying the code in the caller:]]]
+예를 들어 액션팩은 이러한 기법을 `rescue_from`에서 사용하는데, 이 메소드는 메소드명과 해당 예외를 처리할 콜백으로 하나의 Proc객체를 받게 됩니다. 이러한 예외를 처리하기 위해서는 해당 메소드와 콜백을 호출해야 하며 `handler_for_rescue` 메소드는 하나의 bound 메소드를 반환함으로써 호출자에서 코드를 간소화해 줍니다. [[[Action Pack uses this trick in `rescue_from` for example, which accepts the name of a method and also a proc as callbacks for a given rescued exception. It has to call them in either case, so a bound method is returned by `handler_for_rescue`, thus simplifying the code in the caller:]]]
 
 ```ruby
 def handler_for_rescue(exception)
@@ -3004,13 +3004,13 @@ NOTE: 이 메소드는 `active_support/core_ext/proc.rb` 파일내에 정의되�
 
 NOTE: 다음에 나오는 모든 메소드는 `active_support/core_ext/date/calculations.rb` 파일내에 정의되어 있습니다. [[[All the following methods are defined in `active_support/core_ext/date/calculations.rb`.]]]
 
-INFO: 다음의 날짜 연산 메소드들은 1582년 10월에 대해서 5..14 사이의 날짜가 존재하지 않기 때문에 극단적인 경우를 보여 줍니다. 본 가이드는 지면을 절약하기 위해 이 날짜들에 대한 이상한 동적에 대해서 기술하지 않지만 예상대로 동적한다고 말하기에 충분합니다. 즉, `Date.new(1582, 10, 4).tomorrow`는 `Date.new(1582, 10, 15)` 등과 같이 반환하게 되는데, 자세한 것을 `test/core_ext/date_ext_test.rb` 파일을 검토해 보기 바랍니다. [[[The following calculation methods have edge cases in October 1582, since days 5..14 just do not exist. This guide does not document their behavior around those days for brevity, but it is enough to say that they do what you would expect. That is, `Date.new(1582, 10, 4).tomorrow` returns `Date.new(1582, 10, 15)` and so on. Please check `test/core_ext/date_ext_test.rb` in the Active Support test suite for expected behavior.]]]
+INFO: 다음의 날짜 연산 메소드들은 1582년 10월에 대해서 5..14 사이의 날짜가 존재하지 않기 때문에 극단적인 경우를 보여 줍니다. 본 가이드는 지면을 절약하기 위해 이 날짜들에 대한 이상한 동작에 대해서 기술하지 않지만 예상대로 동작한다고 말하기에 충분합니다. 즉, `Date.new(1582, 10, 4).tomorrow`는 `Date.new(1582, 10, 15)` 등과 같이 반환하게 되는데, 자세한 것을 `test/core_ext/date_ext_test.rb` 파일을 검토해 보기 바랍니다. [[[The following calculation methods have edge cases in October 1582, since days 5..14 just do not exist. This guide does not document their behavior around those days for brevity, but it is enough to say that they do what you would expect. That is, `Date.new(1582, 10, 4).tomorrow` returns `Date.new(1582, 10, 15)` and so on. Please check `test/core_ext/date_ext_test.rb` in the Active Support test suite for expected behavior.]]]
 
 #### `Date.current`
 
 액티브서포트는 현재 시간대역의 금일 날짜를 알려주는 `Date.current` 메소드를 지원합니다. 사용자 시간대역(정의되어 있다면)을 고려하는 것만 제외하고는 `Date.today` 메소드와 비슷합니다. 한편 `Date.yesterday`와 `Date.tomorrow` 메소드도 지원하고 기타 `past?`, `today?`, `future?` 메소드도 지원합니다. 이 모든 메소드는 `Date.current`에 대한 상대적인 결과를 반환해 줍니다. [[[Active Support defines `Date.current` to be today in the current time zone. That's like `Date.today`, except that it honors the user time zone, if defined. It also defines `Date.yesterday` and `Date.tomorrow`, and the instance predicates `past?`, `today?`, and `future?`, all of them relative to `Date.current`.]]]
 
-사용자 시간대역을 고려하는 메소드를 이용하여 날짜 비교를 할 때 `Date.today`보다는 `Date.current` 메소드를 사용해야 합니다. 그러나 사용자 시간대역을 시스템 시간역과 비교해야 할 경우도 있을 것입니다. 이 때 시스템 시간대역은 `Date.today` 메소드가 디폴트로 사용합니다. 이 말은 `Date.today`와 `Date.yesterday` 결과 값이 같을 수 있다는 것을 의미합니다. [[[When making Date comparisons using methods which honor the user time zone, make sure to use `Date.current` and not `Date.today`. There are cases where the user time zone might be in the future compared to the system time zone, which `Date.today` uses by default. This means `Date.today` may equal `Date.yesterday`.]]]
+사용자 시간대역을 고려하는 메소드를 이용하여 날짜 비교를 할 때 `Date.today`보다는 `Date.current` 메소드를 사용해야 합니다. 그러나 사용자 시간대역을 시스템 시간대역과 비교해야 할 경우도 있을 것입니다. 이 때 시스템 시간대역은 `Date.today` 메소드가 디폴트로 사용합니다. 이 말은 `Date.today`와 `Date.yesterday` 결과 값이 같을 수 있다는 것을 의미합니다. [[[When making Date comparisons using methods which honor the user time zone, make sure to use `Date.current` and not `Date.today`. There are cases where the user time zone might be in the future compared to the system time zone, which `Date.today` uses by default. This means `Date.today` may equal `Date.yesterday`.]]]
 
 #### [Named dates] 이름을 가지는 날짜들
 
@@ -3024,7 +3024,7 @@ d.prev_year              # => Fri, 08 May 2009
 d.next_year              # => Sun, 08 May 2011
 ```
 
-만역 윤년 2월 29일일 경우에는 각 메소드의 반환값은 28일자가 될 것입니다. [[[If date is the 29th of February of a leap year, you obtain the 28th:]]]
+만약, 윤년 2월 29일일 경우에는 각 메소드의 반환값은 28일자가 될 것입니다. [[[If date is the 29th of February of a leap year, you obtain the 28th:]]]
 
 ```ruby
 d = Date.new(2000, 2, 29) # => Tue, 29 Feb 2000
@@ -3258,7 +3258,7 @@ Date.new(2010, 1, 31).change(month: 2)
 # => ArgumentError: invalid date
 ```
 
-#### Durations
+#### [Durations] 기간연산
 
 일자에서 일정 기간을 더하고 뺄 수 있습니다. [[[Durations can be added to and subtracted from dates:]]]
 
@@ -3367,7 +3367,7 @@ WARNING: `DateTime`은 DST(Daylight Saving Time)을 알지 못해서 DST가 변�
 
 NOTE: 다음의 모든 메소드는 `active_support/core_ext/date_time/calculations.rb` 파일내에 정의되어 있습니다. [[[All the following methods are defined in `active_support/core_ext/date_time/calculations.rb`.]]]
 
-`DateTime` 클래스는 `Date`의 하위 클래스이기 때문에 `active_support/core_ext/date/calculations.rb`를 로딩하면 이러한 메소드(와 기타 별칭메소드)를 그대로 상속받아 사용할 수 있습니다. 이때 이들 메소드가 반환하는 것을 datetime형이 될 것입니다. [[[The class `DateTime` is a subclass of `Date` so by loading `active_support/core_ext/date/calculations.rb` you inherit these methods and their aliases, except that they will always return datetimes:]]]
+`DateTime` 클래스는 `Date`의 하위 클래스이기 때문에 `active_support/core_ext/date/calculations.rb`를 로딩하면 이러한 메소드(와 기타 별칭메소드)를 그대로 상속받아 사용할 수 있습니다. 이때 이들 메소드가 반환하는 것은 datetime형이 될 것입니다. [[[The class `DateTime` is a subclass of `Date` so by loading `active_support/core_ext/date/calculations.rb` you inherit these methods and their aliases, except that they will always return datetimes:]]]
 
 ```ruby
 yesterday
@@ -3482,7 +3482,7 @@ d.advance(seconds: 1).advance(months: 1)
 
 WARNING: `DateTime` 클래스는 DST를 인식하지 못하기 때문에 존재하지 않는 시점에서 경고나 에러 없이 연산처리가 종료될 수 있습니다. [[[Since `DateTime` is not DST-aware you can end up in a non-existing point in time with no warning or error telling you so.]]]
 
-#### Changing Components
+#### [Changing Components] 날짜시간 요소 변경하기
 
 `:year`, `:month`, `:day`, `:hour`, `:min`, `:sec`, `:offset`, `:start` 옵션을 지정하여 `change` 메소드를 이용하면, receiver와 같은 새로운 datetime형 객체를 생성할 수 있습니다. [[[The method `change` allows you to get a new datetime which is the same as the receiver except for the given options, which may include `:year`, `:month`, `:day`, `:hour`, `:min`, `:sec`, `:offset`, `:start`:]]]
 
@@ -3634,7 +3634,7 @@ now.all_year
 # => Fri, 01 Jan 2010 00:00:00 UTC +00:00..Fri, 31 Dec 2010 23:59:59 UTC +00:00
 ```
 
-### Time Constructors
+### [Time Constructors] Time 생성자
 
 액티브서포트는 사용자 시간대역이 정의되어 있는 경우 `Time.current`가 `Time.zone.now` 결과값을 반환하도록 정의합니다. 그렇지 못할 경우에는 `Time.now` 값을 반환합니다. [[[Active Support defines `Time.current` to be `Time.zone.now` if there's a user time zone defined, with fallback to `Time.now`:]]]
 
@@ -3741,7 +3741,7 @@ end
 
 ### `datetime_format=`
 
-이 로거와 연과된 formatter 클래스를 이용하여 datetime 포맷을 변경합니다. 해당 formatter 클래스가 `datetime_format` 메소드를 가지고 있지 않으면, 이것은 무시됩니다. [[[Modifies the datetime format output by the formatter class associated with this logger. If the formatter class does not have a `datetime_format` method then this is ignored.]]]
+이 로거와 연관된 formatter 클래스를 이용하여 datetime 포맷을 변경합니다. 해당 formatter 클래스가 `datetime_format` 메소드를 가지고 있지 않으면, 이것은 무시됩니다. [[[Modifies the datetime format output by the formatter class associated with this logger. If the formatter class does not have a `datetime_format` method then this is ignored.]]]
 
 ```ruby
 class Logger::FormatWithTime < Logger::Formatter
@@ -3768,7 +3768,7 @@ NOTE: 이 메소드는 `active_support/core_ext/logger.rb` 파일내에 정의�
 
 TIP: 심볼은 `:"ActiveRecord::Base`와 같이 절대경로를 포함한 상수명으로 표시할 수 있습니다. 따라서 심볼에 대한 기능은 기술적인 문제가 아니라 편리함 때문에 정의하여 사용합니다. [[[A symbol can represent a fully-qualified constant name as in `:"ActiveRecord::Base"`, so the behavior for symbols is defined for convenience, not because it has to be that way technically.]]]
 
-예를 들면, `PostsController`의 임의의 액션이 호출될 때, 레일스는 `PostHelper`를 사용하고자 할 것입니다. 이 helper 모듈이 존재하지 않아서 문제가 없기 때문에, 해당 상수명에 대한 예외가 발생하더라도 무시되어야 합니다. 그러나, 실제로 존재하지 않는 상수로 인하여 `posts_helper.rb`가 `NameError` 예외를 발생시키게 되는 경우가 있을 수 있습니다. 그러한 경우는 다시금 예외를 발생시켜주어야 하는데 바로 `missing_name?` 메소드가 이러한 두 경우를 구분하는 방법을 제공해 주게 되는 것입니다. [[[For example, when an action of `PostsController` is called Rails tries optimistically to use `PostsHelper`. It is OK that the helper module does not exist, so if an exception for that constant name is raised it should be silenced. But it could be the case that `posts_helper.rb` raises a `NameError` due to an actual unknown constant. That should be reraised. The method `missing_name?` provides a way to distinguish both cases:]]]
+예를 들면, `PostsController`의 임의의 액션이 호출될 때, 레일스는 `PostsHelper`를 사용하고자 할 것입니다. 이 helper 모듈이 존재하지 않아도 문제가 없기 때문에, 해당 상수명에 대한 예외가 발생하더라도 무시되어야 합니다. 그러나, 실제로 존재하지 않는 상수로 인하여 `posts_helper.rb`가 `NameError` 예외를 발생시키게 되는 경우가 있을 수 있습니다. 그러한 경우는 다시금 예외를 발생시켜주어야 하는데 바로 `missing_name?` 메소드가 이러한 두 경우를 구분하는 방법을 제공해 주게 되는 것입니다. [[[For example, when an action of `PostsController` is called Rails tries optimistically to use `PostsHelper`. It is OK that the helper module does not exist, so if an exception for that constant name is raised it should be silenced. But it could be the case that `posts_helper.rb` raises a `NameError` due to an actual unknown constant. That should be reraised. The method `missing_name?` provides a way to distinguish both cases:]]]
 
 ```ruby
 def default_helper_module!
@@ -3787,11 +3787,11 @@ NOTE: 이 메소드는 `active_support/core_ext/name_error.rb` 파일내에 정�
 [Extensions to `LoadError`] `LoadError` 클래스 확장메소드
 -------------------------
 
-액티브서포트는 `LoadError` 클래스에 `is_messing?` 메소드를 추가해 줍니다. 그리고 이전 버전과의 호환성을 위해서 이 클래스에 `MissingSourceFile` 상수를 할당해 줍니다. [[[Active Support adds `is_missing?` to `LoadError`, and also assigns that class to the constant `MissingSourceFile` for backwards compatibility.]]]
+액티브서포트는 `LoadError` 클래스에 `is_missing?` 메소드를 추가해 줍니다. 그리고 이전 버전과의 호환성을 위해서 이 클래스에 `MissingSourceFile` 상수를 할당해 줍니다. [[[Active Support adds `is_missing?` to `LoadError`, and also assigns that class to the constant `MissingSourceFile` for backwards compatibility.]]]
 
 경로명이 주어질 때 `is_missing`? 메소드는 ".rb" 확장자를 제외한 특정 파일에 기인한 예외가 발생했는지를 알려 줍니다. [[[Given a path name `is_missing?` tests whether the exception was raised due to that particular file (except perhaps for the ".rb" extension).]]]
 
-예를 들면, `PostsController`의 특정 액션이 호출될 때 레일스는 `post_helper.rb` 파일을 로드하기 위한 시도를 합니다. 그러나, 이 파일이 존재하지 않을 수 있습니다. 그래도 별 문제는 발생하지 않는데, 헬퍼 모듈이 반드시 있어야 하는 것이 아니기 때문에 레일스는 파일 로드시 발생하는 에러를 묵인하고 넘어갑니다. 그러나, 헬퍼 모듈이 존재하는 경우 존재하지 않는 또 다른 라이브러리를 요구할 수 있습니다. 이런 경우에 레일스는 예외를 재발생시켜야만 합니다. `is_missing?` 메소드는 이 둘 경우를 구분할 수 있는 방법을 제공해 줍니다. [[[For example, when an action of `PostsController` is called Rails tries to load `posts_helper.rb`, but that file may not exist. That's fine, the helper module is not mandatory so Rails silences a load error. But it could be the case that the helper module does exist and in turn requires another library that is missing. In that case Rails must reraise the exception. The method `is_missing?` provides a way to distinguish both cases:]]]
+예를 들면, `PostsController`의 특정 액션이 호출될 때 레일스는 `posts_helper.rb` 파일을 로드하기 위한 시도를 합니다. 그러나, 이 파일이 존재하지 않을 수 있습니다. 그래도 별 문제는 발생하지 않는데, 헬퍼 모듈이 반드시 있어야 하는 것이 아니기 때문에 레일스는 파일 로드시 발생하는 에러를 묵인하고 넘어갑니다. 그러나, 헬퍼 모듈이 존재하는 경우 존재하지 않는 또 다른 라이브러리를 요구할 수 있습니다. 이런 경우에 레일스는 예외를 재발생시켜야만 합니다. `is_missing?` 메소드는 이 둘 경우를 구분할 수 있는 방법을 제공해 줍니다. [[[For example, when an action of `PostsController` is called Rails tries to load `posts_helper.rb`, but that file may not exist. That's fine, the helper module is not mandatory so Rails silences a load error. But it could be the case that the helper module does exist and in turn requires another library that is missing. In that case Rails must reraise the exception. The method `is_missing?` provides a way to distinguish both cases:]]]
 
 ```ruby
 def default_helper_module!
