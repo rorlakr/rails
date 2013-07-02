@@ -997,18 +997,18 @@ end
 
 ### `has_one` Association Reference
 
-The `has_one` association creates a one-to-one match with another model. In database terms, this association says that the other class contains the foreign key. If this class contains the foreign key, then you should use `belongs_to` instead.
+`has_one` association은 다른 모델과 일대일관계를 생성합니다. 데이터베이스용어로는 다른 클래스가 foreign key를 가지고 있다고 합니다. 만약 이 클래스가 foreign key를 가지고 있다면 `belongs_to`를 사용해야합니다. [[[The `has_one` association creates a one-to-one match with another model. In database terms, this association says that the other class contains the foreign key. If this class contains the foreign key, then you should use `belongs_to` instead.]]]
 
-#### Methods Added by `has_one`
+#### [Methods Added by `has_one`] `has_one`에 의해 추가된 메소드
 
-When you declare a `has_one` association, the declaring class automatically gains four methods related to the association:
+`has_one` 관계선언을 하게 되면, 선언하는 클래스는 자동으로 다음의 4가지 메소드를 사용할 수 있게 됩니다. [[[When you declare a `has_one` association, the declaring class automatically gains four methods related to the association:]]]
 
 * `association(force_reload = false)`
 * `association=(associate)`
 * `build_association(attributes = {})`
 * `create_association(attributes = {})`
 
-In all of these methods, `association` is replaced with the symbol passed as the first argument to `has_one`. For example, given the declaration:
+위의 모든 메소드에서 `association` 을 `has_one` 의 첫번째 인수로 받은 심볼로 바꾸면 됩니다. 예를 들어, 다음과 같이 선언하면, [[[In all of these methods, `association` is replaced with the symbol passed as the first argument to `has_one`. For example, given the declaration:]]]
 
 ```ruby
 class Supplier < ActiveRecord::Base
@@ -1016,7 +1016,7 @@ class Supplier < ActiveRecord::Base
 end
 ```
 
-Each instance of the `Supplier` model will have these methods:
+`Supplier` 모델의 각 인스턴스는 다음과 같은 메소드를 가지게 될 것입니다. [[[Each instance of the `Supplier` model will have these methods:]]]
 
 ```ruby
 account
@@ -1025,21 +1025,21 @@ build_account
 create_account
 ```
 
-NOTE: When initializing a new `has_one` or `belongs_to` association you must use the `build_` prefix to build the association, rather than the `association.build` method that would be used for `has_many` or `has_and_belongs_to_many` associations. To create one, use the `create_` prefix.
+NOTE: `has_one` 또는 `belongs_to` 관계형을 새로 생성해서 초기화할 때는, `has_many` 또는 `has_and_belongs_to_many` 관계형에 대해서 사용되는 `association.build` 메소드보다는, 관계형을 만들 때 선언시 넘겨주는 첫번째 인수에 `build_` 를 붙여서 사용해야 합니다. 초기화가 아니라 생성할 때는 `create_` 를 붙여서 사용합니다. [[[When initializing a new `has_one` or `belongs_to` association you must use the `build_` prefix to build the association, rather than the `association.build` method that would be used for `has_many` or `has_and_belongs_to_many` associations. To create one, use the `create_` prefix.]]]
 
 ##### `association(force_reload = false)`
 
-The `association` method returns the associated object, if any. If no associated object is found, it returns `nil`.
+`association` 메소드는 연결된 객체가 있을 경우 그것을 반환합니다. 연결된 객체가 없는 경우에는, nil 값을 반환하게 됩니다. [[[The `association` method returns the associated object, if any. If no associated object is found, it returns `nil`.]]]
 
 ```ruby
 @account = @supplier.account
 ```
 
-If the associated object has already been retrieved from the database for this object, the cached version will be returned. To override this behavior (and force a database read), pass `true` as the `force_reload` argument.
+연관된 객체가 이미 이 객체에 대해서 데이터베이스로부터 데이터를 가져온 상태라면 캐시된 버전이 반환될 것입니다. 이 때 강제로 데이터베이스로부터 데이터를 다시 불러오고자 할 경우에는, `force_reload` 값으로 `true` 값을 넘겨주어야 합니다. [[[If the associated object has already been retrieved from the database for this object, the cached version will be returned. To override this behavior (and force a database read), pass `true` as the `force_reload` argument.]]]
 
 ##### `association=(associate)`
 
-The `association=` method assigns an associated object to this object. Behind the scenes, this means extracting the primary key from this object and setting the associate object's foreign key to the same value.
+`association=` 메소드는 이 객체에 연관된 객체를 할당합니다. 보이지 않는곳에서 이루어지는 작업을 살펴보면 이객체의 primary key 값과 동일한값을 연관된 객체의 foreign key 에 저장합니다. [[[The `association=` method assigns an associated object to this object. Behind the scenes, this means extracting the primary key from this object and setting the associate object's foreign key to the same value.]]]
 
 ```ruby
 @supplier.account = @account
@@ -1047,7 +1047,7 @@ The `association=` method assigns an associated object to this object. Behind th
 
 ##### `build_association(attributes = {})`
 
-The `build_association` method returns a new object of the associated type. This object will be instantiated from the passed attributes, and the link through its foreign key will be set, but the associated object will _not_ yet be saved.
+`build_association` 메소드는 해당 관계형의 새로운 객체를 반환해 줍니다. 그리고, 이 객체는 매개변수로 넘어온 속성값으로 초기화되며, 연관된 객체에 foreign key 값은 설정될 것이지만, 연관된 객체는 아직 저장되지 않은 상태입니다. [[[The `build_association` method returns a new object of the associated type. This object will be instantiated from the passed attributes, and the link through its foreign key will be set, but the associated object will _not_ yet be saved.]]]
 
 ```ruby
 @account = @supplier.build_account(terms: "Net 30")
@@ -1055,15 +1055,15 @@ The `build_association` method returns a new object of the associated type. This
 
 ##### `create_association(attributes = {})`
 
-The `create_association` method returns a new object of the associated type. This object will be instantiated from the passed attributes, the link through its foreign key will be set, and, once it passes all of the validations specified on the associated model, the associated object _will_ be saved.
+`create_association` 메소드는 해당 관계형의 새로운 객체를 반환해 줍니다. 이 객체는 넘어온 속성으로 초기화되며, 연관된 객체에 foreign key 값이 설정됩니다. 또한, 연관된 객체의 모든 유효성 검증을 통과하면 저장될 것입니다. [[[The `create_association` method returns a new object of the associated type. This object will be instantiated from the passed attributes, the link through its foreign key will be set, and, once it passes all of the validations specified on the associated model, the associated object _will_ be saved.]]]
 
 ```ruby
 @account = @supplier.create_account(terms: "Net 30")
 ```
 
-#### Options for `has_one`
+#### [Options for `has_one`] `has_one` 옵션
 
-While Rails uses intelligent defaults that will work well in most situations, there may be times when you want to customize the behavior of the `has_one` association reference. Such customizations can easily be accomplished by passing options when you create the association. For example, this association uses two such options:
+대부분의 경우 레일스의 기본설정값은 잘 작동하지만, `has_one`의 동작을 커스터마이징하고 싶을때가 있을것입니다. `association`을 설정할때 옵션을 추가해서 쉽게 커스터마이제이션 할 수 있습니다. 예를 들어, 몇가지 옵션을 가지는 관계설정은 다음과 같습니다. [[[While Rails uses intelligent defaults that will work well in most situations, there may be times when you want to customize the behavior of the `has_one` association reference. Such customizations can easily be accomplished by passing options when you create the association. For example, this association uses two such options:]]]
 
 ```ruby
 class Supplier < ActiveRecord::Base
@@ -1071,7 +1071,7 @@ class Supplier < ActiveRecord::Base
 end
 ```
 
-The `has_one` association supports these options:
+`has_one` 메소드는 다음과 같은 옵션을 사용할 수 있습니다. [[[The `has_one` association supports these options:]]]
 
 * `:as`
 * `:autosave`
