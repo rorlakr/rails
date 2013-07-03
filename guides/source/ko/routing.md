@@ -587,17 +587,20 @@ end
 
 특히, 간단한 라우팅은 레거시 URL을 새로운 레일스 액션에 손쉽게 매핑할 수 있습니다. [[[In particular, simple routing makes it very easy to map legacy URLs to new Rails actions.]]]
 
-### Bound Parameters
+### [Bound Parameters] 바인딩된 매개변수
 
-When you set up a regular route, you supply a series of symbols that Rails maps to parts of an incoming HTTP request. Two of these symbols are special: `:controller` maps to the name of a controller in your application, and `:action` maps to the name of an action within that controller. For example, consider this route:
+정규 라우트를 설정할 때, 레일스가 들어오는 HTTP 요청 부분을 매핑하는 일련의 심볼을 제공합니다. [[[When you set up a regular route, you supply a series of symbols that Rails maps to parts of an incoming HTTP request.]]]
+이들 두 심볼은 특별합니다: `:controller` 심볼은 응용프로그램의 컨트롤러 명에 매핑하고, `:action` 심볼은 컨트롤러 안의 액션명에 매핑합니다. [[[Two of these symbols are special: `:controller` maps to the name of a controller in your application, and `:action` maps to the name of an action within that controller.]]]
+예를 들어, 다음 라우트를 고려해 보십시오: [[[For example, consider this route:]]]
 
 ```ruby
 get ':controller(/:action(/:id))'
 ```
 
-If an incoming request of `/photos/show/1` is processed by this route (because it hasn't matched any previous route in the file), then the result will be to invoke the `show` action of the `PhotosController`, and to make the final parameter `"1"` available as `params[:id]`. This route will also route the incoming request of `/photos` to `PhotosController#index`, since `:action` and `:id` are optional parameters, denoted by parentheses.
+만약 들어오는 요청 `/photos/show/1`이 (파일 내 이전의 어떤 라우트에도 일지하지 않아) 위 라우트에 의해 처리되었다면, 결과는 `PhotosController`의 `show` 액션을 불러들일 것이고 마지막 매개변수 `"1"`을 `params[:id]`로 사용 가능하게 할 것입니다. [[[If an incoming request of `/photos/show/1` is processed by this route (because it hasn't matched any previous route in the file), then the result will be to invoke the `show` action of the `PhotosController`, and to make the final parameter `"1"` available as `params[:id]`.]]]
+`:action`과 `:id`는 괄호로 표시된 선택적 매개변수이기 때문에, 이 라우트는 또한 `/photos`의 들어오는 요청을 `PhotosController#index`에 라우트할 것입니다. [[[This route will also route the incoming request of `/photos` to `PhotosController#index`, since `:action` and `:id` are optional parameters, denoted by parentheses.]]]
 
-### Dynamic Segments
+### [Dynamic Segments] 동적 세그먼트
 
 You can set up as many dynamic segments within a regular route as you like. Anything other than `:controller` or `:action` will be available to the action as part of `params`. If you set up this route:
 
