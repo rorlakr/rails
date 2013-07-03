@@ -602,13 +602,16 @@ get ':controller(/:action(/:id))'
 
 ### [Dynamic Segments] 동적 세그먼트
 
-You can set up as many dynamic segments within a regular route as you like. Anything other than `:controller` or `:action` will be available to the action as part of `params`. If you set up this route:
+정규 라우트 내에는 원하는 만큼 많은 동적 세그먼트를 설정할 수 있습니다. [[[You can set up as many dynamic segments within a regular route as you like.]]]
+`:controller`나 `:action` 이외의 어떤 것도 `params`의 일부로 액션에 사용가능할 것입니다. [[[Anything other than `:controller` or `:action` will be available to the action as part of `params`.]]]
+만약 다음 라우트를 설정하였다면: [[[If you set up this route:]]]
 
 ```ruby
 get ':controller/:action/:id/:user_id'
 ```
 
-An incoming path of `/photos/show/1/2` will be dispatched to the `show` action of the `PhotosController`. `params[:id]` will be `"1"`, and `params[:user_id]` will be `"2"`.
+`/photos/show/1/2`의 들어오는 경로는 `PhotosController`의 `show` 액션에 보내질 것입니다. [[[An incoming path of `/photos/show/1/2` will be dispatched to the `show` action of the `PhotosController`.]]]
+`params[:id]`는 `"1"`, `params[:user_id]`는 2가 될 것입니다. [[[`params[:id]` will be `"1"`, and `params[:user_id]` will be `"2"`.]]]
 
 NOTE: You can't use `:namespace` or `:module` with a `:controller` path segment. If you need to do this then use a constraint on :controller that matches the namespace you require. e.g:
 
