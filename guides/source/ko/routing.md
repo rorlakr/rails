@@ -613,7 +613,7 @@ get ':controller/:action/:id/:user_id'
 `/photos/show/1/2`의 들어오는 경로는 `PhotosController`의 `show` 액션에 보내질 것입니다. [[[An incoming path of `/photos/show/1/2` will be dispatched to the `show` action of the `PhotosController`.]]]
 `params[:id]`는 `"1"`, `params[:user_id]`는 2가 될 것입니다. [[[`params[:id]` will be `"1"`, and `params[:user_id]` will be `"2"`.]]]
 
-NOTE: You can't use `:namespace` or `:module` with a `:controller` path segment. If you need to do this then use a constraint on :controller that matches the namespace you require. e.g:
+NOTE: `:controller` 경로 세그먼트와 함께 `:namespace` 혹은 `:module`을 사용할 수 있습니다. 이렇게 해야한다면, 다음과 같이 필요로 하는 네임스페이스와 일치하는 :controller상에 제약을 사용합니다. [[[NOTE: You can't use `:namespace` or `:module` with a `:controller` path segment. If you need to do this then use a constraint on :controller that matches the namespace you require. e.g:]]]
 
 ```ruby
 get ':controller(/:action(/:id))', controller: /admin\/[^\/]+/
