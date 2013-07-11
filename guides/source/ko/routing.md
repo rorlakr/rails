@@ -704,27 +704,29 @@ match 'photos', to: 'photos#show', via: :all
 노트: `GET`과 `POST` 두 방식의 요청을 모두 단일 액션에 라우팅하는 것은 보안 문제가 있습니다. [[[NOTE: Routing both `GET` and `POST` requests to a single action has security implications.]]]
 일반적으로, 좋은 이유가 있는 것이 아니라면 모든 verb를 액션에 라우팅하는 것은 피해야 합니다. [[[In general, you should avoid routing all verbs to an action unless you have a good reason to.]]]
 
-### Segment Constraints
+### [Segment Constraints] 세그먼트 제약
 
-You can use the `:constraints` option to enforce a format for a dynamic segment:
+동적 세그먼트를 위한 형식을 강제하기 위해 `:constraints` 옵션을 사용할 수 있습니다.: [[[You can use the `:constraints` option to enforce a format for a dynamic segment:]]]
 
 ```ruby
 get 'photos/:id', to: 'photos#show', constraints: { id: /[A-Z]\d{5}/ }
 ```
 
-This route would match paths such as `/photos/A12345`, but not `/photos/893`. You can more succinctly express the same route this way:
+이것은 `/photos/A12345`와 같은 경로를 매칭할 것이지만, `/photos/893`은 그렇지 않을 것입니다.: [[[This route would match paths such as `/photos/A12345`, but not `/photos/893`.]]]
+좀더 간결하게 이런 방식으로 같은 라우트를 표현할 수 있습니다.: [[[You can more succinctly express the same route this way:]]]
 
 ```ruby
 get 'photos/:id', to: 'photos#show', id: /[A-Z]\d{5}/
 ```
 
-`:constraints` takes regular expressions with the restriction that regexp anchors can't be used. For example, the following route will not work:
+`:constraints`는 정규 표현식을 갖는데, regexp 앵커(역자주: ^, $, \A, \Z, \z, \G, \b, \B 등)는 사용될 수 없습니다. [[[`:constraints` takes regular expressions with the restriction that regexp anchors can't be used.]]]
+예를 들어 다음의 라우트는 작동하지 않을 것입니다. [[[For example, the following route will not work:]]]
 
 ```ruby
 get '/:id', to: 'posts#show', constraints: {id: /^\d/}
 ```
 
-However, note that you don't need to use anchors because all routes are anchored at the start.
+하지만, 모든 라우트는 시작점에 고정되어 있기 때문에, 앵커를 사용할 필요가 없다는 점을 주의하십시오. [[[However, note that you don't need to use anchors because all routes are anchored at the start.]]]
 
 For example, the following routes would allow for `posts` with `to_param` values like `1-hello-world` that always begin with a number and `users` with `to_param` values like `david` that never begin with a number to share the root namespace:
 
