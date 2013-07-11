@@ -619,45 +619,51 @@ NOTE: `:controller` 경로 세그먼트와 함께 `:namespace` 혹은 `:module`�
 get ':controller(/:action(/:id))', controller: /admin\/[^\/]+/
 ```
 
-TIP: By default, dynamic segments don't accept dots - this is because the dot is used as a separator for formatted routes. If you need to use a dot within a dynamic segment, add a constraint that overrides this – for example, `id: /[^\/]+/` allows anything except a slash.
+팁: 기본값으로, 동적 세그먼트는 구두점(.)을 받아들이지 않습니다. 왜냐하면 구두점은 형식화된 라우트를 위한 구분자로 사용되기 때문입니다. [[[TIP: By default, dynamic segments don't accept dots - this is because the dot is used as a separator for formatted routes.]]]
+만약 동적 세그먼트 안에 구두점을 사용할 필요가 있다면, 이것을 오버라이드하는 제약을 추가하십시오. 예를 들어, `id: /[^\/]+/`는 슬래시(/) 이외의 모든 것을 허용합니다. [[[If you need to use a dot within a dynamic segment, add a constraint that overrides this – for example, `id: /[^\/]+/` allows anything except a slash.]]]
 
-### Static Segments
+### [Static Segments] 정적 세그먼트
 
-You can specify static segments when creating a route by not prepending a colon to a fragment:
+분절의 앞에 콜론을 추가하지 않고 라우트를 만들면 정적 세그먼트를 명시할 수 있습니다. [[[You can specify static segments when creating a route by not prepending a colon to a fragment:]]]
 
 ```ruby
 get ':controller/:action/:id/with_user/:user_id'
 ```
 
-This route would respond to paths such as `/photos/show/1/with_user/2`. In this case, `params` would be `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`.
+위 라우트는 `/photos/show/1/with_user/2`와 같은 경로에 응답할 것입니다.[[[This route would respond to paths such as `/photos/show/1/with_user/2`.]]]
+이 경우에, `params`는 `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`가 될 것입니다. [[[In this case, `params` would be `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`.]]]
 
-### The Query String
+### [The Query String] 질의 문자열
 
-The `params` will also include any parameters from the query string. For example, with this route:
+`params`은 또한 질의 문자열로부터 어떤 매개변수라도 포함할 것입니다. [[[The `params` will also include any parameters from the query string.]]]
+다음 라우트를 예로 들면: [[[For example, with this route:]]]
 
 ```ruby
 get ':controller/:action/:id'
 ```
 
-An incoming path of `/photos/show/1?user_id=2` will be dispatched to the `show` action of the `Photos` controller. `params` will be `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`.
+`/photos/show/1?user_id=2`로 들어오는 경로는 `Photos` 컨트롤러의 `show` 액션으로 보내질 것입니다. [[[An incoming path of `/photos/show/1?user_id=2` will be dispatched to the `show` action of the `Photos` controller.]]]
+`params`는 `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`가 될 것입니다.[[[`params` will be `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`.]]]
 
-### Defining Defaults
+### [Defining Defaults] 기본값 정의하기
 
-You do not need to explicitly use the `:controller` and `:action` symbols within a route. You can supply them as defaults:
+라우트에서 `:controller`과 `:action`을 명시적으로 사용할 필요는 없습니다. [[[You do not need to explicitly use the `:controller` and `:action` symbols within a route.]]]
+기본값으로 그들을 제공할 수 있습니다. [[[You can supply them as defaults:]]]
 
 ```ruby
 get 'photos/:id', to: 'photos#show'
 ```
 
-With this route, Rails will match an incoming path of `/photos/12` to the `show` action of `PhotosController`.
+위 라우트로, 레일스는 유입되는 경로 `/photos/12`를 `PhotosController`의 `show` 액션에 매칭할 것입니다. [[[With this route, Rails will match an incoming path of `/photos/12` to the `show` action of `PhotosController`.]]]
 
-You can also define other defaults in a route by supplying a hash for the `:defaults` option. This even applies to parameters that you do not specify as dynamic segments. For example:
+또한 `:defaults` 옵션의 해시를 제공하여 라우트에 다른 기본값을 정의할 수 있습니다. [[[You can also define other defaults in a route by supplying a hash for the `:defaults` option.]]]
+이것도 동적 세그먼트로 지정하지 않은 매개변수에 적용됩니다. 예를 들어: [[[This even applies to parameters that you do not specify as dynamic segments. For example:]]]
 
 ```ruby
 get 'photos/:id', to: 'photos#show', defaults: { format: 'jpg' }
 ```
 
-Rails would match `photos/12` to the `show` action of `PhotosController`, and set `params[:format]` to `"jpg"`.
+레일스는 `photos/12`를 `PhotosController`의 `show` 액션에 매칭하고 `params[:format]`을 `"jpg"`로 설정할 것입니다.[[[Rails would match `photos/12` to the `show` action of `PhotosController`, and set `params[:format]` to `"jpg"`.]]]
 
 ### Naming Routes
 
