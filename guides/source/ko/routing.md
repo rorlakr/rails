@@ -665,39 +665,44 @@ get 'photos/:id', to: 'photos#show', defaults: { format: 'jpg' }
 
 레일스는 `photos/12`를 `PhotosController`의 `show` 액션에 매칭하고 `params[:format]`을 `"jpg"`로 설정할 것입니다.[[[Rails would match `photos/12` to the `show` action of `PhotosController`, and set `params[:format]` to `"jpg"`.]]]
 
-### Naming Routes
+### [Naming Routes] 명명된 라우트
 
-You can specify a name for any route using the `:as` option:
+`:as` 옵션을 사용하면 어떤 라우트에도 이름을 지정할 수 있습니다: [[[You can specify a name for any route using the `:as` option:]]]
 
 ```ruby
 get 'exit', to: 'sessions#destroy', as: :logout
 ```
 
-This will create `logout_path` and `logout_url` as named helpers in your application. Calling `logout_path` will return `/exit`
+이것은 응용프로그램에 명명된 헬퍼로서 `logout_path`와 `logout_url`을 생성할 것입니다. [[[This will create `logout_path` and `logout_url` as named helpers in your application.]]] 
+`logout_path`를 호출하면 `/exit`를 반환할 것입니다. [[[Calling `logout_path` will return `/exit`]]]
 
-You can also use this to override routing methods defined by resources, like this:
+또한 다음과 같이 리소스에 의해 정의된 라우팅 메서드를 오버라이드하기 위해 이것을 사용할 수 있습니다. [[[You can also use this to override routing methods defined by resources, like this:]]]
 
 ```ruby
 get ':username', to: 'users#show', as: :user
 ```
 
-This will define a `user_path` method that will be available in controllers, helpers and views that will go to a route such as `/bob`. Inside the `show` action of `UsersController`, `params[:username]` will contain the username for the user. Change `:username` in the route definition if you do not want your parameter name to be `:username`.
+이것은 `user_path` 메서드를 정의할 것이고 컨트롤러, `/bob`처럼 라우트로 갈 헬퍼 그리고 뷰에서 사용 가능할 것입니다. [[[This will define a `user_path` method that will be available in controllers, helpers and views that will go to a route such as `/bob`.]]]
+`UsersController`의 `show` 액션 내부에서, `params[:username]`는 user의 username을 포함할 것입니다. [[[Inside the `show` action of `UsersController`, `params[:username]` will contain the username for the user.]]]
+매개변수 이름이 `:username`이 되기를 원하지 않는다면 라우트 정의에 있는 `:username`을 변경하십시오. [[[Change `:username` in the route definition if you do not want your parameter name to be `:username`.]]]
 
-### HTTP Verb Constraints
+### [HTTP Verb Constraints] HTTP Verb 제약
 
-In general, you should use the `get`, `post`, `put` and `delete` methods to constrain a route to a particular verb. You can use the `match` method with the `:via` option to match multiple verbs at once:
+일반적으로 특정 verb로 라우트를 제한하기 위해 `get`, `post`, `put` 그리고 `delete`를 사용해야 합니다. [[[In general, you should use the `get`, `post`, `put` and `delete` methods to constrain a route to a particular verb.]]]
+한번에 여러 verb를 매칭하려면 `match` 메서드를 `:via` 옵션과 함께 사용할 수 있습니다: [[[You can use the `match` method with the `:via` option to match multiple verbs at once:]]]
 
 ```ruby
 match 'photos', to: 'photos#show', via: [:get, :post]
 ```
 
-You can match all verbs to a particular route using `via: :all`:
+`via: :all`을 사용하여 모든 verb를 특정 라우트에 매칭시킬 수 있습니다. [[[You can match all verbs to a particular route using `via: :all`:]]]
 
 ```ruby
 match 'photos', to: 'photos#show', via: :all
 ```
 
-NOTE: Routing both `GET` and `POST` requests to a single action has security implications. In general, you should avoid routing all verbs to an action unless you have a good reason to.
+노트: `GET`과 `POST` 두 방식의 요청을 모두 단일 액션에 라우팅하는 것은 보안 문제가 있습니다. [[[NOTE: Routing both `GET` and `POST` requests to a single action has security implications.]]]
+일반적으로, 좋은 이유가 있는 것이 아니라면 모든 verb를 액션에 라우팅하는 것은 피해야 합니다. [[[In general, you should avoid routing all verbs to an action unless you have a good reason to.]]]
 
 ### Segment Constraints
 
