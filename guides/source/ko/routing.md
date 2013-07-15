@@ -808,7 +808,7 @@ get 'books/*section/:title', to: 'books#show'
 위 라우트는 `books/some/section/last-words-a-memoir`의 `params[:section]`가 `'some/section'`와 같은 것으로, `params[:title]`가 `'last-words-a-memoir'`와 같은 것으로 하여 매칭됩니다. [[[would match `books/some/section/last-words-a-memoir` with `params[:section]` equals `'some/section'`, and `params[:title]` equals `'last-words-a-memoir'`.]]]
 
 기술적으로, 라우트는 하나 이상의 와일드카드 세그먼트도 가질 수 있습니다. [[[Technically, a route can have even more than one wildcard segment.]]]
-변환기(matcher)는 직관적인 방식으로 세그먼트를 매개변수에 할당합니다. 예를 들면: [[[The matcher assigns segments to parameters in an intuitive way. For example:]]]
+연결자(matcher)는 직관적인 방식으로 세그먼트를 매개변수에 할당합니다. 예를 들면: [[[The matcher assigns segments to parameters in an intuitive way. For example:]]]
 
 ```ruby
 get '*a/foo/*b', to: 'test#index'
@@ -857,30 +857,31 @@ get '/stories', to: redirect {|p, req| "/posts/#{req.subdomain}" }
 
 ### Routing to Rack Applications
 
-Instead of a String like `'posts#index'`, which corresponds to the `index` action in the `PostsController`, you can specify any <a href="rails_on_rack.html">Rack application</a> as the endpoint for a matcher:
+`PostsController`의 `index` 액션에 대응하는 `'posts#index'`와 같은 문자열 대신, 연결자(matcher)를 위한 엔드포인트로서 특정 <a href="rails_on_rack.html">Rack application</a>를 지정할 수 있습니다.: [[[Instead of a String like `'posts#index'`, which corresponds to the `index` action in the `PostsController`, you can specify any <a href="rails_on_rack.html">Rack application</a> as the endpoint for a matcher:]]]
 
 ```ruby
 match '/application.js', to: Sprockets, via: :all
 ```
 
-As long as `Sprockets` responds to `call` and returns a `[status, headers, body]`, the router won't know the difference between the Rack application and an action. This is an appropriate use of `via: :all`, as you will want to allow your Rack application to handle all verbs as it considers appropriate.
+`Sprockets`가 `call`에 응답하고, `[status, headers, body]`를 반환하는 동안, Rack 응용프로그램과 액션의 차이에 대해 라우터는 알지 못합니다. [[[As long as `Sprockets` responds to `call` and returns a `[status, headers, body]`, the router won't know the difference between the Rack application and an action.]]]
+Rack 응용프로그램이 모든 verbs를 적절하게 고려하여 다루도록 허용하기를 바라는 것이 `via: :all`의 적절한 용법입니다. [[[This is an appropriate use of `via: :all`, as you will want to allow your Rack application to handle all verbs as it considers appropriate.]]]
 
-NOTE: For the curious, `'posts#index'` actually expands out to `PostsController.action(:index)`, which returns a valid Rack application.
+노트: `'posts#index'`는 실제로 `PostsController.action(:index)`로 확장되어, 유효한 Rack 응용프로그램을 반환합니다. [[[NOTE: For the curious, `'posts#index'` actually expands out to `PostsController.action(:index)`, which returns a valid Rack application.]]]
 
-### Using `root`
+### [Using `root`] `root` 사용하기
 
-You can specify what Rails should route `'/'` to with the `root` method:
+`root` 메서드를 사용하여 레일스가 `'/'`를 라우트할 지점을 지정할 수 있습니다.: [[[You can specify what Rails should route `'/'` to with the `root` method:]]]
 
 ```ruby
 root to: 'pages#main'
 root 'pages#main' # shortcut for the above
 ```
 
-You should put the `root` route at the top of the file, because it is the most popular route and should be matched first.
+`root` 라우트는 파일의 맨 처음에 두어야 하는데, 이것이 가장 일반적인 라우트이고 처음 매칭되어야 하는 것이기 때문입니다. [[[You should put the `root` route at the top of the file, because it is the most popular route and should be matched first.]]]
 
-NOTE: The `root` route only routes `GET` requests to the action.
+노트: `root` 라우트는 `GET` 요청만 액션으로 라우트합니다. [[[NOTE: The `root` route only routes `GET` requests to the action.]]]
 
-You can also use root inside namespaces and scopes as well.  For example:
+네임스페이스나 스코프 안에 root를 사용할 수도 있습니다. 예를 들면: [[[You can also use root inside namespaces and scopes as well.  For example:]]]
 
 ```ruby
 namespace :admin do
@@ -890,9 +891,9 @@ end
 root to: "home#index"
 ```
 
-### Unicode character routes
+### [Unicode character routes] 유니코드 캐릭터 라우트
 
-You can specify unicode character routes directly. For example:
+다음과 같이, 직접적으로 유니코드 캐릭터 라우트를 지정할 수 있습니다.: [[[You can specify unicode character routes directly. For example:]]]
 
 ```ruby
 get 'こんにちは', to: 'welcome#index'
