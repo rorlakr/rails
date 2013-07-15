@@ -728,24 +728,24 @@ get '/:id', to: 'posts#show', constraints: {id: /^\d/}
 
 하지만, 모든 라우트는 시작점에 고정되어 있기 때문에, 앵커를 사용할 필요가 없다는 점을 주의하십시오. [[[However, note that you don't need to use anchors because all routes are anchored at the start.]]]
 
-For example, the following routes would allow for `posts` with `to_param` values like `1-hello-world` that always begin with a number and `users` with `to_param` values like `david` that never begin with a number to share the root namespace:
+예를 들어, 다음의 라우트들은 루트 네임스페이스를 공유하기 위해 `1-hello-world`처럼 항상 숫자로 시작하는 `to_param` 값을 `posts`을 위해 허용하며, `david`처럼 절대 숫자로 시작하지 않는 `to_param` 값을 `users`을 위해 허용할 것입니다. [[[For example, the following routes would allow for `posts` with `to_param` values like `1-hello-world` that always begin with a number and `users` with `to_param` values like `david` that never begin with a number to share the root namespace:]]]
 
 ```ruby
 get '/:id', to: 'posts#show', constraints: { id: /\d.+/ }
 get '/:username', to: 'users#show'
 ```
 
-### Request-Based Constraints
+### [Request-Based Constraints] 요청-기반 제약
 
-You can also constrain a route based on any method on the <a href="action_controller_overview.html#the-request-object">Request</a> object that returns a `String`.
+`String`을 반환하는 <a href="action_controller_overview.html#the-request-object">요청</a> 객체상의 어떤 메서드에 기반한 라우트를 제한할 수도 있습니다. [[[You can also constrain a route based on any method on the <a href="action_controller_overview.html#the-request-object">Request</a> object that returns a `String`.]]]
 
-You specify a request-based constraint the same way that you specify a segment constraint:
+세그먼트 제약을 명시하는 것과 같은 방법으로 요청-기반의 제약을 명시할 수 있습니다. [[[You specify a request-based constraint the same way that you specify a segment constraint:]]]
 
 ```ruby
 get 'photos', constraints: {subdomain: 'admin'}
 ```
 
-You can also specify constraints in a block form:
+또한 블록 형태의 제한을 지정할 수도 있습니다. [[[You can also specify constraints in a block form:]]]
 
 ```ruby
 namespace :admin do
@@ -755,9 +755,10 @@ namespace :admin do
 end
 ```
 
-### Advanced Constraints
+### [Advanced Constraints] 고급 제약
 
-If you have a more advanced constraint, you can provide an object that responds to `matches?` that Rails should use. Let's say you wanted to route all users on a blacklist to the `BlacklistController`. You could do:
+더 고급의 제약을 하고 싶다면, 레일스가 사용할 `matches?`에 응답하는 객체를 제공할 수 있습니다. [[[If you have a more advanced constraint, you can provide an object that responds to `matches?` that Rails should use.]]]
+블랙리스트에 있는 모든 사용자를 `BlacklistController`에 라우트하고 싶다고 할 때, 다음과 같이 할 수 있습니다.: [[[Let's say you wanted to route all users on a blacklist to the `BlacklistController`. You could do:]]]
 
 ```ruby
 class BlacklistConstraint
@@ -776,7 +777,7 @@ TwitterClone::Application.routes.draw do
 end
 ```
 
-You can also specify constraints as a lambda:
+또한 제약을 람다로 명시할 수 있습니다: [[[You can also specify constraints as a lambda:]]]
 
 ```ruby
 TwitterClone::Application.routes.draw do
@@ -785,41 +786,44 @@ TwitterClone::Application.routes.draw do
 end
 ```
 
-Both the `matches?` method and the lambda gets the `request` object as an argument.
+`matches?` 메서드와 람다 양쪽 모두 인수로 `request` 객체를 가져옵니다. [[[Both the `matches?` method and the lambda gets the `request` object as an argument.]]]
 
-### Route Globbing and Wildcard Segments
+### [Route Globbing and Wildcard Segments] 패턴매칭(Globbing) 라우트와 와일드카드 세그먼트
 
-Route globbing is a way to specify that a particular parameter should be matched to all the remaining parts of a route. For example:
+패턴매칭 라우트(Route globbing)은 라우트의 잔여 부분 전체에 매칭되는 특정 매개변수를 지정할 수 있는 방법입니다. 예를 들면: [[[Route globbing is a way to specify that a particular parameter should be matched to all the remaining parts of a route. For example:]]]
 
 ```ruby
 get 'photos/*other', to: 'photos#unknown'
 ```
 
-This route would match `photos/12` or `/photos/long/path/to/12`, setting `params[:other]` to `"12"` or `"long/path/to/12"`. The fragments prefixed with a star are called "wildcard segments".
+본 라우트는 `photos/12`나 `/photos/long/path/to/12`를 매칭할 것이고, `params[:other]`에 `"12"`나 `"long/path/to/12"`를 설정할 것입니다. [[[This route would match `photos/12` or `/photos/long/path/to/12`, setting `params[:other]` to `"12"` or `"long/path/to/12"`.]]]
+별표(*)로 접두 표기된 조각을 "와일드카드 세그먼트"라 부릅니다. [[[The fragments prefixed with a star are called "wildcard segments".]]]
 
-Wildcard segments can occur anywhere in a route. For example:
+와일드카드 세그먼트는 라우트의 어떤 곳에도 넣을 수 있습니다. 예를 들면: [[[Wildcard segments can occur anywhere in a route. For example:]]]
 
 ```ruby
 get 'books/*section/:title', to: 'books#show'
 ```
 
-would match `books/some/section/last-words-a-memoir` with `params[:section]` equals `'some/section'`, and `params[:title]` equals `'last-words-a-memoir'`.
+위 라우트는 `books/some/section/last-words-a-memoir`의 `params[:section]`가 `'some/section'`와 같은 것으로, `params[:title]`가 `'last-words-a-memoir'`와 같은 것으로 하여 매칭됩니다. [[[would match `books/some/section/last-words-a-memoir` with `params[:section]` equals `'some/section'`, and `params[:title]` equals `'last-words-a-memoir'`.]]]
 
-Technically, a route can have even more than one wildcard segment. The matcher assigns segments to parameters in an intuitive way. For example:
+기술적으로, 라우트는 하나 이상의 와일드카드 세그먼트도 가질 수 있습니다. [[[Technically, a route can have even more than one wildcard segment.]]]
+변환기(matcher)는 직관적인 방식으로 세그먼트를 매개변수에 할당합니다. 예를 들면: [[[The matcher assigns segments to parameters in an intuitive way. For example:]]]
 
 ```ruby
 get '*a/foo/*b', to: 'test#index'
 ```
 
-would match `zoo/woo/foo/bar/baz` with `params[:a]` equals `'zoo/woo'`, and `params[:b]` equals `'bar/baz'`.
+위 라우트는 `params[:a]`를 `'zoo/woo'`와 같은 것으로, `params[:b]`를 `'bar/baz'`와 같은 것으로 하여 `zoo/woo/foo/bar/baz`를 매칭할 것입니다. [[[would match `zoo/woo/foo/bar/baz` with `params[:a]` equals `'zoo/woo'`, and `params[:b]` equals `'bar/baz'`.]]]
 
-NOTE: By requesting `'/foo/bar.json'`, your `params[:pages]` will be equals to `'foo/bar'` with the request format of JSON. If you want the old 3.0.x behavior back, you could supply `format: false` like this:
+노트: `'/foo/bar.json'`를 요청하면, `params[:pages]`는 `'foo/bar'`와 같은 것으로 JSON 형식 요청으로 매칭됩니다. [[[NOTE: By requesting `'/foo/bar.json'`, your `params[:pages]` will be equals to `'foo/bar'` with the request format of JSON.]]]
+이전 3.0.x 행동으로 되돌리길 원한다면, 다음과 같이 `format:false`를 제공할 수 있습니다.: [[[If you want the old 3.0.x behavior back, you could supply `format: false` like this:]]]
 
 ```ruby
 get '*pages', to: 'pages#show', format: false
 ```
 
-NOTE: If you want to make the format segment mandatory, so it cannot be omitted, you can supply `format: true` like this:
+노트: 형식 세그먼트를 필수로 하고, 생략될 수 없게 하고자 한다면, 다음과 같이 `format: true`를 제공할 수 있습니다.: [[[NOTE: If you want to make the format segment mandatory, so it cannot be omitted, you can supply `format: true` like this:]]]
 
 ```ruby
 get '*pages', to: 'pages#show', format: true
