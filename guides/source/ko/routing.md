@@ -831,28 +831,29 @@ get '*pages', to: 'pages#show', format: true
 
 ### Redirection
 
-You can redirect any path to another path using the `redirect` helper in your router:
+라우터에 `redirect` 헬퍼를 사용하면 어떤 경로든 다른 경로로 리다이렉트할 수 있습니다.: [[[You can redirect any path to another path using the `redirect` helper in your router:]]]
 
 ```ruby
 get '/stories', to: redirect('/posts')
 ```
 
-You can also reuse dynamic segments from the match in the path to redirect to:
+경로에 리다이렉트될 곳을 매칭하기 위해 동적 세그면트를 재사용할 수도 있습니다.[[[You can also reuse dynamic segments from the match in the path to redirect to:]]]
 
 ```ruby
 get '/stories/:name', to: redirect('/posts/%{name}')
 ```
 
-You can also provide a block to redirect, which receives the params and the request object:
+리다이렉트에 params와 request 객체를 수신하는 블록을 제공할 수도 있습니다.: [[[You can also provide a block to redirect, which receives the params and the request object:]]]
 
 ```ruby
 get '/stories/:name', to: redirect {|params, req| "/posts/#{params[:name].pluralize}" }
 get '/stories', to: redirect {|p, req| "/posts/#{req.subdomain}" }
 ```
 
-Please note that this redirection is a 301 "Moved Permanently" redirect. Keep in mind that some web browsers or proxy servers will cache this type of redirect, making the old page inaccessible.
+이 리다이렉션은 301 "Moved Permanently" 리다이렉트임을 주지하십시오. [[[Please note that this redirection is a 301 "Moved Permanently" redirect.]]]
+일부 웹브라우저와 프록시 서버가 이 유형의 리다이렉트를 캐시하고 예전 페이지에 접근하지 못하게 될 수 있음을 명심하십시오. [[[Keep in mind that some web browsers or proxy servers will cache this type of redirect, making the old page inaccessible.]]]
 
-In all of these cases, if you don't provide the leading host (`http://www.example.com`), Rails will take those details from the current request.
+이러한 모든 경우에, 선행 호스트(`http://www.example.com`)을 제공하지 않으면, 레일스는 현재 요청에서 그 내용을 취할 것입니다. [[[In all of these cases, if you don't provide the leading host (`http://www.example.com`), Rails will take those details from the current request.]]]
 
 ### Routing to Rack Applications
 
