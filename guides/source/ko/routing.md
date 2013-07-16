@@ -937,17 +937,19 @@ resources :user_permissions, controller: 'admin/user_permissions'
 
 노트: 디렉터리 표기만 지원됩니다. 루비 상수 표기법(예. `:controller => 'Admin::UserPermissions'`)으로 컨트롤러를 지정하면 라우팅 문제와 경고 결과를 초래할 수 있습니다. [[[NOTE: Only the directory notation is supported. Specifying the controller with ruby constant notation (eg. `:controller => 'Admin::UserPermissions'`) can lead to routing problems and results in a warning.]]]
 
-### Specifying Constraints
+### [Specifying Constraints] 제약 지정하기
 
-You can use the `:constraints` option to specify a required format on the implicit `id`. For example:
+암시적 `id`에 필요한 형식을 지정하기 위해 `:constraints` 옵션을 사용할 수 있습니다. 예를 들면: [[[You can use the `:constraints` option to specify a required format on the implicit `id`. For example:]]]
 
 ```ruby
 resources :photos, constraints: {id: /[A-Z][A-Z][0-9]+/}
 ```
 
-This declaration constrains the `:id` parameter to match the supplied regular expression. So, in this case, the router would no longer match `/photos/1` to this route. Instead, `/photos/RR27` would match.
+이 선언은 제공된 정규 표현식에 일치하는 `:id` 매개변수를 제한합니다. [[[This declaration constrains the `:id` parameter to match the supplied regular expression.]]]
+그래서 이 경우에, 라우터는 더이상 `/photos/1`을 이 라우트에 매치하지 않을 것입니다. [[[So, in this case, the router would no longer match `/photos/1` to this route.]]]
+대신, `/photos/RR27`은 매치될 것입니다. [[[Instead, `/photos/RR27` would match.]]]
 
-You can specify a single constraint to apply to a number of routes by using the block form:
+블록 형식을 사용하여 여러 라우트에 적용할 단일 제약을 지정할 수 있습니다.: [[[You can specify a single constraint to apply to a number of routes by using the block form:]]]
 
 ```ruby
 constraints(id: /[A-Z][A-Z][0-9]+/) do
@@ -956,9 +958,9 @@ constraints(id: /[A-Z][A-Z][0-9]+/) do
 end
 ```
 
-NOTE: Of course, you can use the more advanced constraints available in non-resourceful routes in this context.
+노트: 물론, 이 문맥에서 비-리소스풀 라우트 내에 보다 향상된 제약을 사용할 수도 있습니다. [[[NOTE: Of course, you can use the more advanced constraints available in non-resourceful routes in this context.]]]
 
-TIP: By default the `:id` parameter doesn't accept dots - this is because the dot is used as a separator for formatted routes. If you need to use a dot within an `:id` add a constraint which overrides this - for example `id: /[^\/]+/` allows anything except a slash.
+팁: 기본적으로 `:id` 매개변수는 구두점(.)을 허용하지 않습니다. 이것은 구두점이 형식화된 라우트에서 구분자로 사용되기 때문입니다. 만약 `:id` 내에 구두점을 사용해야 할 필요가 있다면 이것을 오버라이드한 제약을 추가하십시오. 예를 들어 `id: /[^\/]+/`는 슬래시(/)를 제외한 모든 것을 허용합니다. [[[TIP: By default the `:id` parameter doesn't accept dots - this is because the dot is used as a separator for formatted routes. If you need to use a dot within an `:id` add a constraint which overrides this - for example `id: /[^\/]+/` allows anything except a slash.]]]
 
 ### Overriding the Named Helpers
 
