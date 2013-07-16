@@ -114,7 +114,7 @@ resources :photos
 | PATCH/PUT | /photos/:id      | update  | update a specific photo                      |
 | DELETE    | /photos/:id      | destroy | delete a specific photo                      |
 
-노트: 라우터는 HTTP verb와 URL을 인바운드 요청에 매치하기 위해 사용하기 때문에, 네 가지 URL은 일곱 가지 다른 액션에 매핑됩니다.[[[NOTE: Because the router uses the HTTP verb and URL to match inbound requests, four URLs map to seven different actions.]]]
+NOTE: 라우터는 HTTP verb와 URL을 인바운드 요청에 매치하기 위해 사용하기 때문에, 네 가지 URL은 일곱 가지 다른 액션에 매핑됩니다.[[[NOTE: Because the router uses the HTTP verb and URL to match inbound requests, four URLs map to seven different actions.]]]
 
 레일스 라우트는 명시된 순서에 따라 매치됩니다. 그래서 `get 'photos/poll'` 위에 `resources :photos`가 있다면 `resources` 행을 위한 `show` 액션의 라우트는 `get` 행보다 먼저 매칭됩니다.[[[NOTE: Rails routes are matched in the order they are specified, so if you have a `resources :photos` above a `get 'photos/poll'` the `show` action's route for the `resources` line will be matched before the `get` line.]]]
 이것을 바로잡기 위해서는 `get` 행을 `resources` 행 위로 옮겨서 먼저 매치되도록 해야 합니다.[[[To fix this, move the `get` line **above** the `resources` line so that it is matched first.]]]
@@ -183,7 +183,7 @@ resource :geocoder
 | PATCH/PUT | /geocoder      | update  | update the one and only geocoder resource     |
 | DELETE    | /geocoder      | destroy | delete the geocoder resource                  |
 
-노트: 단수형 라우트 (`/account`)와 복수형 라우트 (`/accounts/45`)를 위해 동일 컨트롤러를 사용하고자 할 수 있기 때문에, 단수형 리소스는 복수 컨트롤러에 매핑됩니다. [[[NOTE: Because you might want to use the same controller for a singular route (`/account`) and a plural route (`/accounts/45`), singular resources map to plural controllers.]]]
+NOTE: 단수형 라우트 (`/account`)와 복수형 라우트 (`/accounts/45`)를 위해 동일 컨트롤러를 사용하고자 할 수 있기 때문에, 단수형 리소스는 복수 컨트롤러에 매핑됩니다. [[[NOTE: Because you might want to use the same controller for a singular route (`/account`) and a plural route (`/accounts/45`), singular resources map to plural controllers.]]]
 그래서, 예를 들어, `resource :photo` 와 `resources :photos`는 동일 컨트롤러 (`PhotosController`)에 매핑되는 단수형과 복수형 라우트를 함께 생성합니다. [[[So that, for example, `resource :photo` and `resources :photos` creates both singular and plural routes that map to the same controller (`PhotosController`).]]]
 
 단수형 리소스풀 라우트는 다음과 같은 헬퍼들을 생성합니다. [[[A singular resourceful route generates these helpers:]]]
@@ -325,7 +325,7 @@ end
 이에 대응하는 라우트 헬퍼는 `publisher_magazine_photo_url`가 될 것이고, 이 헬퍼는 세 레벨의 객체 모두를 지정해야  합니다. [[[The corresponding route helper would be `publisher_magazine_photo_url`, requiring you to specify objects at all three levels.]]]
 실제로 이 상황은 유명한 [article](http://weblog.jamisbuck.org/2007/2/5/nesting-resources)에서 제이미스 벅이 제안한 좋은 레일스 디자인을 위한 주먹구구식 방법만큼이나 혼란스럽습니다. [[[[Indeed, this situation is confusing enough that a popular [article](http://weblog.jamisbuck.org/2007/2/5/nesting-resources) by Jamis Buck proposes a rule of thumb for good Rails design:]]]
 
-팁: 리소스는 1 레벨 이상으로 중첩되어서는 안됩니다. [[[TIP: _Resources should never be nested more than 1 level deep._]]]
+TIP: 리소스는 1 레벨 이상으로 중첩되어서는 안됩니다. [[[TIP: _Resources should never be nested more than 1 level deep._]]]
 
 #### Shallow Nesting
 
@@ -573,7 +573,7 @@ end
 이것은 레일스가 GET 방식으로 `/comments/new/preview`와 같은 경로를 인식할 수 있게 해 주고, `CommentsController`의 `preview` 액션으로 라우트할 수 있게 해 줍니다. [[[This will enable Rails to recognize paths such as `/comments/new/preview` with GET, and route to the `preview` action of `CommentsController`.]]]
 또한 `preview_new_comment_url`과 `preview_new_comment_path` 라우트 헬퍼를 생성할 것입니다. [[[It will also create the `preview_new_comment_url` and `preview_new_comment_path` route helpers.]]]
 
-팁: 만약 리소스풀 라우트에 많은 추가 액션을 추가하고 있다면, 그것을 중단하고 다른 리소스를 숨기고 있는지 반문해야 합니다. [[[TIP: If you find yourself adding many extra actions to a resourceful route, it's time to stop and ask yourself whether you're disguising the presence of another resource.]]]
+TIP: 만약 리소스풀 라우트에 많은 추가 액션을 추가하고 있다면, 그것을 중단하고 다른 리소스를 숨기고 있는지 반문해야 합니다. [[[TIP: If you find yourself adding many extra actions to a resourceful route, it's time to stop and ask yourself whether you're disguising the presence of another resource.]]]
 
 [Non-Resourceful Routes] 비-리소스풀 라우트
 ----------------------
@@ -619,7 +619,7 @@ NOTE: `:controller` 경로 세그먼트와 함께 `:namespace` 혹은 `:module`�
 get ':controller(/:action(/:id))', controller: /admin\/[^\/]+/
 ```
 
-팁: 기본값으로, 동적 세그먼트는 구두점(.)을 받아들이지 않습니다. 왜냐하면 구두점은 형식화된 라우트를 위한 구분자로 사용되기 때문입니다. [[[TIP: By default, dynamic segments don't accept dots - this is because the dot is used as a separator for formatted routes.]]]
+TIP: 기본값으로, 동적 세그먼트는 구두점(.)을 받아들이지 않습니다. 왜냐하면 구두점은 형식화된 라우트를 위한 구분자로 사용되기 때문입니다. [[[TIP: By default, dynamic segments don't accept dots - this is because the dot is used as a separator for formatted routes.]]]
 만약 동적 세그먼트 안에 구두점을 사용할 필요가 있다면, 이것을 오버라이드하는 제약을 추가하십시오. 예를 들어, `id: /[^\/]+/`는 슬래시(/) 이외의 모든 것을 허용합니다. [[[If you need to use a dot within a dynamic segment, add a constraint that overrides this – for example, `id: /[^\/]+/` allows anything except a slash.]]]
 
 ### [Static Segments] 정적 세그먼트
@@ -701,7 +701,7 @@ match 'photos', to: 'photos#show', via: [:get, :post]
 match 'photos', to: 'photos#show', via: :all
 ```
 
-노트: `GET`과 `POST` 두 방식의 요청을 모두 단일 액션에 라우팅하는 것은 보안 문제가 있습니다. [[[NOTE: Routing both `GET` and `POST` requests to a single action has security implications.]]]
+NOTE: `GET`과 `POST` 두 방식의 요청을 모두 단일 액션에 라우팅하는 것은 보안 문제가 있습니다. [[[NOTE: Routing both `GET` and `POST` requests to a single action has security implications.]]]
 일반적으로, 좋은 이유가 있는 것이 아니라면 모든 verb를 액션에 라우팅하는 것은 피해야 합니다. [[[In general, you should avoid routing all verbs to an action unless you have a good reason to.]]]
 
 ### [Segment Constraints] 세그먼트 제약
@@ -816,14 +816,14 @@ get '*a/foo/*b', to: 'test#index'
 
 위 라우트는 `params[:a]`를 `'zoo/woo'`와 같은 것으로, `params[:b]`를 `'bar/baz'`와 같은 것으로 하여 `zoo/woo/foo/bar/baz`를 매칭할 것입니다. [[[would match `zoo/woo/foo/bar/baz` with `params[:a]` equals `'zoo/woo'`, and `params[:b]` equals `'bar/baz'`.]]]
 
-노트: `'/foo/bar.json'`를 요청하면, `params[:pages]`는 `'foo/bar'`와 같은 것으로 JSON 형식 요청으로 매칭됩니다. [[[NOTE: By requesting `'/foo/bar.json'`, your `params[:pages]` will be equals to `'foo/bar'` with the request format of JSON.]]]
+NOTE: `'/foo/bar.json'`를 요청하면, `params[:pages]`는 `'foo/bar'`와 같은 것으로 JSON 형식 요청으로 매칭됩니다. [[[NOTE: By requesting `'/foo/bar.json'`, your `params[:pages]` will be equals to `'foo/bar'` with the request format of JSON.]]]
 이전 3.0.x 행동으로 되돌리길 원한다면, 다음과 같이 `format:false`를 제공할 수 있습니다.: [[[If you want the old 3.0.x behavior back, you could supply `format: false` like this:]]]
 
 ```ruby
 get '*pages', to: 'pages#show', format: false
 ```
 
-노트: 형식 세그먼트를 필수로 하고, 생략될 수 없게 하고자 한다면, 다음과 같이 `format: true`를 제공할 수 있습니다.: [[[NOTE: If you want to make the format segment mandatory, so it cannot be omitted, you can supply `format: true` like this:]]]
+NOTE: 형식 세그먼트를 필수로 하고, 생략될 수 없게 하고자 한다면, 다음과 같이 `format: true`를 제공할 수 있습니다.: [[[NOTE: If you want to make the format segment mandatory, so it cannot be omitted, you can supply `format: true` like this:]]]
 
 ```ruby
 get '*pages', to: 'pages#show', format: true
@@ -866,7 +866,7 @@ match '/application.js', to: Sprockets, via: :all
 `Sprockets`가 `call`에 응답하고, `[status, headers, body]`를 반환하는 동안, Rack 응용프로그램과 액션의 차이에 대해 라우터는 알지 못합니다. [[[As long as `Sprockets` responds to `call` and returns a `[status, headers, body]`, the router won't know the difference between the Rack application and an action.]]]
 Rack 응용프로그램이 모든 verbs를 적절하게 고려하여 다루도록 허용하기를 바라는 것이 `via: :all`의 적절한 용법입니다. [[[This is an appropriate use of `via: :all`, as you will want to allow your Rack application to handle all verbs as it considers appropriate.]]]
 
-노트: `'posts#index'`는 실제로 `PostsController.action(:index)`로 확장되어, 유효한 Rack 응용프로그램을 반환합니다. [[[NOTE: For the curious, `'posts#index'` actually expands out to `PostsController.action(:index)`, which returns a valid Rack application.]]]
+NOTE: `'posts#index'`는 실제로 `PostsController.action(:index)`로 확장되어, 유효한 Rack 응용프로그램을 반환합니다. [[[NOTE: For the curious, `'posts#index'` actually expands out to `PostsController.action(:index)`, which returns a valid Rack application.]]]
 
 ### [Using `root`] `root` 사용하기
 
@@ -879,7 +879,7 @@ root 'pages#main' # shortcut for the above
 
 `root` 라우트는 파일의 맨 처음에 두어야 하는데, 이것이 가장 일반적인 라우트이고 처음 매칭되어야 하는 것이기 때문입니다. [[[You should put the `root` route at the top of the file, because it is the most popular route and should be matched first.]]]
 
-노트: `root` 라우트는 `GET` 요청만 액션으로 라우트합니다. [[[NOTE: The `root` route only routes `GET` requests to the action.]]]
+NOTE: `root` 라우트는 `GET` 요청만 액션으로 라우트합니다. [[[NOTE: The `root` route only routes `GET` requests to the action.]]]
 
 네임스페이스나 스코프 안에 root를 사용할 수도 있습니다. 예를 들면: [[[You can also use root inside namespaces and scopes as well.  For example:]]]
 
@@ -925,7 +925,7 @@ resources :photos, controller: 'images'
 | PATCH/PUT | /photos/:id      | update  | photo_path(:id)      |
 | DELETE    | /photos/:id      | destroy | photo_path(:id)      |
 
-노트: 이 리소스의 경로를 생성하기 위해 `photos_path`, `new_photo_path` 등을 사용하십시오. [[[NOTE: Use `photos_path`, `new_photo_path`, etc. to generate paths for this resource.]]]
+NOTE: 이 리소스의 경로를 생성하기 위해 `photos_path`, `new_photo_path` 등을 사용하십시오. [[[NOTE: Use `photos_path`, `new_photo_path`, etc. to generate paths for this resource.]]]
 
 네임스페이스 컨트롤러의 경우 디렉터리 표기를 사용할 수 있습니다. 예를 들면: [[[For namespaced controllers you can use the directory notation. For example:]]]
 
@@ -935,7 +935,7 @@ resources :user_permissions, controller: 'admin/user_permissions'
 
 이것은 `Admin::UserPermissions` 컨트롤러로 라우트할 것입니다. [[[This will route to the `Admin::UserPermissions` controller.]]]
 
-노트: 디렉터리 표기만 지원됩니다. 루비 상수 표기법(예. `:controller => 'Admin::UserPermissions'`)으로 컨트롤러를 지정하면 라우팅 문제와 경고 결과를 초래할 수 있습니다. [[[NOTE: Only the directory notation is supported. Specifying the controller with ruby constant notation (eg. `:controller => 'Admin::UserPermissions'`) can lead to routing problems and results in a warning.]]]
+NOTE: 디렉터리 표기만 지원됩니다. 루비 상수 표기법(예. `:controller => 'Admin::UserPermissions'`)으로 컨트롤러를 지정하면 라우팅 문제와 경고 결과를 초래할 수 있습니다. [[[NOTE: Only the directory notation is supported. Specifying the controller with ruby constant notation (eg. `:controller => 'Admin::UserPermissions'`) can lead to routing problems and results in a warning.]]]
 
 ### [Specifying Constraints] 제약 지정하기
 
@@ -958,19 +958,19 @@ constraints(id: /[A-Z][A-Z][0-9]+/) do
 end
 ```
 
-노트: 물론, 이 문맥에서 비-리소스풀 라우트 내에 보다 향상된 제약을 사용할 수도 있습니다. [[[NOTE: Of course, you can use the more advanced constraints available in non-resourceful routes in this context.]]]
+NOTE: 물론, 이 문맥에서 비-리소스풀 라우트 내에 보다 향상된 제약을 사용할 수도 있습니다. [[[NOTE: Of course, you can use the more advanced constraints available in non-resourceful routes in this context.]]]
 
-팁: 기본적으로 `:id` 매개변수는 구두점(.)을 허용하지 않습니다. 이것은 구두점이 형식화된 라우트에서 구분자로 사용되기 때문입니다. 만약 `:id` 내에 구두점을 사용해야 할 필요가 있다면 이것을 오버라이드한 제약을 추가하십시오. 예를 들어 `id: /[^\/]+/`는 슬래시(/)를 제외한 모든 것을 허용합니다. [[[TIP: By default the `:id` parameter doesn't accept dots - this is because the dot is used as a separator for formatted routes. If you need to use a dot within an `:id` add a constraint which overrides this - for example `id: /[^\/]+/` allows anything except a slash.]]]
+TIP: 기본적으로 `:id` 매개변수는 구두점(.)을 허용하지 않습니다. 이것은 구두점이 형식화된 라우트에서 구분자로 사용되기 때문입니다. 만약 `:id` 내에 구두점을 사용해야 할 필요가 있다면 이것을 오버라이드한 제약을 추가하십시오. 예를 들어 `id: /[^\/]+/`는 슬래시(/)를 제외한 모든 것을 허용합니다. [[[TIP: By default the `:id` parameter doesn't accept dots - this is because the dot is used as a separator for formatted routes. If you need to use a dot within an `:id` add a constraint which overrides this - for example `id: /[^\/]+/` allows anything except a slash.]]]
 
-### Overriding the Named Helpers
+### [Overriding the Named Helpers] 명명된 헬퍼 오버리이드하기
 
-The `:as` option lets you override the normal naming for the named route helpers. For example:
+`:as` 옵션은 명명된 라우트 헬퍼의 평범한 작명을 오버라이드할 수 있게 해줍니다. 예를 들면: [[[The `:as` option lets you override the normal naming for the named route helpers. For example:]]]
 
 ```ruby
 resources :photos, as: 'images'
 ```
 
-will recognize incoming paths beginning with `/photos` and route the requests to `PhotosController`, but use the value of the :as option to name the helpers.
+이것은 `/photos`로 시작하는 유입 경로를 인식하여 요청을 `PhotosController`로 라우트합니다. 그러나 :as 옵션의 값을 사용하여 헬퍼의 이름을 짓습니다. [[[will recognize incoming paths beginning with `/photos` and route the requests to `PhotosController`, but use the value of the :as option to name the helpers.]]]
 
 | HTTP Verb | Path             | Action  | Named Helper         |
 | --------- | ---------------- | ------- | -------------------- |
@@ -982,24 +982,24 @@ will recognize incoming paths beginning with `/photos` and route the requests to
 | PATCH/PUT | /photos/:id      | update  | image_path(:id)      |
 | DELETE    | /photos/:id      | destroy | image_path(:id)      |
 
-### Overriding the `new` and `edit` Segments
+### [Overriding the `new` and `edit` Segments] `new`와 `edit` 세그먼트 오버라이드하기
 
-The `:path_names` option lets you override the automatically-generated "new" and "edit" segments in paths:
+`:path_names` 옵션은 경로상 자동 생성된 "new"와 "edit" 세그먼트를 오버라이드할 수 있게 합니다. [[[The `:path_names` option lets you override the automatically-generated "new" and "edit" segments in paths:]]]
 
 ```ruby
 resources :photos, path_names: { new: 'make', edit: 'change' }
 ```
 
-This would cause the routing to recognize paths such as:
+이것은 라우팅을 다음과 같은 경로로 인식하게 합니다. [[[This would cause the routing to recognize paths such as:]]]
 
 ```
 /photos/make
 /photos/1/change
 ```
 
-NOTE: The actual action names aren't changed by this option. The two paths shown would still route to the `new` and `edit` actions.
+NOTE: 실제 액션명은 이 옵션에 의해 변경되지 않습니다. 두 경로는 여전히 `new`와 `edit` 액션으로 라우트될 것입니다. [[[NOTE: The actual action names aren't changed by this option. The two paths shown would still route to the `new` and `edit` actions.]]]
 
-TIP: If you find yourself wanting to change this option uniformly for all of your routes, you can use a scope.
+TIP: 만약 모든 라우트를 이 옵션으로 동일하게 변경하고 싶다면, 스코프를 사용할 수 있습니다. [[[TIP: If you find yourself wanting to change this option uniformly for all of your routes, you can use a scope.]]]
 
 ```ruby
 scope path_names: { new: 'make' } do
