@@ -1007,9 +1007,10 @@ scope path_names: { new: 'make' } do
 end
 ```
 
-### Prefixing the Named Route Helpers
+### [Prefixing the Named Route Helpers] 명명된 라우트 헬퍼에 접두어 붙이기
 
-You can use the `:as` option to prefix the named route helpers that Rails generates for a route. Use this option to prevent name collisions between routes using a path scope. For example:
+레일스가 라우트를 위해 생성한 명명된 라우트 헬퍼에 접두어를 붙이기 위해 `:as` 옵션을 사용할 수 있습니다. [[[You can use the `:as` option to prefix the named route helpers that Rails generates for a route.]]]
+라우트와 경로 스코프간의 이름 충돌을 방지하려면 이 옵션을 사용하십시오. 예를 들면: [[[Use this option to prevent name collisions between routes using a path scope. For example:]]]
 
 ```ruby
 scope 'admin' do
@@ -1019,9 +1020,9 @@ end
 resources :photos
 ```
 
-This will provide route helpers such as `admin_photos_path`, `new_admin_photo_path` etc.
+이것은 `admin_photos_path`, `new_admin_photo_path` 등과 같은 라우트 헬퍼를 제공할 것입니다. [[[This will provide route helpers such as `admin_photos_path`, `new_admin_photo_path` etc.]]]
 
-To prefix a group of route helpers, use `:as` with `scope`:
+라우트 헬퍼 집합에 접두어를 붙이려면, `scope:`와 함께 `:as`를 사용하십시오. [[[To prefix a group of route helpers, use `:as` with `scope`:]]]
 
 ```ruby
 scope 'admin', as: 'admin' do
@@ -1031,9 +1032,9 @@ end
 resources :photos, :accounts
 ```
 
-This will generate routes such as `admin_photos_path` and `admin_accounts_path` which map to `/admin/photos` and `/admin/accounts` respectively.
+이것은 `/admin/photos`와 `/admin/accounts`에 매핑되는 `admin_photos_path`와 `admin_accounts_path` 같은 라우트를 생성할 것입니다. [[[This will generate routes such as `admin_photos_path` and `admin_accounts_path` which map to `/admin/photos` and `/admin/accounts` respectively.]]]
 
-NOTE: The `namespace` scope will automatically add `:as` as well as `:module` and `:path` prefixes.
+NOTE: `namespace` 스코프는 `:module`과 `:path` 접두어와 마찬가지로 `:as`를 자동적으로 추가할 것입니다. [[[NOTE: The `namespace` scope will automatically add `:as` as well as `:module` and `:path` prefixes.]]]
 
 You can prefix routes with a named parameter also:
 
@@ -1043,7 +1044,7 @@ scope ':username' do
 end
 ```
 
-This will provide you with URLs such as `/bob/posts/1` and will allow you to reference the `username` part of the path as `params[:username]` in controllers, helpers and views.
+이것은 `/bob/posts/1`과 같은 URL을 제공할 것이고, 컨트롤러, 헬퍼 그리고 뷰에서 `params[:username]` 경로의 `username`을 참조할 수 있게 할 것입니다. [[[This will provide you with URLs such as `/bob/posts/1` and will allow you to reference the `username` part of the path as `params[:username]` in controllers, helpers and views.]]]
 
 ### Restricting the Routes Created
 
