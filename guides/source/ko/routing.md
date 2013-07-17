@@ -1150,40 +1150,43 @@ $ CONTROLLER=users rake routes
 
 TIP: 터미널 창을 행이 줄바꿈하지 않을 때까지 넓히면 `rake routes`의 출력은 더 읽기 쉬워짐을 확인할 것입니다. [[[TIP: You'll find that the output from `rake routes` is much more readable if you widen your terminal window until the output lines don't wrap.]]]
 
-### Testing Routes
+### [Testing Routes] 라우트 테스트하기
 
-Routes should be included in your testing strategy (just like the rest of your application). Rails offers three [built-in assertions](http://api.rubyonrails.org/classes/ActionDispatch/Assertions/RoutingAssertions.html) designed to make testing routes simpler:
+라우트는 (응용 프로그램의 다른 부분과 마찬가지로) 테스팅 전략에 포함되어야 합니다. [[[Routes should be included in your testing strategy (just like the rest of your application).]]]
+레일스는 테스트를 보다 간단하게 할 수 있도록 설계된 세 가지 [내장 assertion]을 제공합니다.: (http://api.rubyonrails.org/classes/ActionDispatch/Assertions/RoutingAssertions.html)[[[Rails offers three [built-in assertions](http://api.rubyonrails.org/classes/ActionDispatch/Assertions/RoutingAssertions.html) designed to make testing routes simpler:]]]
 
 * `assert_generates`
 * `assert_recognizes`
 * `assert_routing`
 
-#### The `assert_generates` Assertion
+#### [The `assert_generates` Assertion] `assert_generates` Assertion
 
-`assert_generates` asserts that a particular set of options generate a particular path and can be used with default routes or custom routes. For example:
+`assert_generates`는 옵션의 특정 셋이 특정 경로를 생성하고 기본 라우트 혹은 커스텀 라우트와 함께 사용될 수 있음을 assert 합니다. 예를 들면:[[[`assert_generates` asserts that a particular set of options generate a particular path and can be used with default routes or custom routes. For example:]]]
 
 ```ruby
 assert_generates '/photos/1', { controller: 'photos', action: 'show', id: '1' }
 assert_generates '/about', controller: 'pages', action: 'about'
 ```
 
-#### The `assert_recognizes` Assertion
+#### [The `assert_recognizes` Assertion] `assert_recognizes` Assertion
 
-`assert_recognizes` is the inverse of `assert_generates`. It asserts that a given path is recognized and routes it to a particular spot in your application. For example:
+`assert_recognizes`는 `assert_generates`의 반대입니다. [[[`assert_recognizes` is the inverse of `assert_generates`.]]]
+주어진 경로가 응용프로그램의 특정 지점을 인식하고 라우트함을 assert 합니다. 예를 들면: [[[It asserts that a given path is recognized and routes it to a particular spot in your application. For example:]]]
 
 ```ruby
 assert_recognizes({ controller: 'photos', action: 'show', id: '1' }, '/photos/1')
 ```
 
-You can supply a `:method` argument to specify the HTTP verb:
+`:method` 인수를 제공하여 HTTP verb를 지정할 수 있습니다.: [[[You can supply a `:method` argument to specify the HTTP verb:]]]
 
 ```ruby
 assert_recognizes({ controller: 'photos', action: 'create' }, { path: 'photos', method: :post })
 ```
 
-#### The `assert_routing` Assertion
+#### [The `assert_routing` Assertion] `assert_routing` Assertion
 
-The `assert_routing` assertion checks the route both ways: it tests that the path generates the options, and that the options generate the path. Thus, it combines the functions of `assert_generates` and `assert_recognizes`:
+`assert_routing`은 양쪽 방법 모두로 라우트를 점검합니다: 이것은 경로가 옵션을 생성하는 것을, 그리고 옵션이 경로를 생성하는 것을 테스트합니다. [[[The `assert_routing` assertion checks the route both ways: it tests that the path generates the options, and that the options generate the path.]]]
+따라서, 이것은 `assert_generates`와 `assert_recognizes`의 기능을 합친 것입니다. [[[Thus, it combines the functions of `assert_generates` and `assert_recognizes`:]]]
 
 ```ruby
 assert_routing({ path: 'photos', method: :post }, { controller: 'photos', action: 'create' })
