@@ -1100,9 +1100,9 @@ ActiveSupport::Inflector.inflections do |inflect|
 end
 ```
 
-### Using `:as` in Nested Resources
+### [Using `:as` in Nested Resources] 내포 리소스에 `:as` 사용하기
 
-The `:as` option overrides the automatically-generated name for the resource in nested route helpers. For example:
+`:as` 옵션은 내포 라우트 헬퍼를 위해 자동 생성된 이름을 오버라이드합니다. 예를 들면: [[[The `:as` option overrides the automatically-generated name for the resource in nested route helpers. For example:]]]
 
 ```ruby
 resources :magazines do
@@ -1110,12 +1110,12 @@ resources :magazines do
 end
 ```
 
-This will create routing helpers such as `magazine_periodical_ads_url` and `edit_magazine_periodical_ad_path`.
+이것은 `magazine_periodical_ads_url`과 `edit_magazine_periodical_ad_path` 같은 라우팅 헬퍼를 만듭니다. [[[This will create routing helpers such as `magazine_periodical_ads_url` and `edit_magazine_periodical_ad_path`.]]]
 
-Inspecting and Testing Routes
+[Inspecting and Testing Routes] 라우트를 검사하고 테스트하기
 -----------------------------
 
-Rails offers facilities for inspecting and testing your routes.
+레일스는 라우트를 검사하고 테스트하기 위한 기능을 제공합니다. [[[Rails offers facilities for inspecting and testing your routes.]]]
 
 ### Listing Existing Routes
 
