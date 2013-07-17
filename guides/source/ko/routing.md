@@ -1117,18 +1117,23 @@ end
 
 레일스는 라우트를 검사하고 테스트하기 위한 기능을 제공합니다. [[[Rails offers facilities for inspecting and testing your routes.]]]
 
-### Listing Existing Routes
+### [Listing Existing Routes] 기존 라우트 목록보기
 
-To get a complete list of the available routes in your application, visit `http://localhost:3000/rails/info/routes` in your browser while your server is running in the **development** environment. You can also execute the `rake routes` command in your terminal to produce the same output.
+응용프로그램에서 사용가능한 전체 목록을 얻으려면, 서버가 **개발** 환경에서 구동되는 동안 부라우저로 `http://localhost:3000/rails/info/routes`를 방문하십시오. [[[To get a complete list of the available routes in your application, visit `http://localhost:3000/rails/info/routes` in your browser while your server is running in the **development** environment.]]]
+또한 터미널에서 `rake routes`를 실행하면 동일한 출력을 만들 수 있습니다. [[[You can also execute the `rake routes` command in your terminal to produce the same output.]]]
 
-Both methods will list all of your routes, in the same order that they appear in `routes.rb`. For each route, you'll see:
+두 메서드는 `routes.rb` 내에 나타나는 동일 순서대로 전체 라우트의 목록을 보여줄 것입니다. [[[Both methods will list all of your routes, in the same order that they appear in `routes.rb`.]]]
+각각의 라우트에서 다음 내용을 확인할 수 있습니다.:[[[For each route, you'll see:]]]
 
-* The route name (if any)
-* The HTTP verb used (if the route doesn't respond to all verbs)
-* The URL pattern to match
-* The routing parameters for the route
+* 라우트 이름 (만약 있다면) [[[The route name (if any)]]]
 
-For example, here's a small section of the `rake routes` output for a RESTful route:
+* 사용되는 HTTP verb (만약 라우트가 모든 verb에 응답하는 것이 아니라면) [[[The HTTP verb used (if the route doesn't respond to all verbs)]]]
+
+* 매칭될 URL 패턴 [[[The URL pattern to match]]]
+
+* 라우트를 위한 라우팅 매개변수들 [[[The routing parameters for the route]]]
+
+예를 들어, 아래 레스트풀 라우트를 위한 `rake routes`의 작은 부분이 있습니다. [[[For example, here's a small section of the `rake routes` output for a RESTful route:]]]
 
 ```
     users GET    /users(.:format)          users#index
@@ -1137,13 +1142,13 @@ For example, here's a small section of the `rake routes` output for a RESTful ro
 edit_user GET    /users/:id/edit(.:format) users#edit
 ```
 
-You may restrict the listing to the routes that map to a particular controller setting the `CONTROLLER` environment variable:
+`CONTROLLER` 환경 변수를 설정하여 특정 컨트롤러로 매핑되는 라우트의 목록으로 한정할 수 있습니다. [[[You may restrict the listing to the routes that map to a particular controller setting the `CONTROLLER` environment variable:]]]
 
 ```bash
 $ CONTROLLER=users rake routes
 ```
 
-TIP: You'll find that the output from `rake routes` is much more readable if you widen your terminal window until the output lines don't wrap.
+TIP: 터미널 창을 행이 줄바꿈하지 않을 때까지 넓히면 `rake routes`의 출력은 더 읽기 쉬워짐을 확인할 것입니다. [[[TIP: You'll find that the output from `rake routes` is much more readable if you widen your terminal window until the output lines don't wrap.]]]
 
 ### Testing Routes
 
