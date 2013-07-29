@@ -6,7 +6,9 @@
 본 가이드를 읽고나면 아래 사항을 알게 될것입니다. [[[After reading this guide, you will know:]]]
 
 * 액티브레코드 모델간의 Association 설정하는 방법 [[[How to declare associations between Active Record models.]]]
+
 * 액티브레코드 Association의 다양한 종류에 대한 이해 [[[How to understand the various types of Active Record associations.]]]
+
 * Association 모델에 메서드를 추가하는 방법 [[[How to use the methods added to your models by creating associations.]]]
 
 --------------------------------------------------------------------------------
@@ -1463,9 +1465,13 @@ end
 모객체가 삭제될때 연결된 객체들에 발생하는 현상을 제어할수 있습니다. [[[Controls what happens to the associated objects when their owner is destroyed:]]]
 
 * `:destroy` 옵션은 연결된 객체들도 destory 됩니다. [[[`:destroy` causes all the associated objects to also be destroyed]]]
+
 * `:delete_all` 옵션은 연결된 객체들을 데이터베이스에서 직접 삭제합니다.(따라서 연결된 객체의 어떠한 콜백도 실행되지 않습니다.) [[[`:delete_all` causes all the associated objects to be deleted directly from the database (so callbacks will not execute)]]]
+
 * `:nullify` 옵션은 연결된 객체의 foreign keys를 `NULL`로 설정합니다. 콜백은 실행되지 않습니다. [[[`:nullify` causes the foreign keys to be set to `NULL`. Callbacks are not executed.]]]
+
 * `:restrict_with_exception` 옵션은 연결된 객체가 있는경우 오류가 발생합니다. [[[`:restrict_with_exception` causes an exception to be raised if there are any associated records]]]
+
 * `:restrict_with_error` 옵션은 연결된 객체가 있는경우 모객체에 에러를 추가합니다. [[[`:restrict_with_error` causes an error to be added to the owner if there are any associated objects]]]
 
 NOTE: `:through` 옵션이 설정되어 있는경우 이 옵션은 무시됩니다. [[[This option is ignored when you use the `:through` option on the association.]]]
@@ -2137,5 +2143,7 @@ end
 확장모듈에서는 proxy_association 접근자의 3가지 속성을 이용하여 association proxy의 내부를 참조할 수 있습니다. [[[Extensions can refer to the internals of the association proxy using these three attributes of the `proxy_association` accessor:]]]
 
 * proxy_association.owner 는 관계설정시에 컬렉션을 소유하는 객체를 반환합니다. [[[`proxy_association.owner` returns the object that the association is a part of.]]]
+
 * proxy_association.reflection 은 관계를 기술하는 reflection 객체를 반환합니다. [[[`proxy_association.reflection` returns the reflection object that describes the association.]]]
+
 * proxy_assoction.target 은 belongs_to 또는 has_one 에 대한 연관객체, 또는 has_many 또는 has_and_belongs_to_many 에 대한 연관객체들의 컬렉션을 반환합니다. [[[`proxy_association.target` returns the associated object for `belongs_to` or `has_one`, or the collection of associated objects for `has_many` or `has_and_belongs_to_many`.]]]
