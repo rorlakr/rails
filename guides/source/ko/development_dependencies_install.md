@@ -33,7 +33,7 @@
 
 * [Pro Git](http://git-scm.com/book)은 크리에이티브 커먼스 라이센스로 제공되는 Git에 대한 온전한 책입니다. [[[[Pro Git](http://git-scm.com/book) is an entire book about Git with a Creative Commons license.]]]
 
-### [Clone the Ruby on Rails Repository] 루비 온 레일스 리파지토리 복제
+### [Clone the Ruby on Rails Repository] 루비 온 레일스 저장소 복제
 
 루비 온 레일스 소스 코드를 위치시키고자 하는 폴더로 이동하여(이 작업은 `rails` 서브디렉터리를 만듭니다) 다음을 실행합니다.: [[[Navigate to the folder where you want the Ruby on Rails source code (it will create its own `rails` subdirectory) and run:]]]
 
