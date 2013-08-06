@@ -15,7 +15,7 @@
 [The Hard Way] 어려운 방법
 ------------
 
-위에서 본 것과 같이 레일스 개발 백스를 사용할 수 없디면, 루비 온 레일스 코어 개발을 위한 개발 박스를 수동으로 구축하는 단계가 다음에 있습니다. [[[In case you can't use the Rails development box, see section above, these are the steps to manually build a development box for Ruby on Rails core development.]]]
+위에서 본 것과 같이 레일스 개발 박스를 사용할 수 없디면, 루비 온 레일스 코어 개발을 위한 개발 박스를 수동으로 구축하는 단계가 다음에 있습니다. [[[In case you can't use the Rails development box, see section above, these are the steps to manually build a development box for Ruby on Rails core development.]]]
 
 ### [Install Git] Git 설치
 
