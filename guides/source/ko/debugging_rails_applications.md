@@ -1,21 +1,21 @@
-Debugging Rails Applications
+[Debugging Rails Applications] 레일스 응용프로그램 디버깅하
 ============================
 
-This guide introduces techniques for debugging Ruby on Rails applications.
+본 가이드는 루비 온 레일스 응용프로그램을 디버깅하기 위한 기술을 소개합니다. [[[This guide introduces techniques for debugging Ruby on Rails applications.]]]
 
-After reading this guide, you will know:
+본 가이드를 읽은 후, 다음을 알게 됩니다. [[[After reading this guide, you will know:]]]
 
-* The purpose of debugging.
-* How to track down problems and issues in your application that your tests aren't identifying.
-* The different ways of debugging.
-* How to analyze the stack trace.
+* 디버깅의 목적. [[[The purpose of debugging.]]]
+* 테스트 결과가 확인되지 않는 응용프로그램에서 문제와 이슈를 추척하는 방법. [[[How to track down problems and issues in your application that your tests aren't identifying.]]]
+* 디버깅의 다른 방법. [[[The different ways of debugging.]]]
+* 스택 추적을 분석하는 방법. [[[How to analyze the stack trace.]]]
 
 --------------------------------------------------------------------------------
 
-View Helpers for Debugging
+[View Helpers for Debugging] 디버깅을 위한 뷰 헬퍼들
 --------------------------
 
-One common task is to inspect the contents of a variable. In Rails, you can do this with three methods:
+한가지 일반적인 작업은 변수의 내용을 확인하는 것입니다. 레일스에서는 다음의 세 가지 메서드로 확인할 수 있습니다. [[[One common task is to inspect the contents of a variable. In Rails, you can do this with three methods:]]]
 
 * `debug`
 * `to_yaml`
@@ -23,7 +23,7 @@ One common task is to inspect the contents of a variable. In Rails, you can do t
 
 ### `debug`
 
-The `debug` helper will return a \<pre> tag that renders the object using the YAML format. This will generate human-readable data from any object. For example, if you have this code in a view:
+`debug` 헬퍼는 YAML 형식을 사용하여 객체를 렌더링한 \<pre> 태그를 반환합니다. 이것은 어떤 객체라도 사람이 읽을 수 있는 데이터를 생성합니다. 예를 들어, 뷰에 다음의 코드가 있다면: [[[The `debug` helper will return a \<pre> tag that renders the object using the YAML format. This will generate human-readable data from any object. For example, if you have this code in a view:]]]
 
 ```html+erb
 <%= debug @post %>
@@ -33,7 +33,7 @@ The `debug` helper will return a \<pre> tag that renders the object using the YA
 </p>
 ```
 
-You'll see something like this:
+다음가 같은 것을 볼 것입니다. [[[You'll see something like this:]]]
 
 ```yaml
 --- !ruby/object:Post
@@ -52,7 +52,7 @@ Title: Rails debugging guide
 
 ### `to_yaml`
 
-Displaying an instance variable, or any other object or method, in YAML format can be achieved this way:
+YAML 형식으로 인스턴스 변수나 다른 객체 혹은 메서드를 표시하는 것은 이 방법으로 달성할 수 있습니다. [[[Displaying an instance variable, or any other object or method, in YAML format can be achieved this way:]]]
 
 ```html+erb
 <%= simple_format @post.to_yaml %>
@@ -62,9 +62,9 @@ Displaying an instance variable, or any other object or method, in YAML format c
 </p>
 ```
 
-The `to_yaml` method converts the method to YAML format leaving it more readable, and then the `simple_format` helper is used to render each line as in the console. This is how `debug` method does its magic.
+`to_yaml` 메서드는 메서드를 보다 읽기 쉬운 YAML 포맷으로 변환합니다. 그리고 `simple_format` 헬퍼는 콘솔에 표시하는 것처럼 각 라인을 렌더링하는데 사용됩니다. 이것이 `debug` 메서드가 마법을 발휘하는 방법입니다. [[[The `to_yaml` method converts the method to YAML format leaving it more readable, and then the `simple_format` helper is used to render each line as in the console. This is how `debug` method does its magic.]]]
 
-As a result of this, you will have something like this in your view:
+그 결과로 뷰에서는 다음과 같은 것을 보게 될 것입니다. [[[As a result of this, you will have something like this in your view:]]]
 
 ```yaml
 --- !ruby/object:Post
@@ -82,7 +82,7 @@ Title: Rails debugging guide
 
 ### `inspect`
 
-Another useful method for displaying object values is `inspect`, especially when working with arrays or hashes. This will print the object value as a string. For example:
+특히 배열 혹은 해시와 함께 사용할 때, 객체의 값을 표시하는 또다른 유용한 메서드는 `inspect`입니다. 이것은 객체의 값을 문자열로 출력할 것입니다. 예를 들면: [[[Another useful method for displaying object values is `inspect`, especially when working with arrays or hashes. This will print the object value as a string. For example:]]]
 
 ```html+erb
 <%= [1, 2, 3, 4, 5].inspect %>
@@ -100,49 +100,49 @@ Will be rendered as follows:
 Title: Rails debugging guide
 ```
 
-The Logger
+[The Logger] 로거
 ----------
 
-It can also be useful to save information to log files at runtime. Rails maintains a separate log file for each runtime environment.
+런타임 중에 정보를 로그 파일에 기록하는 것 또한 유용할 것입니다. 레일스는 각 런타임 환경별로 개별 로그 파일을 관리합니다. [[[It can also be useful to save information to log files at runtime. Rails maintains a separate log file for each runtime environment.]]]
 
-### What is the Logger?
+### [What is the Logger?] 로거는 무엇인가?
 
-Rails makes use of the `ActiveSupport::Logger` class to write log information. You can also substitute another logger such as `Log4r` if you wish.
+레일스는 로그 정보를 기록하기 위해 `ActiveSupport::Logger` 클래스를 활용합니다. 원한다면 `Log4r`과 같은 다른 로거로 대체할 수도 있습니다. [[[Rails makes use of the `ActiveSupport::Logger` class to write log information. You can also substitute another logger such as `Log4r` if you wish.]]]
 
-You can specify an alternative logger in your `environment.rb` or any environment file:
+`environment.rb` 혹은 다른 환경 파일에서 대체 로거를 지정할 수 있습니다. [[[You can specify an alternative logger in your `environment.rb` or any environment file:]]]
 
 ```ruby
 Rails.logger = Logger.new(STDOUT)
 Rails.logger = Log4r::Logger.new("Application Log")
 ```
 
-Or in the `Initializer` section, add _any_ of the following
+또는 `Initializer` 섹션 안에, 다음 중 하나를 추가합니다. [[[Or in the `Initializer` section, add _any_ of the following]]]
 
 ```ruby
 config.logger = Logger.new(STDOUT)
 config.logger = Log4r::Logger.new("Application Log")
 ```
 
-TIP: By default, each log is created under `Rails.root/log/` and the log file name is `environment_name.log`.
+TIP: 기본값으로, 각 로그는 `Rails.root/log/` 아래 생성됩니다. 그리고 로그 파일명은 `environment_name.log` 입니다. [[[TIP: By default, each log is created under `Rails.root/log/` and the log file name is `environment_name.log`.]]]
 
 ### Log Levels
 
-When something is logged it's printed into the corresponding log if the log level of the message is equal or higher than the configured log level. If you want to know the current log level you can call the `Rails.logger.level` method.
+무엇인가가 로그될 때, 메시지의 로그 레벨이 로그 레벨 설정값 이상이라면 로그는 해당하는 로그에 출력됩니다. 만약 현재 로그 레벨을 알고 싶다면 `Rails.logger.level` 메서드를 호출할 수 있습니다. [[[When something is logged it's printed into the corresponding log if the log level of the message is equal or higher than the configured log level. If you want to know the current log level you can call the `Rails.logger.level` method.]]]
 
-The available log levels are: `:debug`, `:info`, `:warn`, `:error`, `:fatal`, and `:unknown`, corresponding to the log level numbers from 0 up to 5 respectively. To change the default log level, use
+사용 가능한 로그 레벨은: `:debug`, `:info`, `:warn`, `:error`, `:fatal`, 그리고 `:unknown`이며 이에 상응하는 로그 레벨 번호는 0부터 5입니다. 기본 로그 레벨을 변경하려면 다음을 사용하십시오. [[[The available log levels are: `:debug`, `:info`, `:warn`, `:error`, `:fatal`, and `:unknown`, corresponding to the log level numbers from 0 up to 5 respectively. To change the default log level, use]]]
 
 ```ruby
 config.log_level = :warn # In any environment initializer, or
 Rails.logger.level = 0 # at any time
 ```
 
-This is useful when you want to log under development or staging, but you don't want to flood your production log with unnecessary information.
+이것은 개발 환경과 스테이징 환경 하에서 로그를 기록하고자 할 때 유용하지만, 프로덕션 로그가 불필요한 정보로 넘쳐 흐르는 것을 원하지는 않을 것입니다. [[[This is useful when you want to log under development or staging, but you don't want to flood your production log with unnecessary information.]]]
 
-TIP: The default Rails log level is `info` in production mode and `debug` in development and test mode.
+TIP: 기본 레일스 로그 레벨은 프로덕션 모드에서는 `info`이고 개발과 테스트 모드에서는 `debug`입니다. [[[TIP: The default Rails log level is `info` in production mode and `debug` in development and test mode.]]]
 
-### Sending Messages
+### [Sending Messages] 메시지 보내기
 
-To write in the current log use the `logger.(debug|info|warn|error|fatal)` method from within a controller, model or mailer:
+현재 로그를 기록하려면 컨트롤러, 모델 혹은 메일러에서 `logger.(debug|info|warn|error|fatal)` 메서드를 사용하십시오. [[[To write in the current log use the `logger.(debug|info|warn|error|fatal)` method from within a controller, model or mailer:]]]
 
 ```ruby
 logger.debug "Person attributes hash: #{@person.attributes.inspect}"
@@ -150,7 +150,7 @@ logger.info "Processing the request..."
 logger.fatal "Terminating application, raised unrecoverable error!!!"
 ```
 
-Here's an example of a method instrumented with extra logging:
+여기 부가 로깅으로 계측된 메서드의 예제가 있습니다:[[[Here's an example of a method instrumented with extra logging:]]]
 
 ```ruby
 class PostsController < ApplicationController
@@ -174,7 +174,7 @@ class PostsController < ApplicationController
 end
 ```
 
-Here's an example of the log generated when this controller action is executed:
+아래는 이 컨트롤러 액션이 실행될 때 생성된 로그의 예입니다: [[[Here's an example of the log generated when this controller action is executed:]]]
 
 ```
 Processing PostsController#create (for 127.0.0.1 at 2008-09-08 11:52:54) [POST]
@@ -194,11 +194,11 @@ Redirected to #<Post:0x20af760>
 Completed in 0.01224 (81 reqs/sec) | DB: 0.00044 (3%) | 302 Found [http://localhost/posts]
 ```
 
-Adding extra logging like this makes it easy to search for unexpected or unusual behavior in your logs. If you add extra logging, be sure to make sensible use of log levels to avoid filling your production logs with useless trivia.
+이와 같이 부가 로깅을 더하면 로그상의 의도하지 않았거나 비정상적인 행동을 검색하기 쉽게 해줍니다. 만약 부가 로깅을 추가하려면 프로덕션 로그가 불필요한 내용들로 채워지는 것을 피하기 위해 로그 레벨을 합리적으로 사용해야 합니다. [[[Adding extra logging like this makes it easy to search for unexpected or unusual behavior in your logs. If you add extra logging, be sure to make sensible use of log levels to avoid filling your production logs with useless trivia.]]]
 
-### Tagged Logging
+### [Tagged Logging] 태그된 로깅
 
-When running multi-user, multi-account applications, it’s often useful to be able to filter the logs using some custom rules. `TaggedLogging` in ActiveSupport helps in doing exactly that by stamping log lines with subdomains, request ids, and anything else to aid debugging such applications.
+다중-사용자, 다중-계정 응용프로그램을 실행할 때는 종종 몇 가지 사용자 정의 규칙을 사용하여 로그를 필터링할 수 있게 하는 것이 유용합니다. 액티브 서포트의 `TaggedLogging`은 그러한 응용프로그램을 디버깅하는 것을 지원하는 서브도메인, 요청 id, 그리고 그밖의 것들을 로그에 찍어주어 정확히 그와 같은 일을 할 수 있도록 도와줍니다. [[[When running multi-user, multi-account applications, it’s often useful to be able to filter the logs using some custom rules. `TaggedLogging` in ActiveSupport helps in doing exactly that by stamping log lines with subdomains, request ids, and anything else to aid debugging such applications.]]]
 
 ```ruby
 logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
@@ -207,10 +207,10 @@ logger.tagged("BCX", "Jason") { logger.info "Stuff" }                   # Logs "
 logger.tagged("BCX") { logger.tagged("Jason") { logger.info "Stuff" } } # Logs "[BCX] [Jason] Stuff"
 ```
 
-Debugging with the `debugger` gem
+[Debugging with the `debugger` gem] `debugger`젬으로 디버깅하기
 ---------------------------------
 
-When your code is behaving in unexpected ways, you can try printing to logs or the console to diagnose the problem. Unfortunately, there are times when this sort of error tracking is not effective in finding the root cause of a problem. When you actually need to journey into your running source code, the debugger is your best companion.
+[[[When your code is behaving in unexpected ways, you can try printing to logs or the console to diagnose the problem. Unfortunately, there are times when this sort of error tracking is not effective in finding the root cause of a problem. When you actually need to journey into your running source code, the debugger is your best companion.]]]
 
 The debugger can also help you if you want to learn about the Rails source code but don't know where to start. Just debug any request to your application and use this guide to learn how to move from the code you have written deeper into Rails code.
 
