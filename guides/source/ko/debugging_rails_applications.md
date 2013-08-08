@@ -198,7 +198,7 @@ Completed in 0.01224 (81 reqs/sec) | DB: 0.00044 (3%) | 302 Found [http://localh
 
 ### [Tagged Logging] 태그된 로깅
 
-다중-사용자, 다중-계정 응용프로그램을 실행할 때는 종종 몇 가지 사용자 정의 규칙을 사용하여 로그를 필터링할 수 있게 하는 것이 유용합니다. 액티브 서포트의 `TaggedLogging`은 그러한 응용프로그램을 디버깅하는 것을 지원하는 서브도메인, 요청 id, 그리고 그밖의 것들을 로그에 찍어주어 정확히 그와 같은 일을 할 수 있도록 도와줍니다. [[[When running multi-user, multi-account applications, it’s often useful to be able to filter the logs using some custom rules. `TaggedLogging` in ActiveSupport helps in doing exactly that by stamping log lines with subdomains, request ids, and anything else to aid debugging such applications.]]]
+다중-사용자, 다중-계정 응용프로그램을 실행할 때는 몇 가지 사용자 정의 규칙을 사용하여 로그를 필터링할 수 있도록 하는 것이 종종 유용합니다. 액티브 서포트의 `TaggedLogging`은 그러한 응용프로그램을 디버깅하는 것을 지원하는 서브도메인, 요청 id, 그리고 그밖의 것들을 로그에 찍어주어 정확히 그와 같은 일을 할 수 있도록 도와줍니다. [[[When running multi-user, multi-account applications, it’s often useful to be able to filter the logs using some custom rules. `TaggedLogging` in ActiveSupport helps in doing exactly that by stamping log lines with subdomains, request ids, and anything else to aid debugging such applications.]]]
 
 ```ruby
 logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
@@ -210,21 +210,21 @@ logger.tagged("BCX") { logger.tagged("Jason") { logger.info "Stuff" } } # Logs "
 [Debugging with the `debugger` gem] `debugger`젬으로 디버깅하기
 ---------------------------------
 
-[[[When your code is behaving in unexpected ways, you can try printing to logs or the console to diagnose the problem. Unfortunately, there are times when this sort of error tracking is not effective in finding the root cause of a problem. When you actually need to journey into your running source code, the debugger is your best companion.]]]
+코드가 의도하지 않은 방식으로 작동할 때, 문제를 분석하기 위해 로그나 콘솔에 출력을 시도할 수 있습니다. 불행하게도, 문제의 근본 원인을 찾기에 이런 종류의 오류 추적이 효과적이지 않을 때가 있습니다. 실행되고 있는 소스 코드 내부로 여행을 떠나야 할 필요가 있을 때, 디버거는 최고의 동반자입니다. [[[When your code is behaving in unexpected ways, you can try printing to logs or the console to diagnose the problem. Unfortunately, there are times when this sort of error tracking is not effective in finding the root cause of a problem. When you actually need to journey into your running source code, the debugger is your best companion.]]]
 
-The debugger can also help you if you want to learn about the Rails source code but don't know where to start. Just debug any request to your application and use this guide to learn how to move from the code you have written deeper into Rails code.
+디버거는 또한 레일스 소스 코드에 대해 학습하고 싶지만 어디서부터 시작해야 할 지 모를 때 도움이 될 수도 있습니다. 그냥 응용프로그램에 대한 모든 요청을 디버그하고, 자신이 작성한 코드로부터 레일스 코드 깊은 곳으로 이동하는 것을 익히기 위해 본 가이드를 사용하십시오. [[[The debugger can also help you if you want to learn about the Rails source code but don't know where to start. Just debug any request to your application and use this guide to learn how to move from the code you have written deeper into Rails code.]]]
 
-### Setup
+### [Setup] 설정
 
-You can use the `debugger` gem to set breakpoints and step through live code in Rails. To install it, just run:
+중단점을 설정하고 레일스의 실제 코드를 단계적으로 관통하기(step through) 위해 `debugger` 젬을 사용할 수 있습니다. 이것을 설치하려면, 다음을 실행하십시오: [[[You can use the `debugger` gem to set breakpoints and step through live code in Rails. To install it, just run:]]]
 
 ```bash
 $ gem install debugger
 ```
 
-Rails has had built-in support for debugging since Rails 2.0. Inside any Rails application you can invoke the debugger by calling the `debugger` method.
+레일스는 레일스 2.0 버전부터 디버깅을 지원하는 내장 지원을 가지고 있습니다. 모든 레일스 응용프로그램 내부에서 `debugger` 메서드를 호출하여 디버거를 호출할 수 있습니다. [[[Rails has had built-in support for debugging since Rails 2.0. Inside any Rails application you can invoke the debugger by calling the `debugger` method.]]]
 
-Here's an example:
+여기 예제가 있습니다: [[[Here's an example:]]]
 
 ```ruby
 class PeopleController < ApplicationController
@@ -235,13 +235,13 @@ class PeopleController < ApplicationController
 end
 ```
 
-If you see this message in the console or logs:
+만약 콘솔이나 로그에 다음 메시지를 보게 된다면: [[[If you see this message in the console or logs:]]]
 
 ```
 ***** Debugger requested, but was not available: Start server with --debugger to enable *****
 ```
 
-Make sure you have started your web server with the option `--debugger`:
+웹 서버를 `--debugger` 옵션으로 웹 서버를 실행했는지 확인하십시오. [[[Make sure you have started your web server with the option `--debugger`:]]]
 
 ```bash
 $ rails server --debugger
@@ -251,11 +251,11 @@ $ rails server --debugger
 ...
 ```
 
-TIP: In development mode, you can dynamically `require \'debugger\'` instead of restarting the server, even if it was started without `--debugger`.
+TIP: 개발 모드에서는, `--debugger` 옵션 없이 실행했더라도, 서버를 재시작하지 않고도 동적으로 `require \'debugger\'` 할 수 있습니다. [[[TIP: In development mode, you can dynamically `require \'debugger\'` instead of restarting the server, even if it was started without `--debugger`.]]]
 
 ### The Shell
 
-As soon as your application calls the `debugger` method, the debugger will be started in a debugger shell inside the terminal window where you launched your application server, and you will be placed at the debugger's prompt `(rdb:n)`. The _n_ is the thread number. The prompt will also show you the next line of code that is waiting to run.
+응용프로그램이 `debugger` 메서드를 호출할 때, 디버거는 응용프로그램 서버가 실행된 터미널 창 안의 디버거 셸에서 시작될 것이며 디버거 프롬프트 `(rdb:n)`에 위치할 것입니다. _n_ 은 쓰레드 번호입니다. 프롬프트는 또한 실행 대기중인 코드의 다름 라인을 보여줄 것입니다. [[[As soon as your application calls the `debugger` method, the debugger will be started in a debugger shell inside the terminal window where you launched your application server, and you will be placed at the debugger's prompt `(rdb:n)`. The _n_ is the thread number. The prompt will also show you the next line of code that is waiting to run.]]]
 
 If you got there by a browser request, the browser tab containing the request will be hung until the debugger has finished and the trace has finished processing the entire request.
 
@@ -266,7 +266,7 @@ For example:
 (rdb:7)
 ```
 
-Now it's time to explore and dig into your application. A good place to start is by asking the debugger for help. Type: `help`
+이제 응응프로그램 내부를 탐구하고 발굴할 때입니다. 좋은 시작점은 디버거에게 도움말을 구하는 것입니다. `help`를 입력합니다: [[[Now it's time to explore and dig into your application. A good place to start is by asking the debugger for help. Type: `help`]]]
 
 ```
 (rdb:7) help
@@ -281,11 +281,11 @@ condition  down     finish  list    ps    save     thread  var
 continue   edit     frame   method  putl  set      tmate   where
 ```
 
-TIP: To view the help menu for any command use `help <command-name>` at the debugger prompt. For example: _`help var`_
+TIP: 특정 명령에 대한 도움말 메뉴를 보려면 `help <command-name>`을 디버거 프롬프트에서 사용하십시오. 예를 들어: _`help var`_ [[[TIP: To view the help menu for any command use `help <command-name>` at the debugger prompt. For example: _`help var`_]]]
 
-The next command to learn is one of the most useful: `list`. You can abbreviate any debugging command by supplying just enough letters to distinguish them from other commands, so you can also use `l` for the `list` command.
+다음으로 학습할 명령은 가장 유용한 것 중 하나인 `list` 입니다. 다른 명령어와 구별하기에 충분한 문자를 제공하여 모든 디버깅 명령을 생략할 수 있습니다. 그러므로 `list` 명령을 위해 `l`을 사용할 수도 있습니다. [[[The next command to learn is one of the most useful: `list`. You can abbreviate any debugging command by supplying just enough letters to distinguish them from other commands, so you can also use `l` for the `list` command.]]]
 
-This command shows you where you are in the code by printing 10 lines centered around the current line; the current line in this particular case is line 6 and is marked by `=>`.
+이 명령은 코드상에서 현재 라인을 중심으로 10 라인을 출력하여 보여줍니다; 본 예제에 특정한 경우 현재 라인은 6번째 라인이며 `=>`로 표시됩니다. [[[This command shows you where you are in the code by printing 10 lines centered around the current line; the current line in this particular case is line 6 and is marked by `=>`.]]]
 
 ```
 (rdb:7) list
@@ -302,7 +302,7 @@ This command shows you where you are in the code by printing 10 lines centered a
    10        format.json { render :json => @posts }
 ```
 
-If you repeat the `list` command, this time using just `l`, the next ten lines of the file will be printed out.
+만약 `list` 명령을, 지금은 `l`만 사용하여, 반복한다면 파일의 다음 10개 라인이 출력될 것입니다. [[[If you repeat the `list` command, this time using just `l`, the next ten lines of the file will be printed out.]]]
 
 ```
 (rdb:7) l
@@ -319,9 +319,9 @@ If you repeat the `list` command, this time using just `l`, the next ten lines o
    20        format.html # show.html.erb
 ```
 
-And so on until the end of the current file. When the end of file is reached, the `list` command will start again from the beginning of the file and continue again up to the end, treating the file as a circular buffer.
+그리고 현재 파일이 끝날 때까지 반복합니다. 파일의 끝에 다다르면, `list` 명령은 다시 파일의 처음으로부터 시작하여 끝까지 반복할 것입니다. 파일을 원형 버퍼로 취급하는 것입니다. [[[And so on until the end of the current file. When the end of file is reached, the `list` command will start again from the beginning of the file and continue again up to the end, treating the file as a circular buffer.]]]
 
-On the other hand, to see the previous ten lines you should type `list-` (or `l-`)
+반대로, 이전 열 개의 라임을 보려면 `list-` (혹은 `l-`)를 입력해야 합니다. [[[On the other hand, to see the previous ten lines you should type `list-` (or `l-`)]]]
 
 ```
 (rdb:7) l-
@@ -338,8 +338,8 @@ On the other hand, to see the previous ten lines you should type `list-` (or `l-
    10        format.json { render :json => @posts }
 ```
 
-This way you can move inside the file, being able to see the code above and over the line you added the `debugger`.
-Finally, to see where you are in the code again you can type `list=`
+이 방법으로 파일 내부로 들어가, `debugger`를 추가한 다음 라인을 볼 수 있습니다. [[[This way you can move inside the file, being able to see the code above and over the line you added the `debugger`.]]]
+마지막으로, 현재 실행중인 코드를 다시 보려면 `list=`를 입력할 수 있습니다. [[[Finally, to see where you are in the code again you can type `list=`]]]
 
 ```
 (rdb:7) list=
@@ -358,9 +358,9 @@ Finally, to see where you are in the code again you can type `list=`
 
 ### The Context
 
-When you start debugging your application, you will be placed in different contexts as you go through the different parts of the stack.
+응용프로그램 디버깅을 시작할 때, 스택의 다른 부분을 거쳐감에 따라 다른 컨텍스트에 위치할 것입니다. [[[When you start debugging your application, you will be placed in different contexts as you go through the different parts of the stack.]]]
 
-The debugger creates a context when a stopping point or an event is reached. The context has information about the suspended program which enables a debugger to inspect the frame stack, evaluate variables from the perspective of the debugged program, and contains information about the place where the debugged program is stopped.
+[[[The debugger creates a context when a stopping point or an event is reached. The context has information about the suspended program which enables a debugger to inspect the frame stack, evaluate variables from the perspective of the debugged program, and contains information about the place where the debugged program is stopped.]]]
 
 At any time you can call the `backtrace` command (or its alias `where`) to print the backtrace of the application. This can be very helpful to know how you got where you are. If you ever wondered about how you got somewhere in your code, then `backtrace` will supply the answer.
 
