@@ -360,9 +360,9 @@ TIP: 특정 명령에 대한 도움말 메뉴를 보려면 `help <command-name>`
 
 응용프로그램 디버깅을 시작할 때, 스택의 다른 부분을 거쳐감에 따라 다른 컨텍스트에 위치할 것입니다. [[[When you start debugging your application, you will be placed in different contexts as you go through the different parts of the stack.]]]
 
-[[[The debugger creates a context when a stopping point or an event is reached. The context has information about the suspended program which enables a debugger to inspect the frame stack, evaluate variables from the perspective of the debugged program, and contains information about the place where the debugged program is stopped.]]]
+중단점이나 이벤트에 도달했을 때, 디버거는 컨텍스트를 만듭니다. 컨텍스트는 중단된 프로그램에 대한 정보로, 디버거가 프레임 스텍을 검사하고, 디버그된 프로그램의 관점에서 변수들을 평가할 수 있도록 해줍니다. 그리고 컨텍스트는 디버그된 프로그램이 중단된 지점에 대한 정보를 포함합니다. [[[The debugger creates a context when a stopping point or an event is reached. The context has information about the suspended program which enables a debugger to inspect the frame stack, evaluate variables from the perspective of the debugged program, and contains information about the place where the debugged program is stopped.]]]
 
-At any time you can call the `backtrace` command (or its alias `where`) to print the backtrace of the application. This can be very helpful to know how you got where you are. If you ever wondered about how you got somewhere in your code, then `backtrace` will supply the answer.
+언제든지 `backtrace` 명령(혹은 별칭인 `where`)을 호출하여 응용프로그램의 역추적 정보를 출력할 수 있습니다. 이것은 어떻게 현재 지점에 도달했는지 알아내기 위해 매우 유용할 수 있습니다. 만약 어떻게 코드 내의 어딘가에 도달했는지 궁금하다면, `backtrace`가 그 답을 줄 것입니다. [[[At any time you can call the `backtrace` command (or its alias `where`) to print the backtrace of the application. This can be very helpful to know how you got where you are. If you ever wondered about how you got somewhere in your code, then `backtrace` will supply the answer.]]]
 
 ```
 (rdb:5) where
