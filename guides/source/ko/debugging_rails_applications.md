@@ -391,21 +391,25 @@ TIP: 특정 명령에 대한 도움말 메뉴를 보려면 `help <command-name>`
 
 ### Threads
 
-The debugger can list, stop, resume and switch between running threads by using the command `thread` (or the abbreviated `th`). This command has a handful of options:
+디버거는 `thread` (혹은 단축 `th`) 명령을 사용하여 실행중인 쓰레드의 목록 보기, 정지, 재시작과 쓰레드간 이동을 할 수 있습니다. 본 명령에는 몇 가지 옵션이 있습니다. [[[The debugger can list, stop, resume and switch between running threads by using the command `thread` (or the abbreviated `th`). This command has a handful of options:]]]
 
-* `thread` shows the current thread.
-* `thread list` is used to list all threads and their statuses. The plus + character and the number indicates the current thread of execution.
-* `thread stop _n_` stop thread _n_.
-* `thread resume _n_` resumes thread _n_.
-* `thread switch _n_` switches the current thread context to _n_.
+* `thread`는 현재 쓰레드를 보여줍니다. [[[`thread` shows the current thread.]]]
 
-This command is very helpful, among other occasions, when you are debugging concurrent threads and need to verify that there are no race conditions in your code.
+* `thread list`는 모든 쓰레드들과 그들의 상태 목록을 보기 위해 사용됩니다. + 문자와 숫자는 현재 실행중인 쓰레드를 나타냅니다. [[[`thread list` is used to list all threads and their statuses. The plus + character and the number indicates the current thread of execution.]]]
 
-### Inspecting Variables
+* `thread stop _n_`는 _n_번 쓰레드를 정지시킵니다. [[[`thread stop _n_` stop thread _n_.]]]
 
-Any expression can be evaluated in the current context. To evaluate an expression, just type it!
+* `thread resume _n_`는 _n_번 쓰레드를 재시작합니다. [[[`thread resume _n_` resumes thread _n_.]]]
 
-This example shows how you can print the instance_variables defined within the current context:
+* `thread switch _n_`는 현재 쓰레트 컨텍스트를 _n_번 쓰레드로 바꿉니다. [[[`thread switch _n_` switches the current thread context to _n_.]]]
+
+본 명령은 다른 경우들 중에서 동시 쓰레드를 디버깅할 때 유용하며 코드상에 경쟁 조건이 있는지 확인할 필요가 있습니다. [[[This command is very helpful, among other occasions, when you are debugging concurrent threads and need to verify that there are no race conditions in your code.]]]
+
+### [Inspecting Variables] 변수 검사하기
+
+어떤 표현식이라도 현재 컨텍스트에서 평가될 수 있습니다. 표현식을 평가하려면, 그저 입력만 하십시오! [[[Any expression can be evaluated in the current context. To evaluate an expression, just type it!]]]
+
+아래 예제는 현재 컨텍스트에서 정의된 인스턴스 변수들(instance_variables)를 출력하는 법을 보여줍니다. [[[This example shows how you can print the instance_variables defined within the current context:]]]
 
 ```
 @posts = Post.all
@@ -413,7 +417,7 @@ This example shows how you can print the instance_variables defined within the c
 ["@_response", "@action_name", "@url", "@_session", "@_cookies", "@performed_render", "@_flash", "@template", "@_params", "@before_filter_chain_aborted", "@request_origin", "@_headers", "@performed_redirect", "@_request"]
 ```
 
-As you may have figured out, all of the variables that you can access from a controller are displayed. This list is dynamically updated as you execute code. For example, run the next line using `next` (you'll learn more about this command later in this guide).
+알아채신 바와 같이, 컨트롤러에서 접근할 수 있는 모든 변수가 표시됩니다. 이 목록은 코드가 실행될 때 동적으로 업데이트됩니다. 예를 들어, `next`(이 명령에 대해서는 본 가이드의 뒷 부분에서 배울 것입니다)를 사용하여 다음 라인을 실행합니다.[[[As you may have figured out, all of the variables that you can access from a controller are displayed. This list is dynamically updated as you execute code. For example, run the next line using `next` (you'll learn more about this command later in this guide).]]]
 
 ```
 (rdb:11) next
@@ -424,18 +428,18 @@ Processing PostsController#index (for 127.0.0.1 at 2008-09-04 19:51:34) [GET]
 respond_to do |format|
 ```
 
-And then ask again for the instance_variables:
+그다음 instance_variables를 다시 요청합니다. [[[And then ask again for the instance_variables:]]]
 
 ```
 (rdb:11) instance_variables.include? "@posts"
 true
 ```
 
-Now `@posts` is included in the instance variables, because the line defining it was executed.
+이제 `@posts`가 안스턴스 변수들에 포함됩니다. 정의된 라인이 실행되었기 때문입니다. [[[Now `@posts` is included in the instance variables, because the line defining it was executed.]]]
 
-TIP: You can also step into **irb** mode with the command `irb` (of course!). This way an irb session will be started within the context you invoked it. But be warned: this is an experimental feature.
+TIP: `irb` 명령으로 **irb** 모드로 진입할 수도 있습니다. 이 방법으로 irb 세션은 연결된 컨텍스트와 함께 시작될 것입니다. 그러나 경고를 보게 됩니다: 이 기능은 시험용 기능(experimental feature)입니다[[[TIP: You can also step into **irb** mode with the command `irb` (of course!). This way an irb session will be started within the context you invoked it. But be warned: this is an experimental feature.]]]
 
-The `var` method is the most convenient way to show variables and their values:
+`var` 메서드는 변수들과 그 값들을 보여주기에 가장 편리한 방법입니다. [[[The `var` method is the most convenient way to show variables and their values:]]]
 
 ```
 var
@@ -445,14 +449,14 @@ var
 (rdb:1) v[ar] l[ocal]                   show local variables
 ```
 
-This is a great way to inspect the values of the current context variables. For example:
+이것은 현재 컨텍스트 변수들의 값을 검사하는 훌륭한 방법입니다. 예를 들면: [[[This is a great way to inspect the values of the current context variables. For example:]]]
 
 ```
 (rdb:9) var local
   __dbg_verbose_save => false
 ```
 
-You can also inspect for an object method this way:
+또한 이 방법으로 객체 메서드를 검사할 수도 있습니다. [[[You can also inspect for an object method this way:]]]
 
 ```
 (rdb:9) var instance Post.new
@@ -461,16 +465,16 @@ You can also inspect for an object method this way:
 @new_record = true
 ```
 
-TIP: The commands `p` (print) and `pp` (pretty print) can be used to evaluate Ruby expressions and display the value of variables to the console.
+TIP: `p` (print)와 `pp` (pretty print) 명령은 콘솔에 루비 표현식을 평가하고 변수들의 값을 표시하는데 사용될 수 있습니다. [[[TIP: The commands `p` (print) and `pp` (pretty print) can be used to evaluate Ruby expressions and display the value of variables to the console.]]]
 
-You can use also `display` to start watching variables. This is a good way of tracking the values of a variable while the execution goes on.
+또한 `display`를 사용하여 변수들을 주시하기 시작할 수 있습니다. 이것은 실행이 진행되는 동안 변수의 값을 추적하는 좋은 방법입니다. [[[You can use also `display` to start watching variables. This is a good way of tracking the values of a variable while the execution goes on.]]]
 
 ```
 (rdb:1) display @recent_comments
 1: @recent_comments =
 ```
 
-The variables inside the displaying list will be printed with their values after you move in the stack. To stop displaying a variable use `undisplay _n_` where _n_ is the variable number (1 in the last example).
+표시 목록 안의 변수들은 스택 내부로 이동한 후 그 값들과 함께 출력될 것입니다. 변수 표시를 중단하려면 `undisplay _n_`를 사용하십시오. _n_은 변수 번호(마지막 예제에 있는 1)입니다.[[[The variables inside the displaying list will be printed with their values after you move in the stack. To stop displaying a variable use `undisplay _n_` where _n_ is the variable number (1 in the last example).]]]
 
 ### Step by Step
 
