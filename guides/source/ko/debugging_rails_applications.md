@@ -123,7 +123,7 @@ config.logger = Logger.new(STDOUT)
 config.logger = Log4r::Logger.new("Application Log")
 ```
 
-TIP: 기본값으로, 각 로그는 `Rails.root/log/` 아래 생성됩니다. 그리고 로그 파일명은 `environment_name.log` 입니다. [[[TIP: By default, each log is created under `Rails.root/log/` and the log file name is `environment_name.log`.]]]
+TIP: 기본값으로, 각 로그는 `Rails.root/log/` 아래 생성됩니다. 그리고 로그 파일명은 `environment_name.log` 입니다. [[[TBy default, each log is created under `Rails.root/log/` and the log file name is `environment_name.log`.]]]
 
 ### Log Levels
 
@@ -138,7 +138,7 @@ Rails.logger.level = 0 # at any time
 
 이것은 개발 환경과 스테이징 환경 하에서 로그를 기록하고자 할 때 유용하지만, 프로덕션 로그가 불필요한 정보로 넘쳐 흐르는 것을 원하지는 않을 것입니다. [[[This is useful when you want to log under development or staging, but you don't want to flood your production log with unnecessary information.]]]
 
-TIP: 기본 레일스 로그 레벨은 프로덕션 모드에서는 `info`이고 개발과 테스트 모드에서는 `debug`입니다. [[[TIP: The default Rails log level is `info` in production mode and `debug` in development and test mode.]]]
+TIP: 기본 레일스 로그 레벨은 프로덕션 모드에서는 `info`이고 개발과 테스트 모드에서는 `debug`입니다. [[[The default Rails log level is `info` in production mode and `debug` in development and test mode.]]]
 
 ### [Sending Messages] 메시지 보내기
 
@@ -251,7 +251,7 @@ $ rails server --debugger
 ...
 ```
 
-TIP: 개발 모드에서는, `--debugger` 옵션 없이 실행했더라도, 서버를 재시작하지 않고도 동적으로 `require \'debugger\'` 할 수 있습니다. [[[TIP: In development mode, you can dynamically `require \'debugger\'` instead of restarting the server, even if it was started without `--debugger`.]]]
+TIP: 개발 모드에서는, `--debugger` 옵션 없이 실행했더라도, 서버를 재시작하지 않고도 동적으로 `require \'debugger\'` 할 수 있습니다. [[[In development mode, you can dynamically `require \'debugger\'` instead of restarting the server, even if it was started without `--debugger`.]]]
 
 ### The Shell
 
@@ -281,7 +281,7 @@ condition  down     finish  list    ps    save     thread  var
 continue   edit     frame   method  putl  set      tmate   where
 ```
 
-TIP: 특정 명령에 대한 도움말 메뉴를 보려면 `help <command-name>`을 디버거 프롬프트에서 사용하십시오. 예를 들어: _`help var`_ [[[TIP: To view the help menu for any command use `help <command-name>` at the debugger prompt. For example: _`help var`_]]]
+TIP: 특정 명령에 대한 도움말 메뉴를 보려면 `help <command-name>`을 디버거 프롬프트에서 사용하십시오. 예를 들어: _`help var`_ [[[To view the help menu for any command use `help <command-name>` at the debugger prompt. For example: _`help var`_]]]
 
 다음으로 학습할 명령은 가장 유용한 것 중 하나인 `list` 입니다. 다른 명령어와 구별하기에 충분한 문자를 제공하여 모든 디버깅 명령을 생략할 수 있습니다. 그러므로 `list` 명령을 위해 `l`을 사용할 수도 있습니다. [[[The next command to learn is one of the most useful: `list`. You can abbreviate any debugging command by supplying just enough letters to distinguish them from other commands, so you can also use `l` for the `list` command.]]]
 
@@ -437,7 +437,7 @@ true
 
 이제 `@posts`가 안스턴스 변수들에 포함됩니다. 정의된 라인이 실행되었기 때문입니다. [[[Now `@posts` is included in the instance variables, because the line defining it was executed.]]]
 
-TIP: `irb` 명령으로 **irb** 모드로 진입할 수도 있습니다. 이 방법으로 irb 세션은 연결된 컨텍스트와 함께 시작될 것입니다. 그러나 경고를 보게 됩니다: 이 기능은 시험용 기능(experimental feature)입니다[[[TIP: You can also step into **irb** mode with the command `irb` (of course!). This way an irb session will be started within the context you invoked it. But be warned: this is an experimental feature.]]]
+TIP: `irb` 명령으로 **irb** 모드로 진입할 수도 있습니다. 이 방법으로 irb 세션은 연결된 컨텍스트와 함께 시작될 것입니다. 그러나 경고를 보게 됩니다: 이 기능은 시험용 기능(experimental feature)입니다[[[You can also step into **irb** mode with the command `irb` (of course!). This way an irb session will be started within the context you invoked it. But be warned: this is an experimental feature.]]]
 
 `var` 메서드는 변수들과 그 값들을 보여주기에 가장 편리한 방법입니다. [[[The `var` method is the most convenient way to show variables and their values:]]]
 
@@ -465,7 +465,7 @@ var
 @new_record = true
 ```
 
-TIP: `p` (print)와 `pp` (pretty print) 명령은 콘솔에 루비 표현식을 평가하고 변수들의 값을 표시하는데 사용될 수 있습니다. [[[TIP: The commands `p` (print) and `pp` (pretty print) can be used to evaluate Ruby expressions and display the value of variables to the console.]]]
+TIP: `p` (print)와 `pp` (pretty print) 명령은 콘솔에 루비 표현식을 평가하고 변수들의 값을 표시하는데 사용될 수 있습니다. [[[The commands `p` (print) and `pp` (pretty print) can be used to evaluate Ruby expressions and display the value of variables to the console.]]]
 
 또한 `display`를 사용하여 변수들을 주시하기 시작할 수 있습니다. 이것은 실행이 진행되는 동안 변수의 값을 추적하는 좋은 방법입니다. [[[You can use also `display` to start watching variables. This is a good way of tracking the values of a variable while the execution goes on.]]]
 
