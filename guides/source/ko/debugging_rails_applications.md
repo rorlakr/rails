@@ -377,7 +377,7 @@ TIP: 특정 명령에 대한 도움말 메뉴를 보려면 `help <command-name>`
 ...
 ```
 
-You move anywhere you want in this trace (thus changing the context) by using the `frame _n_` command, where _n_ is the specified frame number.
+`frame _n_` 명령(_n_은 특정 프레임 번호)을 사용하여 이 추적 내에 원하는 어디로든 이동할 수 있습니다.(이것은 컨텍스트를 변경합니다) [[[You move anywhere you want in this trace (thus changing the context) by using the `frame _n_` command, where _n_ is the specified frame number.]]]
 
 ```
 (rdb:5) frame 2
@@ -385,9 +385,9 @@ You move anywhere you want in this trace (thus changing the context) by using th
        at line /PathTo/project/vendor/rails/actionpack/lib/action_controller/base.rb:1175
 ```
 
-The available variables are the same as if you were running the code line by line. After all, that's what debugging is.
+사용가능한 변수들은 코드를 라인 바이 라인으로 실행하는 것과 동일합니다. 결국, 이것이 디버깅입니다. [[[The available variables are the same as if you were running the code line by line. After all, that's what debugging is.]]]
 
-Moving up and down the stack frame: You can use `up [n]` (`u` for abbreviated) and `down [n]` commands in order to change the context _n_ frames up or down the stack respectively. _n_ defaults to one. Up in this case is towards higher-numbered stack frames, and down is towards lower-numbered stack frames.
+스택 프레임을 위 아래로 이동: 컨텍스트 _n_ 프레임을 스택 위 혹은 아래로 변경하기 위해 각각 `up [n]` (단축 `u`)과 `down [n]` 명령을 각각 사용할 수 있습니다. 이 경우 up은 더 높은 번호의 스택 프레임으로, down 은 낮은 번호의 스택 프레임으로 이동합니다. [[[Moving up and down the stack frame: You can use `up [n]` (`u` for abbreviated) and `down [n]` commands in order to change the context _n_ frames up or down the stack respectively. _n_ defaults to one. Up in this case is towards higher-numbered stack frames, and down is towards lower-numbered stack frames.]]]
 
 ### Threads
 
