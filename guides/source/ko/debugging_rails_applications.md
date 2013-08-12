@@ -6,8 +6,11 @@
 본 가이드를 읽은 후, 다음을 알게 됩니다. [[[After reading this guide, you will know:]]]
 
 * 디버깅의 목적. [[[The purpose of debugging.]]]
+
 * 테스트 결과가 확인되지 않는 응용프로그램에서 문제와 이슈를 추척하는 방법. [[[How to track down problems and issues in your application that your tests aren't identifying.]]]
+
 * 디버깅의 다른 방법. [[[The different ways of debugging.]]]
+
 * 스택 추적을 분석하는 방법. [[[How to analyze the stack trace.]]]
 
 --------------------------------------------------------------------------------
@@ -606,7 +609,7 @@ No breakpoints.
 디버거에서 중단된 응용프로그램의 실행을 재개하기 위한 두 가지 방법이 있습니다: [[[There are two ways to resume execution of an application that is stopped in the debugger:]]]
 
 * `continue` [line-specification] \(or `c`): resume program execution, at the address where your script last stopped; any breakpoints set at that address are bypassed. The optional argument line-specification allows you to specify a line number to set a one-time breakpoint which is deleted when that breakpoint is reached.
-* [[[`finish` [frame-number] \(or `fin`): execute until the selected stack frame returns. If no frame number is given, the application will run until the currently selected frame returns. The currently selected frame starts out the most-recent frame or 0 if no frame positioning (e.g up, down or frame) has been performed. If a frame number is given it will run until the specified frame returns.]]]
+* `finish` [frame-number] \(or `fin`): execute until the selected stack frame returns. If no frame number is given, the application will run until the currently selected frame returns. The currently selected frame starts out the most-recent frame or 0 if no frame positioning (e.g up, down or frame) has been performed. If a frame number is given it will run until the specified frame returns.
 
 ### Editing
 
