@@ -478,17 +478,17 @@ TIP: `p` (print)와 `pp` (pretty print) 명령은 콘솔에 루비 표현식을 
 
 ### Step by Step
 
-Now you should know where you are in the running trace and be able to print the available variables. But lets continue and move on with the application execution.
+이제 실행 추적의 어디에 있는지 알아내고 사용 가능한 변수를 출력할 수 있어야 합니다. 하지만 응용프로그램 실행에 대해 계속 진행해 보겠습니다. [[[Now you should know where you are in the running trace and be able to print the available variables. But lets continue and move on with the application execution.]]]
 
-Use `step` (abbreviated `s`) to continue running your program until the next logical stopping point and return control to the debugger.
+`step`(단축 `s`)를 사용하면 다음 논리적 중단 지점까지 프로그램 실행을 계속하여 디버거에 제어를 넘겨줍니다. [[[Use `step` (abbreviated `s`) to continue running your program until the next logical stopping point and return control to the debugger.]]]
 
-TIP: You can also use `step+ n` and `step- n` to move forward or backward `n` steps respectively.
+TIP: 각각 `step+ n`과 `step- n`을 사용하여 `n` 단계 앞과 뒤로 이동할 수도 있습니다. [[[ You can also use `step+ n` and `step- n` to move forward or backward `n` steps respectively.]]]
 
-You may also use `next` which is similar to step, but function or method calls that appear within the line of code are executed without stopping. As with step, you may use plus sign to move _n_ steps.
+step과 비슷하게 `next`를 사용할 수도 있습니다. 그러나 코드 라인 내에 표시되는 함수 혹은 메서드 호출은 중단 없이 실행됩니다. step 명령으로는, _n_ 단계를 이동하기 위해 플러스 기호(+)를 사용할 수 있습니다. [[[You may also use `next` which is similar to step, but function or method calls that appear within the line of code are executed without stopping. As with step, you may use plus sign to move _n_ steps.]]]
 
-The difference between `next` and `step` is that `step` stops at the next line of code executed, doing just a single step, while `next` moves to the next line without descending inside methods.
+`next`와 `step`의 차이는 `step`은 실행된 코드의 다음 라인에 정지하여 한 단계만을 실행하는 반면, `next`는 메서드 내부로 내려가지 않은 채 다음 라인으로 이동한다는 것입니다. [[[The difference between `next` and `step` is that `step` stops at the next line of code executed, doing just a single step, while `next` moves to the next line without descending inside methods.]]]
 
-For example, consider this block of code with an included `debugger` statement:
+예를 들어, `debugger` 문이 포함된 다음과 같인 코드 블록을 생각해 봅시다: [[[For example, consider this block of code with an included `debugger` statement:]]]
 
 ```ruby
 class Author < ActiveRecord::Base
@@ -502,7 +502,7 @@ class Author < ActiveRecord::Base
 end
 ```
 
-TIP: You can use the debugger while using `rails console`. Just remember to `require "debugger"` before calling the `debugger` method.
+TIP: `rails console`을 사용할 때 디버거를 사용할 수도 있습니다. `debugger` 메서드가 호출되기 전에 `require "debugger"`를 실행해야 한다는 것만 기억하십시오. [[[TIP: You can use the debugger while using `rails console`. Just remember to `require "debugger"` before calling the `debugger` method.]]]
 
 ```
 $ rails console
@@ -516,7 +516,7 @@ Loading development environment (Rails 3.2.13)
 )
 ```
 
-With the code stopped, take a look around:
+코드가 중단되면, 출력을 둘러봅니다. [[[With the code stopped, take a look around:]]]
 
 ```
 (rdb:1) list
@@ -531,7 +531,7 @@ With the code stopped, take a look around:
    9  end
 ```
 
-You are at the end of the line, but... was this line executed? You can inspect the instance variables.
+라인의 끝에 위치해 있습니다만... 이 라인은 실행되었을까요? 인스턴스 변수를 검사할 수 있습니다. [[[You are at the end of the line, but... was this line executed? You can inspect the instance variables.]]]
 
 ```
 (rdb:1) var instance
@@ -539,7 +539,7 @@ You are at the end of the line, but... was this line executed? You can inspect t
 @attributes_cache = {}
 ```
 
-`@recent_comments` hasn't been defined yet, so it's clear that this line hasn't been executed yet. Use the `next` command to move on in the code:
+`@recent_comments`가 아직 정의되지 않았습니다. 따라서 아직 이 라인이 실행되지 않은 것이 분명합니다. `next` 명령어를 사용하여 이 코드에서 이동합니다. [[[`@recent_comments` hasn't been defined yet, so it's clear that this line hasn't been executed yet. Use the `next` command to move on in the code:]]]
 
 ```
 (rdb:1) next
@@ -552,26 +552,28 @@ You are at the end of the line, but... was this line executed? You can inspect t
 @recent_comments = []
 ```
 
-Now you can see that the `@comments` relationship was loaded and @recent_comments defined because the line was executed.
+이제 이 라인이 실행되었기 때문에 `@comments`의 관계가 로드되고 @recent_comments가 정의된 것을 볼 수 있습니다. [[[Now you can see that the `@comments` relationship was loaded and @recent_comments defined because the line was executed.]]]
 
-If you want to go deeper into the stack trace you can move single `steps`, through your calling methods and into Rails code. This is one of the best ways to find bugs in your code, or perhaps in Ruby or Rails.
+(재번역 필요)만약 스택 추적 안으로 더 깊이 들어가고 싶다면 호출 메서드를 통하거나 레일스 코드 내부로 단일 단계(`steps`)로 이동할 수 있습니다. 이것은 자신의 코드나 어쩌면 루비 온 레일스에 있을지 모르는 버그를 찾아내는 가장 좋은 방법입니다. [[[If you want to go deeper into the stack trace you can move single `steps`, through your calling methods and into Rails code. This is one of the best ways to find bugs in your code, or perhaps in Ruby or Rails.]]]
 
-### Breakpoints
+### [Breakpoints] 중단점
 
-A breakpoint makes your application stop whenever a certain point in the program is reached. The debugger shell is invoked in that line.
+중단점은 프로그램의 특정 지점에 도달했을 때마다 응용프로그램을 중단시켜줍니다. 디버거 쉘은 그 라인에서 호출됩니다. [[[A breakpoint makes your application stop whenever a certain point in the program is reached. The debugger shell is invoked in that line.]]]
 
-You can add breakpoints dynamically with the command `break` (or just `b`). There are 3 possible ways of adding breakpoints manually:
+`break` (혹은 `b`) 명령으로 동적으로 중단점을 넣을 수 있습니다. 중단점을 수동으로 넣는 세 가지 방법이 있습니다:[[[You can add breakpoints dynamically with the command `break` (or just `b`). There are 3 possible ways of adding breakpoints manually:]]]
 
-* `break line`: set breakpoint in the _line_ in the current source file.
-* `break file:line [if expression]`: set breakpoint in the _line_ number inside the _file_. If an _expression_ is given it must evaluated to _true_ to fire up the debugger.
-* `break class(.|\#)method [if expression]`: set breakpoint in _method_ (. and \# for class and instance method respectively) defined in _class_. The _expression_ works the same way as with file:line.
+* `break line`: 현재 소스파일의 _line_에 중단점을 설정합니다. [[[`break line`: set breakpoint in the _line_ in the current source file.]]]
+
+* `break file:line [if expression]`: 중단점을 _file_ 내부의 _line_에 설정합니다. _expression_이 주어진 경우, 표현식이 _true_로 평가되어야 디버거가 실행됩니다. [[[`break file:line [if expression]`: set breakpoint in the _line_ number inside the _file_. If an _expression_ is given it must evaluated to _true_ to fire up the debugger.]]]
+
+* `break class(.|\#)method [if expression]`: 중단점을 _class_ 내에 정의된 _method_ 내에 설정합니다.(. 과 \#는 각각 클래스와 인스턴스 메서드를 위한 것입니다) _expression_은 file:line에서와 같은 방식으로 작동합니다. [[[`break class(.|\#)method [if expression]`: set breakpoint in _method_ (. and \# for class and instance method respectively) defined in _class_. The _expression_ works the same way as with file:line.]]]
 
 ```
 (rdb:5) break 10
 Breakpoint 1 file /PathTo/project/vendor/rails/actionpack/lib/action_controller/filters.rb, line 10
 ```
 
-Use `info breakpoints _n_` or `info break _n_` to list breakpoints. If you supply a number, it lists that breakpoint. Otherwise it lists all breakpoints.
+중단점 목록을 보려면 `info breakpoints _n_` 혹은 `info break _n_`을 사용하십시오. 아니면 모든 중단점을 나열합니다. [[[Use `info breakpoints _n_` or `info break _n_` to list breakpoints. If you supply a number, it lists that breakpoint. Otherwise it lists all breakpoints.]]]
 
 ```
 (rdb:5) info breakpoints
@@ -579,7 +581,7 @@ Num Enb What
   1 y   at filters.rb:10
 ```
 
-To delete breakpoints: use the command `delete _n_` to remove the breakpoint number _n_. If no number is specified, it deletes all breakpoints that are currently active..
+중단점을 삭제하려면: _n_번 중단점을 삭제하려면 `delete _n_` 명령을 사용하십시오. 만약 숫자가 지정되어 있지 않다면, 현재 활성화된 모든 중단점을 삭제합니다. [[[To delete breakpoints: use the command `delete _n_` to remove the breakpoint number _n_. If no number is specified, it deletes all breakpoints that are currently active..]]]
 
 ```
 (rdb:5) delete 1
@@ -587,7 +589,7 @@ To delete breakpoints: use the command `delete _n_` to remove the breakpoint num
 No breakpoints.
 ```
 
-You can also enable or disable breakpoints:
+중단점을 활성 혹은 비활성 할 수도 있습니다. [[[You can also enable or disable breakpoints:]]]
 
 * `enable breakpoints`: allow a list _breakpoints_ or all of them if no list is specified, to stop your program. This is the default state when you create a breakpoint.
 * `disable breakpoints`: the _breakpoints_ will have no effect on your program.
