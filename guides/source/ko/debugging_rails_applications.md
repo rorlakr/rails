@@ -591,21 +591,22 @@ No breakpoints.
 
 중단점을 활성 혹은 비활성 할 수도 있습니다. [[[You can also enable or disable breakpoints:]]]
 
-* `enable breakpoints`: allow a list _breakpoints_ or all of them if no list is specified, to stop your program. This is the default state when you create a breakpoint.
-* `disable breakpoints`: the _breakpoints_ will have no effect on your program.
+* `enable breakpoints`: 프로그램을 중단하기 위해 단일 _breakpoints_ 리스트 혹은 리스트가 지정되지 않은 경우에는 전체를 허용합니다. 이것은 중단점을 생성했을 때의 기본 상태입니다. [[[`enable breakpoints`: allow a list _breakpoints_ or all of them if no list is specified, to stop your program. This is the default state when you create a breakpoint.]]]
+
+* `disable breakpoints`: 프로그램상의 _breakpoints_는 무효화될 것입니다. [[[`disable breakpoints`: the _breakpoints_ will have no effect on your program.]]]
 
 ### Catching Exceptions
 
-The command `catch exception-name` (or just `cat exception-name`) can be used to intercept an exception of type _exception-name_ when there would otherwise be is no handler for it.
+`catch exception-name` 명령(혹은 `cat exception-name`)는 해당 예외를 위한 핸들러가 없을 때 _exception-name_ 형식의 예외를 가로채기 위해 사용될 수 있습니다. [[[The command `catch exception-name` (or just `cat exception-name`) can be used to intercept an exception of type _exception-name_ when there would otherwise be is no handler for it.]]]
 
-To list all active catchpoints use `catch`.
+모든 활성화된 캐치포인트의 목록을 보려면 `catch`를 사용하십시오. [[[To list all active catchpoints use `catch`.]]]
 
-### Resuming Execution
+### [Resuming Execution] 실행 재개하기
 
-There are two ways to resume execution of an application that is stopped in the debugger:
+디버거에서 중단된 응용프로그램의 실행을 재개하기 위한 두 가지 방법이 있습니다: [[[There are two ways to resume execution of an application that is stopped in the debugger:]]]
 
 * `continue` [line-specification] \(or `c`): resume program execution, at the address where your script last stopped; any breakpoints set at that address are bypassed. The optional argument line-specification allows you to specify a line number to set a one-time breakpoint which is deleted when that breakpoint is reached.
-* `finish` [frame-number] \(or `fin`): execute until the selected stack frame returns. If no frame number is given, the application will run until the currently selected frame returns. The currently selected frame starts out the most-recent frame or 0 if no frame positioning (e.g up, down or frame) has been performed. If a frame number is given it will run until the specified frame returns.
+* [[[`finish` [frame-number] \(or `fin`): execute until the selected stack frame returns. If no frame number is given, the application will run until the currently selected frame returns. The currently selected frame starts out the most-recent frame or 0 if no frame positioning (e.g up, down or frame) has been performed. If a frame number is given it will run until the specified frame returns.]]]
 
 ### Editing
 
