@@ -557,7 +557,7 @@ Loading development environment (Rails 3.2.13)
 
 이제 이 라인이 실행되었기 때문에 `@comments`의 관계가 로드되고 @recent_comments가 정의된 것을 볼 수 있습니다. [[[Now you can see that the `@comments` relationship was loaded and @recent_comments defined because the line was executed.]]]
 
-(재번역 필요)만약 스택 추적 안으로 더 깊이 들어가고 싶다면 호출 메서드를 통하거나 레일스 코드 내부로 단일 단계(`steps`)로 이동할 수 있습니다. 이것은 자신의 코드나 어쩌면 루비 온 레일스에 있을지 모르는 버그를 찾아내는 가장 좋은 방법입니다. [[[If you want to go deeper into the stack trace you can move single `steps`, through your calling methods and into Rails code. This is one of the best ways to find bugs in your code, or perhaps in Ruby or Rails.]]]
+만약 스택 추적 안으로 더 깊이 들어가고 싶다면 호출 메서드를 통하거나 레일스 코드 내부로 단일 단계(`steps`)로 이동할 수 있습니다. 이것은 자신의 코드나 어쩌면 루비 온 레일스에 있을지 모르는 버그를 찾아내는 가장 좋은 방법입니다. [[[If you want to go deeper into the stack trace you can move single `steps`, through your calling methods and into Rails code. This is one of the best ways to find bugs in your code, or perhaps in Ruby or Rails.]]]
 
 ### [Breakpoints] 중단점
 
@@ -670,10 +670,13 @@ Valgrind를 설치하고 루비와 함께 사용하는 법에 대한 더 많은 
 
 응용프로그램의 에러를 찾고 디버깅하는 것을 돕는 몇 가지 레일스 플러그인들이 있습니다. 아래 디버깅을 위한 유용한 플러그인 목록이 있습니다: [[[There are some Rails plugins to help you to find errors and debug your application. Here is a list of useful plugins for debugging:]]]
 
-* [Footnotes](https://github.com/josevalim/rails-footnotes) Every Rails page has footnotes that give request information and link back to your source via TextMate.
-* [Query Trace](https://github.com/ntalbott/query_trace/tree/master) Adds query origin tracing to your logs.
-* [Query Reviewer](https://github.com/nesquena/query_reviewer) This rails plugin not only runs "EXPLAIN" before each of your select queries in development, but provides a small DIV in the rendered output of each page with the summary of warnings for each query that it analyzed.
-* [Exception Notifier](https://github.com/smartinez87/exception_notification/tree/master) Provides a mailer object and a default set of templates for sending email notifications when errors occur in a Rails application.
+* [Footnotes](https://github.com/josevalim/rails-footnotes) 모든 레일스 페이지는 요청 정보와 TextMate를 통해 소스로 돌아가는 링크를 주는 각주를 갖게 됩니다. [[[[Footnotes](https://github.com/josevalim/rails-footnotes) Every Rails page has footnotes that give request information and link back to your source via TextMate.]]]
+
+* [Query Trace](https://github.com/ntalbott/query_trace/tree/master) 로그에 쿼리의 기원 추적을 추가합니다. [[[[Query Trace](https://github.com/ntalbott/query_trace/tree/master) Adds query origin tracing to your logs.]]]
+
+* [Query Reviewer](https://github.com/nesquena/query_reviewer)는 개발시에 각 select 쿼리 이전에 "EXPLAIN"을 실행하며, 분석된 각 쿼리에 대한 경고 요약을 각 페이지 출력에 렌더링하여 작은 DIV로 제공합니다. [[[[Query Reviewer](https://github.com/nesquena/query_reviewer) This rails plugin not only runs "EXPLAIN" before each of your select queries in development, but provides a small DIV in the rendered output of each page with the summary of warnings for each query that it analyzed.]]]
+
+* [Exception Notifier](https://github.com/smartinez87/exception_notification/tree/master) 레일스 응용프로그램에 에러가 발생했을 때 이메일 알림을 전송하기 위한 메일러 객체와 기본 템플릿을 제공합니다. [[[[Exception Notifier](https://github.com/smartinez87/exception_notification/tree/master) Provides a mailer object and a default set of templates for sending email notifications when errors occur in a Rails application.]]]
 
 References
 ----------
