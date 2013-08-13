@@ -1,4 +1,4 @@
-[Debugging Rails Applications] 레일스 응용프로그램 디버깅하
+[Debugging Rails Applications] 레일스 응용프로그램 디버깅하기
 ============================
 
 본 가이드는 루비 온 레일스 응용프로그램을 디버깅하기 위한 기술을 소개합니다. [[[This guide introduces techniques for debugging Ruby on Rails applications.]]]
