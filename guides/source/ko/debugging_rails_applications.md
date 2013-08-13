@@ -1,4 +1,4 @@
-[Debugging Rails Applications] 레일스 응용프로그램 디버깅하기
+[Debugging Rails Applications] 레일스 응용프로그램 디버깅하
 ============================
 
 본 가이드는 루비 온 레일스 응용프로그램을 디버깅하기 위한 기술을 소개합니다. [[[This guide introduces techniques for debugging Ruby on Rails applications.]]]
@@ -628,18 +628,21 @@ No breakpoints.
 
 ### Settings
 
-The `debugger` gem can automatically show the code you're stepping through and reload it when you change it in an editor. Here are a few of the available options:
+`debugger` 젬은 자동으로 현재 단계적으로 진행하고 있는 코드를 보여주고, 에디터에서 수정될 때 코드를 리로드할 수 있습니다. 여기 몇 개의 사용가능한 옵션이 있습니다: [[[The `debugger` gem can automatically show the code you're stepping through and reload it when you change it in an editor. Here are a few of the available options:]]]
 
-* `set reload`: Reload source code when changed.
-* `set autolist`: Execute `list` command on every breakpoint.
-* `set listsize _n_`: Set number of source lines to list by default to _n_.
-* `set forcestep`: Make sure the `next` and `step` commands always move to a new line
+* `set reload`: 변경되었을 때 코드를 리로드합니다. [[[`set reload`: Reload source code when changed.]]]
 
-You can see the full list by using `help set`. Use `help set _subcommand_` to learn about a particular `set` command.
+* `set autolist`: 모든 중단점에서 `list` 명령을 수행합니다. [[[`set autolist`: Execute `list` command on every breakpoint.]]]
 
-TIP: You can save these settings in an `.rdebugrc` file in your home directory. The debugger reads these global settings when it starts.
+* `set listsize _n_`: 목록에 모여줄 소스 라인 수를 기본값에서 _n_으로 설정합니다. [[[`set listsize _n_`: Set number of source lines to list by default to _n_.]]]
 
-Here's a good start for an `.rdebugrc`:
+* `set forcestep`: `next`와 `step` 명령이 항상 새 라인으로 이동하도록 강제합니다. [[[`set forcestep`: Make sure the `next` and `step` commands always move to a new line]]]
+
+`help set`을 사용하여 전체 리스트를 볼 수 있습니다. `help set _subcommand_`를 사용하여 특정 `set` 명령어에 대해 학습하십시오. [[[You can see the full list by using `help set`. Use `help set _subcommand_` to learn about a particular `set` command.]]]
+
+TIP: 이들 설정을 홈 디렉터리 내의 `.rdebugrc` 파일 안에 저장할 수 있습니다. 디버거는 시작될 때 이들을 전역 설정으로 읽어들입니다. [[[TIP: You can save these settings in an `.rdebugrc` file in your home directory. The debugger reads these global settings when it starts.]]]
+
+아래 `.rdebugrc`를 위한 좋은 시작 출발점이 있습니다: [[[Here's a good start for an `.rdebugrc`:]]]
 
 ```bash
 set autolist
@@ -647,7 +650,7 @@ set forcestep
 set listsize 25
 ```
 
-Debugging Memory Leaks
+[Debugging Memory Leaks] 메모리 누수 디버깅하기
 ----------------------
 
 A Ruby application (on Rails or not), can leak memory - either in the Ruby code or at the C code level.
