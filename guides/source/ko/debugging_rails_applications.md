@@ -653,22 +653,22 @@ set listsize 25
 [Debugging Memory Leaks] 메모리 누수 디버깅하기
 ----------------------
 
-A Ruby application (on Rails or not), can leak memory - either in the Ruby code or at the C code level.
+루비 응용프로그램(레일스던 아니던)은 -루비 코드 안에서든 C 코드 레벨에서든-메모리가 누수될 수 있습니다. [[[A Ruby application (on Rails or not), can leak memory - either in the Ruby code or at the C code level.]]]
 
-In this section, you will learn how to find and fix such leaks by using tool such as Valgrind.
+본 섹션에서는, Valgrind와 같은 도구를 사용하여 그러한 누수를 찾아내고 고치는 방법을 학습합니다. [[[In this section, you will learn how to find and fix such leaks by using tool such as Valgrind.]]]
 
 ### Valgrind
 
-[Valgrind](http://valgrind.org/) is a Linux-only application for detecting C-based memory leaks and race conditions.
+[Valgrind](http://valgrind.org/)는 C-기반 메모리 누수와 경쟁 조건을 탐지하기 위한 리눅스 전용 응용프로그램입니다. [[[[Valgrind](http://valgrind.org/) is a Linux-only application for detecting C-based memory leaks and race conditions.]]]
 
-There are Valgrind tools that can automatically detect many memory management and threading bugs, and profile your programs in detail. For example, a C extension in the interpreter calls `malloc()` but is doesn't properly call `free()`, this memory won't be available until the app terminates.
+자동으로 대량 메모리 관리와 쓰레딩 버그를 탐지하고 프로그램을 세밀히 프로파일링 할 수 있는 Valgrind 도구들이 있습니다. 예를 들어 인터프리터에서 C 확장이 `malloc()`를 호출하였으나 적절하게 `free()`를 호출하지 않았다면, 이 메모리는 응용프로그램이 종료될 때까지 사용할 수 없게 될 것입니다. [[[There are Valgrind tools that can automatically detect many memory management and threading bugs, and profile your programs in detail. For example, a C extension in the interpreter calls `malloc()` but is doesn't properly call `free()`, this memory won't be available until the app terminates.]]]
 
-For further information on how to install Valgrind and use with Ruby, refer to [Valgrind and Ruby](http://blog.evanweaver.com/articles/2008/02/05/valgrind-and-ruby/) by Evan Weaver.
+Valgrind를 설치하고 루비와 함께 사용하는 법에 대한 더 많은 정보는, Evan Weaver가 쓴 [Valgrind and Ruby](http://blog.evanweaver.com/articles/2008/02/05/valgrind-and-ruby/)를 참조하십시오. [[[For further information on how to install Valgrind and use with Ruby, refer to [Valgrind and Ruby](http://blog.evanweaver.com/articles/2008/02/05/valgrind-and-ruby/) by Evan Weaver.]]]
 
-Plugins for Debugging
+[Plugins for Debugging] 디버깅을 위한 플러그인들
 ---------------------
 
-There are some Rails plugins to help you to find errors and debug your application. Here is a list of useful plugins for debugging:
+응용프로그램의 에러를 찾고 디버깅하는 것을 돕는 몇 가지 레일스 플러그인들이 있습니다. 아래 디버깅을 위한 유용한 플러그인 목록이 있습니다: [[[There are some Rails plugins to help you to find errors and debug your application. Here is a list of useful plugins for debugging:]]]
 
 * [Footnotes](https://github.com/josevalim/rails-footnotes) Every Rails page has footnotes that give request information and link back to your source via TextMate.
 * [Query Trace](https://github.com/ntalbott/query_trace/tree/master) Adds query origin tracing to your logs.
