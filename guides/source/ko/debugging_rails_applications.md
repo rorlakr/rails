@@ -608,21 +608,23 @@ No breakpoints.
 
 디버거에서 중단된 응용프로그램의 실행을 재개하기 위한 두 가지 방법이 있습니다: [[[There are two ways to resume execution of an application that is stopped in the debugger:]]]
 
-* `continue` [line-specification] \(or `c`): resume program execution, at the address where your script last stopped; any breakpoints set at that address are bypassed. The optional argument line-specification allows you to specify a line number to set a one-time breakpoint which is deleted when that breakpoint is reached.
-* `finish` [frame-number] \(or `fin`): execute until the selected stack frame returns. If no frame number is given, the application will run until the currently selected frame returns. The currently selected frame starts out the most-recent frame or 0 if no frame positioning (e.g up, down or frame) has been performed. If a frame number is given it will run until the specified frame returns.
+* `continue` [line-specification] \(혹은 `c`): 스크립트가 최종 중단된 주소에서부터 프로그램 실행을 재개합니다; 해당 주소에 설정된 중단점들은 무시됩니다. 선택적 인수 line-specification은 해당 중단점에 도달했을 때 삭제되는 일회성 중단점을 설정할 라인을 지정할 수 있게 해 줍니다. [[[`continue` [line-specification] \(or `c`): resume program execution, at the address where your script last stopped; any breakpoints set at that address are bypassed. The optional argument line-specification allows you to specify a line number to set a one-time breakpoint which is deleted when that breakpoint is reached.]]]
+
+* `finish` [frame-number] \(혹은 `fin`): 선택된 스택 프레임을 반환할 때까지 실행합니다. 만약 프레임 번호가 주어지지 않았다면, 응용프로그램은 현재 선택된 프레임을 반환할 때까지 실행될 것입니다. 현재 선택된 프레임은 가장 최근의 프레임 혹은 프레임 위지치정(예 up, down 아니면 frame)이 수행되지 않았다면 0번으로 시작합니다. 만약 프레임 번호가 지정되었다면 응용프로그램은 지정된 프레임을 반환할 때까지 실행됩니다. [[[`finish` [frame-number] \(or `fin`): execute until the selected stack frame returns. If no frame number is given, the application will run until the currently selected frame returns. The currently selected frame starts out the most-recent frame or 0 if no frame positioning (e.g up, down or frame) has been performed. If a frame number is given it will run until the specified frame returns.]]]
 
 ### Editing
 
-Two commands allow you to open code from the debugger into an editor:
+아래 두 명령은 디버거로부터 에디터로 코드를 열 수 있도록 해 줍니다: [[[Two commands allow you to open code from the debugger into an editor:]]]
 
-* `edit [file:line]`: edit _file_ using the editor specified by the EDITOR environment variable. A specific _line_ can also be given.
-* `tmate _n_` (abbreviated `tm`): open the current file in TextMate. It uses n-th frame if _n_ is specified.
+* `edit [file:line]`: EDITOR 환경 변수에 의해 지정된 에디터를 사용하여 _file_을 수정합니다. 특정 _line_도 부여할 수 있습니다. [[[`edit [file:line]`: edit _file_ using the editor specified by the EDITOR environment variable. A specific _line_ can also be given.]]]
+
+* `tmate _n_` (단축 `tm`): 현재 파일을 텍스트메이트에서 엽니다. _n_이 지정되어 있다면, n번째 프레임을 사용합니다. [[[`tmate _n_` (abbreviated `tm`): open the current file in TextMate. It uses n-th frame if _n_ is specified.]]]
 
 ### Quitting
 
-To exit the debugger, use the `quit` command (abbreviated `q`), or its alias `exit`.
+디버거를 종료하려면, `quit` 명령 (단축 `q`) 혹은 별칭 `exit` 명령을 사용하십시오. [[[To exit the debugger, use the `quit` command (abbreviated `q`), or its alias `exit`.]]]
 
-A simple quit tries to terminate all threads in effect. Therefore your server will be stopped and you will have to start it again.
+단순 quit은 모든 유효한 쓰레드 종료를 시도합니다. 그러므로 서버는 중단될 것이며 서버를 다시 시작해야 할 것입니다. [[[A simple quit tries to terminate all threads in effect. Therefore your server will be stopped and you will have to start it again.]]]
 
 ### Settings
 
