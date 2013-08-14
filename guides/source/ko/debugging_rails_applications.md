@@ -95,7 +95,7 @@ Title: Rails debugging guide
 </p>
 ```
 
-Will be rendered as follows:
+위 코드는 다음과 같이 렌더링될 것입니다: [[[Will be rendered as follows:]]]
 
 ```
 [1, 2, 3, 4, 5]
@@ -260,9 +260,9 @@ TIP: 개발 모드에서는, `--debugger` 옵션 없이 실행했더라도, 서�
 
 응용프로그램이 `debugger` 메서드를 호출할 때, 디버거는 응용프로그램 서버가 실행된 터미널 창 안의 디버거 셸에서 시작될 것이며 디버거 프롬프트 `(rdb:n)`에 위치할 것입니다. _n_ 은 쓰레드 번호입니다. 프롬프트는 또한 실행 대기중인 코드의 다름 라인을 보여줄 것입니다. [[[As soon as your application calls the `debugger` method, the debugger will be started in a debugger shell inside the terminal window where you launched your application server, and you will be placed at the debugger's prompt `(rdb:n)`. The _n_ is the thread number. The prompt will also show you the next line of code that is waiting to run.]]]
 
-If you got there by a browser request, the browser tab containing the request will be hung until the debugger has finished and the trace has finished processing the entire request.
+만약 브라우저의 요청에 의해 해당 지점에 이르렀다면, 요청이 포함된 브라우저 탭은 디버거가 종료되고 전체 요청을 처리하는 추적이 끝날 때까지 중지됩니다. [[[If you got there by a browser request, the browser tab containing the request will be hung until the debugger has finished and the trace has finished processing the entire request.]]]
 
-For example:
+예를 들어: [[[For example:]]]
 
 ```bash
 @posts = Post.all
