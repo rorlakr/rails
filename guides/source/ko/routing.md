@@ -68,7 +68,7 @@ get '/patients/:id', to: 'patients#show', as: 'patient'
 [Resource Routing: the Rails Default] 리소스 라우팅: 레일스 디폴트
 -----------------------------------
 
-리소스풀 라우팅은 주어진 리소스풀 컨트롤러를 위한 모든 일반적인 라우트를 빠르게 선언할 수 있게 해줍니다.[[[Resource routing allows you to quickly declare all of the common routes for a given resourceful controller.]]]
+리소스 라우팅은 주어진 리소스풀 컨트롤러를 위한 모든 일반적인 라우트를 빠르게 선언할 수 있게 해줍니다.[[[Resource routing allows you to quickly declare all of the common routes for a given resourceful controller.]]]
 `index`, `show`, `new`, `edit`, `create`, `update` 그리고 `destroy`를 위한 라우트를 개별적으로 선언하는 대신, 리소스풀 라우트는 한 줄의 코드로 모두를 선언합니다. [[[Instead of declaring separate routes for your `index`, `show`, `new`, `edit`, `create`, `update` and `destroy` actions, a resourceful route declares them in a single line of code.]]]
 
 ### [Resources on the Web] 웹상의 리소스
@@ -134,7 +134,7 @@ NOTE: 라우터는 HTTP verb와 URL을 인바운드 요청에 매치하기 위�
 
 이들 핼퍼는 각각 그에 상응하는 `_url` 헬퍼(`photos_url` 같은)를 갖는데, 현재의 호스트, 포트 그리고 경로 접두사와 같은 경로 접두사를 반환합니다. [[[Each of these helpers has a corresponding `_url` helper (such as `photos_url`) which returns the same path prefixed with the current host, port and path prefix.]]]
 
-### [Defining Multiple Resources at the Same Time] 중복 리소스를 한번에 정의하기
+### [Defining Multiple Resources at the Same Time] 여러 리소스를 한번에 정의하기
 
 하나 이상의 리소스를 위한 라우트를 만들 필요가 있다면, `resources` 단일 호출로 그들 모두를 정의하여 타이핑을 줄일 수 있습니다.[[[If you need to create routes for more than one resource, you can save a bit of typing by defining them all with a single call to `resources`:]]]
 
@@ -1119,7 +1119,7 @@ end
 
 ### [Listing Existing Routes] 기존 라우트 목록보기
 
-응용프로그램에서 사용가능한 전체 목록을 얻으려면, 서버가 **개발** 환경에서 구동되는 동안 부라우저로 `http://localhost:3000/rails/info/routes`를 방문하십시오. [[[To get a complete list of the available routes in your application, visit `http://localhost:3000/rails/info/routes` in your browser while your server is running in the **development** environment.]]]
+응용프로그램에서 사용가능한 전체 목록을 얻으려면, 서버가 **개발** 환경에서 구동되는 동안 브라우저로 `http://localhost:3000/rails/info/routes`를 방문하십시오. [[[To get a complete list of the available routes in your application, visit `http://localhost:3000/rails/info/routes` in your browser while your server is running in the **development** environment.]]]
 또한 터미널에서 `rake routes`를 실행하면 동일한 출력을 만들 수 있습니다. [[[You can also execute the `rake routes` command in your terminal to produce the same output.]]]
 
 두 메서드는 `routes.rb` 내에 나타나는 동일 순서대로 전체 라우트의 목록을 보여줄 것입니다. [[[Both methods will list all of your routes, in the same order that they appear in `routes.rb`.]]]
