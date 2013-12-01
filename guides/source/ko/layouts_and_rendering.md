@@ -1,57 +1,62 @@
-Layouts and Rendering in Rails
+[Layouts and Rendering in Rails] 레일스의 레이아웃과 렌더링
 ==============================
 
-This guide covers the basic layout features of Action Controller and Action View.
+본 가이드에서는 액션 컨트롤러와 액션 뷰의 기본 레이아웃 기능을 다루게 됩니다. [[[This guide covers the basic layout features of Action Controller and Action View.]]]
 
-After reading this guide, you will know:
+본 가이드를 읽고나면 다음의 내용들을 이해할 수 있습니다: [[[After reading this guide, you will know:]]]
 
-* How to use the various rendering methods built into Rails.
-* How to create layouts with multiple content sections.
-* How to use partials to DRY up your views.
-* How to use nested layouts (sub-templates).
+* 레일스에 내장된 다양한 렌더링 메소드 사용법 [[[How to use the various rendering methods built into Rails.]]]
+
+* 다중 컨텐츠 섹션을 위한 레이아웃 생성 [[[How to create layouts with multiple content sections.]]]
+
+* 반복작업을 하지 않기 위한 partial 사용법 [[[How to use partials to DRY up your views.]]]
+
+* 중첩 레이아웃(서브 레이아웃) 사용법 [[[How to use nested layouts (sub-templates).]]]
 
 --------------------------------------------------------------------------------
 
-Overview: How the Pieces Fit Together
+[Overview: How the Pieces Fit Together] 개요: 조각이 하나로 합쳐지는 방법
 -------------------------------------
 
-This guide focuses on the interaction between Controller and View in the Model-View-Controller triangle. As you know, the Controller is responsible for orchestrating the whole process of handling a request in Rails, though it normally hands off any heavy code to the Model. But then, when it's time to send a response back to the user, the Controller hands things off to the View. It's that handoff that is the subject of this guide.
+본 가이드에서는 모델-뷰-컨트롤러 삼각구조에서 컨트롤러와 뷰의 상호작용에 대해 초점을 맞추고 있습니다. 일반적으로 많은 코드가 모델에 집중되어 있지만 레일스에서 컨트롤러는 요청에 대한 전체를 지휘하는 역할을 합니다. 하지만 응답을 유저에게 보내야하는 상황에서, 컨트롤러는 권한을 뷰에 넘겨주게 됩니다. 본가이드의 주제는 바로 이부분의 권한 이전에 대한것입니다. [[[This guide focuses on the interaction between Controller and View in the Model-View-Controller triangle. As you know, the Controller is responsible for orchestrating the whole process of handling a request in Rails, though it normally hands off any heavy code to the Model. But then, when it's time to send a response back to the user, the Controller hands things off to the View. It's that handoff that is the subject of this guide.]]]
 
-In broad strokes, this involves deciding what should be sent as the response and calling an appropriate method to create that response. If the response is a full-blown view, Rails also does some extra work to wrap the view in a layout and possibly to pull in partial views. You'll see all of those paths later in this guide.
+이는 응답으로 보낼것과 응답을 만들기 위한 적절한 메소드 호출을 결정하는것을 포함합니다. 응답이 완전한 뷰인 경우, 레일스는 어떤 추가적인 작업을 실행하여 뷰를 레이아웃으로 감싸고 가능한경우 partial 뷰를 이용하게 됩니다. 이 모든 것을 본 가이드에게 알게 될 것입니다. [[[In broad strokes, this involves deciding what should be sent as the response and calling an appropriate method to create that response. If the response is a full-blown view, Rails also does some extra work to wrap the view in a layout and possibly to pull in partial views. You'll see all of those paths later in this guide.]]]
 
-Creating Responses
+[Creating Responses] 응답 만들기
 ------------------
 
-From the controller's point of view, there are three ways to create an HTTP response:
+컨트롤러의 관점에서 뷰를 보면 3가지 방법으로 HTTP 응답을 만들수 있습니다: [[[From the controller's point of view, there are three ways to create an HTTP response:]]]
 
-* Call `render` to create a full response to send back to the browser
-* Call `redirect_to` to send an HTTP redirect status code to the browser
-* Call `head` to create a response consisting solely of HTTP headers to send back to the browser
+* `render`를 호출하여 전체 응답을 만들고 브라우저에 보내기 [[[Call `render` to create a full response to send back to the browser]]]
 
-### Rendering by Default: Convention Over Configuration in Action
+* `redirect_to`를 호출하여 HTTP redirect 상태코드를 브라우저로 보내기 [[[Call `redirect_to` to send an HTTP redirect status code to the browser]]]
 
-You've heard that Rails promotes "convention over configuration". Default rendering is an excellent example of this. By default, controllers in Rails automatically render views with names that correspond to valid routes. For example, if you have this code in your `BooksController` class:
+* `head`를 호출하여 HTTP 헤더만으로 이루어진 응답을 만들고 브라우저로 보내기 [[[Call `head` to create a response consisting solely of HTTP headers to send back to the browser]]]
+
+### [[[Rendering by Default: Convention Over Configuration in Action]]] 기본 렌더링: 액션에서의 설정보다 관례
+
+레일스의 "설정보다 관례"에 대해서 들어본적이 있을것입니다. 기본 렌더링은 이에 대한 좋은예 입니다. 레일스의 컨트롤러는 라우트의 이름으로 자동으로 뷰를 렌더딩합니다. 예를들어 `BooksController` 클래스에 다음과 같은 코드가 있는경우: [[[You've heard that Rails promotes "convention over configuration". Default rendering is an excellent example of this. By default, controllers in Rails automatically render views with names that correspond to valid routes. For example, if you have this code in your `BooksController` class:]]]
 
 ```ruby
 class BooksController < ApplicationController
 end
 ```
 
-And the following in your routes file:
+그리고 라우트 파일에 다음과 같은경우:[[And the following in your routes file:]]
 
 ```ruby
 resources :books
 ```
 
-And you have a view file `app/views/books/index.html.erb`:
+그리고 `app/views/books/index.html.erb` 뷰 파일을 가지고 있다면 [[[And you have a view file `app/views/books/index.html.erb`:]]]
 
 ```html+erb
 <h1>Books are coming soon!</h1>
 ```
 
-Rails will automatically render `app/views/books/index.html.erb` when you navigate to `/books` and you will see "Books are coming soon!" on your screen.
+이 상태에서 `/books` 를 탐색하는경우 레일스는 자동으로 `app/views/books/index.html.erb` 를 랜더딩해서 "Books are coming soon!" 메시지가 화면에 보이게 됩니다. [[[Rails will automatically render `app/views/books/index.html.erb` when you navigate to `/books` and you will see "Books are coming soon!" on your screen.]]]
 
-However a coming soon screen is only minimally useful, so you will soon create your `Book` model and add the index action to `BooksController`:
+coming soon 화면은 별 정보가 없어서 유용하지 않으므로 `Book` 모델을 만들고 `BooksController`에 index 액션을 추가하겠습니다: [[[However a coming soon screen is only minimally useful, so you will soon create your `Book` model and add the index action to `BooksController`:]]]
 
 ```ruby
 class BooksController < ApplicationController
@@ -61,9 +66,9 @@ class BooksController < ApplicationController
 end
 ```
 
-Note that we don't have explicit render at the end of the index action in accordance with "convention over configuration" principle. The rule is that if you do not explicitly render something at the end of a controller action, Rails will automatically look for the `action_name.html.erb` template in the controller's view path and render it. So in this case, Rails will render the `app/views/books/index.html.erb` file.
+여기서 우리는 "설정보다 관례"에 의해 index 액션의 마지막에 render 를 명시하지 않았습니다. 이 규칙은 컨트롤러의 액션 마지막에 명시적인 render가 없는 경우, 레일스는 자동으로 컨트롤러의 뷰 경로에서 `action_name.html.erb` 템플릿파일을 탐색하고 렌더링합니다. 그래서 이 경우 레일스는 `app/views/books/index.html.erb` 파일을 렌더링합니다.  [[[Note that we don't have explicit render at the end of the index action in accordance with "convention over configuration" principle. The rule is that if you do not explicitly render something at the end of a controller action, Rails will automatically look for the `action_name.html.erb` template in the controller's view path and render it. So in this case, Rails will render the `app/views/books/index.html.erb` file.]]]
 
-If we want to display the properties of all the books in our view, we can do so with an ERB template like this:
+만약 뷰에서 책의 정보를 보여주고 싶다면, ERB 템플릿을 다음과 같이 작성할 수 있습니다. [[[If we want to display the properties of all the books in our view, we can do so with an ERB template like this:]]]
 
 ```html+erb
 <h1>Listing Books</h1>
@@ -93,23 +98,23 @@ If we want to display the properties of all the books in our view, we can do so 
 <%= link_to "New book", new_book_path %>
 ```
 
-NOTE: The actual rendering is done by subclasses of `ActionView::TemplateHandlers`. This guide does not dig into that process, but it's important to know that the file extension on your view controls the choice of template handler. Beginning with Rails 2, the standard extensions are `.erb` for ERB (HTML with embedded Ruby), and `.builder` for Builder (XML generator).
+NOTE: 실제 렌더링 작업은 `ActionsView::TemplateHandlers` 가 하게 됩니다. 본 가이드에서는 이 과정을 깊숙이 다루지 않을 것이지만, 뷰 파일의 확장자에 따라 템플릿 핸들러가 결정 된다는 것을 아는 것이 중요합니다. 레일스 2 부터  ERB(루비 코드가 포함된 HTML)에 대한 표준 확장자는 .erb 이고 Builder(XML 생성기)에 대한 확장자는 `.builder` 입니다. [[[The actual rendering is done by subclasses of `ActionView::TemplateHandlers`. This guide does not dig into that process, but it's important to know that the file extension on your view controls the choice of template handler. Beginning with Rails 2, the standard extensions are `.erb` for ERB (HTML with embedded Ruby), and `.builder` for Builder (XML generator).]]]
 
-### Using `render`
+### [Using `render`] `render` 사용
 
-In most cases, the `ActionController::Base#render` method does the heavy lifting of rendering your application's content for use by a browser. There are a variety of ways to customize the behavior of `render`. You can render the default view for a Rails template, or a specific template, or a file, or inline code, or nothing at all. You can render text, JSON, or XML. You can specify the content type or HTTP status of the rendered response as well.
+대부분의 경우 `ActionController::Base#render` 메소드는 브라우저에 보여 줄 어플리케이션의 내용물을 렌더링하는 힘든 작업을 하게 됩니다. 이러한 `render` 메소드의 작업을 변경하는 방법에는 여러가지가 있습니다. 레일스 템플릿의 디폴트 뷰, 특정 템플릿, 파일, 인라인 코드, 빈내용을 렌더링할 수 있다는 것입니다. 문자열, JSON, XML 포맷으로 렌더링할 수 있습니다. 또한 렌더링되는 응답의 종류나 HTTP 상태를 명시할 수 있습니다. [[[In most cases, the `ActionController::Base#render` method does the heavy lifting of rendering your application's content for use by a browser. There are a variety of ways to customize the behavior of `render`. You can render the default view for a Rails template, or a specific template, or a file, or inline code, or nothing at all. You can render text, JSON, or XML. You can specify the content type or HTTP status of the rendered response as well.]]]
 
-TIP: If you want to see the exact results of a call to `render` without needing to inspect it in a browser, you can call `render_to_string`. This method takes exactly the same options as `render`, but it returns a string instead of sending a response back to the browser.
+TIP: `render` 호출에 대한 정확한 결과를 브라우저에서 조사(개발자도구)를 통하지 않고 보기를 원한다면, `render_to_string` 를 사용할 수 있습니다. 이 메소드는 `render`와 동일한 옵션을 가지지만 응답내용을 브라우저가 아닌 문자열로 반환합니다. [[[If you want to see the exact results of a call to `render` without needing to inspect it in a browser, you can call `render_to_string`. This method takes exactly the same options as `render`, but it returns a string instead of sending a response back to the browser.]]]
 
-#### Rendering Nothing
+#### [[[Rendering Nothing]]] 아무것도 렌더링하지 않
 
-Perhaps the simplest thing you can do with `render` is to render nothing at all:
+`render`로 할 수 있는 가장 간단한 작업은 아마도 아무것도 렌더링하지 않는것입니다:[[[Perhaps the simplest thing you can do with `render` is to render nothing at all:]]]
 
 ```ruby
 render nothing: true
 ```
 
-If you look at the response for this using cURL, you will see the following:
+cURL 명렁어를 이용해 응답을 살펴보면 다음과 같습니다: [[[If you look at the response for this using cURL, you will see the following:]]]
 
 ```bash
 $ curl -i 127.0.0.1:3000/books
@@ -126,13 +131,13 @@ Cache-Control: no-cache
  $
 ```
 
-We see there is an empty response (no data after the `Cache-Control` line), but the request was successful because Rails has set the response to 200 OK. You can set the `:status` option on render to change this response. Rendering nothing can be useful for Ajax requests where all you want to send back to the browser is an acknowledgment that the request was completed.
+비어있는 응답을 보게 되는데(`Cache-Control` 줄 다음에 아무데이터 없음), 요청은 레일스에서 200 OK 응답을 설정했기 때문에 성공적으로 완료됩니다. `:status` 옵션을 이용해 이 응답을 변경할수 있습니다. 아무것도 렌더링하지 않는것은 Ajax 요청에서 브라우저에게 요청이 완료되었음만을 알려줄때 유용합니다. [[[We see there is an empty response (no data after the `Cache-Control` line), but the request was successful because Rails has set the response to 200 OK. You can set the `:status` option on render to change this response. Rendering nothing can be useful for Ajax requests where all you want to send back to the browser is an acknowledgment that the request was completed.]]]
 
-TIP: You should probably be using the `head` method, discussed later in this guide, instead of `render :nothing`. This provides additional flexibility and makes it explicit that you're only generating HTTP headers.
+TIP: `render :nothing` 보다는 본 가이드에서 언급할 `head` 메소드를 이용하는것이 좋습니다. 이는 유연성과 헤더만 생성한다는것을 명시적으로 나타냅니다. [[[You should probably be using the `head` method, discussed later in this guide, instead of `render :nothing`. This provides additional flexibility and makes it explicit that you're only generating HTTP headers.]]]
 
-#### Rendering an Action's View
+#### [Rendering an Action's View] 액션 뷰 렌더링하기
 
-If you want to render the view that corresponds to a different template within the same controller, you can use `render` with the name of the view:
+동일한 컨트롤러에서 다른 템플릿 뷰를 렌더링하고자 한다면, `render`를 뷰 이름과 함께 사용합니다: [[[If you want to render the view that corresponds to a different template within the same controller, you can use `render` with the name of the view:]]]
 
 ```ruby
 def update
@@ -145,9 +150,9 @@ def update
 end
 ```
 
-If the call to `update` fails, calling the `update` action in this controller will render the `edit.html.erb` template belonging to the same controller.
+`update` 메소드가 실패한다면, `update` 액션은 동일 컨트롤러의 `edit.html.erb` 템플릿을 이용할것입니다. [[[If the call to `update` fails, calling the `update` action in this controller will render the `edit.html.erb` template belonging to the same controller.]]]
 
-If you prefer, you can use a symbol instead of a string to specify the action to render:
+선호에 따라 문자열 대신 심볼을 이용할 수 있습니다: [[[If you prefer, you can use a symbol instead of a string to specify the action to render:]]]
 
 ```ruby
 def update
@@ -160,45 +165,45 @@ def update
 end
 ```
 
-#### Rendering an Action's Template from Another Controller
+#### [Rendering an Action's Template from Another Controller] 다른 컨트롤러의 액션 템플릿 랜더링하기
 
-What if you want to render a template from an entirely different controller from the one that contains the action code? You can also do that with `render`, which accepts the full path (relative to `app/views`) of the template to render. For example, if you're running code in an `AdminProductsController` that lives in `app/controllers/admin`, you can render the results of an action to a template in `app/views/products` this way:
+액션코드가 있는 컨트롤러와는 완전 다른 컨트롤러에 있는 템플릿을 렌더링하고자 한다면 어떻게 될까요? 이 때는 렌더링할 템플릿의 `app/views` 디렉토리로 부터의 상대경로를 지정해 주고 `render` 메소드를 호출하면 됩니다. 예를 들면, `app/controllers/admin` 폴더에 있는 `AdminProductsController`에서 코드를 실행하고자 하면 해당 액션의 결과는 다음과 같이 `app/views/products` 폴더에 있는 템플릿으로 렌더링할 수 있습니다. [[[What if you want to render a template from an entirely different controller from the one that contains the action code? You can also do that with `render`, which accepts the full path (relative to `app/views`) of the template to render. For example, if you're running code in an `AdminProductsController` that lives in `app/controllers/admin`, you can render the results of an action to a template in `app/views/products` this way:]]]
 
 ```ruby
 render "products/show"
 ```
 
-Rails knows that this view belongs to a different controller because of the embedded slash character in the string. If you want to be explicit, you can use the `:template` option (which was required on Rails 2.2 and earlier):
+레일스는 슬래쉬 문자를 통해 해당뷰가 다른 컨트롤러에 있다고 판단합니다. 만약 명시적으로 지정하고 싶다면 `:template` 옵션을 사용합니다. (레일스 2.2 이전버전에서는 필수) [[[Rails knows that this view belongs to a different controller because of the embedded slash character in the string. If you want to be explicit, you can use the `:template` option (which was required on Rails 2.2 and earlier):]]]
 
 ```ruby
 render template: "products/show"
 ```
 
-#### Rendering an Arbitrary File
+#### [Rendering an Arbitrary File] 임의의 파일 렌더링하기
 
-The `render` method can also use a view that's entirely outside of your application (perhaps you're sharing views between two Rails applications):
+`render` 메소드는 애플리케이션의 외부에 있는 파일도 뷰로 사용할 수 있습니다.(만약 당신이 두개의 레일스 애플리케이션에서 뷰를 공유하는경우) [[[The `render` method can also use a view that's entirely outside of your application (perhaps you're sharing views between two Rails applications):]]]
 
 ```ruby
 render "/u/apps/warehouse_app/current/app/views/products/show"
 ```
 
-Rails determines that this is a file render because of the leading slash character. To be explicit, you can use the `:file` option (which was required on Rails 2.2 and earlier):
+문자열의 맨앞에 있는 슬래쉬 문자를 통해 레일스는 파일이라고 판단합니다. 명시적으로 지정하고 싶다면 `:file` 옵션을 사용합니다.  (레일스 2.2 이전버전에서는 필수) [[[Rails determines that this is a file render because of the leading slash character. To be explicit, you can use the `:file` option (which was required on Rails 2.2 and earlier):]]]
 
 ```ruby
 render file: "/u/apps/warehouse_app/current/app/views/products/show"
 ```
 
-The `:file` option takes an absolute file-system path. Of course, you need to have rights to the view that you're using to render the content.
+`:file` 옵션은 파일의 절대경로를 사용합니다. 물론 렌더링하기 위해서는 해당 파일에 대한 접근권한이 있어야 합니다. [[[The `:file` option takes an absolute file-system path. Of course, you need to have rights to the view that you're using to render the content.]]]
 
-NOTE: By default, the file is rendered without using the current layout. If you want Rails to put the file into the current layout, you need to add the `layout: true` option.
+NOTE: 파일은 기본적으로 레이아웃없이 렌더딩됩니다. 파일에 현재 레이아웃을 적용하고 싶다면 `layout: true` 옵션을 추가합니다. [[[By default, the file is rendered without using the current layout. If you want Rails to put the file into the current layout, you need to add the `layout: true` option.]]]
 
-TIP: If you're running Rails on Microsoft Windows, you should use the `:file` option to render a file, because Windows filenames do not have the same format as Unix filenames.
+TIP: 마이크로소프트의 윈도우즈를 사용한다면 파일 렌더링을 위해 `:file` 옵션을 사용해야합니다. 이는 윈도우의 파일이름이 Unix 의 파일시스템과 다르기 때문입니다. [[[If you're running Rails on Microsoft Windows, you should use the `:file` option to render a file, because Windows filenames do not have the same format as Unix filenames.]]]
 
-#### Wrapping it up
+#### [Wrapping it up] 정리하기
 
-The above three ways of rendering (rendering another template within the controller, rendering a template within another controller and rendering an arbitrary file on the file system) are actually variants of the same action.
+지금까지 소개한 렌더링에 관한 3가지 방법(컨트롤러내의 다른 액션의 템플릿 렌더링하기, 다른 컨트롤러내의 템플릿을 렌더링하기, 파일시스템 내의 임의의 파일 렌더링하기)은 사실 동일한 작업에 대한 변형들입니다. [[[The above three ways of rendering (rendering another template within the controller, rendering a template within another controller and rendering an arbitrary file on the file system) are actually variants of the same action.]]]
 
-In fact, in the BooksController class, inside of the update action where we want to render the edit template if the book does not update successfully, all of the following render calls would all render the `edit.html.erb` template in the `views/books` directory:
+사실, BooksController 클래스에서 book 에 대한 업데이트가 실패하면 update 액션에서 edit 템플릿을 렌더링하고자 할 경우, 아래의 모든 렌더링 호출은 `views/books` 디렉토리에 있는 동일한 `edit.html.erb` 템플릿을 렌더링하게 될 것입니다. [[[In fact, in the BooksController class, inside of the update action where we want to render the edit template if the book does not update successfully, all of the following render calls would all render the `edit.html.erb` template in the `views/books` directory:]]]
 
 ```ruby
 render :edit
@@ -217,55 +222,55 @@ render file: "/path/to/rails/app/views/books/edit"
 render file: "/path/to/rails/app/views/books/edit.html.erb"
 ```
 
-Which one you use is really a matter of style and convention, but the rule of thumb is to use the simplest one that makes sense for the code you are writing.
+어떤 것을 사용할 것인가는 본인의 스타일과 관례에 관한 것이지만, 원칙은 가장 간단한 것을 사용한 것입니다. [[[Which one you use is really a matter of style and convention, but the rule of thumb is to use the simplest one that makes sense for the code you are writing.]]]
 
-#### Using `render` with `:inline`
+#### [Using `render` with `:inline`] `render` 메소드에 `:inline` 사용
 
-The `render` method can do without a view completely, if you're willing to use the `:inline` option to supply ERB as part of the method call. This is perfectly valid:
+ERB를 제공해 주기 위해서 메소드 호출의 일부로 `:inline` 옵션을 이용하면 뷰 템플릿 없이도 `render` 메소드가 작업을 할 수 있습니다. 다음과 같은 render 메소드는 완벽하게 동작합니다. [[[The `render` method can do without a view completely, if you're willing to use the `:inline` option to supply ERB as part of the method call. This is perfectly valid:]]]
 
 ```ruby
 render inline: "<% products.each do |p| %><p><%= p.name %></p><% end %>"
 ```
 
-WARNING: There is seldom any good reason to use this option. Mixing ERB into your controllers defeats the MVC orientation of Rails and will make it harder for other developers to follow the logic of your project. Use a separate erb view instead.
+WARNING: 사실 이 옵션을 사용할 이유는 거의 없습니다. ERB를 컨트롤러에 섞어 버리면 레일스의 MVC 구현 정책에 위배 되는 것이고 다른 개발자들이 해당 프로젝트의 로직을 이해하기가 힘들어 질 것입니다. 따라서 대신에 별도의 erb 뷰 파일을 사용하기 바랍니다. [[[There is seldom any good reason to use this option. Mixing ERB into your controllers defeats the MVC orientation of Rails and will make it harder for other developers to follow the logic of your project. Use a separate erb view instead.]]]
 
-By default, inline rendering uses ERB. You can force it to use Builder instead with the `:type` option:
+기본 설정으로 inline 렌더링은 ERB를 사용합니다. 그러나 `:type` 옵션을 사용하면 대신에 Builder를 사용하도록 할 수 있습니다. [[[By default, inline rendering uses ERB. You can force it to use Builder instead with the `:type` option:]]]
 
 ```ruby
 render inline: "xml.p {'Horrid coding practice!'}", type: :builder
 ```
 
-#### Rendering Text
+#### [Rendering Text] 문자열 렌더링
 
-You can send plain text - with no markup at all - back to the browser by using the `:text` option to `render`:
+`:text` 옵션을 이용해서 렌더링하면 브라우저로 단순한 텍스트만 - 마크없이 없는 - 보낼 수 있습니다. [[[You can send plain text - with no markup at all - back to the browser by using the `:text` option to `render`:]]]
 
 ```ruby
 render text: "OK"
 ```
 
-TIP: Rendering pure text is most useful when you're responding to Ajax or web service requests that are expecting something other than proper HTML.
+TIP: 순수한 문자열으로만 이루어진 응답을 렌더링하는 것은 HTML외에 다른 무언가를 기대하는 Ajax나 웹서비스 요청에 대한 응답을 보낼 때 가장 유용합니다. [[[Rendering pure text is most useful when you're responding to Ajax or web service requests that are expecting something other than proper HTML.]]]
 
-NOTE: By default, if you use the `:text` option, the text is rendered without using the current layout. If you want Rails to put the text into the current layout, you need to add the `layout: true` option.
+NOTE: 기본설정으로 `:text` 옵션을 이용하면 현재의 레이아웃을 사용하지 않은 채 텍스트를 렌더링하게 됩니다. 레이아웃를 적용해서 텍스트를 렌더링하고자 한다면 `layout: true` 옵션을 추가해야 합니다. [[[By default, if you use the `:text` option, the text is rendered without using the current layout. If you want Rails to put the text into the current layout, you need to add the `layout: true` option.]]]
 
-#### Rendering JSON
+#### [Rendering JSON] JSON 렌더링
 
-JSON is a JavaScript data format used by many Ajax libraries. Rails has built-in support for converting objects to JSON and rendering that JSON back to the browser:
+JSON은 다수의 Ajax 라이브러리에서 사용하는 자바스크립트 데이터 포맷을 말합니다. 레일스는 객체를 JSON으로 변환하고 JSON을 브라우저로 렌더링하는 것을 지원합니다. [[[JSON is a JavaScript data format used by many Ajax libraries. Rails has built-in support for converting objects to JSON and rendering that JSON back to the browser:]]]
 
 ```ruby
 render json: @product
 ```
 
-TIP: You don't need to call `to_json` on the object that you want to render. If you use the `:json` option, `render` will automatically call `to_json` for you.
+TIP: 렌더링하고 하는 객체에 대해서 `to_json` 을 호출할 필요가 없습니다. `:json` 옵션을 사용하면 렌더링시 자동으로 `to_json` 을 호출하게 됩니다. [[[You don't need to call `to_json` on the object that you want to render. If you use the `:json` option, `render` will automatically call `to_json` for you.]]]
 
-#### Rendering XML
+#### [Rendering XML] XML 렌더링
 
-Rails also has built-in support for converting objects to XML and rendering that XML back to the caller:
+레일스는 또한 객체를 XML로 변환하고 호출자에게 XML을 렌더링해서 보내도록 지원합니다: [[[Rails also has built-in support for converting objects to XML and rendering that XML back to the caller:]]]
 
 ```ruby
 render xml: @product
 ```
 
-TIP: You don't need to call `to_xml` on the object that you want to render. If you use the `:xml` option, `render` will automatically call `to_xml` for you.
+TIP: 렌더일하고자 하는 객체에 대해서 `to_xml` 을 호출할 필요가 없습니다. `:xml` 옵션을 사용하면 렌더일시 자동으로 `to_xml` 호출하게 됩니다. [[[You don't need to call `to_xml` on the object that you want to render. If you use the `:xml` option, `render` will automatically call `to_xml` for you.]]]
 
 #### Rendering Vanilla JavaScript
 
