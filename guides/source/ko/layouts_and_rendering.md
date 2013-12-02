@@ -561,35 +561,35 @@ end
 
 This will render a book with `special?` set with the `special_show` template, while other books will render with the default `show` template.
 
-### Using `redirect_to`
+### [Using `redirect_to`] `redirect_to` 사용
 
-Another way to handle returning responses to an HTTP request is with `redirect_to`. As you've seen, `render` tells Rails which view (or other asset) to use in constructing a response. The `redirect_to` method does something completely different: it tells the browser to send a new request for a different URL. For example, you could redirect from wherever you are in your code to the index of photos in your application with this call:
+HTTP 요청에 대한 응답을 다루는 또 다른 방법은 `redirect_to` 입니다. 이미 봤듯이 `render`는 레일스에게 응답을 만들때 어떤 뷰(혹은 자원)를 사용할지 알려줍니다. `redirect_to`는 이와 완전히 다르게 브라우저에게 새로운 URL로의 요청을 보내도록 알립니다. 예를들어 다음의 호출로 코드 어디서든지 사진목록으로 리다이렉트 할 수 있습니다. [[[Another way to handle returning responses to an HTTP request is with `redirect_to`. As you've seen, `render` tells Rails which view (or other asset) to use in constructing a response. The `redirect_to` method does something completely different: it tells the browser to send a new request for a different URL. For example, you could redirect from wherever you are in your code to the index of photos in your application with this call:]]]
 
 ```ruby
 redirect_to photos_url
 ```
 
-You can use `redirect_to` with any arguments that you could use with `link_to` or `url_for`. There's also a special redirect that sends the user back to the page they just came from:
+`redirect_to` 인자에는 `link_to` 또는 `url_for`에 사용하는 인자를 사용할 수 있습니다. 또한 사용자가 이전에 방문했던 페이지로 돌려보내는 특별한 리다이렉트도 있습니다. [[[You can use `redirect_to` with any arguments that you could use with `link_to` or `url_for`. There's also a special redirect that sends the user back to the page they just came from:]]]
 
 ```ruby
 redirect_to :back
 ```
 
-#### Getting a Different Redirect Status Code
+#### [Getting a Different Redirect Status Code] 리다이렉트 상태코드 지정
 
-Rails uses HTTP status code 302, a temporary redirect, when you call `redirect_to`. If you'd like to use a different status code, perhaps 301, a permanent redirect, you can use the `:status` option:
+레일스에서 `redirect_to`를 호출할때 임시 리다이렉트를 의미하는 HTTP 302 상태코드를 사용합니다. 만약 영구 리다이렉트를 의미하는 301과 같은 상태코드를 사용하고자 하는경우 `:status` 옵션을 사용합니다. [[[Rails uses HTTP status code 302, a temporary redirect, when you call `redirect_to`. If you'd like to use a different status code, perhaps 301, a permanent redirect, you can use the `:status` option:]]]
 
 ```ruby
 redirect_to photos_path, status: 301
 ```
 
-Just like the `:status` option for `render`, `:status` for `redirect_to` accepts both numeric and symbolic header designations.
+`redirect_to`에서 `:status` 옵션은 `render` 에서의 `:status` 옵션과 동일하게 숫자나 심볼릭 명칭을 지정할 수 있습니다. [[[Just like the `:status` option for `render`, `:status` for `redirect_to` accepts both numeric and symbolic header designations.]]]
 
-#### The Difference Between `render` and `redirect_to`
+#### [The Difference Between `render` and `redirect_to`] `render`와 `redirect_to`의 차이점
 
-Sometimes inexperienced developers think of `redirect_to` as a sort of `goto` command, moving execution from one place to another in your Rails code. This is _not_ correct. Your code stops running and waits for a new request for the browser. It just happens that you've told the browser what request it should make next, by sending back an HTTP 302 status code.
+때때로 경험이 부족한 개발자들은 `redirect_to`를 레일스의 코드에서 다른 지점으로 실행점이 옮겨지는 `goto`와 같은 종류로 인식합니다. 하지만 이것은 _틀렸_습니다. 코드는 실행을 중지하고 브라우저로부터의 새로운 요청을 기다리는 상태가 됩니다. 이때 브라우저에게 HTTP 302 상태코드를 보내 다음에 요청할것을 알려줍니다. [[[Sometimes inexperienced developers think of `redirect_to` as a sort of `goto` command, moving execution from one place to another in your Rails code. This is _not_ correct. Your code stops running and waits for a new request for the browser. It just happens that you've told the browser what request it should make next, by sending back an HTTP 302 status code.]]]
 
-Consider these actions to see the difference:
+아래 액션들의 다른점을 알아보겠습니다:[[[Consider these actions to see the difference:]]]
 
 ```ruby
 def index
@@ -604,7 +604,7 @@ def show
 end
 ```
 
-With the code in this form, there will likely be a problem if the `@book` variable is `nil`. Remember, a `render :action` doesn't run any code in the target action, so nothing will set up the `@books` variable that the `index` view will probably require. One way to fix this is to redirect instead of rendering:
+이 코드에서는 `@book` 변수가 `nil`인경우 문제점이 있습니다. 기억해야할점은 `render :action`은 타겟의 액션코드를 실행하지 않는다는점입니다. 따라서 `index` 뷰에서 필요로하는 `@books` 변수가 설정되지 않습니다. 이 문제는 고치는 방법중 하나는 렌더링 대신 리다이렉트를 사용하는것입니다. [[[With the code in this form, there will likely be a problem if the `@book` variable is `nil`. Remember, a `render :action` doesn't run any code in the target action, so nothing will set up the `@books` variable that the `index` view will probably require. One way to fix this is to redirect instead of rendering:]]]
 
 ```ruby
 def index
@@ -619,11 +619,11 @@ def show
 end
 ```
 
-With this code, the browser will make a fresh request for the index page, the code in the `index` method will run, and all will be well.
+이 코드에서 브라우저는 인덱스 페이지를 위해 새로운 요청을 보내 `index` 메소드를 실행하고 모든것은 정상적으로 작동합니다. [[[With this code, the browser will make a fresh request for the index page, the code in the `index` method will run, and all will be well.]]]
 
-The only downside to this code is that it requires a round trip to the browser: the browser requested the show action with `/books/1` and the controller finds that there are no books, so the controller sends out a 302 redirect response to the browser telling it to go to `/books/`, the browser complies and sends a new request back to the controller asking now for the `index` action, the controller then gets all the books in the database and renders the index template, sending it back down to the browser which then shows it on your screen.
+이 코드의 유일한 단점은 브라우저로 되돌아 가는 것입니다. 브라우저가 `/books/1` 요청을 보내 show 액션을 요청하면 컨트롤러는 책이 없다는것을 알고 `/books/`로 이동하라는 302 리다이렉트 응답을 브라우저에게 보냅니다. 브라우저를 이를 해석해 새로 `index` 액션을 컨트롤러에게 요청하면 컨트롤러는 데이터베이스로부터 모든 책 목록을 가져와 index 템플릿에 렌더링한 결과를 브라우저에게 보내 사용자의 화면에 보이게 됩니다. [[[The only downside to this code is that it requires a round trip to the browser: the browser requested the show action with `/books/1` and the controller finds that there are no books, so the controller sends out a 302 redirect response to the browser telling it to go to `/books/`, the browser complies and sends a new request back to the controller asking now for the `index` action, the controller then gets all the books in the database and renders the index template, sending it back down to the browser which then shows it on your screen.]]]
 
-While in a small application, this added latency might not be a problem, it is something to think about if response time is a concern. We can demonstrate one way to handle this with a contrived example:
+소규모의 어플리케이션에서 이러한 시간 지체가 문제가 되지 않겠지만 응답속도가 중요한경우 생각해 볼 만합니다. 예제를 통해 이 문제를 다루는 방법중 하나를 살펴보겠습니다. [[[While in a small application, this added latency might not be a problem, it is something to think about if response time is a concern. We can demonstrate one way to handle this with a contrived example:]]]
 
 ```ruby
 def index
@@ -640,17 +640,17 @@ def show
 end
 ```
 
-This would detect that there are no books with the specified ID, populate the `@books` instance variable with all the books in the model, and then directly render the `index.html.erb` template, returning it to the browser with a flash alert message to tell the user what happened.
+이것은 특정 ID에 해당하는 책이 없는것을 알게 되었을때 `@books` 인스턴스 변수에 모든책을 할당하고, 사용자에게 무슨일이 벌어졌는지 알려주는 플래시 경고메시지와 함께 `index.html.erb` 템플릿을 렌더링해 브라우저에게 응답합니다. [[[This would detect that there are no books with the specified ID, populate the `@books` instance variable with all the books in the model, and then directly render the `index.html.erb` template, returning it to the browser with a flash alert message to tell the user what happened.]]]
 
-### Using `head` To Build Header-Only Responses
+### [Using `head` To Build Header-Only Responses] `head`를 이용해 헤더만 응답하기
 
-The `head` method can be used to send responses with only headers to the browser. It provides a more obvious alternative to calling `render :nothing`. The `head` method accepts a number or symbol (see [reference table](#the-status-option)) representing a HTTP status code. The options argument is interpreted as a hash of header names and values. For example, you can return only an error header:
+`head` 메소드는 헤더정보만 가진 응답을 보낼수 있습니다. 이것은 `render :nothing`보다 좋은 대안을 제공합니다. `haed` 메소드는 HTTP 상태코드를 나타내는 숫자나 심볼을([reference table](#the-status-option)) 인자로 허용합니다. 추가 인자는 헤더이름과 값으로 이루어진 해쉬입니다. 예를들어 오류 헤더만 반환하는경우 다음과 같습니다: [[[The `head` method can be used to send responses with only headers to the browser. It provides a more obvious alternative to calling `render :nothing`. The `head` method accepts a number or symbol (see [reference table](#the-status-option)) representing a HTTP status code. The options argument is interpreted as a hash of header names and values. For example, you can return only an error header:]]]
 
 ```ruby
 head :bad_request
 ```
 
-This would produce the following header:
+이것은 다음과 같은 헤더를 생성합니다: [[[This would produce the following header:]]]
 
 ```
 HTTP/1.1 400 Bad Request
@@ -663,13 +663,13 @@ Set-Cookie: _blog_session=...snip...; path=/; HttpOnly
 Cache-Control: no-cache
 ```
 
-Or you can use other HTTP headers to convey other information:
+또는 다른 HTTP 헤더를 사용해서 추가 정보를 보낼 수도 있습니다. [[[Or you can use other HTTP headers to convey other information:]]]
 
 ```ruby
 head :created, location: photo_path(@photo)
 ```
 
-Which would produce:
+이것은 다음과 같은 헤더를 생성합니다: [[[Which would produce:]]]
 
 ```
 HTTP/1.1 201 Created
