@@ -644,7 +644,7 @@ end
 
 ### [Using `head` To Build Header-Only Responses] `head`를 이용해 헤더만 응답하기
 
-`head` 메소드는 헤더정보만 가진 응답을 보낼수 있습니다. 이것은 `render :nothing`보다 좋은 대안을 제공합니다. `haed` 메소드는 HTTP 상태코드를 나타내는 숫자나 심볼을([reference table](#the-status-option)) 인자로 허용합니다. 추가 인자는 헤더이름과 값으로 이루어진 해쉬입니다. 예를들어 오류 헤더만 반환하는경우 다음과 같습니다: [[[The `head` method can be used to send responses with only headers to the browser. It provides a more obvious alternative to calling `render :nothing`. The `head` method accepts a number or symbol (see [reference table](#the-status-option)) representing a HTTP status code. The options argument is interpreted as a hash of header names and values. For example, you can return only an error header:]]]
+`head` 메소드는 헤더정보만 가진 응답을 보낼수 있습니다. 이것은 `render :nothing`보다 좋은 대안을 제공합니다. `head` 메소드는 HTTP 상태코드를 나타내는 숫자나 심볼을([reference table](#the-status-option)) 인자로 허용합니다. 추가 인자는 헤더이름과 값으로 이루어진 해쉬입니다. 예를들어 오류 헤더만 반환하는경우 다음과 같습니다: [[[The `head` method can be used to send responses with only headers to the browser. It provides a more obvious alternative to calling `render :nothing`. The `head` method accepts a number or symbol (see [reference table](#the-status-option)) representing a HTTP status code. The options argument is interpreted as a hash of header names and values. For example, you can return only an error header:]]]
 
 ```ruby
 head :bad_request
