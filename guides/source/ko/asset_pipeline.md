@@ -58,7 +58,7 @@ Fingerprinting이라는 것은 파일이름을 파일의 내용에 의존해서 
 
 특정 파일명이 유일하고 파일내용에 근거하여 만들어질 때, HTTP 헤더를 설정하여 캐시가 어느 곳(CDN, ISP, 네트워크 장비, 또는 웹브라우저)에 위치하더라도 자신만의 파일 복사본을 유지하도록 할 수 있습니다. 해당 파일의 내용이 업데이트될 때 fingerprint는 변경될 것입니다. 이것은 원격상의 클라이언트가 해당 파일의 새로운 복사본을 요청하도록 할 것입니다. 이러한 것을 일반적으로 _cache busting_ 이라고 합니다. [[[When a filename is unique and based on its content, HTTP headers can be set to encourage caches everywhere (whether at CDNs, at ISPs, in networking equipment, or in web browsers) to keep their own copy of the content. When the content is updated, the fingerprint will change. This will cause the remote clients to request a new copy of the content. This is generally known as _cache busting_.]]]
 
-fingerprinting에 대해서 레일스가 사용하는 기술은 _파일내용의 해시값_을 대개 파일명의 끝에 삽입하는 것입니다. 예를 들어, `global.css`라는 CSS 파일은 해당 파일내용의 MD5 digest값이 파일명의 끝에 삽입될 것입니다. [[[The technique that Rails uses for fingerprinting is to insert a hash of the content into the name, usually at the end. For example a CSS file `global.css` could be renamed with an MD5 digest of its contents:]]]
+fingerprinting에 대해서 레일스가 사용하는 기술은 _파일내용의 해시값_ 을 대개 파일명의 끝에 삽입하는 것입니다. 예를 들어, `global.css`라는 CSS 파일은 해당 파일내용의 MD5 digest값이 파일명의 끝에 삽입될 것입니다. [[[The technique that Rails uses for fingerprinting is to insert a hash of the content into the name, usually at the end. For example a CSS file `global.css` could be renamed with an MD5 digest of its contents:]]]
 
 ```
 global-908e25f4bf641868d8683022a5b62f54.css

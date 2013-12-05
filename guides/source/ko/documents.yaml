@@ -73,7 +73,6 @@
     -
       name: 액션 메일러의 기본
       url: action_mailer_basics.html
-      work_in_progress: true
       description: 이 가이드의 내용은 액션 메일러를 이용하여 메일을 보내고 받는 방법에 대하서 다룬다.
     -
       name: 레일스 어플리케이션 테스트하기
