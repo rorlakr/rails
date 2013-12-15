@@ -683,18 +683,20 @@ Set-Cookie: _blog_session=...snip...; path=/; HttpOnly
 Cache-Control: no-cache
 ```
 
-Structuring Layouts
+[Structuring Layouts] 레이아웃 구조화
 -------------------
 
-When Rails renders a view as a response, it does so by combining the view with the current layout, using the rules for finding the current layout that were covered earlier in this guide. Within a layout, you have access to three tools for combining different bits of output to form the overall response:
+레일스에서 응답으로 뷰를 렌더링할때, 현재 레이아웃과 뷰를 결합 합니다. 현재 레이아웃을 찾는 규칙은 본 가이드의 앞부분에 설명되었습니다. 레이아웃안에서 여러개의 결과물을 합쳐 전체응답을 만들어내는데 3가지 툴을 사용할 수 있습니다: [[[When Rails renders a view as a response, it does so by combining the view with the current layout, using the rules for finding the current layout that were covered earlier in this guide. Within a layout, you have access to three tools for combining different bits of output to form the overall response:]]]
 
-* Asset tags
-* `yield` and `content_for`
+* Asset 태그들 [[[Asset tags]]]
+
+* `yield`와 `content_for` [[[`yield` and `content_for`]]]
+
 * Partials
 
-### Asset Tag Helpers
+### [Asset Tag Helpers] Asset 태그 헬퍼
 
-Asset tag helpers provide methods for generating HTML that link views to feeds, JavaScript, stylesheets, images, videos and audios. There are six asset tag helpers available in Rails:
+Asset 태그 헬퍼는 피드, 자바스크립트, 스타일시트, 이미지, 비디오, 오디오등을 뷰와 연결하는 HTML을 만들어주는 메소드를 제공합니다: [[[Asset tag helpers provide methods for generating HTML that link views to feeds, JavaScript, stylesheets, images, videos and audios. There are six asset tag helpers available in Rails:]]]
 
 * `auto_discovery_link_tag`
 * `javascript_include_tag`
@@ -703,137 +705,139 @@ Asset tag helpers provide methods for generating HTML that link views to feeds, 
 * `video_tag`
 * `audio_tag`
 
-You can use these tags in layouts or other views, although the `auto_discovery_link_tag`, `javascript_include_tag`, and `stylesheet_link_tag`, are most commonly used in the `<head>` section of a layout.
+이 태그들은 레이아웃이나 다른 뷰에서 사용할 수 있으며, `auto_discovery_link_tag`, `javascript_include_tag`, `stylesheet_link_tag` 태그는 일반적으로 레이아웃의 `<head>` 영역에서 사용됩니다. [[[You can use these tags in layouts or other views, although the `auto_discovery_link_tag`, `javascript_include_tag`, and `stylesheet_link_tag`, are most commonly used in the `<head>` section of a layout.]]]
 
-WARNING: The asset tag helpers do _not_ verify the existence of the assets at the specified locations; they simply assume that you know what you're doing and generate the link.
+WARNING: asset 태그 헬퍼는 asset이 지정한 위치에 존재하는지 검증하지 _않습니다_; 이는 단순히 당신이 무엇을 하는지 알고 있다고 가정하고 링크만을 생성합니다. [[[The asset tag helpers do _not_ verify the existence of the assets at the specified locations; they simply assume that you know what you're doing and generate the link.]]]
 
-#### Linking to Feeds with the `auto_discovery_link_tag`
+#### [Linking to Feeds with the `auto_discovery_link_tag`] `auto_discovery_link_tag`를 이용해 피드와 연결하기
 
-The `auto_discovery_link_tag` helper builds HTML that most browsers and newsreaders can use to detect the presence of RSS or Atom feeds. It takes the type of the link (`:rss` or `:atom`), a hash of options that are passed through to url_for, and a hash of options for the tag:
+`auto_discovery_link_tag` 헬퍼는 대부분의 브라우저와 뉴스리더에서 RSS 혹은 Atom 피드의 존재를 찾을수 있도록 하는 HTML을 생성합니다. 헬퍼는 인자로 링크에 대한 타입(`:rss` 혹은 `:atom`), 해쉬로 이루어진 url_for 에 사용하는 것과 같은 옵션, 태그를 위한 옵션을 받습니다: [[[The `auto_discovery_link_tag` helper builds HTML that most browsers and newsreaders can use to detect the presence of RSS or Atom feeds. It takes the type of the link (`:rss` or `:atom`), a hash of options that are passed through to url_for, and a hash of options for the tag:]]]
 
 ```erb
 <%= auto_discovery_link_tag(:rss, {action: "feed"},
   {title: "RSS Feed"}) %>
 ```
 
-There are three tag options available for the `auto_discovery_link_tag`:
+`auto_discovery_link_tag` 의 3가지 태그 옵션:[[[There are three tag options available for the `auto_discovery_link_tag`:]]]
 
-* `:rel` specifies the `rel` value in the link. The default value is "alternate".
-* `:type` specifies an explicit MIME type. Rails will generate an appropriate MIME type automatically.
-* `:title` specifies the title of the link. The default value is the uppercase `:type` value, for example, "ATOM" or "RSS".
+* `:rel`은 링크의 `rel` 값을 의미합니다. 기본값은 "alternate" 입니다. [[[`:rel` specifies the `rel` value in the link. The default value is "alternate".]]]
 
-#### Linking to JavaScript Files with the `javascript_include_tag`
+* `:type`은 MIME 타입을 명시적으로 나타냅니다. 기본적으로 레일스는 알맞은 MIME 타입을 자동으로 만들어 냅니다. [[[`:type` specifies an explicit MIME type. Rails will generate an appropriate MIME type automatically.]]]
 
-The `javascript_include_tag` helper returns an HTML `script` tag for each source provided.
+* `:title`은 링크의 제목을 의미합니다. 기본값은 `:type` 값의 대문자입니다. 예를들어 "ATOM", "RSS"와 같습니다. [[[`:title` specifies the title of the link. The default value is the uppercase `:type` value, for example, "ATOM" or "RSS".]]]
 
-If you are using Rails with the [Asset Pipeline](asset_pipeline.html) enabled, this helper will generate a link to `/assets/javascripts/` rather than `public/javascripts` which was used in earlier versions of Rails. This link is then served by the asset pipeline.
+#### [Linking to JavaScript Files with the `javascript_include_tag`] `javascript_include_tag`를 이용해 자바스크립트 파일 연결하기
 
-A JavaScript file within a Rails application or Rails engine goes in one of three locations: `app/assets`, `lib/assets` or `vendor/assets`. These locations are explained in detail in the [Asset Organization section in the Asset Pipeline Guide](asset_pipeline.html#asset-organization)
+`javascript_include_tag` 헬퍼는 인자로 주어진 소스에 대한 `script` HTML 태그를 반환합니다. [[[The `javascript_include_tag` helper returns an HTML `script` tag for each source provided.]]]
 
-You can specify a full path relative to the document root, or a URL, if you prefer. For example, to link to a JavaScript file that is inside a directory called `javascripts` inside of one of `app/assets`, `lib/assets` or `vendor/assets`, you would do this:
+만약 레일스의 [Asset Pipeline](asset_pipeline.html)을 활성화 했다면 레일스 이전버전의 `public/javascripts` 대신 `/assets/javascripts/` 에 대한 링크를 생성하게 됩니다. [[[If you are using Rails with the [Asset Pipeline](asset_pipeline.html) enabled, this helper will generate a link to `/assets/javascripts/` rather than `public/javascripts` which was used in earlier versions of Rails. This link is then served by the asset pipeline.]]]
+
+레일스나 레일스 엔진에서 자바스크립트 파일의 위치는 `app/assets`, `lib/assets`, `vendor/assets` 3곳중 한곳입니다. 이 위치에 대한 자세한 설명은 [Asset Pipeline 가이드의 자원의 구성 섹션](asset_pipeline.html#asset-organization)에 되어 있습니다. [[[A JavaScript file within a Rails application or Rails engine goes in one of three locations: `app/assets`, `lib/assets` or `vendor/assets`. These locations are explained in detail in the [Asset Organization section in the Asset Pipeline Guide](asset_pipeline.html#asset-organization)]]]
+
+선호도에 따라 문서 루트에서의 상대경로로 지정하거나 URL을 지정할수 있습니다. 예를들어 `app/assets`, `lib/assets`, `vendor/assets`폴더중 하나안의 `javascripts` 폴더의 파일을 링크하고자 한다면 다음과 같이할 수 있습니다: [[[You can specify a full path relative to the document root, or a URL, if you prefer. For example, to link to a JavaScript file that is inside a directory called `javascripts` inside of one of `app/assets`, `lib/assets` or `vendor/assets`, you would do this:]]]
 
 ```erb
 <%= javascript_include_tag "main" %>
 ```
 
-Rails will then output a `script` tag such as this:
+레일스가 만들어내는 `script` 태그의 결과물은 다음과 같습니다: [[[Rails will then output a `script` tag such as this:]]]
 
 ```html
 <script src='/assets/main.js'></script>
 ```
 
-The request to this asset is then served by the Sprockets gem.
+이 asset 요청에 대한 처리는 Sprockets gem이 담당합니다. [[[The request to this asset is then served by the Sprockets gem.]]]
 
-To include multiple files such as `app/assets/javascripts/main.js` and `app/assets/javascripts/columns.js` at the same time:
+`app/assets/javascripts/main.js`, `app/assets/javascripts/columns.js` 같이 여러개의 파일을 동시에 포함시키기 위해서는: [[[To include multiple files such as `app/assets/javascripts/main.js` and `app/assets/javascripts/columns.js` at the same time:]]]
 
 ```erb
 <%= javascript_include_tag "main", "columns" %>
 ```
 
-To include `app/assets/javascripts/main.js` and `app/assets/javascripts/photos/columns.js`:
+`app/assets/javascripts/main.js`, `app/assets/javascripts/photos/columns.js`을 포함시키기 위해서는:[[[To include `app/assets/javascripts/main.js` and `app/assets/javascripts/photos/columns.js`:]]]
 
 ```erb
 <%= javascript_include_tag "main", "/photos/columns" %>
 ```
 
-To include `http://example.com/main.js`:
+`http://example.com/main.js`을 포함시키기 위해서는:[[[To include `http://example.com/main.js`:]]]
 
 ```erb
 <%= javascript_include_tag "http://example.com/main.js" %>
 ```
 
-#### Linking to CSS Files with the `stylesheet_link_tag`
+#### [Linking to CSS Files with the `stylesheet_link_tag`] `stylesheet_link_tag`를 이용해 CSS 파일 연결하기
 
-The `stylesheet_link_tag` helper returns an HTML `<link>` tag for each source provided.
+`stylesheet_link_tag` 헬퍼는 인자로 주어진 소스에 대한 `<link>` HTML 태그를 반환합니다.  [[[The `stylesheet_link_tag` helper returns an HTML `<link>` tag for each source provided.]]]
 
-If you are using Rails with the "Asset Pipeline" enabled, this helper will generate a link to `/assets/stylesheets/`. This link is then processed by the Sprockets gem. A stylesheet file can be stored in one of three locations: `app/assets`, `lib/assets` or `vendor/assets`.
+만약 레일스의 "Asset Pipeline"을 활성화 했다면 `/assets/stylesheets/`에 대한 링크를 생성합니다. 이 링크는 Sprockets gem이 처리합니다. 스타일시트 파일은 다음 3개의 폴더에 저장될 수 있습니다 `app/assets`, `lib/assets`, `vendor/assets` [[[If you are using Rails with the "Asset Pipeline" enabled, this helper will generate a link to `/assets/stylesheets/`. This link is then processed by the Sprockets gem. A stylesheet file can be stored in one of three locations: `app/assets`, `lib/assets` or `vendor/assets`.]]]
 
-You can specify a full path relative to the document root, or a URL. For example, to link to a stylesheet file that is inside a directory called `stylesheets` inside of one of `app/assets`, `lib/assets` or `vendor/assets`, you would do this:
+문서 루트에서의 상대경로로 지정하거나 URL을 지정할수 있습니다. 예를들어 `app/assets`, `lib/assets`, `vendor/assets`폴더중 하나안의 `stylesheets` 폴더의 파일을 링크하고자 한다면 다음과 같이할 수 있습니다: [[[You can specify a full path relative to the document root, or a URL. For example, to link to a stylesheet file that is inside a directory called `stylesheets` inside of one of `app/assets`, `lib/assets` or `vendor/assets`, you would do this:]]]
 
 ```erb
 <%= stylesheet_link_tag "main" %>
 ```
 
-To include `app/assets/stylesheets/main.css` and `app/assets/stylesheets/columns.css`:
+`app/assets/stylesheets/main.css`, `app/assets/stylesheets/columns.css`을 포함시키기 위해서는: [[[To include `app/assets/stylesheets/main.css` and `app/assets/stylesheets/columns.css`:]]]
 
 ```erb
 <%= stylesheet_link_tag "main", "columns" %>
 ```
 
-To include `app/assets/stylesheets/main.css` and `app/assets/stylesheets/photos/columns.css`:
+`app/assets/stylesheets/main.css`, `app/assets/stylesheets/photos/columns.css`을 포함시키기 위해서는: [[[To include `app/assets/stylesheets/main.css` and `app/assets/stylesheets/photos/columns.css`:]]]
 
 ```erb
 <%= stylesheet_link_tag "main", "photos/columns" %>
 ```
 
-To include `http://example.com/main.css`:
+`http://example.com/main.css`을 포함시키기 위해서는: [[[To include `http://example.com/main.css`:]]]
 
 ```erb
 <%= stylesheet_link_tag "http://example.com/main.css" %>
 ```
 
-By default, the `stylesheet_link_tag` creates links with `media="screen" rel="stylesheet"`. You can override any of these defaults by specifying an appropriate option (`:media`, `:rel`):
+기본값으로 `stylesheet_link_tag`은 태그속성 `media="screen" rel="stylesheet"`과 함께 생성합니다. 이 기본값은 (`:media`, `:rel`) 옵션에 적당한 값을 입력해 변경할 수 있습니다: [[[By default, the `stylesheet_link_tag` creates links with `media="screen" rel="stylesheet"`. You can override any of these defaults by specifying an appropriate option (`:media`, `:rel`):]]]
 
 ```erb
 <%= stylesheet_link_tag "main_print", media: "print" %>
 ```
 
-#### Linking to Images with the `image_tag`
+#### [Linking to Images with the `image_tag`] `image_tag`를 이용해 이미지 연결하기
 
-The `image_tag` helper builds an HTML `<img />` tag to the specified file. By default, files are loaded from `public/images`.
+`image_tag` 헬퍼는 특정 파일에 대한 `<img />` HTML 태그를 생성합니다. 기본설정으로 파일은 `public/images` 폴더에서 로드됩니다. [[[The `image_tag` helper builds an HTML `<img />` tag to the specified file. By default, files are loaded from `public/images`.]]]
 
-WARNING: Note that you must specify the extension of the image.
+WARNING: 이미지파일의 확장자를 명시해야합니다. [[[Note that you must specify the extension of the image.]]]
 
 ```erb
 <%= image_tag "header.png" %>
 ```
 
-You can supply a path to the image if you like:
+이미지 경로는 다음과 같이 지정할 수 있습니다.: [[[You can supply a path to the image if you like:]]]
 
 ```erb
 <%= image_tag "icons/delete.gif" %>
 ```
 
-You can supply a hash of additional HTML options:
+해쉬를 이용해 HTML 태그 옵션을 지정할 수 있습니다.: [[[You can supply a hash of additional HTML options:]]]
 
 ```erb
 <%= image_tag "icons/delete.gif", {height: 45} %>
 ```
 
-You can supply alternate text for the image which will be used if the user has images turned off in their browser. If you do not specify an alt text explicitly, it defaults to the file name of the file, capitalized and with no extension. For example, these two image tags would return the same code:
+사용자가 브라우저에서 이미지를 보이지 않도록 했을때 제공할 대체 텍스트도 지정할 수 있습니다. 대체 텍스트를 명시적으로 지정하지 않으면 이미지 파일의 확장자를 제외한 이름의 대문자로 제공됩니다. 예를들어 다음의 2개의 이미지 태그는 같은 코드를 반환합니다: [[[You can supply alternate text for the image which will be used if the user has images turned off in their browser. If you do not specify an alt text explicitly, it defaults to the file name of the file, capitalized and with no extension. For example, these two image tags would return the same code:]]]
 
 ```erb
 <%= image_tag "home.gif" %>
 <%= image_tag "home.gif", alt: "Home" %>
 ```
 
-You can also specify a special size tag, in the format "{width}x{height}":
+"{가로}x{세로}" 포맷을 이용해 태그의 크기를 지정할 수 있습니다.[[[You can also specify a special size tag, in the format "{width}x{height}":]]]
 
 ```erb
 <%= image_tag "home.gif", size: "50x20" %>
 ```
 
-In addition to the above special tags, you can supply a final hash of standard HTML options, such as `:class`, `:id` or `:name`:
+위의 특수 태그이외에도 마지막 해쉬에 `:class`, `:id`, `:name`와 같은 키를 이용해 HTML 옵션을 지정할 수 있습니다.[[[In addition to the above special tags, you can supply a final hash of standard HTML options, such as `:class`, `:id` or `:name`:]]]
 
 ```erb
 <%= image_tag "home.gif", alt: "Go Home",
@@ -841,67 +845,73 @@ In addition to the above special tags, you can supply a final hash of standard H
                           class: "nav_bar" %>
 ```
 
-#### Linking to Videos with the `video_tag`
+#### [Linking to Videos with the `video_tag`] `video_tag`를 이용해 비디오 연결하기
 
-The `video_tag` helper builds an HTML 5 `<video>` tag to the specified file. By default, files are loaded from `public/videos`.
+`video_tag` 헬퍼는 특정 파일에 대한 `<video>` HTML 5 태그를 생성합니다. 기본설정으로 파일은 `public/videos` 폴더에서 로드됩니다. [[[The `video_tag` helper builds an HTML 5 `<video>` tag to the specified file. By default, files are loaded from `public/videos`.]]]
 
 ```erb
 <%= video_tag "movie.ogg" %>
 ```
 
-Produces
+다음과 같은 코드 생성 [[[Produces]]]
 
 ```erb
 <video src="/videos/movie.ogg" />
 ```
 
-Like an `image_tag` you can supply a path, either absolute, or relative to the `public/videos` directory. Additionally you can specify the `size: "#{width}x#{height}"` option just like an `image_tag`. Video tags can also have any of the HTML options specified at the end (`id`, `class` et al).
+`image_tag` 태그처럼 절대경로나 `public/videos` 디렉토리로부터의 상대경로를 지정할 수 있습니다. 추가로 `image_tag`처럼 `size: "#{가로}x#{세로}"` 옵션을 지정할 수 있습니다. 또한 `id`, `class`와 같은 HTML 옵션을 비디오태그의 마지막에 붙여 사용할 수 있습니다. [[[Like an `image_tag` you can supply a path, either absolute, or relative to the `public/videos` directory. Additionally you can specify the `size: "#{width}x#{height}"` option just like an `image_tag`. Video tags can also have any of the HTML options specified at the end (`id`, `class` et al).]]]
 
-The video tag also supports all of the `<video>` HTML options through the HTML options hash, including:
+추가적으로 비디오태그는 다음과 같은 옵션들을 포함해서 `<video>` HTML 태그 옵션의 모든것을 해쉬로 지원합니다: [[[The video tag also supports all of the `<video>` HTML options through the HTML options hash, including:]]]
 
-* `poster: "image_name.png"`, provides an image to put in place of the video before it starts playing.
-* `autoplay: true`, starts playing the video on page load.
-* `loop: true`, loops the video once it gets to the end.
-* `controls: true`, provides browser supplied controls for the user to interact with the video.
-* `autobuffer: true`, the video will pre load the file for the user on page load.
+* `poster: "image_name.png"`, 비디오가 플레이되기전에 보여질 이미지를 지정. [[[provides an image to put in place of the video before it starts playing.]]]
 
-You can also specify multiple videos to play by passing an array of videos to the `video_tag`:
+* `autoplay: true`, 페이지 로드가 끝났을경우 자동으로 재생. [[[starts playing the video on page load.]]]
+
+* `loop: true`, 비디오 재생이 완료되었을경우 다시 재생.[[[loops the video once it gets to the end.]]]
+
+* `controls: true`, 사용자가 비디오를 제어할 수 있도록 브라우저가 제공하는 컨트롤을 추가. [[[provides browser supplied controls for the user to interact with the video.]]]
+
+* `autobuffer: true`, 사용자가 페이지를 로드한후 비디오파일을 미리 로드. [[[the video will pre load the file for the user on page load.]]]
+
+여러개의 비디오목록을 `video_tag`에 배열로 넘겨 사용: [[[You can also specify multiple videos to play by passing an array of videos to the `video_tag`:]]]
 
 ```erb
 <%= video_tag ["trailer.ogg", "movie.ogg"] %>
 ```
 
-This will produce:
+다음과 같은 코드를 생성:[[[This will produce:]]]
 
 ```erb
 <video><source src="trailer.ogg" /><source src="movie.ogg" /></video>
 ```
 
-#### Linking to Audio Files with the `audio_tag`
+#### [Linking to Audio Files with the `audio_tag`] `audio_tag`를 이용해 소리파일 연결하기
 
-The `audio_tag` helper builds an HTML 5 `<audio>` tag to the specified file. By default, files are loaded from `public/audios`.
+`audio_tag` 헬퍼는 특정 파일에 대한 `<audio>` HTML 5 태그를 생성합니다. 기본설정으로 파일은 `public/audios` 폴더에서 로드됩니다. [[[The `audio_tag` helper builds an HTML 5 `<audio>` tag to the specified file. By default, files are loaded from `public/audios`.]]]
 
 ```erb
 <%= audio_tag "music.mp3" %>
 ```
 
-You can supply a path to the audio file if you like:
+소리파일에 대한 경로는 다음과 같이 지정합니다: [[[You can supply a path to the audio file if you like:]]]
 
 ```erb
 <%= audio_tag "music/first_song.mp3" %>
 ```
 
-You can also supply a hash of additional options, such as `:id`, `:class` etc.
+`:id`, `:class` 같은 추가옵션을 해쉬를 이용해 지정할 수 있습니다. [[[You can also supply a hash of additional options, such as `:id`, `:class` etc.]]]
 
-Like the `video_tag`, the `audio_tag` has special options:
+`video_tag`처럼 `audio_tag`도 다음과 같은 특수 옵션을 가집니다: [[[Like the `video_tag`, the `audio_tag` has special options:]]]
 
-* `autoplay: true`, starts playing the audio on page load
-* `controls: true`, provides browser supplied controls for the user to interact with the audio.
-* `autobuffer: true`, the audio will pre load the file for the user on page load.
+* `autoplay: true`, 페이지 로드가 끝났을경우 자동으로 재생 [[[starts playing the audio on page load]]]
 
-### Understanding `yield`
+* `controls: true`, 사용자가 소리를 제어할 수 있도록 브라우저가 제공하는 컨트롤을 추가. [[[provides browser supplied controls for the user to interact with the audio.]]]
 
-Within the context of a layout, `yield` identifies a section where content from the view should be inserted. The simplest way to use this is to have a single `yield`, into which the entire contents of the view currently being rendered is inserted:
+* `autobuffer: true`, 사용자가 페이지를 로드한후 소리파일을 미리 로드. [[[the audio will pre load the file for the user on page load.]]]
+
+### [Understanding `yield`] `yield`에 대한 이해
+
+레이아웃 문법에서 `yield`는 뷰의 컨텐츠가 추가될 영역을 의미합니다. 이를 사용하는 간단한 방법은 하나의 `yield`를 사용해 렌더된 뷰의 전체 컨텐츠를 추가하는것입니다: [[[Within the context of a layout, `yield` identifies a section where content from the view should be inserted. The simplest way to use this is to have a single `yield`, into which the entire contents of the view currently being rendered is inserted:]]]
 
 ```html+erb
 <html>
@@ -913,7 +923,7 @@ Within the context of a layout, `yield` identifies a section where content from 
 </html>
 ```
 
-You can also create a layout with multiple yielding regions:
+여러개의 yeild 영역을 가진 레이아웃을 생성할 수 있습니다.[[[You can also create a layout with multiple yielding regions:]]]
 
 ```html+erb
 <html>
@@ -926,11 +936,11 @@ You can also create a layout with multiple yielding regions:
 </html>
 ```
 
-The main body of the view will always render into the unnamed `yield`. To render content into a named `yield`, you use the `content_for` method.
+뷰의 메인영역은 이름이 지정되지 않은 `yield`에 추가됩니다. 이름이 지정된 `yield`에 컨텐츠를 표시하려면 `content_for` 메소드를 이용합니다. [[[The main body of the view will always render into the unnamed `yield`. To render content into a named `yield`, you use the `content_for` method.]]]
 
-### Using the `content_for` Method
+### [Using the `content_for` Method] `content_for` 메서드 사용
 
-The `content_for` method allows you to insert content into a named `yield` block in your layout. For example, this view would work with the layout that you just saw:
+`content_for` 메소드는 레이아웃에서 이름을 가진 `yield` 블록에 컨텐츠를 추가할 수 있게합니다. 예를들어 다음의 뷰는 레이아웃의 동작방식을 보여줍니다: [[[The `content_for` method allows you to insert content into a named `yield` block in your layout. For example, this view would work with the layout that you just saw:]]]
 
 ```html+erb
 <% content_for :head do %>
@@ -940,7 +950,7 @@ The `content_for` method allows you to insert content into a named `yield` block
 <p>Hello, Rails!</p>
 ```
 
-The result of rendering this page into the supplied layout would be this HTML:
+레이아웃이 렌더링된 HTML 결과물은 다음과 같습니다: [[[The result of rendering this page into the supplied layout would be this HTML:]]]
 
 ```html+erb
 <html>
@@ -953,7 +963,7 @@ The result of rendering this page into the supplied layout would be this HTML:
 </html>
 ```
 
-The `content_for` method is very helpful when your layout contains distinct regions such as sidebars and footers that should get their own blocks of content inserted. It's also useful for inserting tags that load page-specific JavaScript or css files into the header of an otherwise generic layout.
+레이아웃이 사이드바, 푸터와 같이 컨텐츠가 추가될 별개의 영역들을 가진 경우 `content_for` 메소드는 매우 유용합니다. 페이지에 특화된 자바스크립트나 CSS 파일의 태그를 일반 레이아웃의 헤더에 추가하는데도 유용합니다. [[[The `content_for` method is very helpful when your layout contains distinct regions such as sidebars and footers that should get their own blocks of content inserted. It's also useful for inserting tags that load page-specific JavaScript or css files into the header of an otherwise generic layout.]]]
 
 ### Using Partials
 
