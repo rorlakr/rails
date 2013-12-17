@@ -1,9 +1,9 @@
 [Ruby on Rails Security Guide] 루비온레일스 보안 가이드
 ============================
 
-이 매뉴얼은 웹어플리케이션에 있어서 일반적인 보안 문제를 설명하고 레일스로 이러한 문제를 피하는 방법을 소개 합니다. [[[This manual describes common security problems in web applications and how to avoid them with Rails.]]]
+이 매뉴얼은 웹어플리케이션에서 발생하는 일반적인 보안 문제를 설명하고 레일스로 이러한 문제를 해결하는 방법을 소개 합니다. [[[This manual describes common security problems in web applications and how to avoid them with Rails.]]]
 
-이 가이드를 읽은 후에는 아래의 내용을 알게 될 것입니다. [[[After reading this guide, you will know:]]]
+이 가이드를 읽은 후에는 아래와 같은 내용을 알게 될 것입니다. [[[After reading this guide, you will know:]]]
 
 * _중요한_ 대처방법 [[[All countermeasures _that are highlighted_.]]]
 
@@ -15,76 +15,75 @@
 
 * 사용자 관리방법(로그인/로그아웃)과 모든 레이어 상에서 메소드를 공격하는 방법 [[[How to manage users: Logging in and out and attack methods on all layers.]]]
 
-* 가장 흔한 injection 공격 메소드 [[[And the most popular injection attack methods.]]]
+* 가장 흔한 주입 공격 메소드 [[[And the most popular injection attack methods.]]]
 
 --------------------------------------------------------------------------------
 
-Introduction
+[Introduction] 개요
 ------------
 
-Web application frameworks are made to help developers building web applications. Some of them also help you with securing the web application. In fact one framework is not more secure than another: If you use it correctly, you will be able to build secure apps with many frameworks. Ruby on Rails has some clever helper methods, for example against SQL injection, so that this is hardly a problem. It's nice to see that all of the Rails applications I audited had a good level of security.
+웹어플리케이션 프레임워크는 개발자들의 웹어플리케이션 제작을 도와줍니다. 몇가지는 웹어플리케이션의 보안관련 사항도 지원해 줍니다. 실제로는 하나의 프레임워크가 다른 것 보다 보안상 더 안전하지는 것은 없습니다. 즉, 정확하게 사용한다면 몇가지 프레임워크를 함께 사용하여 보다 안전한 웹어플리케이션을 만들 수 있습니다. 루비온레일스는 예를 들어 SQL 주입에 대한 문제를 방지하기 위한 몇가지 영리한 헬퍼 메소드를 가지고 있어서 거의 문제가 되지 않습니다. 점검해 본 모든 레일스 어플리케이션이 양호한 보안상태를 보였다는 사실을 알게 되면 좋아할 것입니다. [[[Web application frameworks are made to help developers build web applications. Some of them also help you with securing the web application. In fact one framework is not more secure than another: If you use it correctly, you will be able to build secure apps with many frameworks. Ruby on Rails has some clever helper methods, for example against SQL injection, so that this is hardly a problem. It's nice to see that all of the Rails applications I audited had a good level of security.]]]
 
-In general there is no such thing as plug-n-play security. Security depends on the people using the framework, and sometimes on the development method. And it depends on all layers of a web application environment: The back-end storage, the web server and the web application itself (and possibly other layers or applications).
+일반적으로, 그냥 사용하면 보안상태가 유지되는 것은 없습니다. 보안은 프레임워크를 어떻게 사용했는가에 좌우되고 때로는 개발 방법에 따라 달라질 수 있습니다. 그리고 웹어플리케이션 환경의 모든 레이어에서의 구현 방법에 좌우되는데, 백엔드 저장, 웹서버, 웹어플리케이션 자체, 그외에도 다른 레이어에서도 영향을 받을 수 있습니다. [[[In general there is no such thing as plug-n-play security. Security depends on the people using the framework, and sometimes on the development method. And it depends on all layers of a web application environment: The back-end storage, the web server and the web application itself (and possibly other layers or applications).]]]
 
-The Gartner Group however estimates that 75% of attacks are at the web application layer, and found out "that out of 300 audited sites, 97% are vulnerable to attack". This is because web applications are relatively easy to attack, as they are simple to understand and manipulate, even by the lay person.
+그러나, 가트너 그룹의 보고에 의하면 공격의 75%가 웹어플리케이션 레이어에서 이루어졌고 300개의 점검 웹사이트 중에서 97%가 공격에 취약한 것으로 밝혀 졌습니다. 이유는 웹어플리케이션은 비교적 공격하기가 쉽기 때문인데, 일반인들도 쉽게 이해하고 조작할 수 있기 때문인데 바로 이러한 점이 공격이 용이한 이유이기도 합니다. [[[The Gartner Group however estimates that 75% of attacks are at the web application layer, and found out "that out of 300 audited sites, 97% are vulnerable to attack". This is because web applications are relatively easy to attack, as they are simple to understand and manipulate, even by the lay person.]]]
 
-The threats against web applications include user account hijacking, bypass of access control, reading or modifying sensitive data, or presenting fraudulent content. Or an attacker might be able to install a Trojan horse program or unsolicited e-mail sending software, aim at financial enrichment or cause brand name damage by modifying company resources. In order to prevent attacks, minimize their impact and remove points of attack, first of all, you have to fully understand the attack methods in order to find the correct countermeasures. That is what this guide aims at.
+웹어플리케이션에 대한 보안상의 문제점들로는, 사용자 계정 하이재킹, 접근통제의 우회술, 민간한 데이터를 읽거나 수정하기, 가짜 컨텐츠 보여주기 등이 있습니다. 또는 공격자는 Trojan 목마 프로그램이나 쓸모없는 이메일 발송 소프트웨어를 설치하거나, 재정확장을 목적으로 하거나 회사 자원을 변경하여 상품명에 손상을 입힐 수 있습니다. 이러한 공격을 막기 위해서는, 공격의 영향을 최소한으로 하고 공격 포인트를 제거하고, 무엇보다도 먼저, 정확한 대책을 찾기 위해서는 공격방법을 잘 이해해야만 합니다. 바로 이것이 본 가이드이 목적입니다. [[[The threats against web applications include user account hijacking, bypass of access control, reading or modifying sensitive data, or presenting fraudulent content. Or an attacker might be able to install a Trojan horse program or unsolicited e-mail sending software, aim at financial enrichment or cause brand name damage by modifying company resources. In order to prevent attacks, minimize their impact and remove points of attack, first of all, you have to fully understand the attack methods in order to find the correct countermeasures. That is what this guide aims at.]]]
 
-In order to develop secure web applications you have to keep up to date on all layers and know your enemies. To keep up to date subscribe to security mailing lists, read security blogs and make updating and security checks a habit (check the <a href="#additional-resources">Additional Resources</a> chapter). I do it manually because that's how you find the nasty logical security problems.
+안전한 웹어플리케이션을 개발하기 위해서는, 모든 레이어에 대한 보안상의 최신 정보를 유지하고 적에 대해서 알아야 합니다. 최신 정보를 지속적으로 얻기 위해서는 보안관련 메일링 리스트를 구독하고 보안관련 블로그를 읽어 최신의 보안정보로 업데이트하고 보안상태를 점검하는 것을 습관으로 해야 합니다(<a href="#additional-resources">Additional Resources</a> 챕터를 보기 바랍니다). 저자의 경우 이러한 일이, 짜증나는 이론상의 보안 문제를 찾는 방법이기 때문에 직접 작업하고 있습니다. [[[In order to develop secure web applications you have to keep up to date on all layers and know your enemies. To keep up to date subscribe to security mailing lists, read security blogs and make updating and security checks a habit (check the <a href="#additional-resources">Additional Resources</a> chapter). I do it manually because that's how you find the nasty logical security problems.]]]
 
-Sessions
+[Sessions] 세션
 --------
 
-A good place to start looking at security is with sessions, which can be vulnerable to particular attacks.
+보안문제를 찾아 보는 시작점으로는 세션이 적당한데, 세션은 특정 공격에 취약할 수 있기 때문입니다. [[[A good place to start looking at security is with sessions, which can be vulnerable to particular attacks.]]]
 
-### What are Sessions?
+### [What are Sessions?] 세션이란 무엇인가?
 
-NOTE: _HTTP is a stateless protocol. Sessions make it stateful._
+NOTE: _HTTP는 상태를 유지하지 못하는 stateless 프로토콜입니다. 그러나, 세션은 상태를 유지할 수 있게 해 줍니다._ [[[_HTTP is a stateless protocol. Sessions make it stateful._]]]
 
-Most applications need to keep track of certain state of a particular user. This could be the contents of a shopping basket or the user id of the currently logged in user. Without the idea of sessions, the user would have to identify, and probably authenticate, on every request.
-Rails will create a new session automatically if a new user accesses the application. It will load an existing session if the user has already used the application.
+대부분의 어플리케이션은 사용자의 상태를 추적할 필요가 있습니다. 쇼핑 바스켓의 내용이나 현재 로그인한 사용자의 id가 이에 해당할 수 있습니다. 세션이라는 개념이 없다면 아마도 매 요청시마다 사용자를 확인해서 인증해야 할 것입니다. 레일스는 새로운 사용자가 해당 어플리케이션에 접근할 때 자동으로 새로운 세션을 만들게 됩니다. 사용자가 이미 해당 어플리케이션을 사용한 적이 있다면 이전의 세션 값을 로드할 것입니다. [[[Most applications need to keep track of certain state of a particular user. This could be the contents of a shopping basket or the user id of the currently logged in user. Without the idea of sessions, the user would have to identify, and probably authenticate, on every request. Rails will create a new session automatically if a new user accesses the application. It will load an existing session if the user has already used the application.]]]
 
-A session usually consists of a hash of values and a session id, usually a 32-character string, to identify the hash. Every cookie sent to the client's browser includes the session id. And the other way round: the browser will send it to the server on every request from the client. In Rails you can save and retrieve values using the session method:
+하나의 세션은 대개 해시값들과 이 해시값에 대한 ID 값(32개의 문자열로 이루어진) 세션 id로 구성됩니다. 클라이언트 브라우져로 보내지는 모든 쿠키는 이 세션 id를 포함합니다. 그래서 클라이언트로부터 매 요청시마다 브라우저는 이 쿠키를 보내게 되는 것입니다. 레일스에서는 session 메소드를 이용하여 해당 값들을 저장하고 찾아볼 수 있습니다. [[[A session usually consists of a hash of values and a session id, usually a 32-character string, to identify the hash. Every cookie sent to the client's browser includes the session id. And the other way round: the browser will send it to the server on every request from the client. In Rails you can save and retrieve values using the session method:]]]
 
 ```ruby
 session[:user_id] = @current_user.id
 User.find(session[:user_id])
 ```
 
-### Session id
+### [Session id] 세선 id
 
-NOTE: _The session id is a 32 byte long MD5 hash value._
+NOTE: _세션 id는 32 바이트 길이의 MD5 해시값을 가집니다._ [[[_The session id is a 32 byte long MD5 hash value._]]]
 
-A session id consists of the hash value of a random string. The random string is the current time, a random number between 0 and 1, the process id number of the Ruby interpreter (also basically a random number) and a constant string. Currently it is not feasible to brute-force Rails' session ids. To date MD5 is uncompromised, but there have been collisions, so it is theoretically possible to create another input text with the same hash value. But this has had no security impact to date.
+세션 id 는 무작위 문자열을 가지는 해시로 구성되어 있습니다. 이 무작위 문자열은, 현재 시간, 0 과 1 사이의 무작위 숫자, 루비 인터프리터의 프로세스 id 숫자(역시 기본적으로 무작위 숫자), 그리고 상수 문자열로 구성되어 있습니다. 현재로서는 레일스의 세선 id 값을 무차별 대입 공격으로 알아낼 수 없습니다. 아직까지 MD5가 건재하지만 의견 충돌이 있어 왔습니다. 그래서 이론적으로는 동일한 값을 가지는 input 텍스트를 만들 수 있습니다. 그러나, 아직까지는 보안상의 문제점을 일으킨 적이 없습니다. [[[A session id consists of the hash value of a random string. The random string is the current time, a random number between 0 and 1, the process id number of the Ruby interpreter (also basically a random number) and a constant string. Currently it is not feasible to brute-force Rails' session ids. To date MD5 is uncompromised, but there have been collisions, so it is theoretically possible to create another input text with the same hash value. But this has had no security impact to date.]]]
 
-### Session Hijacking
+### [Session Hijacking] 세션 하이재킹 (세션 가로채기)
 
-WARNING: _Stealing a user's session id lets an attacker use the web application in the victim's name._
+WARNING: _공격자가 사용자의 세션 id를 가로채면 해당 사용자의 이름으로 웹어플리케이션을 사용할 수 있게 됩니다._ [[[_Stealing a user's session id lets an attacker use the web application in the victim's name._]]]
 
-Many web applications have an authentication system: a user provides a user name and password, the web application checks them and stores the corresponding user id in the session hash. From now on, the session is valid. On every request the application will load the user, identified by the user id in the session, without the need for new authentication. The session id in the cookie identifies the session.
+많은 수의 웹어플리케이션들이 인증시스템을 가지고 있어서, 사용자가 이름과 비밀번호를 제공하고 웹어플리케이션이 확인 후 해당 사용자의 id를 세션 해시에 저장하게 됩니다. 이 후로는 해당 세션이 유효하게 되는 것입니다. 매 요청시마다 어플리케이션은 새롭게 인증절차를 밟지 않고 세션 값 중의 사용자 id 를 확인하여 사용자를 로드하게 됩니다. 쿠키내의 세션 id는 세션을 확인하는데 사용합니다. [[[Many web applications have an authentication system: a user provides a user name and password, the web application checks them and stores the corresponding user id in the session hash. From now on, the session is valid. On every request the application will load the user, identified by the user id in the session, without the need for new authentication. The session id in the cookie identifies the session.]]]
 
-Hence, the cookie serves as temporary authentication for the web application. Anyone who seizes a cookie from someone else, may use the web application as this user - with possibly severe consequences. Here are some ways to hijack a session, and their countermeasures:
+따라서, 쿠키는 웹어플리케이션을 위한 임시 인증시스템으로서 역할을 하게 됩니다. 다른 사람의 쿠키 값을 이용하면 마치 해당 사람인 것처럼 어플리케이션을 사용할 수 있게 되어 심각한 결과를 초개할 수 있습니다. 아래에는 세션을 가로채는 몇가지 방법들을 소개합니다. [[[Hence, the cookie serves as temporary authentication for the web application. Anyone who seizes a cookie from someone else, may use the web application as this user - with possibly severe consequences. Here are some ways to hijack a session, and their countermeasures:]]]
 
-* Sniff the cookie in an insecure network. A wireless LAN can be an example of such a network. In an unencrypted wireless LAN it is especially easy to listen to the traffic of all connected clients. This is one more reason not to work from a coffee shop. For the web application builder this means to _provide a secure connection over SSL_. In Rails 3.1 and later, this could be accomplished by always forcing SSL connection in your application config file:
+* 보안상 안전하지 못한 네트워크. 무선 LAN이 이러한 네트워크의 예가 될 수 있습니다. 암호화되지 않는 무선 LAN에서는 특히 연결된 모든 클라이언트의 트래픽을 쉽게 들여다 볼 수 있습니다. 이런 문제가 커피 숍에서 작업을 하지 않게 되는 또 하나의 이유이기도 합니다. 웹어플리케이션 개발자들을 위해서는 _SSL로 안전하게 네트워크에 접속_할 수 있어야 합니다. 레일스 3.1부터는, 어플리케이션 config 파일에 항상 SSL로 강제 연결하도록 하여 이러한 문제를 해결할 수 있게 되었습니다. [[[* Sniff the cookie in an insecure network. A wireless LAN can be an example of such a network. In an unencrypted wireless LAN it is especially easy to listen to the traffic of all connected clients. This is one more reason not to work from a coffee shop. For the web application builder this means to _provide a secure connection over SSL_. In Rails 3.1 and later, this could be accomplished by always forcing SSL connection in your application config file:]]]
 
     ```ruby
     config.force_ssl = true
     ```
 
-* Most people don't clear out the cookies after working at a public terminal. So if the last user didn't log out of a web application, you would be able to use it as this user. Provide the user with a _log-out button_ in the web application, and _make it prominent_.
+* 대부분의 사람들은 공중 컴퓨터 터미널에서 작업을 한 후에 쿠키를 제거하지 않습니다. 그래서 마지막 사용자가 웹어플리케이션으로부터 로그 아웃하지 않았다면, 다른 사람이 해당 사용자의 로그상태를 이용할 수 있게 되는 것입니다. 따라서 웹어플리케이션에서 사용자에게 _로그아웃 버튼_을 제고해 주고 눈에 확띄게 만들어 놓아야 합니다. [[[* Most people don't clear out the cookies after working at a public terminal. So if the last user didn't log out of a web application, you would be able to use it as this user. Provide the user with a _log-out button_ in the web application, and _make it prominent_.]]]
 
-* Many cross-site scripting (XSS) exploits aim at obtaining the user's cookie. You'll read <a href="#cross-site-scripting-xss">more about XSS</a> later.
+* 많은 수의 XSS(cross-site scripting) 공격은 사용자의 쿠키를 얻는 것을 목적으로 합니다. 나중에 <a href="#cross-site-scripting-xss">XSS에 대한 자세한 내용</a>을 읽어 보기 바랍니다. [[[* Many cross-site scripting (XSS) exploits aim at obtaining the user's cookie. You'll read <a href="#cross-site-scripting-xss">more about XSS</a> later.]]]
 
-* Instead of stealing a cookie unknown to the attacker, he fixes a user's session identifier (in the cookie) known to him. Read more about this so-called session fixation later.
+* 공격자가 알지 못하는 쿠키를 훔치는 대신에, 공격자가 알고 있는 쿠키상의 사용자의 세션 id 값으로 바꿔 버리는 경우도 있습니다. 소위 세션 fixation 에 대해서 나중에 자세히 읽어 보기 바랍니다. [[[* Instead of stealing a cookie unknown to the attacker, he fixes a user's session identifier (in the cookie) known to him. Read more about this so-called session fixation later.]]]
 
-The main objective of most attackers is to make money. The underground prices for stolen bank login accounts range from $10-$1000 (depending on the available amount of funds), $0.40-$20 for credit card numbers, $1-$8 for online auction site accounts and $4-$30 for email passwords, according to the [Symantec Global Internet Security Threat Report](http://eval.symantec.com/mktginfo/enterprise/white_papers/b-whitepaper_internet_security_threat_report_xiii_04-2008.en-us.pdf).
+대부분의 공격자들의 주 목적은 돈을 벌기 위함입니다. 
+[[[The main objective of most attackers is to make money. The underground prices for stolen bank login accounts range from $10-$1000 (depending on the available amount of funds), $0.40-$20 for credit card numbers, $1-$8 for online auction site accounts and $4-$30 for email passwords, according to the [Symantec Global Internet Security Threat Report](http://eval.symantec.com/mktginfo/enterprise/white_papers/b-whitepaper_internet_security_threat_report_xiii_04-2008.en-us.pdf).]]]
 
-### Session Guidelines
+### [Session Guidelines] 세션 가이드라인
 
-Here are some general guidelines on sessions.
+아래에 세션에 관련된 몇가지 일반적인 가이드라인이 있습니다. [[[Here are some general guidelines on sessions.]]]
 
-* _Do not store large objects in a session_. Instead you should store them in the database and save their id in the session. This will eliminate synchronization headaches and it won't fill up your session storage space (depending on what session storage you chose, see below).
-This will also be a good idea, if you modify the structure of an object and old versions of it are still in some user's cookies. With server-side session storages you can clear out the sessions, but with client-side storages, this is hard to mitigate.
+* _하나의 세션이 용량이 큰 객체들을 저장하지 않는다_. 대신에 이 객체들을 데이터베이스에 저장하고 id 값을 세션에 저장해야 합니다. 이렇게 하므로써 동기화와 관련된 골치아픈 문제들을 제거하게 되고 어떤 세선 저장소를 선택하느냐에 따라 세션 저장 공간을 절약할 수 있게 될 것입니다. 또한 이것은 특정 객체의 구조를 변경할 경우 이전 버전의 객체가 다른 사용자의 쿠키에 여전히 존재할 경우에 대한 좋은 대안이 될 수 있습니다. 서버 측 세션 저장소를 사용할 경우에는 쉽게 세션들을 제거할 수 있지만, 클라이언트 측 저장소를 사용할 경우에는 세션 제거가 어렵게 됩니다. [[[_Do not store large objects in a session_. Instead you should store them in the database and save their id in the session. This will eliminate synchronization headaches and it won't fill up your session storage space (depending on what session storage you chose, see below). This will also be a good idea, if you modify the structure of an object and old versions of it are still in some user's cookies. With server-side session storages you can clear out the sessions, but with client-side storages, this is hard to mitigate.]]]
 
 * _Critical data should not be stored in session_. If the user clears his cookies or closes the browser, they will be lost. And with a client-side session storage, the user can read the data.
 
@@ -178,45 +177,53 @@ delete_all "updated_at < '#{time.ago.to_s(:db)}' OR
   created_at < '#{2.days.ago.to_s(:db)}'"
 ```
 
-Cross-Site Request Forgery (CSRF)
+[Cross-Site Request Forgery (CSRF)] 사이트간 요청 위조(CSRF)
 ---------------------------------
 
-This attack method works by including malicious code or a link in a page that accesses a web application that the user is believed to have authenticated. If the session for that web application has not timed out, an attacker may execute unauthorized commands.
+이 공격방법은, 특정 사용자가 인증받은 바 있는 웹어플리케이션으로 연결되는, 특정 페이지에 악성 코드나 링크를 삽입하여 동작합니다. 해당 웹어플리케이션에 대한 세션이 유지된 상태라면, 공격자가 인증받지 못한 명령도 수행할 수 있게 될 것입니다. [[[This attack method works by including malicious code or a link in a page that accesses a web application that the user is believed to have authenticated. If the session for that web application has not timed out, an attacker may execute unauthorized commands.]]]
 
 ![](images/csrf.png)
 
-In the <a href="#sessions">session chapter</a> you have learned that most Rails applications use cookie-based sessions. Either they store the session id in the cookie and have a server-side session hash, or the entire session hash is on the client-side. In either case the browser will automatically send along the cookie on every request to a domain, if it can find a cookie for that domain. The controversial point is, that it will also send the cookie, if the request comes from a site of a different domain. Let's start with an example:
+<a href="#sessions">session 챕터</a>에서 대부분의 레일스 어플리케이션에서 쿠키를 이용한 세션을 이용한다는 것을 배웠습니다. 즉, 세션 id를 쿠키에 저장하여 서버측 세션 해시에 두거나, 전체 세션 해시를 클라이언트 측에 두게 됩니다. 어떤 경우에든, 해당 도메인에 대한 쿠키가 있을 경우, 매 요청시마다 브라우저는 자동으로 쿠키를 함께 도메인으로 보내게 됩니다. 다른 도메인으로부터의 요청이 있을 때에도 해당 쿠키를 보내게 되는지에 대해서는 논란의 여지가 있습니다. 아래의 예를 보도록 하겠습니다. [[[In the <a href="#sessions">session chapter</a> you have learned that most Rails applications use cookie-based sessions. Either they store the session id in the cookie and have a server-side session hash, or the entire session hash is on the client-side. In either case the browser will automatically send along the cookie on every request to a domain, if it can find a cookie for that domain. The controversial point is, that it will also send the cookie, if the request comes from a site of a different domain. Let's start with an example:]]]
 
-* Bob browses a message board and views a post from a hacker where there is a crafted HTML image element. The element references a command in Bob's project management application, rather than an image file.
+* Bob 은 게시판에서 해커가 조작한 HTML image 엘리먼트가 포함되어 있는 임의의 게시물을 보게 됩니다. 이 이미지 엘리먼트는 이미지 파일이 아니라 Bob 의 프로젝트 관리 어플리케이션에 있는 특정 명령을 참조하도록 되어 있습니다. [[[Bob browses a message board and views a post from a hacker where there is a crafted HTML image element. The element references a command in Bob's project management application, rather than an image file.]]]
+
 * `<img src="http://www.webapp.com/project/1/destroy">`
-* Bob's session at www.webapp.com is still alive, because he didn't log out a few minutes ago.
-* By viewing the post, the browser finds an image tag. It tries to load the suspected image from www.webapp.com. As explained before, it will also send along the cookie with the valid session id.
-* The web application at www.webapp.com verifies the user information in the corresponding session hash and destroys the project with the ID 1. It then returns a result page which is an unexpected result for the browser, so it will not display the image.
-* Bob doesn't notice the attack - but a few days later he finds out that project number one is gone.
 
-It is important to notice that the actual crafted image or link doesn't necessarily have to be situated in the web application's domain, it can be anywhere - in a forum, blog post or email.
+* Bob 은 (몇분전에) 아직 로그아웃을 하지 않은 상태여서 www.webapp.com 에 대한 세션이 그대로 살아 있습니다. [[[Bob's session at www.webapp.com is still alive, because he didn't log out a few minutes ago.]]]
 
-CSRF appears very rarely in CVE (Common Vulnerabilities and Exposures) - less than 0.1% in 2006 - but it really is a 'sleeping giant' [Grossman]. This is in stark contrast to the results in my (and others) security contract work - _CSRF is an important security issue_.
+* Bob 이 해당 게시물을 보는 동작을 하게 될 때 브라우저는 이미지 태그를 찾게 됩니다. 그리고 www.webapp.com으로부터 (의심스러운) 해당 이미지를 로드하려고 시도하게 됩니다. 앞에서 설명한 바와 같이, 브라우저는 유효 세션 id가 들어 있는 쿠키와 함께 요청을 보내게 될 것입니다. [[[By viewing the post, the browser finds an image tag. It tries to load the suspected image from www.webapp.com. As explained before, it will also send along the cookie with the valid session id.]]]
 
-### CSRF Countermeasures
+* www.webapp.com 으로 연결되는 웹어플리케이션은 해당 세션 해시에 포함되어 있는 사용자 정보를 확인하게 되고 결국 1번 프로젝트를 삭제하게 됩니다. 그리고 나서 해당 브라우저에 대해서 기대치 못한 결과인 결과 페이지가 반환되고 결국 이미지를 표시되지 않게 될 것입니다. [[[The web application at www.webapp.com verifies the user information in the corresponding session hash and destroys the project with the ID 1. It then returns a result page which is an unexpected result for the browser, so it will not display the image.]]]
 
-NOTE: _First, as is required by the W3C, use GET and POST appropriately. Secondly, a security token in non-GET requests will protect your application from CSRF._
+* Bob 은 공격상황을 인지하지 못하지만 몇일 후에 해당 번호의 프로젝트가 삭제된 것을 발견하게 됩니다. [[[Bob doesn't notice the attack - but a few days later he finds out that project number one is gone.]]]
 
-The HTTP protocol basically provides two main types of requests - GET and POST (and more, but they are not supported by most browsers). The World Wide Web Consortium (W3C) provides a checklist for choosing HTTP GET or POST:
+실제로는 이러한 조작된 이미지나 링크가 반드시 웹어플리케이션의 도메인에 위치할 필요는 없다는 것을 아는 것이 중요합니다. 즉, 포럼, 블로그 또는 이메일에도 위치할 수도 있습니다. [[[It is important to notice that the actual crafted image or link doesn't necessarily have to be situated in the web application's domain, it can be anywhere - in a forum, blog post or email.]]]
 
-**Use GET if:**
+CSRF는 CVE (Common Vulnerabilities and Exposures) 에서 거의 보이지 않습니다. 2006년 경우 0.1% 미만에 불과했지만, 실제로는 '잠자는 거인'[Grossmann]의 형상을 하고 있는 것입니다. 이것은 나(그리고 다른 사람들)의 담보계약 업무에서의 결과와 현저한 대조를 이루는 것인데, _CSRF는 중요한 보안 문제입니다._ [[[CSRF appears very rarely in CVE (Common Vulnerabilities and Exposures) - less than 0.1% in 2006 - but it really is a 'sleeping giant' [Grossman]. This is in stark contrast to the results in my (and others) security contract work - _CSRF is an important security issue_.]]]
 
-* The interaction is more _like a question_ (i.e., it is a safe operation such as a query, read operation, or lookup).
+### [CSRF Countermeasures] CSRF 대처법
 
-**Use POST if:**
+NOTE: _가장 중요한 것은, W3C의 요구사항이기도 한데, 적절하게 GET과 POST를 사용하는 것입니다. 두번째로는, non-GET 요청에서 보안 토큰을 사용하면, 어플리케이션을 CSRF로부터 보호할 수 있을 것입니다._ [[[_First, as is required by the W3C, use GET and POST appropriately. Secondly, a security token in non-GET requests will protect your application from CSRF._]]]
 
-* The interaction is more _like an order_, or
-* The interaction _changes the state_ of the resource in a way that the user would perceive (e.g., a subscription to a service), or
-* The user is _held accountable for the results_ of the interaction.
+HTTP 프로토콜은 기본적으로 GET과 POST 두개의 요청 형태(이것 외에도 더 있지만 대부분의 브라우저에서는 지원하지 않습니다)를 제공해 줍니다. World Wide Web Consortium (W3C) 에서는 HTTP GET 또는 POST 선택시 점검사항을 제공해 줍니다. [[[The HTTP protocol basically provides two main types of requests - GET and POST (and more, but they are not supported by most browsers). The World Wide Web Consortium (W3C) provides a checklist for choosing HTTP GET or POST:]]]
 
-If your web application is RESTful, you might be used to additional HTTP verbs, such as PATCH, PUT or DELETE. Most of today's web browsers, however do not support them - only GET and POST. Rails uses a hidden `_method` field to handle this barrier.
+[**Use GET if:**] **GET을 사용할 경우**
 
-_POST requests can be sent automatically, too_. Here is an example for a link which displays www.harmless.com as destination in the browser's status bar. In fact it dynamically creates a new form that sends a POST request.
+* 상호작용이 _질의와 흡사_한 경우 (예를 들면, 쿼리, 읽기, 또는 검색)
+[[[The interaction is more _like a question_ (i.e., it is a safe operation such as a query, read operation, or lookup).]]]
+
+[**Use POST if:**] **POST를 사용할 경우**
+
+* 상호작용이 _주문과 흡사_한 경우, 또는 [[[The interaction is more _like an order_, or]]]
+
+* 상호작용이 사용자가 인지할 수 있는 방식(예, 특정 서비스에 대한 구독)으로 리소스의 _상태를 변경_하는 경우, 또는 [[[The interaction _changes the state_ of the resource in a way that the user would perceive (e.g., a subscription to a service), or]]]
+
+* 사용자가 상호작용의 _결과에 대해서 책임_을 지게 되는 경우 [[[The user is _held accountable for the results_ of the interaction.]]]
+
+웹어플리케이션이 RESTful할 경우, PATCH, PUT, DELETE 와 같은 추가 HTTP 메소드에 익숙해져 있을 것입니다. 그러나, 오늘날 웹브라우저 대부분은 GET과 POST 외에는 지원하지 않습니다. 레일스는 이러한 문제점을 해결하기 위해서 hidden `_method` 속성을 사용합니다. [[[If your web application is RESTful, you might be used to additional HTTP verbs, such as PATCH, PUT or DELETE. Most of today's web browsers, however do not support them - only GET and POST. Rails uses a hidden `_method` field to handle this barrier.]]]
+
+_POST 요청을 또한 자동으로 보낼 수 있습니다_. 아래에, 브라우저 상태바에 목적지로서 www.harmless.com 도메인을 표시해 주는 링크에 대한 예재 코드가 있습니다. 실제로, 이것은 동적으로 POST 요청을 보내게 되는 새로운 폼을 생성하게 됩니다. [[[_POST requests can be sent automatically, too_. Here is an example for a link which displays www.harmless.com as destination in the browser's status bar. In fact it dynamically creates a new form that sends a POST request.]]]
 
 ```html
 <a href="http://www.harmless.com/" onclick="
@@ -229,21 +236,21 @@ _POST requests can be sent automatically, too_. Here is an example for a link wh
   return false;">To the harmless survey</a>
 ```
 
-Or the attacker places the code into the onmouseover event handler of an image:
+또는 공격자는 특정 이미지의 onmouseover 이벤트 핸들러에 이 코드를 삽입해 두게 됩니다. [[[Or the attacker places the code into the onmouseover event handler of an image:]]]
 
 ```html
 <img src="http://www.harmless.com/img" width="400" height="400" onmouseover="..." />
 ```
 
-There are many other possibilities, including Ajax to attack the victim in the background. The _solution to this is including a security token in non-GET requests_ which check on the server-side. In Rails 2 or higher, this is a one-liner in the application controller:
+백그라운드에서 공격하는 Ajax 를 포함해서 여러가지 다른 경우들도 있습니다. _이러한 것에 대한 해결책은 non-GET 요청시에 보안 토큰을 포함하는 것입니다_. 이러한 요청은 서버측에서 보안 토큰을 점검하게 됩니다. 레일스 2부터는 어플리케이션 컨트롤러에서 한줄로 해결하게 됩니다. [[[There are many other possibilities, including Ajax to attack the victim in the background. The _solution to this is including a security token in non-GET requests_ which check on the server-side. In Rails 2 or higher, this is a one-liner in the application controller:]]]
 
 ```ruby
 protect_from_forgery secret: "123456789012345678901234567890..."
 ```
 
-This will automatically include a security token, calculated from the current session and the server-side secret, in all forms and Ajax requests generated by Rails. You won't need the secret, if you use CookieStorage as session storage. If the security token doesn't match what was expected, the session will be reset. **Note:** In Rails versions prior to 3.0.4, this raised an `ActionController::InvalidAuthenticityToken` error.
+이렇게 하면, 레일스에서 생성되는 모든 폼과 Ajax 요청에서, 현재 세션과 서버측 secret 로부터 산출되는 보안 토큰을 자동으로 포함게 될 것입니다. 세션 저장소로 CookieStorage 를 사용할 경우에는 서버측 secret 가 필요없습니다. 보안 토큰이 일치하지 않을 경우에는, 세션이 재설정될 것입니다. **주의:** 레일스 3.0.4 버전 이전에서는 이러한 상황에서 `ActionController::InvalidAuthenticityToken` 에러가 발생하게 됩니다. [[[This will automatically include a security token, calculated from the current session and the server-side secret, in all forms and Ajax requests generated by Rails. You won't need the secret, if you use CookieStorage as session storage. If the security token doesn't match what was expected, the session will be reset. **Note:** In Rails versions prior to 3.0.4, this raised an `ActionController::InvalidAuthenticityToken` error.]]]
 
-It is common to use persistent cookies to store user information, with `cookies.permanent` for example. In this case, the cookies will not be cleared and the out of the box CSRF protection will not be effective. If you are using a different cookie store than the session for this information, you must handle what to do with it yourself:
+예를 들어, `cookies.permament`와 같이 쿠키를 유지하는 상태로 사용자 정보를 저장하는 것이 일반적입니다. 이와 같은 경우에는, 쿠키가 제거되지 않게 되어 즉각적으로 CSRF 보호 효과가 사라지게 될 것입니다. 이러한 정보를 저장하기 위해 세션외에 다른 쿠키 저장을 사용할 경우에는 직접 조치사항을 작성해 주어야 합니다. [[[It is common to use persistent cookies to store user information, with `cookies.permanent` for example. In this case, the cookies will not be cleared and the out of the box CSRF protection will not be effective. If you are using a different cookie store than the session for this information, you must handle what to do with it yourself:]]]
 
 ```ruby
 def handle_unverified_request
@@ -252,9 +259,9 @@ def handle_unverified_request
 end
 ```
 
-The above method can be placed in the `ApplicationController` and will be called when a CSRF token is not present on a non-GET request.
+위의 메소드를 `ApplicationController`에 추가해 주면 non-GET 요청시에 CSRF 토큰이 없는 경우 자동으로 호출될 것입니다. [[[The above method can be placed in the `ApplicationController` and will be called when a CSRF token is not present on a non-GET request.]]]
 
-Note that _cross-site scripting (XSS) vulnerabilities bypass all CSRF protections_. XSS gives the attacker access to all elements on a page, so he can read the CSRF security token from a form or directly submit the form. Read <a href="#cross-site-scripting-xss">more about XSS</a> later.
+_cross-site scripting (XSS) 에 취약할 경우에는 모든 CSRF 보호 효과가 사라지게 된다_는 것을 주의해야 합니다. XSS 는 공격자가 특정 페이지 상에 있는 모든 엘리먼트에 접근할 수 있게 주기 때문에, 공격자는 특정 폼으로부터 CSRF 보안 토큰을 읽을 수 있게 되거나 해당 폼에 대해서 직접 데이터를 서밋할 수 있게 됩니다. 나중에 <a href="#cross-site-scripting-xss">XSS</a> 에 대한 자세한 내용을 읽어 보기 바랍니다. [[[Note that _cross-site scripting (XSS) vulnerabilities bypass all CSRF protections_. XSS gives the attacker access to all elements on a page, so he can read the CSRF security token from a form or directly submit the form. Read <a href="#cross-site-scripting-xss">more about XSS</a> later.]]]
 
 Redirection and Files
 ---------------------
@@ -295,7 +302,7 @@ NOTE: _Make sure file uploads don't overwrite important files, and process media
 
 Many web applications allow users to upload files. _File names, which the user may choose (partly), should always be filtered_ as an attacker could use a malicious file name to overwrite any file on the server. If you store file uploads at /var/www/uploads, and the user enters a file name like "../../../etc/passwd", it may overwrite an important file. Of course, the Ruby interpreter would need the appropriate permissions to do so - one more reason to run web servers, database servers and other programs as a less privileged Unix user.
 
-When filtering user input file names, _don't try to remove malicious parts_. Think of a situation where the web application removes all "../" in a file name and an attacker uses a string such as "....//" - the result will be "../". It is best to use a whitelist approach, which _checks for the validity of a file name with a set of accepted characters_. This is opposed to a blacklist approach which attempts to remove not allowed characters. In case it isn't a valid file name, reject it (or replace not accepted characters), but don't remove them. Here is the file name sanitizer from the [attachment_fu plugin](https://github.com/technoweenie/attachment_fu/tree/master):
+When filtering user input file names, _don't try to remove malicious parts_. Think of a situation where the web application removes all "../" in a file name and an attacker uses a string such as "....//" - the result will be "../". It is best to use a whitelist approach, which _checks for the validity of a file name with a set of accepted characters_. This is opposed to a blacklist approach which attempts to remove not allowed characters. In case it isn't a valid file name, reject it (or replace not accepted characters), but don't remove them. Here is the file name sanitizer from the [attachment\_fu plugin](https://github.com/technoweenie/attachment_fu/tree/master):
 
 ```ruby
 def sanitize_filename(filename)
