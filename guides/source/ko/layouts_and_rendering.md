@@ -965,29 +965,29 @@ WARNING: 이미지파일의 확장자를 명시해야합니다. [[[Note that you
 
 레이아웃이 사이드바, 푸터와 같이 컨텐츠가 추가될 별개의 영역들을 가진 경우 `content_for` 메소드는 매우 유용합니다. 페이지에 특화된 자바스크립트나 CSS 파일의 태그를 일반 레이아웃의 헤더에 추가하는데도 유용합니다. [[[The `content_for` method is very helpful when your layout contains distinct regions such as sidebars and footers that should get their own blocks of content inserted. It's also useful for inserting tags that load page-specific JavaScript or css files into the header of an otherwise generic layout.]]]
 
-### Using Partials
+### [Using Partials] Partial 사용
 
-Partial templates - usually just called "partials" - are another device for breaking the rendering process into more manageable chunks. With a partial, you can move the code for rendering a particular piece of a response to its own file.
+partial 템플릿 - "partials" 라고 불리우는 - 은 다루기 쉬운 작은조각으로 나누는 렌더링 프로세스의 또다른 도구입니다. partial을 사용하면 응답의 특정 부분을 렌더링하는 코드를 파일로 옮길수 있습니다. [[[Partial templates - usually just called "partials" - are another device for breaking the rendering process into more manageable chunks. With a partial, you can move the code for rendering a particular piece of a response to its own file.]]]
 
-#### Naming Partials
+#### [Naming Partials] Partial 이름 규칙
 
-To render a partial as part of a view, you use the `render` method within the view:
+partial을 뷰의 일부로 렌더링하기 위해서 뷰 내부에서 `render` 메소드를 사용합니다. [[[To render a partial as part of a view, you use the `render` method within the view:]]]
 
 ```ruby
 <%= render "menu" %>
 ```
 
-This will render a file named `_menu.html.erb` at that point within the view being rendered. Note the leading underscore character: partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore. This holds true even when you're pulling in a partial from another folder:
+위의 코드는 뷰가 만들어질때 해당 지점에 `_menu.html.erb` 라는 이름의 파일을 렌더링합니다. 여기서 주목할것은 첫문자인 밑줄문자입니다: partial을 사용할때 밑줄문자가 없더라도 다른 일반뷰와 구별하기 위해 첫문자를 밑줄문자로 시작하게 이름짓습니다. 이는 다른폴더의 partial을 불러올때도 적용됩니다: [[[This will render a file named `_menu.html.erb` at that point within the view being rendered. Note the leading underscore character: partials are named with a leading underscore to distinguish them from regular views, even though they are referred to without the underscore. This holds true even when you're pulling in a partial from another folder:]]]
 
 ```ruby
 <%= render "shared/menu" %>
 ```
 
-That code will pull in the partial from `app/views/shared/_menu.html.erb`.
+위 코드는 `app/views/shared/_menu.html.erb` partial을 불러옵니다. [[[That code will pull in the partial from `app/views/shared/_menu.html.erb`.]]]
 
-#### Using Partials to Simplify Views
+#### [Using Partials to Simplify Views] partial 을 이용해서 뷰를 간소화하기
 
-One way to use partials is to treat them as the equivalent of subroutines: as a way to move details out of a view so that you can grasp what's going on more easily. For example, you might have a view that looked like this:
+partial 을 이용하는 한가지 방법은 partial을 마치 서브루틴처럼 생각하는 것입니다: 상세한 내용을 뷰로부터 분리시켜 더 쉽게 파악할 수 있도록 이동시키는 것처럼. 예를 들어, 다음과 같은 뷰가 있다고 가정해 봅시다: [[[One way to use partials is to treat them as the equivalent of subroutines: as a way to move details out of a view so that you can grasp what's going on more easily. For example, you might have a view that looked like this:]]]
 
 ```erb
 <%= render "shared/ad_banner" %>
@@ -1000,25 +1000,25 @@ One way to use partials is to treat them as the equivalent of subroutines: as a 
 <%= render "shared/footer" %>
 ```
 
-Here, the `_ad_banner.html.erb` and `_footer.html.erb` partials could contain content that is shared among many pages in your application. You don't need to see the details of these sections when you're concentrating on a particular page.
+여기서 `_ad_banner.html.erb` 과 `_footer.html.erb` partial은 어플리케이션의 다른 페이지에서도 많이 공유하는 내용을 가지고있을 수 있습니다. 특정 페이지에 대한 내용에 집중할때 이러한 영역의 자세한 내용은 볼 필요가 없습니다. [[[Here, the `_ad_banner.html.erb` and `_footer.html.erb` partials could contain content that is shared among many pages in your application. You don't need to see the details of these sections when you're concentrating on a particular page.]]]
 
-TIP: For content that is shared among all pages in your application, you can use partials directly from layouts.
+TIP: 어플리케이션의 모든 페이지에서 공유하는 내용인경우 레이아웃에서 직접 partial을 사용할 수 있습니다. [[[For content that is shared among all pages in your application, you can use partials directly from layouts.]]]
 
-#### Partial Layouts
+#### [Partial Layouts] Partial 레이아웃
 
-A partial can use its own layout file, just as a view can use a layout. For example, you might call a partial like this:
+partial은 뷰가 레이아웃을 사용하는것처럼 자신만의 레이아웃 파일을 가질수 있습니다.예를들어, partial은 다음과 같이 호출할 수 있습니다: [[[A partial can use its own layout file, just as a view can use a layout. For example, you might call a partial like this:]]]
 
 ```erb
 <%= render partial: "link_area", layout: "graybar" %>
 ```
 
-This would look for a partial named `_link_area.html.erb` and render it using the layout `_graybar.html.erb`. Note that layouts for partials follow the same leading-underscore naming as regular partials, and are placed in the same folder with the partial that they belong to (not in the master `layouts` folder).
+위의 코드는 `_link_area.html.erb` partial을 만들때 `_graybar.html.erb` 레이아웃 파일을 이용합니다. 여기서 주목할점은 partial을 위한 레이아웃역시 partial 처럼 밑줄문자로 시작하고, partial이 있는 위치와 같은 폴더에 존재한다는것입니다.(기본뷰 위치의 `layouts`폴더가 아님) [[[This would look for a partial named `_link_area.html.erb` and render it using the layout `_graybar.html.erb`. Note that layouts for partials follow the same leading-underscore naming as regular partials, and are placed in the same folder with the partial that they belong to (not in the master `layouts` folder).]]]
 
-Also note that explicitly specifying `:partial` is required when passing additional options such as `:layout`.
+또한 주의할 사항은 `:layout` 옵션을 사용할 때는 `:partial` 을 명시해야 한다는 것입니다. [[[Also note that explicitly specifying `:partial` is required when passing additional options such as `:layout`.]]]
 
-#### Passing Local Variables
+#### [Passing Local Variables] 지역변수 전달
 
-You can also pass local variables into partials, making them even more powerful and flexible. For example, you can use this technique to reduce duplication between new and edit pages, while still keeping a bit of distinct content:
+partial에 지역변수를 전달해서 보다 강력하고 유연하게 만들수 있습니다. 예를들어, new와 edit 페이지가 각각 다른 내용을 가지면서 중복을 줄일 수 있게 됩니다: [[[You can also pass local variables into partials, making them even more powerful and flexible. For example, you can use this technique to reduce duplication between new and edit pages, while still keeping a bit of distinct content:]]]
 
 * `new.html.erb`
 
@@ -1050,27 +1050,27 @@ You can also pass local variables into partials, making them even more powerful 
     <% end %>
     ```
 
-Although the same partial will be rendered into both views, Action View's submit helper will return "Create Zone" for the new action and "Update Zone" for the edit action.
+비록 동일한 partial 이 두개의 뷰로 렌더링되지만, Action View 의 submit 헬퍼는 new 액션에 대해서는 "Create Zone"을 edit 액션에 대해서는 "Update Zone"을 리턴하게 됩니다. [[[Although the same partial will be rendered into both views, Action View's submit helper will return "Create Zone" for the new action and "Update Zone" for the edit action.]]]
 
-Every partial also has a local variable with the same name as the partial (minus the underscore). You can pass an object in to this local variable via the `:object` option:
+모든 partial은 partial 이름과 동일한 지역변수를 가지고 있습니다(밑줄문자를 제외한). `:object` 옵션을 이용해 이 지역변수에 객체를 전달할 수 있습니다. [[[Every partial also has a local variable with the same name as the partial (minus the underscore). You can pass an object in to this local variable via the `:object` option:]]]
 
 ```erb
 <%= render partial: "customer", object: @new_customer %>
 ```
 
-Within the `customer` partial, the `customer` variable will refer to `@new_customer` from the parent view.
+`customer` partial의 `customer` 변수는 상위뷰의 `@new_customer`변수를 참조하게 됩니다. [[[Within the `customer` partial, the `customer` variable will refer to `@new_customer` from the parent view.]]]
 
-If you have an instance of a model to render into a partial, you can use a shorthand syntax:
+모델의 인스턴스를 partial로 렌더링할 경우에는 다음과 같이 단축 문법을 사용할 수 있습니다. [[[If you have an instance of a model to render into a partial, you can use a shorthand syntax:]]]
 
 ```erb
 <%= render @customer %>
 ```
 
-Assuming that the `@customer` instance variable contains an instance of the `Customer` model, this will use `_customer.html.erb` to render it and will pass the local variable `customer` into the partial which will refer to the `@customer` instance variable in the parent view.
+`@customer` 인스턴스 변수가 `Customer` 모델의 인스턴스를 가지고 있다고 가정한다면, 위의 코드는 `_customer.html.erb` partial을 이용해서 렌더링할 것이고 이 때 partial의 `customer` 지역변수에 상위 뷰의 `@customer` 인스턴스 변수를 전달해 참조할 수 있도록합니다. [[[Assuming that the `@customer` instance variable contains an instance of the `Customer` model, this will use `_customer.html.erb` to render it and will pass the local variable `customer` into the partial which will refer to the `@customer` instance variable in the parent view.]]]
 
-#### Rendering Collections
+#### [Rendering Collections] 컬렉션 렌더링
 
-Partials are very useful in rendering collections. When you pass a collection to a partial via the `:collection` option, the partial will be inserted once for each member in the collection:
+Partial은 컬렉션을 렌더링할 때 매우 유용합니다. `:collection` 옵션을 이용해서 partial에 컬렉션을 넘겨 줄 때, partial에 컬렉션의 각 항목들이 한번씩 채워지게 됩니다: [[[Partials are very useful in rendering collections. When you pass a collection to a partial via the `:collection` option, the partial will be inserted once for each member in the collection:]]]
 
 * `index.html.erb`
 
@@ -1085,16 +1085,17 @@ Partials are very useful in rendering collections. When you pass a collection to
     <p>Product Name: <%= product.name %></p>
     ```
 
-When a partial is called with a pluralized collection, then the individual instances of the partial have access to the member of the collection being rendered via a variable named after the partial. In this case, the partial is `_product`, and within the `_product` partial, you can refer to `product` to get the instance that is being rendered.
 
-There is also a shorthand for this. Assuming `@products` is a collection of `product` instances, you can simply write this in the `index.html.erb` to produce the same result:
+컬렉션으로 partial이 호출되는경우, 각각의 partial 인스턴스는 컬렉션의 항목이 partial 이름의 변수로 할당되어 렌더링됩니다. 이 경우에 partial은 `_product` 이 되고 `_product` partial 내에서 `product` 변수를 참조하여 렌더링됩니다. [[[When a partial is called with a pluralized collection, then the individual instances of the partial have access to the member of the collection being rendered via a variable named after the partial. In this case, the partial is `_product`, and within the `_product` partial, you can refer to `product` to get the instance that is being rendered.]]]
+
+이것에 대한 짧은 방법이 있습니다. `@products`가 `product` 인스턴스의 컬렉션이라고 가정하면, 동일한 결과물을 얻기 위해 `index.html.erb` 에 다음과 같이 사용할 수 있습니다. [[[There is also a shorthand for this. Assuming `@products` is a collection of `product` instances, you can simply write this in the `index.html.erb` to produce the same result:]]]
 
 ```html+erb
 <h1>Products</h1>
 <%= render @products %>
 ```
 
-Rails determines the name of the partial to use by looking at the model name in the collection. In fact, you can even create a heterogeneous collection and render it this way, and Rails will choose the proper partial for each member of the collection:
+레일스는 컬렉션에 있는 모델 이름을 찾아보고 partial 이름을 결정하게 됩니다. 사실, 다양한 종류의 모델로부터 만들어진 인스턴스로 구성된 컬렉션을 만들어 동일한 방법으로 렌더링할 수 있는데, 이때 레일스는 컬렉션 각 멤버에 대한 적절한 partial을 선택하게 될 것입니다. [[[Rails determines the name of the partial to use by looking at the model name in the collection. In fact, you can even create a heterogeneous collection and render it this way, and Rails will choose the proper partial for each member of the collection:]]]
 
 * `index.html.erb`
 
@@ -1115,61 +1116,63 @@ Rails determines the name of the partial to use by looking at the model name in 
     <p>Employee: <%= employee.name %></p>
     ```
 
-In this case, Rails will use the customer or employee partials as appropriate for each member of the collection.
+위의 경우, 레일스는 컬렉션의 각 멤버에 따라 해당하는 모델의 partial로 customer 또는 employee partial을 사용하게 될 것입니다. [[[In this case, Rails will use the customer or employee partials as appropriate for each member of the collection.]]]
 
-In the event that the collection is empty, `render` will return nil, so it should be fairly simple to provide alternative content.
+컬렉션이 비어있는경우, `render`는 nil을 반환하므로 정말 간단하게 대체 내용을 제공할 수 있습니다. [[[In the event that the collection is empty, `render` will return nil, so it should be fairly simple to provide alternative content.]]]
 
 ```html+erb
 <h1>Products</h1>
 <%= render(@products) || "There are no products available." %>
 ```
 
-#### Local Variables
+#### [Local Variables] 지역 변수
 
-To use a custom local variable name within the partial, specify the `:as` option in the call to the partial:
+partial 내에서 별도의 지역변수 이름을 사용하고자 할때는, partial 호출시에 `:as` 옵션에 명시해 주면 됩니다. [[[To use a custom local variable name within the partial, specify the `:as` option in the call to the partial:]]]
 
 ```erb
 <%= render partial: "product", collection: @products, as: :item %>
 ```
 
-With this change, you can access an instance of the `@products` collection as the `item` local variable within the partial.
+위의 경우, partial에서 `@products` 컬렉션 인스턴스 항목을 `item` 지역변수로 접근할 수 있습니다. [[[With this change, you can access an instance of the `@products` collection as the `item` local variable within the partial.]]]
 
-You can also pass in arbitrary local variables to any partial you are rendering with the `locals: {}` option:
+`locals: {}` 옵션을 이용해 렌더링하면 partial에서 임의의 지역변수를 사용할 수 있습니다. [[[You can also pass in arbitrary local variables to any partial you are rendering with the `locals: {}` option:]]]
 
 ```erb
 <%= render partial: "products", collection: @products,
            as: :item, locals: {title: "Products Page"} %>
 ```
 
-Would render a partial `_products.html.erb` once for each instance of `product` in the `@products` instance variable passing the instance to the partial as a local variable called `item` and to each partial, make the local variable `title` available with the value `Products Page`.
+이것은 지역변수 `item`으로 partial 로 넘어가는 `@products` 인스턴스 변수의 `product` 각각에 대해서 `_productions.html.erb` partial 을 렌더링하게 될 것입니다.
 
-TIP: Rails also makes a counter variable available within a partial called by the collection, named after the member of the collection followed by `_counter`. For example, if you're rendering `@products`, within the partial you can refer to `product_counter` to tell you how many times the partial has been rendered. This does not work in conjunction with the `as: :value` option.
+`@products` 인스턴스변수의 `product` 인스턴스 항목들을 `_products.html.erb` partial로 렌더링할때 `item` 지역변수와 `Product Page` 값을가진 `title` 지역변수를 가집니다. [[[Would render a partial `_products.html.erb` once for each instance of `product` in the `@products` instance variable passing the instance to the partial as a local variable called `item` and to each partial, make the local variable `title` available with the value `Products Page`.]]]
 
-You can also specify a second partial to be rendered between instances of the main partial by using the `:spacer_template` option:
+TIP: 레일스는 컬렉션에 의해 partial이 호출될 때 counter 변수를 생성합니다. 이 변수는 컬렉션 멤버의 이름 뒤에 `_counter` 를 붙인 형태의 이름을 가지게 됩니다. 예를 들면, `@products` 를 렌더링할 경우, partial에서 `product_counter`를 참조하면 partial이 렌더링된 횟수를 알 수 있습니다. 그러나 `as: :value` 옵션을 사용해서 partial을 호출한 경우에는 작동하지 않습니다. [[[Rails also makes a counter variable available within a partial called by the collection, named after the member of the collection followed by `_counter`. For example, if you're rendering `@products`, within the partial you can refer to `product_counter` to tell you how many times the partial has been rendered. This does not work in conjunction with the `as: :value` option.]]]
 
-#### Spacer Templates
+`:spacer_template` 옵션을 이용하면 여러개의 주 partial 사이에 렌더링되는 두번째 partial 을 지정할 수 있습니다. [[[You can also specify a second partial to be rendered between instances of the main partial by using the `:spacer_template` option:]]]
+
+#### [Spacer Templates] 스페이서 템플릿
 
 ```erb
 <%= render partial: @products, spacer_template: "product_ruler" %>
 ```
 
-Rails will render the `_product_ruler` partial (with no data passed in to it) between each pair of `_product` partials.
+레일스는 `_product_ruler` partial을(데이터가 전달되지 않는 경우) `_product` partial 사이 사이에 렌더링하게 될 것입니다. [[[Rails will render the `_product_ruler` partial (with no data passed in to it) between each pair of `_product` partials.]]]
 
-#### Collection Partial Layouts
+#### [Collection Partial Layouts] 컬렉션 Partial 레이아웃
 
-When rendering collections it is also possible to use the `:layout` option:
+컬렉션 partial을 렌더링할때도 `:layout` 옵션을 사용할 수 있습니다. [[[When rendering collections it is also possible to use the `:layout` option:]]]
 
 ```erb
 <%= render partial: "product", collection: @products, layout: "special_layout" %>
 ```
 
-The layout will be rendered together with the partial for each item in the collection. The current object and object_counter variables will be available in the layout as well, the same way they do within the partial.
+이 레이아웃은 컬렉션의 각 항목에 대해 렌더링될때 사용됩니다. partial에서 그렇듯 현재 object와 object_counter 변수를 레이아웃에서 사용할 수 있습니다. [[[The layout will be rendered together with the partial for each item in the collection. The current object and object_counter variables will be available in the layout as well, the same way they do within the partial.]]]
 
-### Using Nested Layouts
+### [Using Nested Layouts] 중첩 레이아웃 사용
 
-You may find that your application requires a layout that differs slightly from your regular application layout to support one particular controller. Rather than repeating the main layout and editing it, you can accomplish this by using nested layouts (sometimes called sub-templates). Here's an example:
+일반 레이아웃과는 달리 특정 컨트롤러를 지원하는 레이아웃이 필요한 경우가 있을 것입니다. 주 레이아웃을 수정후 사용하기를 반복하는것 보다 중첩 레이아웃을(때로 sub-template라고도 불리는) 이용할 수도 있습니다. 아래에 그 예를 보여줍니다: [[[You may find that your application requires a layout that differs slightly from your regular application layout to support one particular controller. Rather than repeating the main layout and editing it, you can accomplish this by using nested layouts (sometimes called sub-templates). Here's an example:]]]
 
-Suppose you have the following `ApplicationController` layout:
+ApplicationController 레이아웃있다고 가정하면: [[[Suppose you have the following `ApplicationController` layout:]]]
 
 * `app/views/layouts/application.html.erb`
 
@@ -1188,7 +1191,7 @@ Suppose you have the following `ApplicationController` layout:
     </html>
     ```
 
-On pages generated by `NewsController`, you want to hide the top menu and add a right menu:
+`NewsController` 에서 만들어지는 페이지에서는 상단 메뉴를 감추고 오른쪽 메뉴를 추가하고 싶다면: [[[On pages generated by `NewsController`, you want to hide the top menu and add a right menu:]]]
 
 * `app/views/layouts/news.html.erb`
 
@@ -1204,6 +1207,6 @@ On pages generated by `NewsController`, you want to hide the top menu and add a 
     <%= render template: "layouts/application" %>
     ```
 
-That's it. The News views will use the new layout, hiding the top menu and adding a new right menu inside the "content" div.
+News 뷰는 "content" div 안에 상단 메뉴가 사라지고 우측 메뉴가 추가된 새 레이아웃을 사용할 것입니다. [[[That's it. The News views will use the new layout, hiding the top menu and adding a new right menu inside the "content" div.]]]
 
-There are several ways of getting similar results with different sub-templating schemes using this technique. Note that there is no limit in nesting levels. One can use the `ActionView::render` method via `render template: 'layouts/news'` to base a new layout on the News layout. If you are sure you will not subtemplate the `News` layout, you can replace the `content_for?(:news_content) ? yield(:news_content) : yield` with simply `yield`.
+이러한 기법을 이용하면 다양한 서브템플릿으로 비슷한 결과를 보여주는 방법이 많아지게 됩니다. 중첩 레벨에는 제한이 없습니다. `render template: 'layouts/news'` 으로 `ActionView::render` 메소드를 이용하여 News 레아아웃 상에 새로운 레이아웃을 만들 수 있습니다. 만약에 `News` 레이아웃을 서브템플릿으로 사용하지 않을 경우에는 `content_for?(:news_content) ? yield(:news_content) : yield`를 `yield`로 대치 하면 됩니다.  [[[There are several ways of getting similar results with different sub-templating schemes using this technique. Note that there is no limit in nesting levels. One can use the `ActionView::render` method via `render template: 'layouts/news'` to base a new layout on the News layout. If you are sure you will not subtemplate the `News` layout, you can replace the `content_for?(:news_content) ? yield(:news_content) : yield` with simply `yield`.]]]
