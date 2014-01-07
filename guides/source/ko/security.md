@@ -1,3 +1,4 @@
+[Ruby on Rails Security Guide] 루비온레일스 보안 가이드
 ============================
 
 이 매뉴얼은 웹어플리케이션에서 발생하는 일반적인 보안 문제를 설명하고 레일스로 이러한 문제를 해결하는 방법을 소개 합니다. [[[This manual describes common security problems in web applications and how to avoid them with Rails.]]]
@@ -382,55 +383,57 @@ XSS에 대한 조치사항은 Injection 센션을 참고하기 바랍니다. 내
 
 관리자 인터페이스와 내부망 어플리케이션에서 CSRF에 대한 조치사항에 대해서는 CSRF 섹션의 조치사항을 참고하시 바랍니다. [[[For _countermeasures against CSRF in administration interfaces and Intranet applications, refer to the countermeasures in the CSRF section_.]]]
 
-### Additional Precautions
+### [Additional Precautions] 추가 주의사항
 
-The common admin interface works like this: it's located at www.example.com/admin, may be accessed only if the admin flag is set in the User model, re-displays user input and allows the admin to delete/add/edit whatever data desired. Here are some thoughts about this:
+일반적인 관리자 인터페이스는 다음과 같이 동작합니다. 대개는 www.example.com/admin 에 위치하고 User 모델에 admin 표시가 된 경우에만 접근할 수 있고, 사용자의 입력 데이터를 다시 볼 수 있으며 어떤 데이터이든 삭제 추가 수정할 수 있도록 되어 있습니다. 아래에 이러한 구조에 대한 몇가지 생각을 정리해 두었습니다. [[[The common admin interface works like this: it's located at www.example.com/admin, may be accessed only if the admin flag is set in the User model, re-displays user input and allows the admin to delete/add/edit whatever data desired. Here are some thoughts about this:]]]
 
-* It is very important to _think about the worst case_: What if someone really got hold of my cookie or user credentials. You could _introduce roles_ for the admin interface to limit the possibilities of the attacker. Or how about _special login credentials_ for the admin interface, other than the ones used for the public part of the application. Or a _special password for very serious actions_?
+* _최악의 경우를 생각하는 것_ 이 매우 중요합니다. 즉, 누군가가 본인의 쿠키나 사용자 신용정보를 실제로 가로챘다면 어떻게 될까. 공격 가능성을 줄이기 위해서 관리자 인터페이스에 대해서 _role 기능_ 을 도입할 수 있습니다. 또는 어플리케이션에서 공개된 정보 외의 _특수한 로그인 신용정보를 추가_ 하는 것도 생각해 볼 수 있습니다. _매우 중요한 작업에 대해서는 특별한 비밀번호를 추가_ 하는 것도 고려해 볼 수 있을 것입니다. [[[It is very important to _think about the worst case_: What if someone really got hold of my cookie or user credentials. You could _introduce roles_ for the admin interface to limit the possibilities of the attacker. Or how about _special login credentials_ for the admin interface, other than the ones used for the public part of the application. Or a _special password for very serious actions_?]]]
 
-* Does the admin really have to access the interface from everywhere in the world? Think about _limiting the login to a bunch of source IP addresses_. Examine request.remote_ip to find out about the user's IP address. This is not bullet-proof, but a great barrier. Remember that there might be a proxy in use, though.
+* 관리자는 정말 이 세상의 모든 곳에서 관리자 인터페이스에 접근해야만 할까요? 따라서 _로그인을 일련의 IP 주소로 제한_ 하는 것을 생각해 볼 수 있습니다. request.remote_ip 에서 사용자의 IP 주소를 알아낼 수 있습니다. 이것은 방탄효과는 없지만 그래도 큰 장벽을 만들어 줄 수 있습니다. 그러나 proxy 가 필요할 수도 있다는 것을 기억하기 바랍니다. [[[Does the admin really have to access the interface from everywhere in the world? Think about _limiting the login to a bunch of source IP addresses_. Examine request.remote_ip to find out about the user's IP address. This is not bullet-proof, but a great barrier. Remember that there might be a proxy in use, though.]]]
 
-* _Put the admin interface to a special sub-domain_ such as admin.application.com and make it a separate application with its own user management. This makes stealing an admin cookie from the usual domain, www.application.com, impossible. This is because of the same origin policy in your browser: An injected (XSS) script on www.application.com may not read the cookie for admin.application.com and vice-versa.
+* 관리자 인터페이스를 admin.application.com과 같이 전용 서브도메인으로 연결하고 별도의 어플리케이션을 만들어 사용자 관리를 따로 하는 방법도 있습니다. 이렇게 하므로써 www.application.com 과 같은 일반적인 도메인으로 부터 관리자 쿠키를 가로채는 것이 불가능하게 됩니다. 이것은 브라우저의 _**same origin policy**_ 때문인데, www.application.com 에 주입된 XSS는 admin.application.com의 쿠키를 읽을 수 없고 그 반대도 마찬가지입니다. [[[_Put the admin interface to a special sub-domain_ such as admin.application.com and make it a separate application with its own user management. This makes stealing an admin cookie from the usual domain, www.application.com, impossible. This is because of the same origin policy in your browser: An injected (XSS) script on www.application.com may not read the cookie for admin.application.com and vice-versa.]]]
 
-User Management
+[User Management] 사용자 관리
 ---------------
 
-NOTE: _Almost every web application has to deal with authorization and authentication. Instead of rolling your own, it is advisable to use common plug-ins. But keep them up-to-date, too. A few additional precautions can make your application even more secure._
+NOTE: _거의 모든 웹어프리케이션은 사용자 인증과 권한설정 기능을 제공해야 합니다. 직접 만드는 것보다는 흔히 사용하는 플러그인을 사용할 것을 권합니다. 그러나 또한 항상 최신의 상태로 업데이트 지속적으로 해야 합니다. 몇가지 주의사항만 잘 지키면 어플리케이션을 보다 보안상 더 안전하게 만들 수 있습니다._ [[[_Almost every web application has to deal with authorization and authentication. Instead of rolling your own, it is advisable to use common plug-ins. But keep them up-to-date, too. A few additional precautions can make your application even more secure._]]]
 
-There are a number of authentication plug-ins for Rails available. Good ones, such as the popular [devise](https://github.com/plataformatec/devise) and [authlogic](https://github.com/binarylogic/authlogic), store only encrypted passwords, not plain-text passwords. In Rails 3.1 you can use the built-in `has_secure_password` method which has similar features.
+다수의 레일스용 인증 플러그인을 사용할 수 있습니다. [devise](https://github.com/plataformatec/devise)와 [authlogic](https://github.com/binarylogic/authlogic) 와 같은 훌륭한 플러그인들은 평문형 비밀번호를 대신에 암호화된 비밀번호만을 저장합니다. 레일스 3.1 부터는 유사한 기능을 가지는 `has_secure_password` 메소드를 기본 제공하고 있습니다. [[[There are a number of authentication plug-ins for Rails available. Good ones, such as the popular [devise](https://github.com/plataformatec/devise) and [authlogic](https://github.com/binarylogic/authlogic), store only encrypted passwords, not plain-text passwords. In Rails 3.1 you can use the built-in `has_secure_password` method which has similar features.]]]
 
-Every new user gets an activation code to activate his account when he gets an e-mail with a link in it. After activating the account, the activation_code columns will be set to NULL in the database. If someone requested an URL like these, he would be logged in as the first activated user found in the database (and chances are that this is the administrator):
+새로 등록한 모든 사용자는 인증을 위한 이메일을 받게 되는데 사용자 자신의 계정을 활성화하기 위한 링크를 포함하고 있습니다. 계정이 활성화된 후에는 데이터베이스의 activation_code 컬럼이 NULL 값으로 할당될 것입니다. 누군가 이와 같은 URL을 요청했다면 데이터베이스에서 조회되는 최초의 활성화된 사용자로써 로그인될 것입니다. 이것은 아마도 관리자일 가능이 있습니다. [[[Every new user gets an activation code to activate his account when he gets an e-mail with a link in it. After activating the account, the activation_code columns will be set to NULL in the database. If someone requested an URL like these, he would be logged in as the first activated user found in the database (and chances are that this is the administrator):]]]
 
 ```
 http://localhost:3006/user/activate
 http://localhost:3006/user/activate?id=
 ```
 
-This is possible because on some servers, this way the parameter id, as in params[:id], would be nil. However, here is the finder from the activation action:
+이것이 가능한 이유는, 어떤 서버에서는 이런식으로, params[:id]와 같이, id 파라미터가 nil이 될 것이기 때문입니다. 그러나, 아래에는 계정 활성화를 위한 액션에서 사용하는 finder 메소드를 볼 수 있습니다. [[[This is possible because on some servers, this way the parameter id, as in params[:id], would be nil. However, here is the finder from the activation action:]]]
 
 ```ruby
 User.find_by_activation_code(params[:id])
 ```
 
-If the parameter was nil, the resulting SQL query will be
+파라미터가 nil이라면 다음과 같은 SQL 쿼리문을 보게 될 것입니다. [[[If the parameter was nil, the resulting SQL query will be]]]
 
 ```sql
 SELECT * FROM users WHERE (users.activation_code IS NULL) LIMIT 1
 ```
 
-And thus it found the first user in the database, returned it and logged him in. You can find out more about it in [my blog post](http://www.rorsecurity.info/2007/10/28/restful_authentication-login-security/). _It is advisable to update your plug-ins from time to time_. Moreover, you can review your application to find more flaws like this.
+이와 같이 데이터베이스에서 첫번째 사용자를 찾았다면 로그인되도록 해 줍니다. 이에 대한 자세한 내용은 [my blog post](http://www.rorsecurity.info/2007/10/28/restful_authentication-login-security/)에서 찾을 수 있습니다. _가끔식 플러그인들을 업데이트할 것을 권합니다_. 더우기 어플리케이션을 재검토하면 이와 같이 더 많은 문제점들을 찾을 수 있을 것입니다. [[[And thus it found the first user in the database, returned it and logged him in. You can find out more about it in [my blog post](http://www.rorsecurity.info/2007/10/28/restful_authentication-login-security/). _It is advisable to update your plug-ins from time to time_. Moreover, you can review your application to find more flaws like this.]]]
 
-### Brute-Forcing Accounts
+### [Brute-Forcing Accounts] 계정에 대한 무차별 공격
 
-NOTE: _Brute-force attacks on accounts are trial and error attacks on the login credentials. Fend them off with more generic error messages and possibly require to enter a CAPTCHA._
+**[역자주석]** 무차별 공격(Brute forcing) : 사전적인 단어들로 구성된 아이디와 패스워드 리스트를 가지고 계속적으로 로그인을 시도하는 것.
 
-A list of user names for your web application may be misused to brute-force the corresponding passwords, because most people don't use sophisticated passwords. Most passwords are a combination of dictionary words and possibly numbers. So armed with a list of user names and a dictionary, an automatic program may find the correct password in a matter of minutes.
+NOTE: _계정에 대한 무차별 공격은 로그인 인증정보에 대한 시행착오 방식의 공격입니다. 따라서 보다 일반적인 에러 메시지를 보여 줌으로써 이러한 공격을 방지하고 때로는 CAPTCHA 입력을 요구할 수도 있습니다_. [[[_Brute-force attacks on accounts are trial and error attacks on the login credentials. Fend them off with more generic error messages and possibly require to enter a CAPTCHA._]]]
 
-Because of this, most web applications will display a generic error message "user name or password not correct", if one of these are not correct. If it said "the user name you entered has not been found", an attacker could automatically compile a list of user names.
+웹어플리케이션에서 사용자 명단을 작성하는 것은, 대부분의 사람들이 대충 비밀번호를 작성하기 때문에, 각 사용자의 비밀번호에 대한 무차별 공격을 받을 수 있습니다. 대부분의 비밀번호는 사전의 단어와 번호를 조합해서 만들어 집니다. 사용자 명단과 사전을 이용하면 자동화된 프로그램에서 수분내에 정확한 비밀번호를 찾아낼 수 있게 됩니다. [[[A list of user names for your web application may be misused to brute-force the corresponding passwords, because most people don't use sophisticated passwords. Most passwords are a combination of dictionary words and possibly numbers. So armed with a list of user names and a dictionary, an automatic program may find the correct password in a matter of minutes.]]]
 
-However, what most web application designers neglect, are the forgot-password pages. These pages often admit that the entered user name or e-mail address has (not) been found. This allows an attacker to compile a list of user names and brute-force the accounts.
+이와 같은 이유로, 대부분의 웹어플리케이션은, 둘 중에 하나가 정확치 않을 경우, "사용자 이름 또는 비밀번호가 틀립니다"와 같이 일반적인 에러 메시지를 표시하게 됩니다. "입력한 사용자 이름을 찾을 수 없습니다"와 같이 표시해 줄 경우, 공격자가 사용자 명단을 자동으로 컴파일하여 모드 찾을 수 있게 될 것입니다. [[[Because of this, most web applications will display a generic error message "user name or password not correct", if one of these are not correct. If it said "the user name you entered has not been found", an attacker could automatically compile a list of user names.]]]
 
-In order to mitigate such attacks, _display a generic error message on forgot-password pages, too_. Moreover, you can _require to enter a CAPTCHA after a number of failed logins from a certain IP address_. Note, however, that this is not a bullet-proof solution against automatic programs, because these programs may change their IP address exactly as often. However, it raises the barrier of an attack.
+그러나, 대부분의 웹어플리케이션 디자이너들이 게을리하는 것은 비밀번호 분실 페이지입니다. 때로는 이러한 페이지가 입력한 사용자 이름이나 이메일 주소를 찾았거나 찾지 못한 것을 확인해 주는 결과를 초래하게 됩니다. 이로 인해 공격자는 사용자 명단을 작성하여 계정에 대해서 무차별 공격을 할 수 있게 될 것입니다. [[[However, what most web application designers neglect, are the forgot-password pages. These pages often admit that the entered user name or e-mail address has (not) been found. This allows an attacker to compile a list of user names and brute-force the accounts.]]]
+
+이러한 공격을 줄이기 위해서는, _비밀번호 분실 페이지에 일반적인 에러 메시지를 보여주어야 합니다_. 더우기, 특정 IP 주소로부터 수차례의 로그인 실패가 있을 경우에는, CAPTCHA 를 입력하도록 할 수 있습니다. 그러나 주의할 것은, 자동화된 프로그램은 가끔식 IP 주소를 변경해가면서 공격을 할 수 있기 때문에 완전하게 방어하지는 못한다는 것입니다. 그러나, 이러한 조치는 공격자들에게는 장애물이 되는 것입니다. [[[In order to mitigate such attacks, _display a generic error message on forgot-password pages, too_. Moreover, you can _require to enter a CAPTCHA after a number of failed logins from a certain IP address_. Note, however, that this is not a bullet-proof solution against automatic programs, because these programs may change their IP address exactly as often. However, it raises the barrier of an attack.]]]
 
 ### Account Hijacking
 
