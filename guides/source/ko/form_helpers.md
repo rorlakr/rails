@@ -1,27 +1,33 @@
-Form Helpers
+[Form Helpers] 폼 헬퍼
 ============
 
-Forms in web applications are an essential interface for user input. However, form markup can quickly become tedious to write and maintain because of form control naming and their numerous attributes. Rails does away with these complexities by providing view helpers for generating form markup. However, since they have different use-cases, developers are required to know all the differences between similar helper methods before putting them to use.
+웹 어플리케이션에서 폼은 사용자의 입력을 위한 필수 인터페이스입니다. 하지만 폼 마크업을 작성하고 수정하는것은 폼 컨트롤의 이름짓기와 많은 속성들로인해 금방 지루해집니다. 레일스는 이러한 복잡한작업을 위해 폼 마크업을 생성하는 뷰헬퍼를 제공합니다. 하지만 다양한 유즈케이스가 있기에 사용하기전에는 헬퍼 메소드의 다른점과 유사점을 알아야할 필요가 있습니다. [[[Forms in web applications are an essential interface for user input. However, form markup can quickly become tedious to write and maintain because of form control naming and their numerous attributes. Rails does away with these complexities by providing view helpers for generating form markup. However, since they have different use-cases, developers are required to know all the differences between similar helper methods before putting them to use.]]]
 
-After reading this guide, you will know:
+본 가이드를 읽고나면 다음의 내용들을 이해할 수 있습니다: [[[After reading this guide, you will know:]]]
 
-* How to create search forms and similar kind of generic forms not representing any specific model in your application.
-* How to make model-centric forms for creation and editing of specific database records.
-* How to generate select boxes from multiple types of data.
-* The date and time helpers Rails provides.
-* What makes a file upload form different.
-* Some cases of building forms to external resources.
-* How to build complex forms.
+* 검색폼과 모델에 특정되지 않는 유사한 일반적인 폼의 생성 방법 [[[How to create search forms and similar kind of generic forms not representing any specific model in your application.]]]
+
+* 특정 데이터베이스 레코드를 생성하거나 수정하는 모델중심의 폼 생성 방법. [[[How to make model-centric forms for creation and editing of specific database records.]]]
+
+* 여러종류의 데이터를 표현하는 select 박스 생성 방법. [[[How to generate select boxes from multiple types of data.]]]
+
+* 레일스가 제공하는 날짜, 시간 헬퍼. [[[The date and time helpers Rails provides.]]]
+
+* 파일 업로드 폼을 다르게하는 것. [[[What makes a file upload form different.]]]
+
+* 외부 리소스와 연결하는 폼 생성 방법 [[[Some cases of building forms to external resources.]]]
+
+* 복잡한 폼 생성 방법. [[[How to build complex forms.]]]
 
 --------------------------------------------------------------------------------
 
-NOTE: This guide is not intended to be a complete documentation of available form helpers and their arguments. Please visit [the Rails API documentation](http://api.rubyonrails.org/) for a complete reference.
+NOTE: 본 가이드는 폼 헬퍼와 인수에대한 완전한 문서를 목표로 하지 않습니다. 완전한 문서를 참고하려면 [the Rails API documentation](http://api.rubyonrails.org/) 링크를 방문하세요. [[[This guide is not intended to be a complete documentation of available form helpers and their arguments. Please visit [the Rails API documentation](http://api.rubyonrails.org/) for a complete reference.]]]
 
 
-Dealing with Basic Forms
+[Dealing with Basic Forms] 기본폼 다루기
 ------------------------
 
-The most basic form helper is `form_tag`.
+가장 일반적인 폼 헬퍼는 `form_tag` 입니다. [[[The most basic form helper is `form_tag`.]]]
 
 ```erb
 <%= form_tag do %>
@@ -29,7 +35,7 @@ The most basic form helper is `form_tag`.
 <% end %>
 ```
 
-When called without arguments like this, it creates a `<form>` tag which, when submitted, will POST to the current page. For instance, assuming the current page is `/home/index`, the generated HTML will look like this (some line breaks added for readability):
+인수없이 위와 같이 호출하는경우, `<form>` 태그를 생성하고 전송하는경우 현재 페이지에 POST 요청을 합니다. 예를들어, 현재 페이지가 `/home/index` 인경우 생성되는 HTML은 다음과 같습니다.(가독성을 위해 개행문자가 일부 추가되었습니다.) [[[When called without arguments like this, it creates a `<form>` tag which, when submitted, will POST to the current page. For instance, assuming the current page is `/home/index`, the generated HTML will look like this (some line breaks added for readability):]]]
 
 ```html
 <form accept-charset="UTF-8" action="/home/index" method="post">
@@ -41,20 +47,23 @@ When called without arguments like this, it creates a `<form>` tag which, when s
 </form>
 ```
 
-Now, you'll notice that the HTML contains something extra: a `div` element with two hidden input elements inside. This div is important, because the form cannot be successfully submitted without it. The first input element with name `utf8` enforces browsers to properly respect your form's character encoding and is generated for all forms whether their actions are "GET" or "POST". The second input element with name `authenticity_token` is a security feature of Rails called **cross-site request forgery protection**, and form helpers generate it for every non-GET form (provided that this security feature is enabled). You can read more about this in the [Security Guide](./security.html#cross-site-request-forgery-csrf).
+HTML이 몇개의 추가 요소를 가지고 있는것을 확인할 수 있습니다: 2개의 숨겨진 input 요소를 포함한 `div`. 추가된 div 는 중요한데, 이것 없이는 폼이 받아들여지지 않기 때문입니다. 첫번째 input 요소는 `utf8`이라는 이름을 가지고 있으며 폼이 "GET"이나 "POST" 요청을 할때 브라우저가 문자열 인코딩을 제대로 다루도록 합니다. 두번째 input 요소는 `authenticity_token`이라는 이름을 가지고 있으며 레일스에서 **cross-site request forgery protection**라고 부르는 보안기능으로 폼 헬퍼는 GET 요청을 제외한 모든 폼에 생성합니다(이 보안기능이 활성화 되어 있을때 제공). 자세한 내용은 [레일스 어플리케이션 보안](./security.html#cross-site-request-forgery-csrf)을 확인합니다. [[[Now, you'll notice that the HTML contains something extra: a `div` element with two hidden input elements inside. This div is important, because the form cannot be successfully submitted without it. The first input element with name `utf8` enforces browsers to properly respect your form's character encoding and is generated for all forms whether their actions are "GET" or "POST". The second input element with name `authenticity_token` is a security feature of Rails called **cross-site request forgery protection**, and form helpers generate it for every non-GET form (provided that this security feature is enabled). You can read more about this in the [Security Guide](./security.html#cross-site-request-forgery-csrf).]]]
 
-NOTE: Throughout this guide, the `div` with the hidden input elements will be excluded from code samples for brevity.
+NOTE: 본가이드의 샘플코드에서 `div`의 숨겨진 input 요소는 간결성을 위해 제외됩니다. [[[Throughout this guide, the `div` with the hidden input elements will be excluded from code samples for brevity.]]]
 
-### A Generic Search Form
+### [A Generic Search Form] 검색 폼
 
-One of the most basic forms you see on the web is a search form. This form contains:
+웹에서 가장 기본적인 폼중 하나는 검색 폼입니다. 이 폼은 다음을 포함합니다: [[[One of the most basic forms you see on the web is a search form. This form contains:]]]
 
-* a form element with "GET" method,
-* a label for the input,
-* a text input element, and
-* a submit element.
+* "GET" 메소드를 가진 폼, [[[a form element with "GET" method,]]]
 
-To create this form you will use `form_tag`, `label_tag`, `text_field_tag`, and `submit_tag`, respectively. Like this:
+* input을 위한 라벨, [[[a label for the input,]]]
+
+* text input 요소, [[[a text input element, and]]]
+
+* submit 요소. [[[a submit element.]]]
+
+이 폼을 만들기 위해 `form_tag`, `label_tag`, `text_field_tag`, `submit_tag`를 사용해야 할것입니다. 다음과 같은: [[[To create this form you will use `form_tag`, `label_tag`, `text_field_tag`, and `submit_tag`, respectively. Like this:]]]
 
 ```erb
 <%= form_tag("/search", method: "get") do %>
@@ -64,7 +73,7 @@ To create this form you will use `form_tag`, `label_tag`, `text_field_tag`, and 
 <% end %>
 ```
 
-This will generate the following HTML:
+다음과 같은 HTML을 생성합니다: [[[This will generate the following HTML:]]]
 
 ```html
 <form accept-charset="UTF-8" action="/search" method="get">
@@ -74,39 +83,39 @@ This will generate the following HTML:
 </form>
 ```
 
-TIP: For every form input, an ID attribute is generated from its name ("q" in the example). These IDs can be very useful for CSS styling or manipulation of form controls with JavaScript.
+TIP: 모든 폼의 input에 ID 속성값은 name 속성값으로 생성됩니다(예제의 경우 "q"). 이러한 ID들은 CSS 스타일링이나 자바스크립트를 이용한 폼 처리에 매우 유용합니다. [[[For every form input, an ID attribute is generated from its name ("q" in the example). These IDs can be very useful for CSS styling or manipulation of form controls with JavaScript.]]]
 
-Besides `text_field_tag` and `submit_tag`, there is a similar helper for _every_ form control in HTML.
+`text_field_tag`, `submit_tag` 외에도 HTML의 _모든_ 폼 컨트롤에 대하여 비슷한 헬퍼가 있습니다. [[[Besides `text_field_tag` and `submit_tag`, there is a similar helper for _every_ form control in HTML.]]]
 
-IMPORTANT: Always use "GET" as the method for search forms. This allows users to bookmark a specific search and get back to it. More generally Rails encourages you to use the right HTTP verb for an action.
+IMPORTANT: 검색 폼에 대해서는 항상 "GET"을 사용합니다. 이렇게 하면 사용자가 특정 검색어를 즐겨찾기해서 다시 찾아올수 있게 합니다. 일반적으로 레일스는 액션에 알맞는 HTTP verb를 사용하도록 권장합니다. [[[Always use "GET" as the method for search forms. This allows users to bookmark a specific search and get back to it. More generally Rails encourages you to use the right HTTP verb for an action.]]]
 
-### Multiple Hashes in Form Helper Calls
+### [Multiple Hashes in Form Helper Calls] 폼 헬퍼를 호출시 다양한 인수
 
-The `form_tag` helper accepts 2 arguments: the path for the action and an options hash. This hash specifies the method of form submission and HTML options such as the form element's class.
+`form_tag` 헬퍼는 2개의 인수를 받습니다: 액션의 경로와 옵션 해쉬. 이 해쉬는 폼의 속성이나 HTML class와 같은 옵션에 해당합니다. [[[The `form_tag` helper accepts 2 arguments: the path for the action and an options hash. This hash specifies the method of form submission and HTML options such as the form element's class.]]]
 
-As with the `link_to` helper, the path argument doesn't have to be a string; it can be a hash of URL parameters recognizable by Rails' routing mechanism, which will turn the hash into a valid URL. However, since both arguments to `form_tag` are hashes, you can easily run into a problem if you would like to specify both. For instance, let's say you write this:
+`link_to` 헬퍼는 경로 인수는 문자열이 아니어도 됩니다; 레일스 라우팅 매커니즘이 이해하고 알맞은 URL로 변환되는 해쉬도 가능합니다. 하지만 `form_tag`의 경우 경로를 설정할때 두개의 인수를 지정하는경우 문제를 발생시킬수 있습니다. 예를 들어 다음과 같이 적는다면: [[[As with the `link_to` helper, the path argument doesn't have to be a string; it can be a hash of URL parameters recognizable by Rails' routing mechanism, which will turn the hash into a valid URL. However, since both arguments to `form_tag` are hashes, you can easily run into a problem if you would like to specify both. For instance, let's say you write this:]]]
 
 ```ruby
 form_tag(controller: "people", action: "search", method: "get", class: "nifty_form")
 # => '<form accept-charset="UTF-8" action="/people/search?method=get&class=nifty_form" method="post">'
 ```
 
-Here, `method` and `class` are appended to the query string of the generated URL because even though you mean to write two hashes, you really only specified one. So you need to tell Ruby which is which by delimiting the first hash (or both) with curly brackets. This will generate the HTML you expect:
+`method`와 `class`는 URL의 쿼리문자열에 추가된것을 볼수 있습니다. 2개의 해쉬를 의미하는것이 었다면 하나를 명시해야합니다. 루비에게 첫번째 해쉬인지를(혹은 둘다) 중괄호로 분리해서 알려주어야 합니다. 이는 당신이 예상한 HTML을 만들것입니다: [[[Here, `method` and `class` are appended to the query string of the generated URL because even though you mean to write two hashes, you really only specified one. So you need to tell Ruby which is which by delimiting the first hash (or both) with curly brackets. This will generate the HTML you expect:]]]
 
 ```ruby
 form_tag({controller: "people", action: "search"}, method: "get", class: "nifty_form")
 # => '<form accept-charset="UTF-8" action="/people/search" method="get" class="nifty_form">'
 ```
 
-### Helpers for Generating Form Elements
+### [Helpers for Generating Form Elements] 폼 요소를 생성하는 헬퍼
 
-Rails provides a series of helpers for generating form elements such as checkboxes, text fields, and radio buttons. These basic helpers, with names ending in "_tag" (such as `text_field_tag` and `check_box_tag`), generate just a single `<input>` element. The first parameter to these is always the name of the input. When the form is submitted, the name will be passed along with the form data, and will make its way to the `params` hash in the controller with the value entered by the user for that field. For example, if the form contains `<%= text_field_tag(:query) %>`, then you would be able to get the value of this field in the controller with `params[:query]`.
+레일스는 체크박스, 텍스트 필드, 라디오버튼과 같은 폼 요소를 생성하는 일련의 헬퍼를 제공합니다. 이러한 기본 헬퍼는 "_tag"라는 이름으로 끝나고(`text_field_tag`나 `check_box_tag`와 같이), 하나의 `<input>` 요소를 생성합니다. 첫번째 변수는 항상 input의 name입니다. 폼이 전송될때 name은 폼 데이터와 함께 전송되며 사용자의 입력값이 컨트롤러의 `params` 해쉬를 생성합니다. 예를들어 폼에 `<%= text_field_tag(:query) %>`이 있다며 컨트롤러에서 이 필드의 값은 `params[:query]`를 이용해 가져옵니다. [[[Rails provides a series of helpers for generating form elements such as checkboxes, text fields, and radio buttons. These basic helpers, with names ending in "_tag" (such as `text_field_tag` and `check_box_tag`), generate just a single `<input>` element. The first parameter to these is always the name of the input. When the form is submitted, the name will be passed along with the form data, and will make its way to the `params` hash in the controller with the value entered by the user for that field. For example, if the form contains `<%= text_field_tag(:query) %>`, then you would be able to get the value of this field in the controller with `params[:query]`.]]]
 
-When naming inputs, Rails uses certain conventions that make it possible to submit parameters with non-scalar values such as arrays or hashes, which will also be accessible in `params`. You can read more about them in [chapter 7 of this guide](#understanding-parameter-naming-conventions). For details on the precise usage of these helpers, please refer to the [API documentation](http://api.rubyonrails.org/classes/ActionView/Helpers/FormTagHelper.html).
+input 이름을 지을때 array, hash와 같은 non-scalar 값들을 `params`에서 사용하기위해 레일스는 약간의 관례를 사용합니다. 이에 대한 자세한 것은 [본 가이드의 챕터 7](#understanding-parameter-naming-conventions)를 읽어봅니다. 헬퍼의 정확한 사용방법을 자세히 알고 싶다면 [API documentation](http://api.rubyonrails.org/classes/ActionView/Helpers/FormTagHelper.html)를 참고합니다. [[[When naming inputs, Rails uses certain conventions that make it possible to submit parameters with non-scalar values such as arrays or hashes, which will also be accessible in `params`. You can read more about them in [chapter 7 of this guide](#understanding-parameter-naming-conventions). For details on the precise usage of these helpers, please refer to the [API documentation](http://api.rubyonrails.org/classes/ActionView/Helpers/FormTagHelper.html).]]]
 
-#### Checkboxes
+#### [Checkboxes] 체크박스
 
-Checkboxes are form controls that give the user a set of options they can enable or disable:
+체크박스는 사용자가 여러개의 옵션을 활성화하거나 비활성화할 수 있도록 하는 폼 컨트롤입니다.: [[[Checkboxes are form controls that give the user a set of options they can enable or disable:]]]
 
 ```erb
 <%= check_box_tag(:pet_dog) %>
@@ -115,7 +124,7 @@ Checkboxes are form controls that give the user a set of options they can enable
 <%= label_tag(:pet_cat, "I own a cat") %>
 ```
 
-This generates the following:
+위의 코드는 다음과 같이 생성됩니다: [[[This generates the following:]]]
 
 ```html
 <input id="pet_dog" name="pet_dog" type="checkbox" value="1" />
@@ -124,11 +133,11 @@ This generates the following:
 <label for="pet_cat">I own a cat</label>
 ```
 
-The first parameter to `check_box_tag`, of course, is the name of the input. The second parameter, naturally, is the value of the input. This value will be included in the form data (and be present in `params`) when the checkbox is checked.
+`check_box_tag`의 첫번째 변수는 당연히 input의 name입니다. 두번째 변수는 input의 값입니다. 이 값은 체크박스가 체크된경우 폼 데이터에 포함됩니다(그리고 `params`에 제공됩니다). [[[The first parameter to `check_box_tag`, of course, is the name of the input. The second parameter, naturally, is the value of the input. This value will be included in the form data (and be present in `params`) when the checkbox is checked.]]]
 
-#### Radio Buttons
+#### [Radio Buttons] 라디오 버튼
 
-Radio buttons, while similar to checkboxes, are controls that specify a set of options in which they are mutually exclusive (i.e., the user can only pick one):
+라디오 버튼은 체크박스와 비슷하게 여러개의 옵션을 베타적으로 선택할수 있게하는 폼 컨트롤입니다(예를들어 사용자는 한개만 선택가능): [[[Radio buttons, while similar to checkboxes, are controls that specify a set of options in which they are mutually exclusive (i.e., the user can only pick one):]]]
 
 ```erb
 <%= radio_button_tag(:age, "child") %>
@@ -137,7 +146,7 @@ Radio buttons, while similar to checkboxes, are controls that specify a set of o
 <%= label_tag(:age_adult, "I'm over 21") %>
 ```
 
-Output:
+결과물: [[[Output:]]]
 
 ```html
 <input id="age_child" name="age" type="radio" value="child" />
@@ -146,15 +155,13 @@ Output:
 <label for="age_adult">I'm over 21</label>
 ```
 
-As with `check_box_tag`, the second parameter to `radio_button_tag` is the value of the input. Because these two radio buttons share the same name (age) the user will only be able to select one, and `params[:age]` will contain either "child" or "adult".
+`check_box_tag`와 같이 `radio_button_tag`의 두번째 변수는 input의 값입니다. 라디오 버튼은 같은 이름(age)을 공유하고 있기 때문에 사용자는 하나만 선택할 수 있고, `params[:age]`는 "child", "adult"중 하나의 값만 가지게 됩니다. [[[As with `check_box_tag`, the second parameter to `radio_button_tag` is the value of the input. Because these two radio buttons share the same name (age) the user will only be able to select one, and `params[:age]` will contain either "child" or "adult".]]]
 
-NOTE: Always use labels for checkbox and radio buttons. They associate text with a specific option and,
-by expanding the clickable region,
-make it easier for users to click the inputs.
+NOTE: 체크박스와 라디오버튼에는 항상 라벨을 사용합니다. 특정 옵션과 연결된 텍스트는 클릭가능 영역을 늘려주고 사용자가 input을 쉽게 클릭할 수 있도록 합니다. [[[Always use labels for checkbox and radio buttons. They associate text with a specific option and, by expanding the clickable region, make it easier for users to click the inputs.]]]
 
-### Other Helpers of Interest
+### [Other Helpers of Interest] 흥미로운 다른 헬퍼들
 
-Other form controls worth mentioning are textareas, password fields, hidden fields, search fields, telephone fields, date fields, time fields, color fields, datetime fields, datetime-local fields, month fields, week fields, URL fields and email fields:
+textarea, 비밀번호 필드, 숨김 필드, 검색 필드, 전화번호 필드, 날짜 필드, 시간 필드, 색상 필드, datetime-local 필드, month 필드, week 필드, URL 필드, 이메일 필드는 언급할 만한 가치가 있는 폼 컨트롤입니다. [[[Other form controls worth mentioning are textareas, password fields, hidden fields, search fields, telephone fields, date fields, time fields, color fields, datetime fields, datetime-local fields, month fields, week fields, URL fields and email fields:]]]
 
 ```erb
 <%= text_area_tag(:message, "Hi, nice site", size: "24x6") %>
@@ -192,11 +199,11 @@ Output:
 <input id="task_started_at" name="task[started_at]" type="time" />
 ```
 
-Hidden inputs are not shown to the user but instead hold data like any textual input. Values inside them can be changed with JavaScript.
+숨김 필드는 사용자에게 보이지 않지만 다른 문자열 input 필드처럼 데이터를 가지고 있습니다. 이 값은 자바스크립트에 의해 변경될 수 있습니다. [[[Hidden inputs are not shown to the user but instead hold data like any textual input. Values inside them can be changed with JavaScript.]]]
 
-IMPORTANT: The search, telephone, date, time, color, datetime, datetime-local, month, week, URL, and email inputs are HTML5 controls. If you require your app to have a consistent experience in older browsers, you will need an HTML5 polyfill (provided by CSS and/or JavaScript). There is definitely [no shortage of solutions for this](https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills), although a couple of popular tools at the moment are [Modernizr](http://www.modernizr.com/) and [yepnope](http://yepnopejs.com/), which provide a simple way to add functionality based on the presence of detected HTML5 features.
+IMPORTANT: 검색, 전화번호, 날짜, 시간, 색상, datetime, datetime-local, month, week, URL, 이메일 input은 HTML5 컨트롤입니다. 만약 당신의 앱이 오래된 브라우저를 지원해야 한다면 HTML5 polyfill(CSS 또는 자바스크립트에 의해 제공되는)이 필요할것입니다. 현재 인기 있는 툴 [Modernizr](http://www.modernizr.com/)과 [yepnope](http://yepnopejs.com/)은 감지된 HTML5 기능의 존재 여부에 따라 기능을 추가 할 수있는 간단한 방법을 제공하지만 이것은 확실히 [부족함이 없는 해결 방법](https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills)입니다. [[[The search, telephone, date, time, color, datetime, datetime-local, month, week, URL, and email inputs are HTML5 controls. If you require your app to have a consistent experience in older browsers, you will need an HTML5 polyfill (provided by CSS and/or JavaScript). There is definitely [no shortage of solutions for this](https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills), although a couple of popular tools at the moment are [Modernizr](http://www.modernizr.com/) and [yepnope](http://yepnopejs.com/), which provide a simple way to add functionality based on the presence of detected HTML5 features.]]]
 
-TIP: If you're using password input fields (for any purpose), you might want to configure your application to prevent those parameters from being logged. You can learn about this in the [Security Guide](security.html#logging).
+TIP: 비밀번호 input 필드를 사용한다면(어떠한 목적이던지), 이 변수가 로그에 남지 않도록 어플리케이션 설정을 해야합니다. 자세한 내용은 [Security Guide](security.html#logging)에서 배울수 있습니다. [[[If you're using password input fields (for any purpose), you might want to configure your application to prevent those parameters from being logged. You can learn about this in the [레일스 어플리케이션 보안](security.html#logging).]]]
 
 Dealing with Model Objects
 --------------------------
