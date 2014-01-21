@@ -435,82 +435,86 @@ NOTE: _계정에 대한 무차별 공격은 로그인 인증정보에 대한 시
 
 이러한 공격을 줄이기 위해서는, _비밀번호 분실 페이지에 일반적인 에러 메시지를 보여주어야 합니다_. 더우기, 특정 IP 주소로부터 수차례의 로그인 실패가 있을 경우에는, CAPTCHA 를 입력하도록 할 수 있습니다. 그러나 주의할 것은, 자동화된 프로그램은 가끔식 IP 주소를 변경해가면서 공격을 할 수 있기 때문에 완전하게 방어하지는 못한다는 것입니다. 그러나, 이러한 조치는 공격자들에게는 장애물이 되는 것입니다. [[[In order to mitigate such attacks, _display a generic error message on forgot-password pages, too_. Moreover, you can _require to enter a CAPTCHA after a number of failed logins from a certain IP address_. Note, however, that this is not a bullet-proof solution against automatic programs, because these programs may change their IP address exactly as often. However, it raises the barrier of an attack.]]]
 
-### Account Hijacking
+### [Account Hijacking] 계정 가로채기
 
-Many web applications make it easy to hijack user accounts. Why not be different and make it more difficult?.
+많은 수의 웹어플리케이션에서 쉽게 유저 계정을 가로채기 할 수 있습니다. 왜 계정을 다르게, 좀 더 어렵게 만들지 못할까? [[[Many web applications make it easy to hijack user accounts. Why not be different and make it more difficult?.]]]
 
-#### Passwords
+#### [Passwords] 비밀번호
 
-Think of a situation where an attacker has stolen a user's session cookie and thus may co-use the application. If it is easy to change the password, the attacker will hijack the account with a few clicks. Or if the change-password form is vulnerable to CSRF, the attacker will be able to change the victim's password by luring him to a web page where there is a crafted IMG-tag which does the CSRF. As a countermeasure, _make change-password forms safe against CSRF_, of course. And _require the user to enter the old password when changing it_.
+공격자가 특정 사용자의 세션 쿠키를 가로태서 웹어플리케이션을 공동으로 사용하는 상황을 가정해 보겠습니다. 비밀번호를 쉽게 변경할 수 있을 경우 공격자는 클릭만 몇차례 하는 것만으로 계정을 가로채게 될 것입니다. 또는 비밀번호 변경 폼이 CSRF에 취약할 경우, 공격자는 CSRF 공격을 할 수 있도록 작업해 놓은 IMG 태그가 삽입되어 있는 웹페이지로 사용자를 유도하여 사용자의 비밀번호를 변경하도록 할 수 있을 것입니다. 이에 대한 대처방법으로는, 물론, _비밀번호 변경 폼을 CSRF에 대해서 안전하게 만들어야 합니다_. 그리고 비밀번호 변경시에 이전의 비밀번호도 함께 입력하도록 해야 합니다. [[[Think of a situation where an attacker has stolen a user's session cookie and thus may co-use the application. If it is easy to change the password, the attacker will hijack the account with a few clicks. Or if the change-password form is vulnerable to CSRF, the attacker will be able to change the victim's password by luring him to a web page where there is a crafted IMG-tag which does the CSRF. As a countermeasure, _make change-password forms safe against CSRF_, of course. And _require the user to enter the old password when changing it_.]]]
 
-#### E-Mail
+#### [E-Mail] 이메일
 
-However, the attacker may also take over the account by changing the e-mail address. After he changed it, he will go to the forgotten-password page and the (possibly new) password will be mailed to the attacker's e-mail address. As a countermeasure _require the user to enter the password when changing the e-mail address, too_.
+그러나, 공격자는 이메일 주소를 변경하여 해당 계정을 자기 것으로 만들 수도 있을 것입니다. 이와 같이 이메일 주소를 변경한 후에, 공격자는 비밀번호 분실 페이지로 이동해서 새로운 비밀번호가 공격자의 이메일 주소로 발송되도록 할 것입니다. 또한, 이에 대한 대처방법은, 이메일 주소를 변경시에 비밀번호를 입력하도록 해야 합니다. [[[However, the attacker may also take over the account by changing the e-mail address. After he changed it, he will go to the forgotten-password page and the (possibly new) password will be mailed to the attacker's e-mail address. As a countermeasure _require the user to enter the password when changing the e-mail address, too_.]]]
 
-#### Other
+#### [Other] 기타
 
-Depending on your web application, there may be more ways to hijack the user's account. In many cases CSRF and XSS will help to do so. For example, as in a CSRF vulnerability in [Google Mail](http://www.gnucitizen.org/blog/google-gmail-e-mail-hijack-technique/). In this proof-of-concept attack, the victim would have been lured to a web site controlled by the attacker. On that site is a crafted IMG-tag which results in a HTTP GET request that changes the filter settings of Google Mail. If the victim was logged in to Google Mail, the attacker would change the filters to forward all e-mails to his e-mail address. This is nearly as harmful as hijacking the entire account. As a countermeasure, _review your application logic and eliminate all XSS and CSRF vulnerabilities_.
+웹어플리케이션에 따라서, 유저의 계정을 가로채는 방법에는 여러가지가 있을 수 있습니다. 많은 경우에, CSRF와 XSS를 이용하면 이와 같은 작업을 하는데 도움을 받을 수 있습니다. [Google Mail](http://www.gnucitizen.org/blog/google-gmail-e-mail-hijack-technique/)에서 CSRF 취약성을 예로 들 수 있습니다. 이와 같이 새로운 개념을 검증하기 위한 공격상황에서, 공격에 희생이 될 사용자는 공격자가 조정하는 웹사이트로 유인되었을 것입니다. 그리고 해당 사이트의 웹페이지에는, 결국은 사용자의 구글메일의 필터 설정을 변경하는 HTTP GET 요청을 하도록 작업을 해 놓은 IMG 태그를 삽입해 놓게 됩니다. 이렇게해서 공격을 받게된 사용자가 구글 메일로 로그인하면 공격자는 필터를 변경해서 모든 이메일을 공격자의 이메일 주소로 전달되도록 할 것입니다. 이것은 거의 이메일 계정 전체를 가로채는 것 만큼의 피해를 주게 됩니다. 이에 대한 조치는, _어플리케이션 로직을 재검토해서 XSS와 CSRF에 취약한 부분을 모두 제거하는 것입니다._ [[[Depending on your web application, there may be more ways to hijack the user's account. In many cases CSRF and XSS will help to do so. For example, as in a CSRF vulnerability in [Google Mail](http://www.gnucitizen.org/blog/google-gmail-e-mail-hijack-technique/). In this proof-of-concept attack, the victim would have been lured to a web site controlled by the attacker. On that site is a crafted IMG-tag which results in a HTTP GET request that changes the filter settings of Google Mail. If the victim was logged in to Google Mail, the attacker would change the filters to forward all e-mails to his e-mail address. This is nearly as harmful as hijacking the entire account. As a countermeasure, _review your application logic and eliminate all XSS and CSRF vulnerabilities_.]]]
 
-### CAPTCHAs
+### [CAPTCHAs] 캡챠
 
-INFO: _A CAPTCHA is a challenge-response test to determine that the response is not generated by a computer. It is often used to protect comment forms from automatic spam bots by asking the user to type the letters of a distorted image. The idea of a negative CAPTCHA is not for a user to prove that he is human, but reveal that a robot is a robot._
+INFO: _캡챠란 반응이 컴퓨터에 의해서 만들어지지 않았다는 것을 알아보기 위한 일종의 질의-답변 테스트입니다. 사용자에게 일그러진 이미지의 문자를 보고 입력하도록 하여 자동화된 스탬 봇이 코멘트 폼을 작성하지 못하도록 할 때 종종 사용됩니다. 네거티브 캡챠라는 것은 사용자가 본인이 사람이라는 것을 입증하도록 하는 것이 아니라 자기(로봇)가 로봇이라는 것을 밝히도록 하는 것입니다._ [[[_A CAPTCHA is a challenge-response test to determine that the response is not generated by a computer. It is often used to protect comment forms from automatic spam bots by asking the user to type the letters of a distorted image. The idea of a negative CAPTCHA is not for a user to prove that he is human, but reveal that a robot is a robot._]]]
 
-But not only spam robots (bots) are a problem, but also automatic login bots. A popular CAPTCHA API is [reCAPTCHA](http://recaptcha.net/) which displays two distorted images of words from old books. It also adds an angled line, rather than a distorted background and high levels of warping on the text as earlier CAPTCHAs did, because the latter were broken. As a bonus, using reCAPTCHA helps to digitize old books. [ReCAPTCHA](https://github.com/ambethia/recaptcha/) is also a Rails plug-in with the same name as the API.
+그러나 스탬 로봇(봇) 뿐만 아니라 자동 로그인 봇들도 문제입니다. 인기있는 캡챠 API는 [reCAPTCHA](http://recaptcha.net/)인데 오래된 책에서 발췌한 단어들을 가지고 만든 두개의 일그러진 이미지를 보여 줍니다. 또한 이전의 캡챠가 했던 것과 같이 배경을 일그러지게하고 텍스트의 왜곡도를 높이는 대신, 꺽인 선을 추가해 줍니다. 왜내하면 이전의 캡챠는 이미 해커들에 의해서 뚫렸기 때문입니다. 추가로, 리캡챠라는 것을 이용하면 오래된 책들을 디지탈화하는 데 도움을 받을 수 있습니다. [ReCAPTCHA](https://github.com/ambethia/recaptcha/)는 또한 API와 동일한 이름을 가지는 레일스 플러그인을 가지고 있습니다. [[[But not only spam robots (bots) are a problem, but also automatic login bots. A popular CAPTCHA API is [reCAPTCHA](http://recaptcha.net/) which displays two distorted images of words from old books. It also adds an angled line, rather than a distorted background and high levels of warping on the text as earlier CAPTCHAs did, because the latter were broken. As a bonus, using reCAPTCHA helps to digitize old books. [ReCAPTCHA](https://github.com/ambethia/recaptcha/) is also a Rails plug-in with the same name as the API.]]]
 
-You will get two keys from the API, a public and a private key, which you have to put into your Rails environment. After that you can use the recaptcha_tags method in the view, and the verify_recaptcha method in the controller. Verify_recaptcha will return false if the validation fails.
-The problem with CAPTCHAs is, they are annoying. Additionally, some visually impaired users have found certain kinds of distorted CAPTCHAs difficult to read. The idea of negative CAPTCHAs is not to ask a user to proof that he is human, but reveal that a spam robot is a bot.
+캡챠 API에서는 두개의 키를 제공해 주는데, 공개키와 개인키입니다. 이것들은 레일스 환경에 추가해 주어야 합니다. 그리고 나서 뷰에서 recaptcha_tags 메소드를 사용하고 있고 컨트롤러에서는 verify_recaptcha 메소드를 사용할 수 있게 됩니다. 유효성 검증이 실패할 경우 verify_recaptcha 는 false를 반환하게 됩니다. 캡챠의 문제는 성가시게 한다는 것입니다. 또한, 시력 장애가 있는 사용자는 몇몇 일그러진 캡챠를 읽기가 어려ㅃ다는 것입니다. 네거티브 캡챠는 사용자가 사람이라는 적을 입증하는 것이 아니라 스탬 로봇이 봇이라는 것을 밝히는 것입니다. [[[You will get two keys from the API, a public and a private key, which you have to put into your Rails environment. After that you can use the recaptcha_tags method in the view, and the verify_recaptcha method in the controller. Verify_recaptcha will return false if the validation fails.
+The problem with CAPTCHAs is, they are annoying. Additionally, some visually impaired users have found certain kinds of distorted CAPTCHAs difficult to read. The idea of negative CAPTCHAs is not to ask a user to proof that he is human, but reveal that a spam robot is a bot.]]]
 
-Most bots are really dumb, they crawl the web and put their spam into every form's field they can find. Negative CAPTCHAs take advantage of that and include a "honeypot" field in the form which will be hidden from the human user by CSS or JavaScript.
+대부분의 봇은 정말로 바보라서 그저 웹을 다니면서 찾게 되는 모든 폼의 필드에 값을 넣어 줍니다. 네거티브 캡챠는 이러한 특징을 이용해서 사람이 인식하지 못하도록 CSS나 자바스크립트를 이용하여 폼에 하나의 "honeypot" 필드를 포함합니다. [[[Most bots are really dumb, they crawl the web and put their spam into every form's field they can find. Negative CAPTCHAs take advantage of that and include a "honeypot" field in the form which will be hidden from the human user by CSS or JavaScript.]]]
 
-Here are some ideas how to hide honeypot fields by JavaScript and/or CSS:
+아래에는 자바스크립트나 CSS를 이용하여 honeypot 필드를 숨기는 방법에 대한 몇가지를 소개합니다. [[[Here are some ideas how to hide honeypot fields by JavaScript and/or CSS:]]]
 
-* position the fields off of the visible area of the page
-* make the elements very small or color them the same as the background of the page
-* leave the fields displayed, but tell humans to leave them blank
+* 필드를 페이지의 가시영역 밖으로 위치시킨다. [[[position the fields off of the visible area of the page]]]
 
-The most simple negative CAPTCHA is one hidden honeypot field. On the server side, you will check the value of the field: If it contains any text, it must be a bot. Then, you can either ignore the post or return a positive result, but not saving the post to the database. This way the bot will be satisfied and moves on. You can do this with annoying users, too.
+* 엘리먼트를 매우 작게 만들거나 페이지의 배경색과 동일하게 색상을 조절을 한다. [[[make the elements very small or color them the same as the background of the page]]]
 
-You can find more sophisticated negative CAPTCHAs in Ned Batchelder's [blog post](http://nedbatchelder.com/text/stopbots.html):
+* 필드를 보이게 할 경우에는 사용에게 빈칸으로 남겨 두도록 알려 준다. [[[leave the fields displayed, but tell humans to leave them blank]]]
 
-* Include a field with the current UTC time-stamp in it and check it on the server. If it is too far in the past, or if it is in the future, the form is invalid.
-* Randomize the field names
-* Include more than one honeypot field of all types, including submission buttons
+가장 간단한 네거티브 캡챠는 숨겨진 honeypot 필드 하나만 있는 경우입니다. 서버 측에서는, 해당 필드의 값을 체크하게 되는데, 텍스트 값이 있을 경우에는 봇임에 틀림없습니다. 이 경우에 해당 포스트를 무시하거나 수락하는 결과를 반환할 수 있지만, 해당 포스트는 데이터베이스에 저장되지 않을 것입니다. 이런 식으로 하면 봇이 만족하는 상태에서 계속해서 작업을 수행하게 될 것입니다. 그러나 역시 사용자들에게 불편감을 줄 수 있을 것입니다. [[[The most simple negative CAPTCHA is one hidden honeypot field. On the server side, you will check the value of the field: If it contains any text, it must be a bot. Then, you can either ignore the post or return a positive result, but not saving the post to the database. This way the bot will be satisfied and moves on. You can do this with annoying users, too.]]]
 
-Note that this protects you only from automatic bots, targeted tailor-made bots cannot be stopped by this. So _negative CAPTCHAs might not be good to protect login forms_.
+Ned Batchelder의 [블로그 글](http://nedbatchelder.com/text/stopbots.html)을 보면 네거티브 캡챠에 대한 더 자세한 내용을 볼 수 있을 것입니다. [[[You can find more sophisticated negative CAPTCHAs in Ned Batchelder's [blog post](http://nedbatchelder.com/text/stopbots.html):]]]
 
-### Logging
+* 현재의 UTC 타임스탬프 값을 가지는 필드를 포함하고 서버에서 이를 체크한다. 그 시간이 과거로 오래전의 것이거나 미래의 시간일 경우에 그 폼은 유효하지 않게 됩니다. [[[Include a field with the current UTC time-stamp in it and check it on the server. If it is too far in the past, or if it is in the future, the form is invalid.]]]
 
-WARNING: _Tell Rails not to put passwords in the log files._
+* 필드명을 무작위로 만든다. [[[Randomize the field names]]]
 
-By default, Rails logs all requests being made to the web application. But log files can be a huge security issue, as they may contain login credentials, credit card numbers et cetera. When designing a web application security concept, you should also think about what will happen if an attacker got (full) access to the web server. Encrypting secrets and passwords in the database will be quite useless, if the log files list them in clear text. You can _filter certain request parameters from your log files_ by appending them to `config.filter_parameters` in the application configuration. These parameters will be marked [FILTERED] in the log.
+* 서밋 버튼을 포함해서, 모든 종류의 필드타입을 가지는 하나이상의 honeypot 필드를 포함한다. [[[Include more than one honeypot field of all types, including submission buttons]]]
+
+이렇게 하면 자동 봇으로 부터만 보호를 받을 수 있고, 특정 대상을 겨냥한 봇은 막을 수 없다는 것을 주목해야 합니다. 그래서 _네거티브 캡챠는 로그인폼을 보호할 수 있는 좋은 대안이 되지 못할 수 있습니다._ [[[Note that this protects you only from automatic bots, targeted tailor-made bots cannot be stopped by this. So _negative CAPTCHAs might not be good to protect login forms_.]]]
+
+### [Logging] 로깅
+
+WARNING: _레일스가 로그 파일에 비밀번호를 남기지 못하도록 해야 합니다._ [[[_Tell Rails not to put passwords in the log files._]]]
+
+디폴트 상태에서는, 레일스가 웹어플리케이션으로 들어오는 모든 요청을 로그로 남기도록 되어 있습니다. 그러나, 이러한 로그 파일은, 로그인 정보, 신용카드 번호 등과 같은 정보를 포함할 수 있기 때문에, 커다란 보안 문제를 야기시킬 수 있습니다. 따라서, 웹어플리케이션의 보안을 디자인할 때는 공격자가 웹서버를 접근할 수 있을 경우 발생하게 될 문제들을 고려해야만 합니다. 데이터베이스에서 보안키와 비밀번호를 암호화한다고 하더라도 로그파일에 clear text 형태로 보이게 된다면 무용지물이 되어 버립니다. 그러므로 어플리케이션 설정파일에 `config.filter_parameters` 옵션에 이 값들을 추가해 주어서 로그파일에 특정 요청 파라미터는 걸러지도록 할 수 있습니다. 이러한 파라미터는 로그상에서 [FILTERED]라고 표시될 것입니다. [[[By default, Rails logs all requests being made to the web application. But log files can be a huge security issue, as they may contain login credentials, credit card numbers et cetera. When designing a web application security concept, you should also think about what will happen if an attacker got (full) access to the web server. Encrypting secrets and passwords in the database will be quite useless, if the log files list them in clear text. You can _filter certain request parameters from your log files_ by appending them to `config.filter_parameters` in the application configuration. These parameters will be marked [FILTERED] in the log.]]]
 
 ```ruby
 config.filter_parameters << :password
 ```
 
-### Good Passwords
+### [Good Passwords] 안전한 비밀번호
 
-INFO: _Do you find it hard to remember all your passwords? Don't write them down, but use the initial letters of each word in an easy to remember sentence._
+INFO: _모든 비밀번호를 기억한다는 것은 어려운 일입니다. 그렇다고 비밀번호를 기록으로 남겨 두어서는 안되지만 기억하기 쉬운 문장 속의 각 단어들의 첫문자를 이용하면 편리합니다._ [[[_Do you find it hard to remember all your passwords? Don't write them down, but use the initial letters of each word in an easy to remember sentence._]]]
 
-Bruce Schneier, a security technologist, [has analyzed](http://www.schneier.com/blog/archives/2006/12/realworld_passw.html) 34,000 real-world user names and passwords from the MySpace phishing attack mentioned <a href="#examples-from-the-underground">below</a>. It turns out that most of the passwords are quite easy to crack. The 20 most common passwords are:
+보안 전문가인 Bruce Schneier는 <a href="#examples-from-the-underground">아래</a>에서 언급되는 MySpace 피싱 공격으로부터 34,000개의 사용자 이름과 비밀번호를 [분석](http://www.schneier.com/blog/archives/2006/12/realworld_passw.html)했습니다. 분석결과에서 대부분의 비밀번호는 매우 쉽게 알 수 있었다고 했습니다. 가장 흔히 사용하는 비밀번호 20개는 아래와 같습니다. [[[Bruce Schneier, a security technologist, [has analyzed](http://www.schneier.com/blog/archives/2006/12/realworld_passw.html) 34,000 real-world user names and passwords from the MySpace phishing attack mentioned <a href="#examples-from-the-underground">below</a>. It turns out that most of the passwords are quite easy to crack. The 20 most common passwords are:]]]
 
 password1, abc123, myspace1, password, blink182, qwerty1, ****you, 123abc, baseball1, football1, 123456, soccer, monkey1, liverpool1, princess1, jordan23, slipknot1, superman1, iloveyou1, and monkey.
 
-It is interesting that only 4% of these passwords were dictionary words and the great majority is actually alphanumeric. However, password cracker dictionaries contain a large number of today's passwords, and they try out all kinds of (alphanumerical) combinations. If an attacker knows your user name and you use a weak password, your account will be easily cracked.
+이러한 비밀번호의 4%만이 사전에 있는 단어들이고 대부분은 알파벳과 숫자의 조합으로 만들어 진 것들이라는 것은 흥미로운 것입니다. 그러나, 비밀번호를 알아내는 크래커 사전에는 요즈음 많이 사용하는 비밀번호를 상당수 포함하고 있고, 이를 근거로 가능한 모든 알파벳 숫자 조합을 만들어 냅니다. 공격자가 사용자 명을 알고 있을 경우 보안이 약한 비밀번호를 사용한다면 해당 계정은 쉽게 뚫리게 될 것입니다. [[[It is interesting that only 4% of these passwords were dictionary words and the great majority is actually alphanumeric. However, password cracker dictionaries contain a large number of today's passwords, and they try out all kinds of (alphanumerical) combinations. If an attacker knows your user name and you use a weak password, your account will be easily cracked.]]]
 
-A good password is a long alphanumeric combination of mixed cases. As this is quite hard to remember, it is advisable to enter only the _first letters of a sentence that you can easily remember_. For example "The quick brown fox jumps over the lazy dog" will be "Tqbfjotld". Note that this is just an example, you should not use well known phrases like these, as they might appear in cracker dictionaries, too.
+따라서 좋은 비밀번호란 대소문자를 섞어서 아주 긴 알파벳숫자 조합을 이용해서 만든 것입니다. 그러나 이러한 비밀번호는 기억하기 매우 어렵기 때문에, _쉽게 기억할 수 있는 문장의 첫 문자들만_ 을 입력하는 것을 권장하고 있습니다. 예를 들어, "The quick brown fox jumps over the lazy dog" 문장을 이용하면 "Tqbfjotld"와 같은 비밀번호를 만들 수 있는 것입니다. 이것은 예에 불과하기 때문에 이와 같이 잘 알려진 문구들을 해커들의 사전에 등록되어 있기 때문에 사용해서는 안됩니다. [[[A good password is a long alphanumeric combination of mixed cases. As this is quite hard to remember, it is advisable to enter only the _first letters of a sentence that you can easily remember_. For example "The quick brown fox jumps over the lazy dog" will be "Tqbfjotld". Note that this is just an example, you should not use well known phrases like these, as they might appear in cracker dictionaries, too.]]]
 
-### Regular Expressions
+### [Regular Expressions] 정규 표현식
 
-INFO: _A common pitfall in Ruby's regular expressions is to match the string's beginning and end by ^ and $, instead of \A and \z._
+INFO: _루비 정규 표현식에는 잘 알려진 문제가 있는데, **문자열** 의 시작과 끝을 \A와 \z 대신에, ^ 과 $로 구분한다는 것입니다._ [[[_A common pitfall in Ruby's regular expressions is to match the string's beginning and end by ^ and $, instead of \A and \z._]]]
 
-Ruby uses a slightly different approach than many other languages to match the end and the beginning of a string. That is why even many Ruby and Rails books get this wrong. So how is this a security threat? Say you wanted to loosely validate a URL field and you used a simple regular expression like this:
+루비는 보통 언어와는 약간 다른 방식으로 특정 **문자열** 의 시작과 끝을 구분합니다. 이것은 다수의 루비와 레일스 책들 조차도 잘 못 사용하는 이유이기도 합니다. 그렇다면 이것이 보안상 어떤 문제점을 야기하게 될까요? URL을 입력하는 필드값에 대한 유효성 검증을 약하게 하기 위해서 아래와 같이 간단한 정규표현식을 사용한다고 가정해 보겠습니다. [[[Ruby uses a slightly different approach than many other languages to match the end and the beginning of a string. That is why even many Ruby and Rails books get this wrong. So how is this a security threat? Say you wanted to loosely validate a URL field and you used a simple regular expression like this:]]]
 
 ```ruby
   /^https?:\/\/[^\n]+$/i
 ```
 
-This may work fine in some languages. However, _in Ruby ^ and $ match the **line** beginning and line end_. And thus a URL like this passes the filter without problems:
+이것은 어떤 언어에서는 제대로 작동할 수 있습니다. 그러나, _루비에서는 ^ 와 $ 는 각각 **라인** 시작과 라인 끝을 구분해 줍니다. 따라서 아래와 같은 URL은 문제없이 필터를 통과하게 됩니다._ [[[This may work fine in some languages. However, _in Ruby ^ and $ match the **line** beginning and line end_. And thus a URL like this passes the filter without problems:]]]
 
 ```
 javascript:exploit_code();/*
@@ -518,48 +522,48 @@ http://hi.com
 */
 ```
 
-This URL passes the filter because the regular expression matches - the second line, the rest does not matter. Now imagine we had a view that showed the URL like this:
+이 URL은 정규표현식이 두번째 라인과 일치하기 때문에 필터를 통과하게 됩니다. 즉 나머지 코드는 관련이 없게 됩니다. 이제 아래와 같은 URL을 뷰가 있다고 상상해 봅시다. [[[This URL passes the filter because the regular expression matches - the second line, the rest does not matter. Now imagine we had a view that showed the URL like this:]]]
 
 ```ruby
   link_to "Homepage", @user.homepage
 ```
 
-The link looks innocent to visitors, but when it's clicked, it will execute the JavaScript function "exploit_code" or any other JavaScript the attacker provides.
+위의 링크는 방문자들에게 별 문제 없이 보이지만, 클릭하는 순간 "exploit_code" 자바스크립트 함수 또는 공격자가 제공하는 다른 자바스크립트를 실행하게 될 것입니다. [[[The link looks innocent to visitors, but when it's clicked, it will execute the JavaScript function "exploit_code" or any other JavaScript the attacker provides.]]]
 
-To fix the regular expression, \A and \z should be used instead of ^ and $, like so:
+위의 정규표현식을 제대로 동작하도록 하기 위해서는, 아래와 같이 ^ 와 $ 대신에 \A 와 \z 을 사용해야 합니다. [[[To fix the regular expression, \A and \z should be used instead of ^ and $, like so:]]]
 
 ```ruby
   /\Ahttps?:\/\/[^\n]+\z/i
 ```
 
-Since this is a frequent mistake, the format validator (validates_format_of) now raises an exception if the provided regular expression starts with ^ or ends with $. If you do need to use ^ and $ instead of \A and \z (which is rare), you can set the :multiline option to true, like so:
+이것은 종종 범하기 쉬운 실수이기 때문에, validates_format_of 와 같은 포맷 유효성 검증기는 정규표현식이 ^ 시작하거나 $ 로 끝나는 경우 예외를 발생하게 됩니다. 드문 경우이지만, \A 와 \z 대신에 ^ 와 $ 을 사용할 필요가 있을 때는 아래와 같이 :multiline 옵션을 true로 지정할 수 있습니다. [[[Since this is a frequent mistake, the format validator (validates_format_of) now raises an exception if the provided regular expression starts with ^ or ends with $. If you do need to use ^ and $ instead of \A and \z (which is rare), you can set the :multiline option to true, like so:]]]
 
 ```ruby
   # content should include a line "Meanwhile" anywhere in the string
   validates :content, format: { with: /^Meanwhile$/, multiline: true }
 ```
 
-Note that this only protects you against the most common mistake when using the format validator - you always need to keep in mind that ^ and $ match the **line** beginning and line end in Ruby, and not the beginning and end of a string.
+이것은 포맷 유효성 검증기를 사용할 때 가장 범하기 쉬운 실수에 대해서만 보호를 받도록 해준다는 것을 주의해야 합니다. 즉, 항상 기억해 두어야 할 것은 루비에서 ^ 와 $ 은 문자열이 아니라 **라인** 의 시작과 끝을 매칭시켜 준다는 것입니다. [[[Note that this only protects you against the most common mistake when using the format validator - you always need to keep in mind that ^ and $ match the **line** beginning and line end in Ruby, and not the beginning and end of a string.]]]
 
-### Privilege Escalation
+### [Privilege Escalation] 권한 상승
 
-WARNING: _Changing a single parameter may give the user unauthorized access. Remember that every parameter may be changed, no matter how much you hide or obfuscate it._
+WARNING: _하나의 파라미터를 변경하는 것으로 사용자는 접근권한이 없어질 수 있습니다. 제 아무리 감추고 코드 판독을 애매하게 하더라도 모든 파라미터는 변경될 수 있다는 것을 기억해야 합니다._ [[[_Changing a single parameter may give the user unauthorized access. Remember that every parameter may be changed, no matter how much you hide or obfuscate it._]]]
 
-The most common parameter that a user might tamper with, is the id parameter, as in `http://www.domain.com/project/1`, whereas 1 is the id. It will be available in params in the controller. There, you will most likely do something like this:
+임의의 사용자 임의로 변경할 수 있는 대부분의 파라미터는, `http://www.domain.com/project/1`와 같이, id 파라미터이며 1 이 바로 id에 해당하는 것입니다. 이것은 컨트롤러에서 params 형태로 사용할 수 있을 것입니다. 대부분이 아래와 같이 코딩을 할 것입니다. [[[The most common parameter that a user might tamper with, is the id parameter, as in `http://www.domain.com/project/1`, whereas 1 is the id. It will be available in params in the controller. There, you will most likely do something like this:]]]
 
 ```ruby
 @project = Project.find(params[:id])
 ```
 
-This is alright for some web applications, but certainly not if the user is not authorized to view all projects. If the user changes the id to 42, and he is not allowed to see that information, he will have access to it anyway. Instead, _query the user's access rights, too_:
+이것은 어떤 웹어플리케이션에서는 괜찮겠지만, 특정 사용자가 모든 프로젝트를 볼 수 있는 권한이 없다면 문제가 발생하게 됩니다. 즉, 해당 아이디의 정보에 대한 접근 권한이 없는 경우에도, 사용자가 id를 42로 변경하여 해당 정보를 볼 수 있게 된다는 것입니다. 따라서 이 경우에는,대신에, _사용자의 접근 권한을 쿼리해야 합니다._ [[[This is alright for some web applications, but certainly not if the user is not authorized to view all projects. If the user changes the id to 42, and he is not allowed to see that information, he will have access to it anyway. Instead, _query the user's access rights, too_:]]]
 
 ```ruby
 @project = @current_user.projects.find(params[:id])
 ```
 
-Depending on your web application, there will be many more parameters the user can tamper with. As a rule of thumb, _no user input data is secure, until proven otherwise, and every parameter from the user is potentially manipulated_.
+웹어플리케이션에 따라서, 특정 사용자가 훨씬 많은 파라미터를 변경할 수 있을 것입니다. 경험에 따른 규칙에 따라, 어떠한 사용자 입력 데이터는, 보안상 입증될 때까지, 안전하지 않다는 것이고, 사용자가 변경할 수 있는 모든 파라미터는 조작될 수 있다는 것입니다. [[[Depending on your web application, there will be many more parameters the user can tamper with. As a rule of thumb, _no user input data is secure, until proven otherwise, and every parameter from the user is potentially manipulated_.]]]
 
-Don't be fooled by security by obfuscation and JavaScript security. The Web Developer Toolbar for Mozilla Firefox lets you review and change every form's hidden fields. _JavaScript can be used to validate user input data, but certainly not to prevent attackers from sending malicious requests with unexpected values_. The Live Http Headers plugin for Mozilla Firefox logs every request and may repeat and change them. That is an easy way to bypass any JavaScript validations. And there are even client-side proxies that allow you to intercept any request and response from and to the Internet.
+코드의 난독성과 자바스크립트를 이용한 보안처리를 함으로써 안전하다고 생각하는 우를 범해서는 안됩니다. 모질라 파이어폭스용 웹개발자용 툴바를 이용하면 폼 안의 숨겨진 모든 필드를 재검토하고 변경할 수 있게 해 줍니다. _자바스크립트를 이용하여 사용자 입력 데이터에 대한 유효성 검증을 할 수 있지만 공격자는 예상치 못한 값을 이용하여 악성 요청을 여전히 보낼 수 있게 됩니다._ 모질라 파이어폭스용 Live Http Headers 플러그인은 모든 요청에 대한 로그를 잡아내어 요청을 반복하고 변경할 수 있게 해 줍니다. 이것은 자바스크립트 유효성 검증을 우회하는 손쉬운 방법이 됩니다. 그리고 심지어 클라이언트 측 프록시를 이용하면 인터넷을 통한 어떠한 요청이나 반응을 가로챌 수 있게 됩니다. [[[Don't be fooled by security by obfuscation and JavaScript security. The Web Developer Toolbar for Mozilla Firefox lets you review and change every form's hidden fields. _JavaScript can be used to validate user input data, but certainly not to prevent attackers from sending malicious requests with unexpected values_. The Live Http Headers plugin for Mozilla Firefox logs every request and may repeat and change them. That is an easy way to bypass any JavaScript validations. And there are even client-side proxies that allow you to intercept any request and response from and to the Internet.]]]
 
 Injection
 ---------
