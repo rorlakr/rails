@@ -5,10 +5,12 @@
 
 이 가이드를 읽고나면 아래 사항을 알게 될 것 입니다. [[[After reading this guide, you will know:]]]
 
-* 레일즈를 설치, 새 레일즈 어플리케이션을 만들고 데이터베이스에 연결하는 법. [[[How to install Rails, create a new Rails application, and connect your
-  application to a database.]]]
+* 레일즈를 설치, 새 레일즈 어플리케이션을 만들고 데이터베이스에 연결하는 법. [[[How to install Rails, create a new Rails application, and connect your application to a database.]]]
+
 * 일반적이 레일즈 어필리케이션 레이아웃. [[[The general layout of a Rails application.]]]
+
 * MVC(모델, 뷰, 컨트롤러) 그리고 RESTful 디자인의 기본적인 원리. [[[The basic principles of MVC (Model, View, Controller) and RESTful design.]]]
+
 * 레일즈 어플리케이션의 초석을 빠르게 만드는 법. [[[How to quickly generate the starting pieces of a Rails application.]]]
 
 --------------------------------------------------------------------------------
@@ -70,10 +72,10 @@ learned elsewhere, you may have a less happy experience.]]]
 
 레이즈의 철학은 두가지의 핵심 원리로 이루어져 있습니다.[[[The Rails philosophy includes two major guiding principles:]]]
 
-* DRY - "Don't Repeat Yourself"(너 자신을 반복하지마라, 했던 것을 또 하지마라) - DRY는 작성했던 코드를 반복해서 다시 작성하는 것은 나쁜 것임을 시사합니다.
-[[DRY - "Don't Repeat Yourself" - suggests that writing the same code over and over again is a bad thing.]]
-* 설정보다는 규칙 - 말인 즉슨 레일즈가 당신이 무엇을 원하는지 그리고 어떻게 할 것인지에 대한 가정을 하고  작은 사항까지 끝이 없는 설정을 요구하는 것이 아니다. [[[Convention Over Configuration - means that Rails makes assumptions about what you want to do and how you're going to
-do it, rather than requiring you to specify every little thing through endless configuration files.]]]
+* DRY - "Don't Repeat Yourself"(너 자신을 반복하지마라, 했던 것을 또 하지마라) - DRY는 작성했던 코드를 반복해서 다시 작성하는 것은 나쁜 것임을 시사합니다. [[DRY - "Don't Repeat Yourself" - suggests that writing the same code over and over again is a bad thing.]]]
+
+* 설정보다는 규칙 - 말인 즉슨 레일즈가 당신이 무엇을 원하는지 그리고 어떻게 할 것인지에 대한 가정을 하고  작은 사항까지 끝이 없는 설정을 요구하는 것이 아니다. [[[Convention Over Configuration - means that Rails makes assumptions about what you want to do and how you're going to do it, rather than requiring you to specify every little thing through endless configuration files.]]]
+
 
 [Creating a New Rails Project] 새로운 레일즈 프로젝트 만들기
 ----------------------------
@@ -91,10 +93,7 @@ literally follow along step by step. You can get the complete code
 (very) simple weblog. Before you can start building the application, you need to
 make sure that you have Rails itself installed.]]]
 
-팁: '#'과 '$'는 UNIX-like OS(유사 유니스 운영체제)의 터미널 프롬프트에서 각각 슈퍼유저와 일반유저를 나타내는것이다. 윈도우를 사용하신다면 `c:\source_code>`과 같이 표시 될것입니다.
-[[[TIP: The examples below use `#` and `$` to denote superuser and regular
-user terminal prompts respectively in a UNIX-like OS. If you are using
-Windows, your prompt will look something like `c:\source_code>`]]]
+TIP: '#'과 '$'는 UNIX-like OS(유사 유니스 운영체제)의 터미널 프롬프트에서 각각 슈퍼유저와 일반유저를 나타내는것이다. 윈도우를 사용하신다면 `c:\source_code>`과 같이 표시 될것입니다. [[[The examples below use `#` and `$` to denote superuser and regular user terminal prompts respectively in a UNIX-like OS. If you are using Windows, your prompt will look something like `c:\source_code>`]]]
 
 ### 레일즈 설치하기 [[[Installing Rails]]]
 
@@ -110,29 +109,30 @@ $ ruby -v
 ruby 1.9.3p385
 ```
 
-레일즈를 설치하기 위해서 루비잼에 의해서 제공되는 'gem install' 커맨트를 사용한다. [[[To install Rails, use the `gem install` command provided by RubyGems:]]]
+레일즈를 설치하기 위해서 루비잼에 의해서 제공되는 'gem install' 커맨를 사용한다. [[[To install Rails, use the `gem install` command provided by RubyGems:]]]
 
 ```bash
 $ gem install rails
 ```
 
-팁. [[[TIP. A number of tools exist to help you quickly install Ruby and Ruby
+TIP: 루비 온 레일즈를 빠르게 설치하기를 도와줄 많은 툴들이 존재합니다. 윈도우 사용자들은  [Rails Installer](http://railsinstaller.org), 맥 OS X 사용자들은 [Rails One Click](http://railsoneclick.com)을 사용하실수 있니다. [[[TIP. A number of tools exist to help you quickly install Ruby and Ruby
 on Rails on your system. Windows users can use [Rails Installer](http://railsinstaller.org), while Mac OS X users can use
 [Rails One Click](http://railsoneclick.com).]]]
 
-To verify that you have everything installed correctly, you should be able to run the following:
+모든 것이 제대로 설치 되었는지 확인하기 위해서는 아래의 명령어들을 실행 시킬수 있으셔야 합니다.[[[To verify that you have everything installed correctly, you should be able to run the following:]]]
 
 ```bash
 $ rails --version
 ```
 
-If it says something like "Rails 4.0.0", you are ready to continue.
+먄약 "Rails 4.0.0"와 같이 나타난다면 계속 진행 하실 준비가 되신 것 입니다.[[[If it says something like "Rails 4.0.0", you are ready to continue.]]]
 
-### Creating the Blog Application
+### 블로그 어플리케이션 만들기 [[[Creating the Blog Application]]]
 
-Rails comes with a number of scripts called generators that are designed to make your development life easier by creating everything that's necessary to start working on a particular task. One of these is the new application generator, which will provide you with the foundation of a fresh Rails application so that you don't have to write it yourself.
+레일즈는 특정한 업무를 시작하는 데 필요한것을 만들어 줌으로 개발자들의 삶을 편하게 만들어줄 많은 제너레이터(generators)라는 스크립트와 함께 온다. 이런 스크립트중 하나인 새 어플리케이션 제너레이터 (new application generator)는 개발자 스스로 작성할 필요없이, 레일즈 어플리케이션의 기본적인 구조를 제공하게 된다.  [[[Rails comes with a number of scripts called generators that are designed to make your development life easier by creating everything that's necessary to start working on a particular task. One of these is the new application generator, which will provide you with the foundation of a fresh Rails application so that you don't have to write it yourself.]]]
 
-To use this generator, open a terminal, navigate to a directory where you have rights to create files, and type:
+제너레이터를 사용하기 위해서는 터미널을 열고 파일 쓰기 권한이 있는 디렉토리에 가서 아래와 같이 치면 됩니다:
+[[[To use this generator, open a terminal, navigate to a directory where you have rights to create files, and type:]]]
 
 ```bash
 $ rails new blog
