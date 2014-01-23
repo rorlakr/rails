@@ -1,24 +1,24 @@
-레일즈 시작하기
+레일스 시작하기
 ==========================
 
-이 가이드는 루비온레일즈를 시작 그리고 실행까지 다룹니다. [[[This guide covers getting up and running with Ruby on Rails.]]]
+이 가이드는 루비온레일스를 시작 그리고 실행까지 다룹니다. [[[This guide covers getting up and running with Ruby on Rails.]]]
 
-이 가이드를 읽고나면 아래 사항을 알게 될 것 입니다. [[[After reading this guide, you will know:]]]
+이 가이드를 읽고나면 아래 사항을 알게 될 것입니다. [[[After reading this guide, you will know:]]]
 
-* 레일즈를 설치, 새 레일즈 어플리케이션을 만들고 데이터베이스에 연결하는 법. [[[How to install Rails, create a new Rails application, and connect your application to a database.]]]
+* 레일스를 설치, 새 레일스 어플리케이션을 만들고 데이터베이스에 연결하는 법. [[[How to install Rails, create a new Rails application, and connect your application to a database.]]]
 
-* 일반적이 레일즈 어필리케이션 레이아웃. [[[The general layout of a Rails application.]]]
+* 일반적이 레일스 어필리케이션 레이아웃. [[[The general layout of a Rails application.]]]
 
 * MVC(모델, 뷰, 컨트롤러) 그리고 RESTful 디자인의 기본적인 원리. [[[The basic principles of MVC (Model, View, Controller) and RESTful design.]]]
 
-* 레일즈 어플리케이션의 초석을 빠르게 만드는 법. [[[How to quickly generate the starting pieces of a Rails application.]]]
+* 레일스 어플리케이션의 초석을 빠르게 만드는 법. [[[How to quickly generate the starting pieces of a Rails application.]]]
 
 --------------------------------------------------------------------------------
 
 [Guide Assumptions] 가이드에 대한 가정 사항들
 -----------------
 
-이 가이드는 레일즈 어플리케이션을 처음 부터 시작하는 초보자를 위한 것입니다. 레일즈에 관한 어떤한 경험도 없음을 가정하고 쓰여진 것입니다. 하지만 최대한으로 얻어 가실려면 아래의 것들을 미리 설치하시면 됩니다. [[[This guide is designed for beginners who want to get started with a Rails
+이 가이드는 레일스 어플리케이션을 처음 부터 시작하는 초보자를 위한 것 입니다. 레일스에 관한 어떤한 경험도 없음을 가정하고 쓰여진 것입니다. 하지만 최대한으로 얻어 가실려면 아래의 것들을 미리 설치하시면 됩니다. [[[This guide is designed for beginners who want to get started with a Rails
 application from scratch. It does not assume that you have any prior experience
 with Rails. However, to get the most out of it, you need to have some
 prerequisites installed:]]]
@@ -26,13 +26,13 @@ prerequisites installed:]]]
 * [루비](http://www.ruby-lang.org/en/downloads) 1.9.3 이상의 버젼 [[[The [Ruby](http://www.ruby-lang.org/en/downloads) language version 1.9.3 or newer]]]
 
 * [루비](http://rubygems.org/) 패키징 시스템 [[[The [RubyGems](http://rubygems.org/) packaging system]]]
-    루비잼에 대해서 더 배우시길 원하신 다면 [RubyGems User Guide](http://docs.rubygems.org/read/book/1)를 읽어주세요. [[[* To learn more about RubyGems, please read the [루비잼 사용자 가이드](http://docs.rubygems.org/read/book/1)]]]
+    루비잼에 대해서 더 배우시길 원하신 다면 [RubyGems User Guide](http://docs.rubygems.org/read/book/1)를 읽기 바랍니다. [[[* To learn more about RubyGems, please read the [루비잼 사용자 가이드](http://docs.rubygems.org/read/book/1)]]]
 
 * 동작하는 [SQLite3 데이터베이스](http://www.sqlite.org) [[[A working installation of the [SQLite3 Database](http://www.sqlite.org)]]]
 
 
-레일즈는 루비 프로그래밍 언어에서 동작하는 웹 어플리케이션 프레임 워크 입니다. 루비에 대한 경험이 없다면 
-레일즈로 바로 들어가기에는 진입장벽이 높을 것입니다. 인터넷이 루비를 배우기 위한 많은 무료자료들이 있습니다. 
+레일스는 루비 프로그래밍 언어에서 동작하는 웹 어플리케이션 프레임 워크입니다. 루비에 대한 경험이 없다면 
+레일스로 바로 들어가기에는 진입장벽이 높을 것입니다. 인터넷이 루비를 배우기 위한 많은 무료자료들이 있습니다. 
 대표적으로 아래의 것들이 있습니다.
 [[[Rails is a web application framework running on the Ruby programming language.
 If you have no prior experience with Ruby, you will find a very steep learning
@@ -46,13 +46,13 @@ internet for learning Ruby, including:]]]
 * [Why's (Poignant) Guide to Ruby](http://mislav.uniqpath.com/poignant-guide/)
 
 
-[What is Rails?] 레일즈란?
+[What is Rails?] 레일스란?
 --------------
 
-레일즈는 루비로 작성된 웹 어플리케이션 개발 프레임워크 입니다.
-모든 개발자들이 필요한 것을 미리 가정(설정)해 놓음 으로서 웹 어플리케이션 개발이 더욱 쉽도록 디자인 되었습니다. 
+레일스는 루비로 작성된 웹 어플리케이션 개발 프레임워크 입니다.
+모든 개발자들이 필요한 것을 미리 가정(설정)해 놓음으로서 웹 어플리케이션 개발이 더욱 쉽도록 디자인 되었습니다. 
 그 어떤 언어나 프레임워크보다도 적은 코드를 작성하게 끔 만들어 졌습니다. 
-숙련된 레일즈 개발자들에 의하면 웹 개발을 더욱 재미있게 만들어 주기까지 한답니다.
+숙련된 레일스 개발자들에 의하면 웹 개발을 더욱 재미있게 만들어 주기까지 한답니다.
 [[[Rails is a web application development framework written in the Ruby language.
 It is designed to make programming web applications easier by making assumptions
 about what every developer needs to get started. It allows you to write less
@@ -60,8 +60,8 @@ code while accomplishing more than many other languages and frameworks.
 Experienced Rails developers also report that it makes web application
 development more fun.]]]
 
-레일즈는 독단적인 소프트웨어 입니다. "최선"의 방법이 있다고 가정하고 그 방법을 사용하도록 독려를 합니다.
-때로는 다른 방법의 사용하지 않게 추천합니다."The Rails Way"(레일즈 방법론?)을 배우게 된다면 엄청나게 효율성이 늘어난다는 것을 느낄수 있을 것입니다.
+레일스는 독단적인 소프트웨어 입니다. "최선"의 방법이 있다고 가정하고 그 방법을 사용하도록 독려를 합니다.
+때로는 다른 방법의 사용하지 않게 추천합니다. "The Rails Way"(레일스 방법론?)을 배우게 된다면 엄청나게 효율성이 늘어난다는 것을 느낄수 있을 것입니다.
 다른 언어에서 사용하던 오래된 습관을 고집하고나 다른 곳에서 배운 패턴들을 사용하려고 한다면 아마도 덜 즐거운 경험이 될 것입니다.
 [[[Rails is opinionated software. It makes the assumption that there is the "best"
 way to do things, and it's designed to encourage that way - and in some cases to
@@ -70,32 +70,32 @@ tremendous increase in productivity. If you persist in bringing old habits from
 other languages to your Rails development, and trying to use patterns you
 learned elsewhere, you may have a less happy experience.]]]
 
-레이즈의 철학은 두가지의 핵심 원리로 이루어져 있습니다.[[[The Rails philosophy includes two major guiding principles:]]]
+레이스의 철학은 두가지의 핵심 원리로 이루어져 있습니다.[[[The Rails philosophy includes two major guiding principles:]]]
 
 * DRY - "Don't Repeat Yourself"(너 자신을 반복하지마라, 했던 것을 또 하지마라) - DRY는 작성했던 코드를 반복해서 다시 작성하는 것은 나쁜 것임을 시사합니다. [[DRY - "Don't Repeat Yourself" - suggests that writing the same code over and over again is a bad thing.]]]
 
-* 설정보다는 규칙 - 말인 즉슨 레일즈가 당신이 무엇을 원하는지 그리고 어떻게 할 것인지에 대한 가정을 하고  작은 사항까지 끝이 없는 설정을 요구하는 것이 아니다. [[[Convention Over Configuration - means that Rails makes assumptions about what you want to do and how you're going to do it, rather than requiring you to specify every little thing through endless configuration files.]]]
+* 설정보다는 규칙 - 말인 즉슨 레일스가 당신이 무엇을 원하는지 그리고 어떻게 할 것인지에 대한 가정을 하고 작은 사항까지 끝이 없는 설정을 요구하는 것이 아니다. [[[Convention Over Configuration - means that Rails makes assumptions about what you want to do and how you're going to do it, rather than requiring you to specify every little thing through endless configuration files.]]]
 
 
-[Creating a New Rails Project] 새로운 레일즈 프로젝트 만들기
+[Creating a New Rails Project] 새로운 레일스 프로젝트 만들기
 ----------------------------
 
-이 가이드를 사용하기 가장 좋은 방법은 매 단계를 발생할떄 마다 따라 하는 것이다. 이 참고 어플리케이션에서의 어떠한 코드나 단계도 빠지지 않았다. 말그대로 단계 단계 그대로 따라하면 됩니다. [여기](https://github.com/lifo/docrails/tree/master/guides/code/getting_started).에서 완성된 코드를 받으실수 있습니다.
+이 가이드를 사용하기 가장 좋은 방법은 매 단계를 발생할떄 마다 따라 하는 것이다. 이 참고 어플리케이션에서의 어떠한 코드나 단계도 빠지지 않았습니다. 말그대로 단계 단계 그대로 따라하면 됩니다. [여기](https://github.com/lifo/docrails/tree/master/guides/code/getting_started).에서 완성된 코드를 받으실수 있습니다.
 [[[The best way to use this guide is to follow each step as it happens, no code or
 step needed to make this example application has been left out, so you can
 literally follow along step by step. You can get the complete code
 [here](https://github.com/lifo/docrails/tree/master/guides/code/getting_started).]]]
 
-가이드를 따라감으로써 (매우) 간단한 웹블로그 'blog'라는 레일즈 프로 젝트를 생성하게 될것입니다.
-어플리케이션을 제작하기 시작하기 전에 레일즈가 설치되어있는지 확인 해야한다.
+가이드를 따라감으로써 (매우) 간단한 웹블로그 'blog'라는 레일스 프로 젝트를 생성하게 될 것입니다.
+어플리케이션을 제작하기 시작하기 전에 레일스가 설치되어있는지 확인 해야한다.
 [[[By following along with this guide, you'll create a Rails project called
 `blog`, a
 (very) simple weblog. Before you can start building the application, you need to
 make sure that you have Rails itself installed.]]]
 
-TIP: '#'과 '$'는 UNIX-like OS(유사 유니스 운영체제)의 터미널 프롬프트에서 각각 슈퍼유저와 일반유저를 나타내는것이다. 윈도우를 사용하신다면 `c:\source_code>`과 같이 표시 될것입니다. [[[The examples below use `#` and `$` to denote superuser and regular user terminal prompts respectively in a UNIX-like OS. If you are using Windows, your prompt will look something like `c:\source_code>`]]]
+TIP: '#'과 '$'는 UNIX-like OS(유사 유니스 운영체제)의 터미널 프롬프트에서 각각 슈퍼유저와 일반유저를 나타내는 것입니다. 윈도우를 사용하신다면 `c:\source_code>`과 같이 표시될 것입니다. [[[The examples below use `#` and `$` to denote superuser and regular user terminal prompts respectively in a UNIX-like OS. If you are using Windows, your prompt will look something like `c:\source_code>`]]]
 
-### 레일즈 설치하기 [[[Installing Rails]]]
+### 레일스 설치하기 [[[Installing Rails]]]
 
 커맨드 라인 프롬프트를 연다. 맥 OS X에서 터미널.app을 윈도우에서는 스타트 메뉴에 있는 "Run"에서 'cmd.exe'를 실행시킨다.
 어떠한 명령어도 달라 싸인 '$'과 앞에 붙어 나오는 경우에는 커맨드 라인을 실행 시켜야한다. 최신 버젼의 루비가 설치되어 있는지 확인한다.
@@ -109,13 +109,13 @@ $ ruby -v
 ruby 1.9.3p385
 ```
 
-레일즈를 설치하기 위해서 루비잼에 의해서 제공되는 'gem install' 커맨를 사용한다. [[[To install Rails, use the `gem install` command provided by RubyGems:]]]
+레일스를 설치하기 위해서 루비잼에 의해서 제공되는 'gem install' 명령을 사용한다. [[[To install Rails, use the `gem install` command provided by RubyGems:]]]
 
 ```bash
 $ gem install rails
 ```
 
-TIP: 루비 온 레일즈를 빠르게 설치하기를 도와줄 많은 툴들이 존재합니다. 윈도우 사용자들은  [Rails Installer](http://railsinstaller.org), 맥 OS X 사용자들은 [Rails One Click](http://railsoneclick.com)을 사용하실수 있니다. [[[TIP. A number of tools exist to help you quickly install Ruby and Ruby
+TIP: 루비 온 레일스를 빠르게 설치하기를 도와줄 많은 툴들이 존재합니다. 윈도우 사용자들은  [Rails Installer](http://railsinstaller.org), 맥 OS X 사용자들은 [Rails One Click](http://railsoneclick.com)을 사용하실수 있니다. [[[TIP. A number of tools exist to help you quickly install Ruby and Ruby
 on Rails on your system. Windows users can use [Rails Installer](http://railsinstaller.org), while Mac OS X users can use
 [Rails One Click](http://railsoneclick.com).]]]
 
@@ -129,7 +129,7 @@ $ rails --version
 
 ### 블로그 어플리케이션 만들기 [[[Creating the Blog Application]]]
 
-레일즈는 특정한 업무를 시작하는 데 필요한것을 만들어 줌으로 개발자들의 삶을 편하게 만들어줄 많은 제너레이터(generators)라는 스크립트와 함께 온다. 이런 스크립트중 하나인 새 어플리케이션 제너레이터 (new application generator)는 개발자 스스로 작성할 필요없이, 레일즈 어플리케이션의 기본적인 구조를 제공하게 된다.  [[[Rails comes with a number of scripts called generators that are designed to make your development life easier by creating everything that's necessary to start working on a particular task. One of these is the new application generator, which will provide you with the foundation of a fresh Rails application so that you don't have to write it yourself.]]]
+레일스는 특정한 업무를 시작하는 데 필요한것을 만들어 줌으로 개발자들의 삶을 편하게 만들어줄 많은 제너레이터(generators)라는 스크립트와 함께 온다. 이런 스크립트중 하나인 새 어플리케이션 제너레이터 (new application generator)는 개발자 스스로 작성할 필요없이, 레일스 어플리케이션의 기본적인 구조를 제공하게 된다.  [[[Rails comes with a number of scripts called generators that are designed to make your development life easier by creating everything that's necessary to start working on a particular task. One of these is the new application generator, which will provide you with the foundation of a fresh Rails application so that you don't have to write it yourself.]]]
 
 제너레이터를 사용하기 위해서는 터미널을 열고 파일 쓰기 권한이 있는 디렉토리에 가서 아래와 같이 치면 됩니다:
 [[[To use this generator, open a terminal, navigate to a directory where you have rights to create files, and type:]]]
