@@ -72,7 +72,7 @@ learned elsewhere, you may have a less happy experience.]]]
 
 레이스의 철학은 두가지의 핵심 원리로 이루어져 있습니다.[[[The Rails philosophy includes two major guiding principles:]]]
 
-* DRY - "Don't Repeat Yourself"(너 자신을 반복하지마라, 했던 것을 또 하지마라) - DRY는 작성했던 코드를 반복해서 다시 작성하는 것은 나쁜 것임을 시사합니다. [[DRY - "Don't Repeat Yourself" - suggests that writing the same code over and over again is a bad thing.]]]
+* DRY - "Don't Repeat Yourself"(너 자신을 반복하지마라, 했던 것을 또 하지마라) - DRY는 작성했던 코드를 반복해서 다시 작성하는 것은 나쁜 것임을 시사합니다. [[[DRY - "Don't Repeat Yourself" - suggests that writing the same code over and over again is a bad thing.]]]
 
 * 설정보다는 규칙 - 말인 즉슨 레일스가 당신이 무엇을 원하는지 그리고 어떻게 할 것인지에 대한 가정을 하고 작은 사항까지 끝이 없는 설정을 요구하는 것이 아니다. [[[Convention Over Configuration - means that Rails makes assumptions about what you want to do and how you're going to do it, rather than requiring you to specify every little thing through endless configuration files.]]]
 
@@ -115,7 +115,7 @@ ruby 1.9.3p385
 $ gem install rails
 ```
 
-TIP: 루비 온 레일스를 빠르게 설치하기를 도와줄 많은 툴들이 존재합니다. 윈도우 사용자들은  [Rails Installer](http://railsinstaller.org), 맥 OS X 사용자들은 [Rails One Click](http://railsoneclick.com)을 사용하실수 있니다. [[[TIP. A number of tools exist to help you quickly install Ruby and Ruby
+TIP: 루비 온 레일스를 빠르게 설치하기를 도와줄 많은 툴들이 존재합니다. 윈도우 사용자들은  [Rails Installer](http://railsinstaller.org), 맥 OS X 사용자들은 [Rails One Click](http://railsoneclick.com)을 사용하실수 있니다. [[[A number of tools exist to help you quickly install Ruby and Ruby
 on Rails on your system. Windows users can use [Rails Installer](http://railsinstaller.org), while Mac OS X users can use
 [Rails One Click](http://railsoneclick.com).]]]
 
@@ -138,21 +138,24 @@ $ rails --version
 $ rails new blog
 ```
 
-This will create a Rails application called Blog in a directory called blog and install the gem dependencies that are already mentioned in `Gemfile` using `bundle install`.
+이 과정은 blog 디렉토리에 Blog라고 불리는 레일스 에플리케이션을 생성할것이고 `bundle install`을 통해서 `Gemfile`에 게시되어 있는 젬들과 의존 젬들을 설치합니다. [[[This will create a Rails application called Blog in a directory called blog and install the gem dependencies that are already mentioned in `Gemfile` using `bundle install`.]]]
 
-TIP: You can see all of the command line options that the Rails
-application builder accepts by running `rails new -h`.
+TIP: 레일스 어플리케이션 빌더가 허락하는 모든 커맨드 라인 옵션은 `rails new -h`을 실행시킴으로써 확인할수 있다.
+[[[You can see all of the command line options that the Rails application builder accepts by running `rails new -h`.]]]
 
-After you create the blog application, switch to its folder to continue work directly in that application:
+blog 어플리케이션을 생성후 어플리케이션에서 직접 작업을 할수있도록 그 폴더로 옮겨간다: [[[After you create the blog application, switch to its folder to continue work directly in that application:]]]
 
 ```bash
 $ cd blog
 ```
 
-The `rails new blog` command we ran above created a folder in your
+위에서 실행시킨 명령인 `rails new blog`는 현제 작업하는 경로에 `blog`라는 폴더를 생성해준다.
+`blog` 디렉토리에는 레일스 어플리케이션의 골격을 구성하는 많은 자동생성된 파일과 폴더들이 있습니다.
+이 튜토리얼의 대부분의 작업은 `app/` 폴더에서 일어날 것이지만 여기 레일스가 기본적으로 생성하는 파일과 폴더들의 기능들의 기본적 설명이 있습니다.
+[[[The `rails new blog` command we ran above created a folder in your
 working directory called `blog`. The `blog` directory has a number of
 auto-generated files and folders that make up the structure of a Rails
-application. Most of the work in this tutorial will happen in the `app/` folder, but here's a basic rundown on the function of each of the files and folders that Rails created by default:
+application. Most of the work in this tutorial will happen in the `app/` folder, but here's a basic rundown on the function of each of the files and folders that Rails created by default:]]]
 
 | File/Folder | Purpose |
 | ----------- | ------- |
