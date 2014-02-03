@@ -205,36 +205,36 @@ IMPORTANT: 검색, 전화번호, 날짜, 시간, 색상, datetime, datetime-loca
 
 TIP: 비밀번호 input 필드를 사용한다면(어떠한 목적이던지), 이 변수가 로그에 남지 않도록 어플리케이션 설정을 해야합니다. 자세한 내용은 [Security Guide](security.html#logging)에서 배울수 있습니다. [[[If you're using password input fields (for any purpose), you might want to configure your application to prevent those parameters from being logged. You can learn about this in the [레일스 어플리케이션 보안](security.html#logging).]]]
 
-Dealing with Model Objects
+[Dealing with Model Objects] 모델객체와 연결된 폼 다루기
 --------------------------
 
-### Model Object Helpers
+### [Model Object Helpers] 모델객체 헬퍼
 
-A particularly common task for a form is editing or creating a model object. While the `*_tag` helpers can certainly be used for this task they are somewhat verbose as for each tag you would have to ensure the correct parameter name is used and set the default value of the input appropriately. Rails provides helpers tailored to this task. These helpers lack the _tag suffix, for example `text_field`, `text_area`.
+폼의 일반적인 작업은 모델객체를 수정하거나 생성하는것입니다. `*_tag` 헬퍼들은 다소 장황하지만 각 태그들에 알맞은 변수명을 강제하고 적절한 input 기본값을 설정해 이러한 작업에 사용할 수 있습니다. 레일스는 이러한 작업에 맞추어진 헬퍼를 제공합니다. 이러한 헬퍼들은 `text_field`, `text_area` 처럼 _tag 접미사가 제외됩니다. [[[A particularly common task for a form is editing or creating a model object. While the `*_tag` helpers can certainly be used for this task they are somewhat verbose as for each tag you would have to ensure the correct parameter name is used and set the default value of the input appropriately. Rails provides helpers tailored to this task. These helpers lack the _tag suffix, for example `text_field`, `text_area`. ]]]
 
-For these helpers the first argument is the name of an instance variable and the second is the name of a method (usually an attribute) to call on that object. Rails will set the value of the input control to the return value of that method for the object and set an appropriate input name. If your controller has defined `@person` and that person's name is Henry then a form containing:
+이 헬퍼들의 첫번째 인수는 인스턴스 변수의 이름이고 두번째 인수는 객체의 메소드 이름(대개는 속성)입니다. 레일스는 객체 메소드의 반환값을 input의 값으로 하고 알맞은 input 이름을 설정합니다. 만약 컨트롤러에 `@person` 변수가 정의되어 있고 사람의 이름이 Henry인 경우 폼은 다음과 같습니다: [[[For these helpers the first argument is the name of an instance variable and the second is the name of a method (usually an attribute) to call on that object. Rails will set the value of the input control to the return value of that method for the object and set an appropriate input name. If your controller has defined `@person` and that person's name is Henry then a form containing:]]]
 
 ```erb
 <%= text_field(:person, :name) %>
 ```
 
-will produce output similar to
+다음과 같은 결과를 생성합니다 [[[will produce output similar to]]]
 
 ```erb
 <input id="person_name" name="person[name]" type="text" value="Henry"/>
 ```
 
-Upon form submission the value entered by the user will be stored in `params[:person][:name]`. The `params[:person]` hash is suitable for passing to `Person.new` or, if `@person` is an instance of Person, `@person.update`. While the name of an attribute is the most common second parameter to these helpers this is not compulsory. In the example above, as long as person objects have a `name` and a `name=` method Rails will be happy.
+폼 전송시 사용자가 입력한 값은 `params[:person][:name]`에 저장됩니다. `params[:person]` 해쉬는 `Person.new`의 인수 또는 `@person`이 Person 인스턴스인경우 `@person.update`의 인수로 전달하기 알맞습니다. 헬퍼의 두번째 인수로 속성의 이름이 사용되는것이 강제적인것은 아닙니다. 위의 경우 person 객체가 `name` 혹은 `name=` 메소드를 가지고 있다면 레일스의 헬퍼는 동작합니다. [[[Upon form submission the value entered by the user will be stored in `params[:person][:name]`. The `params[:person]` hash is suitable for passing to `Person.new` or, if `@person` is an instance of Person, `@person.update`. While the name of an attribute is the most common second parameter to these helpers this is not compulsory. In the example above, as long as person objects have a `name` and a `name=` method Rails will be happy.]]]
 
-WARNING: You must pass the name of an instance variable, i.e. `:person` or `"person"`, not an actual instance of your model object.
+WARNING: `person` 또는 `"person"` 처럼 인스턴스 변수의 이름을 전달해야지 모델 인스턴스를 전달하는것이 아닙니다. [[[You must pass the name of an instance variable, i.e. `:person` or `"person"`, not an actual instance of your model object.]]]
 
-Rails provides helpers for displaying the validation errors associated with a model object. These are covered in detail by the [Active Record Validations](./active_record_validations.html#displaying-validation-errors-in-views) guide.
+레일스는 모델 객체와 연동된 검증 오류를 표시하는 헬퍼를 제공합니다. 이것들은 [Active Record Validations](./active_record_validations.html#displaying-validation-errors-in-views)가이드에 자세히 설명되어 있습니다. [[[Rails provides helpers for displaying the validation errors associated with a model object. These are covered in detail by the [Active Record Validations](./active_record_validations.html#displaying-validation-errors-in-views) guide.]]]
 
-### Binding a Form to an Object
+### [Binding a Form to an Object] 객체에 폼 바인딩
 
-While this is an increase in comfort it is far from perfect. If Person has many attributes to edit then we would be repeating the name of the edited object many times. What we want to do is somehow bind a form to a model object, which is exactly what `form_for` does.
+이것은 완벽함과 멀어지면서 편리함을 증가시킵니다. 만약 Person의 많은 속성을 수정하는 경우 변경하려는 객체의 이름을 반복해서 적어야 합니다. 우리가 원하는것은 폼을 모델객체에 바인딩 하는것인데 `form_for`가 정확히 그런 동작을 합니다. [[[While this is an increase in comfort it is far from perfect. If Person has many attributes to edit then we would be repeating the name of the edited object many times. What we want to do is somehow bind a form to a model object, which is exactly what `form_for` does.]]]
 
-Assume we have a controller for dealing with articles `app/controllers/articles_controller.rb`:
+articles을 다루는 컨트롤러 `app/controllers/articles_controller.rb`를 가정했을때: [[[Assume we have a controller for dealing with articles `app/controllers/articles_controller.rb`:]]]
 
 ```ruby
 def new
@@ -242,7 +242,7 @@ def new
 end
 ```
 
-The corresponding view `app/views/articles/new.html.erb` using `form_for` looks like this:
+`form_for`를 사용하는 뷰 `app/views/articles/new.html.erb`는 다음과 같습니다: [[[The corresponding view `app/views/articles/new.html.erb` using `form_for` looks like this:]]]
 
 ```erb
 <%= form_for @article, url: {action: "create"}, html: {class: "nifty_form"} do |f| %>
@@ -252,14 +252,18 @@ The corresponding view `app/views/articles/new.html.erb` using `form_for` looks 
 <% end %>
 ```
 
-There are a few things to note here:
+여기 주의할 몇가지 사항이 있습니다: [[[There are a few things to note here:]]]
 
-* `@article` is the actual object being edited.
-* There is a single hash of options. Routing options are passed in the `:url` hash, HTML options are passed in the `:html` hash. Also you can provide a `:namespace` option for your form to ensure uniqueness of id attributes on form elements. The namespace attribute will be prefixed with underscore on the generated HTML id.
-* The `form_for` method yields a **form builder** object (the `f` variable).
-* Methods to create form controls are called **on** the form builder object `f`
 
-The resulting HTML is:
+* `@article`은 수정하려는 실제 객체이다. [[[`@article` is the actual object being edited.]]]
+
+* 옵션은 단일 해쉬이다. 라우팅 옵션은 `:url` 해쉬, HTML 옵션은 `:html` 해쉬에 전달된다. 또한 `:namespace` 옵션을 제공해 폼이 유일한 id 값을 가지게할 수 있다. namespace 속성값은 밑줄문자를 추가후 생성된 HTML id 값에 접두사로 사용된다. [[[There is a single hash of options. Routing options are passed in the `:url` hash, HTML options are passed in the `:html` hash. Also you can provide a `:namespace` option for your form to ensure uniqueness of id attributes on form elements. The namespace attribute will be prefixed with underscore on the generated HTML id.]]]
+
+* `form_for` 메소드는 **폼 빌더** 객체를 yields 한다(`f` 변수). [[[The `form_for` method yields a **form builder** object (the `f` variable).]]]
+
+* 폼 컨트롤을 생성하는 메소드는 폼 빌더 오브젝트 `f`의 **on** 메소드를 호출한다. [[[Methods to create form controls are called **on** the form builder object `f`]]]
+
+HTML 결과는 다음과 같다: [[[The resulting HTML is:]]]
 
 ```html
 <form accept-charset="UTF-8" action="/articles/create" method="post" class="nifty_form">
@@ -269,11 +273,11 @@ The resulting HTML is:
 </form>
 ```
 
-The name passed to `form_for` controls the key used in `params` to access the form's values. Here the name is `article` and so all the inputs have names of the form `article[attribute_name]`. Accordingly, in the `create` action `params[:article]` will be a hash with keys `:title` and `:body`. You can read more about the significance of input names in the parameter_names section.
+`form_for` 컨트롤에 전달된 name은 `params`의 키로 폼의 값에 접근할 수 있다. `article`의 모든 input은 `article[속성이름]`과 같은 name을 가진다. `create` 액션에서 `params[:article]` 해쉬는 `:title`, `:body` 키를 가진다. parameter_names 섹션에서 보다 자세한 input name에 대한 내용을 알 수 있다. [[[The name passed to `form_for` controls the key used in `params` to access the form's values. Here the name is `article` and so all the inputs have names of the form `article[attribute_name]`. Accordingly, in the `create` action `params[:article]` will be a hash with keys `:title` and `:body`. You can read more about the significance of input names in the parameter_names section.]]]
 
-The helper methods called on the form builder are identical to the model object helpers except that it is not necessary to specify which object is being edited since this is already managed by the form builder.
+폼 빌더에 의해 호출된 헬퍼 메소드는 이미 폼 빌더에 의해 관리되어 어떤 객체가 수정되는지 필요하지 않을때를 제외하고는 모델 객체의 헬퍼와 동일하다. [[[The helper methods called on the form builder are identical to the model object helpers except that it is not necessary to specify which object is being edited since this is already managed by the form builder.]]]
 
-You can create a similar binding without actually creating `<form>` tags with the `fields_for` helper. This is useful for editing additional model objects with the same form. For example if you had a Person model with an associated ContactDetail model you could create a form for creating both like so:
+`fields_for` 헬퍼를 이용해 실제 `<form>` 태그를 생성하는 대신 바인딩을 생성할 수 있다. 이는 같은 폼 안에서 또 다른 모델객체를 수정할 때 유용하다. 예를들어 만약 Pserson 모델과 연관된 ContactDetail 모델을 가지고 있을때 다음과 같이 둘다 포함하는 폼을 생성할 수 있다: [[[You can create a similar binding without actually creating `<form>` tags with the `fields_for` helper. This is useful for editing additional model objects with the same form. For example if you had a Person model with an associated ContactDetail model you could create a form for creating both like so:]]]
 
 ```erb
 <%= form_for @person, url: {action: "create"} do |person_form| %>
@@ -284,7 +288,7 @@ You can create a similar binding without actually creating `<form>` tags with th
 <% end %>
 ```
 
-which produces the following output:
+다음과 같은 결과를 생성한다: [[[which produces the following output:]]]
 
 ```html
 <form accept-charset="UTF-8" action="/people/create" class="new_person" id="new_person" method="post">
@@ -293,19 +297,19 @@ which produces the following output:
 </form>
 ```
 
-The object yielded by `fields_for` is a form builder like the one yielded by `form_for` (in fact `form_for` calls `fields_for` internally).
+`fields_for`에 의해 yield된 객체는 `form_for`에 yield된 폼 빌더와 비슷하다(사실 `form_for` 내부에서는 `fields_for`를 호출). [[[The object yielded by `fields_for` is a form builder like the one yielded by `form_for` (in fact `form_for` calls `fields_for` internally).]]]
 
-### Relying on Record Identification
+### [Relying on Record Identification] 레코드 식별에 의지하기
 
-The Article model is directly available to users of the application, so — following the best practices for developing with Rails — you should declare it **a resource**:
+사용자 어플리케이션에서 Article 모델을 사용 하려면 **리소스**에 선언 해야한다. [[[The Article model is directly available to users of the application, so — following the best practices for developing with Rails — you should declare it **a resource**:]]]
 
 ```ruby
 resources :articles
 ```
 
-TIP: Declaring a resource has a number of side-affects. See [Rails Routing From the Outside In](routing.html#resource-routing-the-rails-default) for more information on setting up and using resources.
+리소스를 선언하는것은 몇가지 사이드 이팩트가 있다. [Rails Routing From the Outside In](routing.html#resource-routing-the-rails-default)에서 리소스 설정과 사용에 대해 보다 자세한 정보를 얻을수 있다. [[[TIP: Declaring a resource has a number of side-affects. See [Rails Routing From the Outside In](routing.html#resource-routing-the-rails-default) for more information on setting up and using resources.]]]
 
-When dealing with RESTful resources, calls to `form_for` can get significantly easier if you rely on **record identification**. In short, you can just pass the model instance and have Rails figure out model name and the rest:
+RESTful 리소스를 다룰때, **레코드 식별**에 의지해 `form_for`를 사용하면 상당히 쉬워진다. 모델 인스턴스를 전달하는 것으로 레일스는 모델이름과 rest를 알아낸다. [[[When dealing with RESTful resources, calls to `form_for` can get significantly easier if you rely on **record identification**. In short, you can just pass the model instance and have Rails figure out model name and the rest:]]]
 
 ```ruby
 ## Creating a new article
@@ -321,40 +325,40 @@ form_for(@article, url: article_path(@article), html: {method: "patch"})
 form_for(@article)
 ```
 
-Notice how the short-style `form_for` invocation is conveniently the same, regardless of the record being new or existing. Record identification is smart enough to figure out if the record is new by asking `record.new_record?`. It also selects the correct path to submit to and the name based on the class of the object.
+`form_for`의 간략버전은 레코드가 신규인지 기존에 존재하던것인지와 무관하게 동일한 것을 편리하게 한다. 레코드 식별은 `record.new_record?` 메소드를 통해 신규 레코드인지 알아낸다. 또한 정확한 경로에 폼을 전송하고 객체의 클래스에 기반에 이름을 정한다. [[[Notice how the short-style `form_for` invocation is conveniently the same, regardless of the record being new or existing. Record identification is smart enough to figure out if the record is new by asking `record.new_record?`. It also selects the correct path to submit to and the name based on the class of the object.]]]
 
-Rails will also automatically set the `class` and `id` of the form appropriately: a form creating an article would have `id` and `class` `new_article`. If you were editing the article with id 23, the `class` would be set to `edit_article` and the id to `edit_article_23`. These attributes will be omitted for brevity in the rest of this guide.
+레일스는 또한 알맞은 `class`, `id`를 자동으로 설정한다: article을 생성하는 폼은 `id`, `class`에 `new_article`를 가진다. 만약 id 23번 article를 수정한다면 `class`는 `edit_article`, `id`는 `edit_article_23`가 된다. 이 속성은 가이드의 간결성을 위해 생략한다. [[[Rails will also automatically set the `class` and `id` of the form appropriately: a form creating an article would have `id` and `class` `new_article`. If you were editing the article with id 23, the `class` would be set to `edit_article` and the id to `edit_article_23`. These attributes will be omitted for brevity in the rest of this guide.]]]
 
-WARNING: When you're using STI (single-table inheritance) with your models, you can't rely on record identification on a subclass if only their parent class is declared a resource. You will have to specify the model name, `:url`, and `:method` explicitly.
+WARNING: STI(단일 테이블 상속)을 모델과 함께 사용한다면, 상위 리소스만 선언된경우 서브클래스는 레코드 식별에 의지할수 없다. 이경우 모델 이름, `:url`, `:method`를 명시해야한다. [[[When you're using STI (single-table inheritance) with your models, you can't rely on record identification on a subclass if only their parent class is declared a resource. You will have to specify the model name, `:url`, and `:method` explicitly.]]]
 
-#### Dealing with Namespaces
+#### [Dealing with Namespaces] 네임스페이스 다루기
 
-If you have created namespaced routes, `form_for` has a nifty shorthand for that too. If your application has an admin namespace then
+네임스페이스 라우트를 생성하면 `form_for`는 9개의 약칭을 가집니다. 만약 당신의 어플리케이션이 admin 네임스페이스를 가진다면 [[[If you have created namespaced routes, `form_for` has a nifty shorthand for that too. If your application has an admin namespace then]]]
 
 ```ruby
 form_for [:admin, @article]
 ```
 
-will create a form that submits to the articles controller inside the admin namespace (submitting to `admin_article_path(@article)` in the case of an update). If you have several levels of namespacing then the syntax is similar:
+admin 네임스페이스안의 articles 컨트롤러로 전송하는 폼을 만들게 됩니다(업데이트의 경우 `admin_article_path(@article)`에 전송). 만약 몇개의 네임스페이스 레벨을 가지는 구문은 비슷합니다: [[[will create a form that submits to the articles controller inside the admin namespace (submitting to `admin_article_path(@article)` in the case of an update). If you have several levels of namespacing then the syntax is similar:]]]
 
 ```ruby
 form_for [:admin, :management, @article]
 ```
 
-For more information on Rails' routing system and the associated conventions, please see the [routing guide](routing.html).
+레일스 라우팅 시스템과 관련규칙에 관한 더 자세한 정보는 [routing guide](routing.html)를 참고합니다. [[[For more information on Rails' routing system and the associated conventions, please see the [routing guide](routing.html).]]]
 
 
-### How do forms with PATCH, PUT, or DELETE methods work?
+### [How do forms with PATCH, PUT, or DELETE methods work?] 폼의 PATCH, PUT, DELETE 메소드는 어떻게 동작하는가?
 
-The Rails framework encourages RESTful design of your applications, which means you'll be making a lot of "PATCH" and "DELETE" requests (besides "GET" and "POST"). However, most browsers _don't support_ methods other than "GET" and "POST" when it comes to submitting forms.
+레일스 프레임워크는 RESTful 디자인을 장려합니다. 이는 많은 "PATCH", "DELETE" 요청("GET", "POST"외에)을 사용하는것을 의미합니다. 하지만 대부분의 브라우저는 폼을 전송할때 "GET", "POST" 메소드 이외에는 _지원하지 않습니다_. [[[The Rails framework encourages RESTful design of your applications, which means you'll be making a lot of "PATCH" and "DELETE" requests (besides "GET" and "POST"). However, most browsers _don't support_ methods other than "GET" and "POST" when it comes to submitting forms.]]]
 
-Rails works around this issue by emulating other methods over POST with a hidden input named `"_method"`, which is set to reflect the desired method:
+레일스는 이 이슈를 POST의 숨겨진 input `"_method"` 이름으로 다른 메소드를 에뮬레이팅하여 원하는 메소드를 반영하도록합니다. [[[Rails works around this issue by emulating other methods over POST with a hidden input named `"_method"`, which is set to reflect the desired method:]]]
 
 ```ruby
 form_tag(search_path, method: "patch")
 ```
 
-output:
+결과: [[[output:]]]
 
 ```html
 <form accept-charset="UTF-8" action="/search" method="post">
@@ -366,7 +370,7 @@ output:
   ...
 ```
 
-When parsing POSTed data, Rails will take into account the special `_method` parameter and acts as if the HTTP method was the one specified inside it ("PATCH" in this example).
+POST 데이터를 파싱할때, 레일스는 HTTP 메소드가 내부의 지정된 하나인 경우(예제는 "PATCH") `_method` 특수 파라미터를 고려해 동작하도록 합니다. [[[When parsing POSTed data, Rails will take into account the special `_method` parameter and acts as if the HTTP method was the one specified inside it ("PATCH" in this example).]]]
 
 Making Select Boxes with Ease
 -----------------------------
