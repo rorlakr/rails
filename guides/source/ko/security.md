@@ -582,11 +582,11 @@ NOTE: _중요한 내용을 보호할 때는 블랙리스트 보다는 화이트�
 
 * XSS 를 방지하기 위해서 &lt;script&gt; 를 제거하는 대신에 &lt;strong&gt; 를 사용해야 합니다. 자세한 것은 아래를 보기 바랍니다. [[[Allow &lt;strong&gt; instead of removing &lt;script&gt; against Cross-Site Scripting (XSS). See below for details.]]]
 
-* 블랙리스트가 작성한 입력내용을 수정하려고 시도해서는 안됩니다. [[[Don't try to correct user input by blacklists:]]]가
+* 블랙리스트가 작성한 입력내용을 수정하려고 시도해서는 안됩니다. [[[Don't try to correct user input by blacklists:]]]
 
-    * 이와 같은 조치로 인하여 공격이 작동하게 될 것입니다. "&lt;sc&lt;script&gt;ript&gt;".gsub("&lt;script&gt;", "") [[[This will make the attack work: "&lt;sc&lt;script&gt;ript&gt;".gsub("&lt;script&gt;", "")]]]
+* 이와 같은 조치로 인하여 공격이 작동하게 될 것입니다. "&lt;sc&lt;script&gt;ript&gt;".gsub("&lt;script&gt;", "") [[[This will make the attack work: "&lt;sc&lt;script&gt;ript&gt;".gsub("&lt;script&gt;", "")]]]
 
-    * 그러나 잘 못된 입력내용은 거절해야 합니다. [[[But reject malformed input]]]
+* 그러나 잘 못된 입력내용은 거절해야 합니다. [[[But reject malformed input]]]
 
 화이트리스트는, 블랙리스트 상에 중요한 항목을 빠뜨릴 수 있는 사람의 실수를 방지하기 위한 좋은 접근방법이 되기도 합니다. [[[Whitelists are also a good approach against the human factor of forgetting something in the blacklist.]]]
 
@@ -602,7 +602,7 @@ SQL 주입은 웹어플리케이션 파라미터를 조작하여 데이터베이
 Project.where("name = '#{params[:name]}'")
 ```
 
-이것은 검색 액션에서 필요한 수 있는데 사용자는 찾기를 원하는 특정 프로젝트의 이름을 입려하게 됩니다. 악성 사용자가 ' OR 1 --' 와 같이 입력한다면 SQL결과는 다음과 같을 것입니다. [[[This could be in a search action and the user may enter a project's name that he wants to find. If a malicious user enters ' OR 1 --, the resulting SQL query will be:]]]
+이것은 검색 액션에서 필요할 수 있는데, 사용자는 찾기를 원하는 특정 프로젝트의 이름을 입력하게 됩니다. 악성 사용자가 ' OR 1 --' 와 같이 입력한다면 SQL결과는 다음과 같을 것입니다. [[[This could be in a search action and the user may enter a project's name that he wants to find. If a malicious user enters ' OR 1 --, the resulting SQL query will be:]]]
 
 ```sql
 SELECT * FROM projects WHERE name = '' OR 1 --'
@@ -628,7 +628,7 @@ SELECT * FROM users WHERE login = '' OR '1'='1' AND password = '' OR '2'>'1' LIM
 
 #### [Unauthorized Reading] 권한없이 읽기
 
-UNION 문장은 두개의 SQL 쿼리를 연결해서 하나의 결과셋으로 데이터를 반환합니다. 공격자는 이거을 이용해서 데이터베이스로부터 임의의 데이터를 읽을 수 있습니다. 위에서 언급했던 예제 코드를 보겠습니다. [[[The UNION statement connects two SQL queries and returns the data in one set. An attacker can use it to read arbitrary data from the database. Let's take the example from above:]]]
+UNION 문장은 두개의 SQL 쿼리를 연결해서 하나의 결과셋으로 데이터를 반환합니다. 공격자는 이것을 이용해서 데이터베이스로부터 임의의 데이터를 읽을 수 있습니다. 위에서 언급했던 예제 코드를 보겠습니다. [[[The UNION statement connects two SQL queries and returns the data in one set. An attacker can use it to read arbitrary data from the database. Let's take the example from above:]]]
 
 ```ruby
 Project.where("name = '#{params[:name]}'")
@@ -653,7 +653,7 @@ SELECT * FROM projects WHERE (name = '') UNION
 
 #### [Countermeasures] 대처방안
 
-루비온레일스는 ' , " , NULL 문자, 개행문자와 같은 특수한 SQL 문자를 이스케이프하는 내장 필터를 가지고 있습니다. 따라서 cters, which will escape ' , " , NULL character and line breaks. <em class="highlight">`Model.find(id)` 또는 `Model.find_by_some thing(something)` 를 사용하면 이러한 조치들이 자동으로 적용됩니다</em>. 그러나 <em class="highlight">조건절(`where("...")`), `connection.execute()` 또는 `Model.find_by_sql()` 메소드와 같은 경우에는 SQL 부분에서 대해서 직접 수작업으로 적용시켜줘야 합니다</em>. [[[Ruby on Rails has a built-in filter for special SQL characters, which will escape ' , " , NULL character and line breaks. <em class="highlight">Using `Model.find(id)` or `Model.find_by_some thing(something)` automatically applies this countermeasure</em>. But in SQL fragments, especially <em class="highlight">in conditions fragments (`where("...")`), the `connection.execute()` or `Model.find_by_sql()` methods, it has to be applied manually</em>.]]]
+루비온레일스는 ' , " , NULL 문자, 개행문자와 같은 특수한 SQL 문자를 이스케이프하는 내장 필터를 가지고 있습니다. 따라서 <em class="highlight">`Model.find(id)` 또는 `Model.find_by_some thing(something)` 를 사용하면 이러한 조치들이 자동으로 적용됩니다</em>. 그러나 <em class="highlight">조건절(`where("...")`), `connection.execute()` 또는 `Model.find_by_sql()` 메소드와 같은 경우에는 SQL 부분에서 대해서 직접 수작업으로 적용시켜줘야 합니다</em>. [[[Ruby on Rails has a built-in filter for special SQL characters, which will escape ' , " , NULL character and line breaks. <em class="highlight">Using `Model.find(id)` or `Model.find_by_some thing(something)` automatically applies this countermeasure</em>. But in SQL fragments, especially <em class="highlight">in conditions fragments (`where("...")`), the `connection.execute()` or `Model.find_by_sql()` methods, it has to be applied manually</em>.]]]
 
 조건절 옵션에 문자열을 넘겨주는 대신에, 아래와 같이 문제의 소지가 있는 문자열을 방지하기 위해서 배열을 넘겨 줄 수 있습니다. [[[Instead of passing a string to the conditions option, you can pass an array to sanitize tainted strings like this:]]]
 
