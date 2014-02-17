@@ -372,12 +372,12 @@ form_tag(search_path, method: "patch")
 
 POST 데이터를 파싱할때, 레일스는 HTTP 메소드가 내부의 지정된 하나인 경우(예제는 "PATCH") `_method` 특수 파라미터를 고려해 동작하도록 합니다. [[[When parsing POSTed data, Rails will take into account the special `_method` parameter and acts as if the HTTP method was the one specified inside it ("PATCH" in this example).]]]
 
-Making Select Boxes with Ease
+[Making Select Boxes with Ease] Select 박스 쉽게 만들기
 -----------------------------
 
-Select boxes in HTML require a significant amount of markup (one `OPTION` element for each option to choose from), therefore it makes the most sense for them to be dynamically generated.
+HTML에서의 Select 박스는 많은 마크업(각각의 선택 항목마다 한개의 `OPTION`)을 필요로 하기 때문에 동적으로 생성하는것이 의미가 있습니다. [[[Select boxes in HTML require a significant amount of markup (one `OPTION` element for each option to choose from), therefore it makes the most sense for them to be dynamically generated.]]]
 
-Here is what the markup might look like:
+다음과 같은 마크업이 있습니다: [[[Here is what the markup might look like:]]]
 
 ```html
 <select name="city_id" id="city_id">
@@ -388,37 +388,37 @@ Here is what the markup might look like:
 </select>
 ```
 
-Here you have a list of cities whose names are presented to the user. Internally the application only wants to handle their IDs so they are used as the options' value attribute. Let's see how Rails can help out here.
+여기 유저에게 보여질 도시 이름 목록이 있습니다. 어플리케이션 내부적으로는 옵션의 value 속성에 있는 ID 값만을 사용합니다. 레일스에서 이부분을 어떻게 쉽게 해주는지 살펴 보겠습니다. [[[Here you have a list of cities whose names are presented to the user. Internally the application only wants to handle their IDs so they are used as the options' value attribute. Let's see how Rails can help out here.]]]
 
-### The Select and Option Tags
+### [The Select and Option Tags] Select, Option 태그
 
-The most generic helper is `select_tag`, which — as the name implies — simply generates the `SELECT` tag that encapsulates an options string:
+가장 일반적인 헬퍼는 `select_tag` 이며, 옵션의 문자열을 감싸는 `SELECT` 태그를 생성합니다. [[[The most generic helper is `select_tag`, which — as the name implies — simply generates the `SELECT` tag that encapsulates an options string:]]]
 
 ```erb
 <%= select_tag(:city_id, '<option value="1">Lisbon</option>...') %>
 ```
 
-This is a start, but it doesn't dynamically create the option tags. You can generate option tags with the `options_for_select` helper:
+이것은 시작에 불과하며 option 태그를 동적으로 생성하지는 않습니다. `options_for_select` 헬퍼를 이용해 option 태그를 생성할 수 있습니다: [[[This is a start, but it doesn't dynamically create the option tags. You can generate option tags with the `options_for_select` helper:]]]
 
 ```html+erb
 <%= options_for_select([['Lisbon', 1], ['Madrid', 2], ...]) %>
 
-output:
+결과: [[[output:]]]
 
 <option value="1">Lisbon</option>
 <option value="2">Madrid</option>
 ...
 ```
 
-The first argument to `options_for_select` is a nested array where each element has two elements: option text (city name) and option value (city id). The option value is what will be submitted to your controller. Often this will be the id of a corresponding database object but this does not have to be the case.
+`options_for_select`의 첫번째 인수는 각 항목마다 두개의 항목을 가진 중첩된 배열 입니다: 각 항목은 option 문자열(도시 이름)과 option 값(도시 id)로 이루어졌습니다. option 값은 컨트롤러에 전달됩니다. 이값은 데이터베이스 객체의 id에 상응하는 경우가 보통이지만 상황에따라 아닐수있습니다. [[[The first argument to `options_for_select` is a nested array where each element has two elements: option text (city name) and option value (city id). The option value is what will be submitted to your controller. Often this will be the id of a corresponding database object but this does not have to be the case.]]]
 
-Knowing this, you can combine `select_tag` and `options_for_select` to achieve the desired, complete markup:
+이것을 알면 `select_tag`, `options_for_select`을 이용해 원하는 마크업을 만들수 있습니다: [[[Knowing this, you can combine `select_tag` and `options_for_select` to achieve the desired, complete markup:]]]
 
 ```erb
 <%= select_tag(:city_id, options_for_select(...)) %>
 ```
 
-`options_for_select` allows you to pre-select an option by passing its value.
+`options_for_select`에 옵션값을 전달해 사전에 선택될 옵션을 지정할 수 있습니다. [[[`options_for_select` allows you to pre-select an option by passing its value.]]]
 
 ```html+erb
 <%= options_for_select([['Lisbon', 1], ['Madrid', 2], ...], 2) %>
@@ -430,27 +430,27 @@ output:
 ...
 ```
 
-Whenever Rails sees that the internal value of an option being generated matches this value, it will add the `selected` attribute to that option.
+레일스는 option의 값을 확인해 전달된 값과 일치하면 `selected` 속성을 옵션에 추가합니다. [[[Whenever Rails sees that the internal value of an option being generated matches this value, it will add the `selected` attribute to that option.]]]
 
-TIP: The second argument to `options_for_select` must be exactly equal to the desired internal value. In particular if the value is the integer 2 you cannot pass "2" to `options_for_select` — you must pass 2. Be aware of values extracted from the `params` hash as they are all strings.
+TIP: `options_for_select`의 두번째 인수는 내부에서 사용하는 값과 동일해야합니다. 값은 숫자 2인데 인수로 문자열 "2"를 `options_for_select`에 전달할 수 없으며 숫자 2를 전달해야합니다. `params` 해쉬로부터 추출된 값은 모두 문자열이라는것을 유의해야합니다. [[[The second argument to `options_for_select` must be exactly equal to the desired internal value. In particular if the value is the integer 2 you cannot pass "2" to `options_for_select` — you must pass 2. Be aware of values extracted from the `params` hash as they are all strings.]]]
 
-WARNING: when `:include_blank` or `:prompt` are not present, `:include_blank` is forced true if the select attribute `required` is true, display `size` is one and `multiple` is not true.
+WARNING: `:include_blank` 또는 `:prompt`가 제공되지 않는다면, select의 `required` 속성이 true 인경우 `:include_blank`는 true로 설정되며, `size`는 한개가 되고, `multiple`는 true가 아니게 됩니다. [[[when `:include_blank` or `:prompt` are not present, `:include_blank` is forced true if the select attribute `required` is true, display `size` is one and `multiple` is not true.]]]
 
-You can add arbitrary attributes to the options using hashes:
+해쉬를 이용해 option에 임의의 속성을 추가할 수 있습니다: [[[You can add arbitrary attributes to the options using hashes:]]]
 
 ```html+erb
 <%= options_for_select([['Lisbon', 1, {'data-size' => '2.8 million'}], ['Madrid', 2, {'data-size' => '3.2 million'}]], 2) %>
 
-output:
+결과: [[[output:]]]
 
 <option value="1" data-size="2.8 million">Lisbon</option>
 <option value="2" selected="selected" data-size="3.2 million">Madrid</option>
 ...
 ```
 
-### Select Boxes for Dealing with Models
+### [Select Boxes for Dealing with Models] 모델과 연동되는 Select 박스
 
-In most cases form controls will be tied to a specific database model and as you might expect Rails provides helpers tailored for that purpose. Consistent with other form helpers, when dealing with models you drop the `_tag` suffix from `select_tag`:
+대부분의 경우 폼 컨트롤은 특정 데이터베이스 모델에 연동되고 레일스는 그 목적을 위한 헬퍼를 제공합니다. 다른 폼 헬퍼와 동일하게 모델과 연동하는경우 `select_tag`에서 `_tag` 접미사를 제거합니다. [[[In most cases form controls will be tied to a specific database model and as you might expect Rails provides helpers tailored for that purpose. Consistent with other form helpers, when dealing with models you drop the `_tag` suffix from `select_tag`:]]]
 
 ```ruby
 # controller:
@@ -462,53 +462,53 @@ In most cases form controls will be tied to a specific database model and as you
 <%= select(:person, :city_id, [['Lisbon', 1], ['Madrid', 2], ...]) %>
 ```
 
-Notice that the third parameter, the options array, is the same kind of argument you pass to `options_for_select`. One advantage here is that you don't have to worry about pre-selecting the correct city if the user already has one — Rails will do this for you by reading from the `@person.city_id` attribute.
+세번째 변수(options의 배열)는 `options_for_select`에 전달하는 인수와 동일합니다. 한가지 이점은 사전에 선택될 도시이름에 대해 신경쓰지 않아도 유저가 이미 가지고 있는 도시를 선택합니다 - 레일스는 `@person.city_id` 값으로부터 이를 수행합니다. [[[Notice that the third parameter, the options array, is the same kind of argument you pass to `options_for_select`. One advantage here is that you don't have to worry about pre-selecting the correct city if the user already has one — Rails will do this for you by reading from the `@person.city_id` attribute.]]]
 
-As with other helpers, if you were to use the `select` helper on a form builder scoped to the `@person` object, the syntax would be:
+`@person` 영역을 가지는 폼 빌더헬퍼에서 `select` 헬퍼를 사용하고자 한다면 다음과 같습니다: [[[As with other helpers, if you were to use the `select` helper on a form builder scoped to the `@person` object, the syntax would be:]]]
 
 ```erb
 # select on a form builder
 <%= f.select(:city_id, ...) %>
 ```
 
-WARNING: If you are using `select` (or similar helpers such as `collection_select`, `select_tag`) to set a `belongs_to` association you must pass the name of the foreign key (in the example above `city_id`), not the name of association itself. If you specify `city` instead of `city_id` Active Record will raise an error along the lines of ` ActiveRecord::AssociationTypeMismatch: City(#17815740) expected, got String(#1138750) ` when you pass the `params` hash to `Person.new` or `update`. Another way of looking at this is that form helpers only edit attributes. You should also be aware of the potential security ramifications of allowing users to edit foreign keys directly.
+WARNING: `belongs_to` association을 설정하기위해 `select`(또는 비슷한 헬퍼인 `collection_select`, `select_tag`)를 사용할때는 assosiation 이름이 아니라 외부키의 이름을 전달해야 합니다.(위의 예제에서는 `city_id`) `city_id`가 아니라 `city`를 사용하면 `params` 해쉬를 `Person.new`나 `update`에 전달할때 Active Record는 ` ActiveRecord::AssociationTypeMismatch: City(#17815740) expected, got String(#1138750) ` 에러를 발생시킵니다. 이를 살펴볼수 있는 또다른 방법은 폼 헬퍼의 속성만을 수정하는것입니다. 사용자가 외부키를 직접 변경하는 잠재적인 보안 문제에 대해 알아야합니다. [[[If you are using `select` (or similar helpers such as `collection_select`, `select_tag`) to set a `belongs_to` association you must pass the name of the foreign key (in the example above `city_id`), not the name of association itself. If you specify `city` instead of `city_id` Active Record will raise an error along the lines of ` ActiveRecord::AssociationTypeMismatch: City(#17815740) expected, got String(#1138750) ` when you pass the `params` hash to `Person.new` or `update`. Another way of looking at this is that form helpers only edit attributes. You should also be aware of the potential security ramifications of allowing users to edit foreign keys directly.]]]
 
-### Option Tags from a Collection of Arbitrary Objects
+### [Option Tags from a Collection of Arbitrary Objects] 임의의 객체 모음을 위한 option 태그
 
-Generating options tags with `options_for_select` requires that you create an array containing the text and value for each option. But what if you had a City model (perhaps an Active Record one) and you wanted to generate option tags from a collection of those objects? One solution would be to make a nested array by iterating over them:
+`options_for_select`를 이용한 option 태그 생성은 각 option의 문자열과 값으로 이루어진 배열을 필요로 합니다. 하지만 City 모델(아마도 Active Record)을 가지고 있고 이들 객체 모음으로부터 option 태그를 생성하고 싶다면 어떻게 해야할까요? 여기에 중첩배열을 만들어내는 한가지 해결방법이 있습니다: [[[Generating options tags with `options_for_select` requires that you create an array containing the text and value for each option. But what if you had a City model (perhaps an Active Record one) and you wanted to generate option tags from a collection of those objects? One solution would be to make a nested array by iterating over them:]]]
 
 ```erb
 <% cities_array = City.all.map { |city| [city.name, city.id] } %>
 <%= options_for_select(cities_array) %>
 ```
 
-This is a perfectly valid solution, but Rails provides a less verbose alternative: `options_from_collection_for_select`. This helper expects a collection of arbitrary objects and two additional arguments: the names of the methods to read the option **value** and **text** from, respectively:
+이것은 완벽히 유효한 해결방법이지만 레일스는 간결한 대안인 `options_from_collection_for_select`를 제공합니다. 이 헬퍼는 임의의 객체 모음이 2개의 인수(option의 **value**, **text** 에 접근하는 메서드 이름)를 가지고 있다고 가정합니다: [[[This is a perfectly valid solution, but Rails provides a less verbose alternative: `options_from_collection_for_select`. This helper expects a collection of arbitrary objects and two additional arguments: the names of the methods to read the option **value** and **text** from, respectively:]]]
 
 ```erb
 <%= options_from_collection_for_select(City.all, :id, :name) %>
 ```
 
-As the name implies, this only generates option tags. To generate a working select box you would need to use it in conjunction with `select_tag`, just as you would with `options_for_select`. When working with model objects, just as `select` combines `select_tag` and `options_for_select`, `collection_select` combines `select_tag` with `options_from_collection_for_select`.
+이름에서 알 수 있듯이, 이것은 option 태그만을 생성합니다. select 박스와 함께 사용하려면 `options_for_select`처럼 `select_tag`와 같이 사용합니다. 모델 객체와 사용하는경우, `select`가 `select_tag`, `options_for_select` 하나로 합친것처럼, `collection_select`는 `select_tag`, `options_from_collection_for_select` 하나로 합친것처럼 동작합니다. [[[As the name implies, this only generates option tags. To generate a working select box you would need to use it in conjunction with `select_tag`, just as you would with `options_for_select`. When working with model objects, just as `select` combines `select_tag` and `options_for_select`, `collection_select` combines `select_tag` with `options_from_collection_for_select`.]]]
 
 ```erb
 <%= collection_select(:person, :city_id, City.all, :id, :name) %>
 ```
 
-To recap, `options_from_collection_for_select` is to `collection_select` what `options_for_select` is to `select`.
+정리해보면, `options_for_select`가 `select`로 되는것처럼 `options_from_collection_for_select`는 `collection_select`으로 됩니다. [[[To recap, `options_from_collection_for_select` is to `collection_select` what `options_for_select` is to `select`.]]]
 
-NOTE: Pairs passed to `options_for_select` should have the name first and the id second, however with `options_from_collection_for_select` the first argument is the value method and the second the text method.
+NOTE: `options_for_select`에 전달되는 배열의 쌍은 첫번째는 문자열 두번째는 값입니다. 하지만 `options_from_collection_for_select`는 첫번째 인수는 값 메소드, 두번째는 문자열 메소드입니다. [[[Pairs passed to `options_for_select` should have the name first and the id second, however with `options_from_collection_for_select` the first argument is the value method and the second the text method.]]]
 
-### Time Zone and Country Select
+### [Time Zone and Country Select] 시간대와 국가 선택
 
-To leverage time zone support in Rails, you have to ask your users what time zone they are in. Doing so would require generating select options from a list of pre-defined TimeZone objects using `collection_select`, but you can simply use the `time_zone_select` helper that already wraps this:
+레일스에서 시간대 지원을 사용하려면 사용자에게 어떤 시간대에 있는지 질의해야합니다. 이를 위해 미리 지정되어 있는 TimeZone 객체들을 `collection_select`를 이용해 select option을 생성해야 합니다. 하지만 `time_zone_select` 헬퍼를 이용해 쉽게 사용할 수 있습니다. [[[To leverage time zone support in Rails, you have to ask your users what time zone they are in. Doing so would require generating select options from a list of pre-defined TimeZone objects using `collection_select`, but you can simply use the `time_zone_select` helper that already wraps this:]]]
 
 ```erb
 <%= time_zone_select(:person, :time_zone) %>
 ```
 
-There is also `time_zone_options_for_select` helper for a more manual (therefore more customizable) way of doing this. Read the API documentation to learn about the possible arguments for these two methods.
+또한 좀더 자세한 설정을 위해 `time_zone_options_for_select` 헬퍼가 있습니다. 이 두가지 메소드의 인수에 대한 자세한 내용은 API 문서를 읽어보기 바랍니다. [[[There is also `time_zone_options_for_select` helper for a more manual (therefore more customizable) way of doing this. Read the API documentation to learn about the possible arguments for these two methods.]]]
 
-Rails _used_ to have a `country_select` helper for choosing countries, but this has been extracted to the [country_select plugin](https://github.com/stefanpenner/country_select). When using this, be aware that the exclusion or inclusion of certain names from the list can be somewhat controversial (and was the reason this functionality was extracted from Rails).
+레일스는 국가를 선택하기위해 `country_select` 헬퍼를 _사용_합니다. 하지만 이것은 [country_select plugin](https://github.com/stefanpenner/country_select)으로 분리되어 있습니다. 이것을 사용할때 특정이름을 목록에 포함하거나 제외하는것은 논란의 여지가 있다는것을 인식해야합니다.(이것은 레일스로부터 분리된 이유이기도 합니다) [[[Rails _used_ to have a `country_select` helper for choosing countries, but this has been extracted to the [country_select plugin](https://github.com/stefanpenner/country_select). When using this, be aware that the exclusion or inclusion of certain names from the list can be somewhat controversial (and was the reason this functionality was extracted from Rails).]]]
 
 Using Date and Time Form Helpers
 --------------------------------
