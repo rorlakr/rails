@@ -765,7 +765,7 @@ s = sanitize(user_input, tags: tags, attributes: %w(href title))
 
 이것은 주어진 태그들만 허용하는데, 온갖 트릭과 악성 태그에 대해서도 잘 동작합니다. [[[This allows only the given tags and does a good job, even against all kinds of tricks and malformed tags.]]]
 
-두번째 단계로, _어플리케이션의 모든 출력물을 이스케이핑하는 습관을 들이는 것이 좋습니다_. 특히, 이전 예에 예로 든 검색폼에서와 같이 입력값을 필터하지 않은 경우, 사용자 입력값을 다시 보여줄 때 이러한 작업을 추가해 주어야 합니다. _`escapeHTML()` (또는 다름 이름인 `h()`) 메소드를 이용하면_, HTML (`&amp;`, `&quot;`, `&lt`;, and `&gt;`)로 해독되지 않은 형태로 HTML 입력 문자들(&amp;, &quot;, &lt;, &gt;)을 교체해 줄 수 있습니다. 그러나, 개발자가 이 메소드를 사용하는 것을 쉽게 기억하지 못할 수 있어서, _[SafeErb](http://safe-erb.rubyforge.org/svn/plugins/safe_erb/) 플러그인을 사용할 것을 권해 드립니다_. SafeErb는 외부소스로 부터 오는 문자열을 이스케이핑하는 것을 개발자에게 상기시켜 줍니다. [[[As a second step, _it is good practice to escape all output of the application_, especially when re-displaying user input, which hasn't been input-filtered (as in the search form example earlier on). _Use `escapeHTML()` (or its alias `h()`) method_ to replace the HTML input characters &amp;, &quot;, &lt;, &gt; by their uninterpreted representations in HTML (`&amp;`, `&quot;`, `&lt`;, and `&gt;`). However, it can easily happen that the programmer forgets to use it, so _it is recommended to use the [SafeErb](http://safe-erb.rubyforge.org/svn/plugins/safe_erb/) plugin_. SafeErb reminds you to escape strings from external sources.]]]
+두번째 단계로, _어플리케이션의 모든 출력물을 이스케이핑하는 습관을 들이는 것이 좋습니다_. 특히, 이전 예에 예로 든 검색폼에서와 같이 입력값을 필터하지 않은 경우, 사용자 입력값을 다시 보여줄 때 이러한 작업을 추가해 주어야 합니다. `escapeHTML()` (또는 다름 이름인 `h()`) 메소드를 이용하면, HTML (`&amp;`, `&quot;`, `&lt`;, and `&gt;`)로 해독되지 않은 형태로 HTML 입력 문자들(&amp;, &quot;, &lt;, &gt;)을 교체해 줄 수 있습니다. 그러나, 개발자가 이 메소드를 사용하는 것을 쉽게 기억하지 못할 수 있어서, _[SafeErb](http://safe-erb.rubyforge.org/svn/plugins/safe_erb/) 플러그인을 사용할 것을 권해 드립니다_. SafeErb는 외부소스로 부터 오는 문자열을 이스케이핑하는 것을 개발자에게 상기시켜 줍니다. [[[As a second step, _it is good practice to escape all output of the application_, especially when re-displaying user input, which hasn't been input-filtered (as in the search form example earlier on). _Use `escapeHTML()` (or its alias `h()`) method_ to replace the HTML input characters &amp;, &quot;, &lt;, &gt; by their uninterpreted representations in HTML (`&amp;`, `&quot;`, `&lt`;, and `&gt;`). However, it can easily happen that the programmer forgets to use it, so _it is recommended to use the [SafeErb](http://safe-erb.rubyforge.org/svn/plugins/safe_erb/) plugin_. SafeErb reminds you to escape strings from external sources.]]]
 
 ##### [Obfuscation and Encoding Injection] 코드난독화와 인코딩 주입
 
@@ -922,34 +922,34 @@ Location: http://www.malicious.tld
 
 따라서, _헤더 주입에 대한 공격 매개체는 CRLF 문자를 헤더 필드에 주입하는 것에 근거하게 됩니다._ 그렇다면 잘못된 URL로 리디렉션하므로써 공격자는 어떤 일을 할 수 있을까요? 공격자는 원래 웹사이트와 똑같이 생긴 피싱 사이트로 리디렉트하도록 하여 로그인하도록 요구하게 되고 결과적으로 로그인 정보를 공격자에게 보내게 되는 것입니다. 또는 공격자는 해당 사이트에 브라우저 보안 구멍을 통해서 악성 소프트웨어를 인스톨할 수 있게 될 것입니다. 레일스 2.1.2는 `redirect_to` 메소드에서 헤더의 위치 필드에 대해서 이러한 문자들을 이스케이핑하도록 지원합니다. _사용자의 입력내용을 이용하여 다른 헤더 필드를 작성할 때는 직접 코디을 하도록 해야 합니다._ [[[So _attack vectors for Header Injection are based on the injection of CRLF characters in a header field._ And what could an attacker do with a false redirection? He could redirect to a phishing site that looks the same as yours, but asks to login again (and sends the login credentials to the attacker). Or he could install malicious software through browser security holes on that site. Rails 2.1.2 escapes these characters for the Location field in the `redirect_to` method. _Make sure you do it yourself when you build other header fields with user input._]]]
 
-#### Response Splitting
+#### [Response Splitting] 응답 분리
 
-If Header Injection was possible, Response Splitting might be, too. In HTTP, the header block is followed by two CRLFs and the actual data (usually HTML). The idea of Response Splitting is to inject two CRLFs into a header field, followed by another response with malicious HTML. The response will be:
+헤더 주입이 가능하댜면, 응답 분리도 역시 가능할 겁니다. HTTP에서, 헤더 블록 다음에 두 개의 CRLF와 실제 데이터(대개는 HTML)가 옵니다. 응답 분리의 아이디어는 헤더 필드로 두 개의 CRLF을 주입하는 것이고 이어서 악성 HTML을 가지는 또 다른 응답이 뒤따라 오는 것입니다. 응답은 다음과 같은 것이다. [[[If Header Injection was possible, Response Splitting might be, too. In HTTP, the header block is followed by two CRLFs and the actual data (usually HTML). The idea of Response Splitting is to inject two CRLFs into a header field, followed by another response with malicious HTML. The response will be:]]]
 
 ```
-HTTP/1.1 302 Found [First standard 302 response]
+HTTP/1.1 302 Found [첫번째 표준 302 응답]
 Date: Tue, 12 Apr 2005 22:09:07 GMT
 Location: Content-Type: text/html
 
 
-HTTP/1.1 200 OK [Second New response created by attacker begins]
+HTTP/1.1 200 OK [공격자가 생성한 두번째 새로운 응답 시작]
 Content-Type: text/html
 
 
-&lt;html&gt;&lt;font color=red&gt;hey&lt;/font&gt;&lt;/html&gt; [Arbitary malicious input is
-Keep-Alive: timeout=15, max=100         shown as the redirected page]
+&lt;html&gt;&lt;font color=red&gt;hey&lt;/font&gt;&lt;/html&gt; [임의의 악성 입력이 리디렉트된 페이지로 보여집니다.]
+Keep-Alive: timeout=15, max=100
 Connection: Keep-Alive
 Transfer-Encoding: chunked
 Content-Type: text/html
 ```
 
-Under certain circumstances this would present the malicious HTML to the victim. However, this only seems to work with Keep-Alive connections (and many browsers are using one-time connections). But you can't rely on this. _In any case this is a serious bug, and you should update your Rails to version 2.0.5 or 2.1.2 to eliminate Header Injection (and thus response splitting) risks._
+어떤 상황에서는, 이것이 악성 HTML을 사용자에게 보여줄 것입니다. 그러나, 이것은 단지 Keep-Alive 연결에서 작동하는 것처럼 보입니다. (그리고 다수의 브라우저는 단일 연결을 사용할 것입니다.) 그러나, 이것에 의존할 수 없습니다. _어떤 경우에도, 이것은 심각한 버그이고 레일스 버전을 2.0.5 또는 2.1.2로 업데이트해서 헤더 주입(과 응답 분리) 위험을 제거해야만 합니다._ [[[Under certain circumstances this would present the malicious HTML to the victim. However, this only seems to work with Keep-Alive connections (and many browsers are using one-time connections). But you can't rely on this. _In any case this is a serious bug, and you should update your Rails to version 2.0.5 or 2.1.2 to eliminate Header Injection (and thus response splitting) risks._]]]
 
 
-Default Headers
+[Default Headers] 디폴트 헤더
 ---------------
 
-Every HTTP response from your Rails application receives the following default security headers.
+레일스 어플리케이션의 모든 HTTP 응답은 다음의 디폴트 보안 헤더를 받습니다. [[[Every HTTP response from your Rails application receives the following default security headers.]]]
 
 ```ruby
 config.action_dispatch.default_headers = {
@@ -959,7 +959,7 @@ config.action_dispatch.default_headers = {
 }
 ```
 
-You can configure default headers in `config/application.rb`.
+`config/application.rb`에서 디폴트 헤더를 설정할 수 있습니다. [[[You can configure default headers in `config/application.rb`.]]]
 
 ```ruby
 config.action_dispatch.default_headers = {
@@ -968,38 +968,53 @@ config.action_dispatch.default_headers = {
 }
 ```
 
-Or you can remove them.
+또는 제거할 수 있습니다. [[[Or you can remove them.]]]
 
 ```ruby
 config.action_dispatch.default_headers.clear
 ```
 
-Here is a list of common headers:
+아래에는 흔히 사용하는 헤더 목록이 있습니다. [[[Here is a list of common headers:]]]
 
 * X-Frame-Options
-_'SAMEORIGIN' in Rails by default_ - allow framing on same domain. Set it to 'DENY' to deny framing at all or 'ALLOWALL' if you want to allow framing for all website.
-* X-XSS-Protection
-_'1; mode=block' in Rails by default_ - use XSS Auditor and block page if XSS attack is detected. Set it to '0;' if you want to switch XSS Auditor off(useful if response contents scripts from request parameters)
-* X-Content-Type-Options
-_'nosniff' in Rails by default_ - stops the browser from guessing the MIME type of a file.
-* X-Content-Security-Policy
-[A powerful mechanism for controlling which sites certain content types can be loaded from](http://dvcs.w3.org/hg/content-security-policy/raw-file/tip/csp-specification.dev.html)
-* Access-Control-Allow-Origin
-Used to control which sites are allowed to bypass same origin policies and send cross-origin requests.
-* Strict-Transport-Security
-[Used to control if the browser is allowed to only access a site over a secure connection](http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security)
+_'SAMEORIGIN' 레일스 디폴트 값_ - 동일 도메인에 대해서 프레임 사용(framing)을 가능하게 한다.  프레임 사용을 절대 사용하지 못하도록 하기 위해서 'DENY' 값을 설정하거나, 모든 웹사이트에 대해서 프레임 사용을 허락하기 위해서는 'ALLOWALL' 값을 설정한다. [[[X-Frame-Options
+_'SAMEORIGIN' in Rails by default_ - allow framing on same domain. Set it to 'DENY' to deny framing at all or 'ALLOWALL' if you want to allow framing for all website.]]]
 
-Environmental Security
+* X-XSS-Protection
+_'1; mode=block' 레일스 디폴트 값_ - XSS 공격이 감지되면 XSS Auditor와 차단 페이지를 사용한다. XSS Auditor 기능을 사용하지 않을 때 '0;'으로 설정한다. (이것은 응답 컨텐츠 스크립트가 요청 파라미터로부터 올 경우에 유용한다.) [[[X-XSS-Protection
+_'1; mode=block' in Rails by default_ - use XSS Auditor and block page if XSS attack is detected. Set it to '0;' if you want to switch XSS Auditor off(useful if response contents scripts from request parameters)]]]
+
+* X-Content-Type-Options
+_'nosniff' 레일스 디폴트 값_ - 브라우저가 파일의 MIME 타입을 추측하지 못하게 한다. [[[X-Content-Type-Options
+_'nosniff' in Rails by default_ - stops the browser from guessing the MIME type of a file.]]]
+
+* X-Content-Security-Policy
+[어떤 컨텐트 타입을 로드할 수 있는 사이트를 제어하는데 강력한 메카니즘](http://dvcs.w3.org/hg/content-security-policy/raw-file/tip/csp-specification.dev.html) [[[X-Content-Security-Policy
+[A powerful mechanism for controlling which sites certain content types can be loaded from](http://dvcs.w3.org/hg/content-security-policy/raw-file/tip/csp-specification.dev.html)]]]
+
+* Access-Control-Allow-Origin
+same origin policy를 우회하여 cross-origin 요청을 보낼 수 있도록 사이트를 제어하기 위해서 사용한다. [[[Access-Control-Allow-Origin
+Used to control which sites are allowed to bypass same origin policies and send cross-origin requests.]]]
+
+* Strict-Transport-Security
+[브라우저가 보안 연결상태로만 특정 사이트에 접근할 수 있도록 제어하기 위해서 사용한다.](http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security) [[[Strict-Transport-Security
+[Used to control if the browser is allowed to only access a site over a secure connection](http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security)]]]
+
+
+[Environmental Security] 환경 보안
 ----------------------
 
-It is beyond the scope of this guide to inform you on how to secure your application code and environments. However, please secure your database configuration, e.g. `config/database.yml`, and your server-side secret, e.g. stored in `config/initializers/secret_token.rb`. You may want to further restrict access, using environment-specific versions of these files and any others that may contain sensitive information.
+어플리케이션 코드와 환경에 대한 보안 설정 문제를 다루는 것은 이 가이드의 영역을 벗어나는 것입니다. 그러나, 데이터베이스 설정(`config/database.yml`)과 서버측 secret(`config/initializers/secret_token.rb`)에 대한 보안을 설정하기 바랍니다. 이러한 파일들과 개인정보 관련 정보를 포함하고 있는 모든 것에 대한 환경별 버전을 사용하여 접근을 더 제한할 수 있습니다. [[[It is beyond the scope of this guide to inform you on how to secure your application code and environments. However, please secure your database configuration, e.g. `config/database.yml`, and your server-side secret, e.g. stored in `config/initializers/secret_token.rb`. You may want to further restrict access, using environment-specific versions of these files and any others that may contain sensitive information.]]]
 
-Additional Resources
+[Additional Resources] 추가 리소스
 --------------------
 
-The security landscape shifts and it is important to keep up to date, because missing a new vulnerability can be catastrophic. You can find additional resources about (Rails) security here:
+보안 상황은 변합니다. 따라서 새로운 취약성에 대처하지 못하면 치명적일 수 있기 때문에 항상 최신상태로 업데이트하는 것이 중요합니다. 레일스 관련 보안에 대한 추가적인 리소스를 아래에서 찾아 볼 수 있습니다. [[[The security landscape shifts and it is important to keep up to date, because missing a new vulnerability can be catastrophic. You can find additional resources about (Rails) security here:]]]
 
-* The Ruby on Rails security project posts security news regularly: [http://www.rorsecurity.info](http://www.rorsecurity.info)
-* Subscribe to the Rails security [mailing list](http://groups.google.com/group/rubyonrails-security)
-* [Keep up to date on the other application layers](http://secunia.com/) (they have a weekly newsletter, too)
-* A [good security blog](http://ha.ckers.org/blog/) including the [Cross-Site scripting Cheat Sheet](http://ha.ckers.org/xss.html)
+* Ruby on Rails 보안 프로젝트는 정기적으로 보안 뉴스를 포스팅합니다. [http://www.rorsecurity.info](http://www.rorsecurity.info) [[[The Ruby on Rails security project posts security news regularly: [http://www.rorsecurity.info](http://www.rorsecurity.info)]]]
+
+* Rails security를 정기구독 합시다. [mailing list](http://groups.google.com/group/rubyonrails-security) [[[Subscribe to the Rails security [mailing list](http://groups.google.com/group/rubyonrails-security)]]]
+
+* [다른 어플리케이션 레이어에 대해 최신 상태로 업데이트 하십시요.](http://secunia.com/) 여기서는 주간 뉴스레터도 제공합니다. [[[[Keep up to date on the other application layers](http://secunia.com/) (they have a weekly newsletter, too)]]]
+
+* [Cross-Site scripting Cheat Sheet](http://ha.ckers.org/xss.html)를 포함하는 [훌륭한 보안 블로그 ](http://ha.ckers.org/blog/)[[[A [good security blog](http://ha.ckers.org/blog/) including the [Cross-Site scripting Cheat Sheet](http://ha.ckers.org/xss.html)]]]
