@@ -47,7 +47,7 @@
     -
       name: 액션 뷰 폼 헬퍼메소드
       url: form_helpers.html
-      description: 이 가이드 내용은 내장 폼 헬퍼메소드 사용에 대해 다룬다. 
+      description: 이 가이드 내용은 내장 폼 헬퍼메소드 사용에 대해 다룬다.
 -
   name: 컨트롤러
   documents:
@@ -82,7 +82,7 @@
     -
       name: 레일스 어플리케이션 보안
       url: security.html
-      description: 이 가이드 내용은 웹어플리케이션에서의 일반적인 보안문제와 레일스에서의 해결방법에 대해서 기술하고 있다. 
+      description: 이 가이드 내용은 웹어플리케이션에서의 일반적인 보안문제와 레일스에서의 해결방법에 대해서 기술하고 있다.
     -
       name: 레일스 어플리케이션 디버깅
       url: debugging_rails_applications.html
@@ -106,7 +106,6 @@
       description: 이 가이드 내용은 asset pipeline에 대해서 기술한다.
     -
       name: 레일스에서 자바스크립트로 작업하기
-      work_in_progress: true
       url: working_with_javascript_in_rails.html
       description: 이 가이드 내용은 레일스의 내장 Ajax/Javascript 기능을 다룬다.
     -
