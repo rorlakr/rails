@@ -510,25 +510,26 @@ NOTE: `options_for_select`에 전달되는 배열의 쌍은 첫번째는 문자�
 
 레일스는 국가를 선택하기위해 `country_select` 헬퍼를 _사용_합니다. 하지만 이것은 [country_select plugin](https://github.com/stefanpenner/country_select)으로 분리되어 있습니다. 이것을 사용할때 특정이름을 목록에 포함하거나 제외하는것은 논란의 여지가 있다는것을 인식해야합니다.(이것은 레일스로부터 분리된 이유이기도 합니다) [[[Rails _used_ to have a `country_select` helper for choosing countries, but this has been extracted to the [country_select plugin](https://github.com/stefanpenner/country_select). When using this, be aware that the exclusion or inclusion of certain names from the list can be somewhat controversial (and was the reason this functionality was extracted from Rails).]]]
 
-Using Date and Time Form Helpers
+[Using Date and Time Form Helpers] 날짜와 시간 폼 헬퍼 사용하기
 --------------------------------
 
-You can choose not to use the form helpers generating HTML5 date and time input fields and use the alternative date and time helpers. These date and time helpers differ from all the other form helpers in two important respects:
+HTML5에서 제공하는 날짜와 시간 입력 필드를 생성하는 폼헬퍼를 사용하지 않고 다른 헬퍼를 선택할 수 있습니다. 이러한 날짜와 시간 헬퍼는 다른 폼 헬퍼와 다른 두가지가 있습니다. [[[You can choose not to use the form helpers generating HTML5 date and time input fields and use the alternative date and time helpers. These date and time helpers differ from all the other form helpers in two important respects:]]]
 
-* Dates and times are not representable by a single input element. Instead you have several, one for each component (year, month, day etc.) and so there is no single value in your `params` hash with your date or time.
-* Other helpers use the `_tag` suffix to indicate whether a helper is a barebones helper or one that operates on model objects. With dates and times, `select_date`, `select_time` and `select_datetime` are the barebones helpers, `date_select`, `time_select` and `datetime_select` are the equivalent model object helpers.
+* 날짜와 시간은 하나의 입력 항목으로 표현되지 않습니다. 대신 각 항목의 컴포넌트(년, 월, 일 등...)를 가지며 `params` 해쉬에 하나의 값으로 날짜와 시간이 전달 되지 않습니다. [[[Dates and times are not representable by a single input element. Instead you have several, one for each component (year, month, day etc.) and so there is no single value in your `params` hash with your date or time.]]]
 
-Both of these families of helpers will create a series of select boxes for the different components (year, month, day etc.).
+* 다른 헬퍼는 `_tag` 접미사를 가지는 것으로 기본 헬퍼인지 아니면 모델객체와 연결된 객체인지 판단합니다. 하지만 날짜와 시간 헬퍼의 경우 `select_date`, `select_time`, `select_datetime`은 기본 헬퍼, `date_select`, `time_select`, `datetime_select`는 모델객체 헬퍼입니다. [[[Other helpers use the `_tag` suffix to indicate whether a helper is a barebones helper or one that operates on model objects. With dates and times, `select_date`, `select_time` and `select_datetime` are the barebones helpers, `date_select`, `time_select` and `datetime_select` are the equivalent model object helpers.]]]
 
-### Barebones Helpers
+헬퍼는 여러개의 select 박스로 이루어진 각기 다른 컴포넌트(년도, 월, 일 등)를 생성합니다. [[[Both of these families of helpers will create a series of select boxes for the different components (year, month, day etc.).]]]
 
-The `select_*` family of helpers take as their first argument an instance of Date, Time or DateTime that is used as the currently selected value. You may omit this parameter, in which case the current date is used. For example
+### [Barebones Helpers] 기본 헬퍼
+
+`select_*`와 비슷한 헬퍼는 첫번째 인수로 Date, Time, DateTime 인스턴스를 받아서 현재 선택된 값을 결정하는데 사용합니다. 해당 값을 전달하지 않는경우 현재 날짜값이 사용됩니다. 예를들어 [[[The `select_*` family of helpers take as their first argument an instance of Date, Time or DateTime that is used as the currently selected value. You may omit this parameter, in which case the current date is used. For example]]]
 
 ```erb
 <%= select_date Date.today, prefix: :start_date %>
 ```
 
-outputs (with actual option values omitted for brevity)
+결과(실제 옵션 값은 간결함을 위해 생략) [[[outputs (with actual option values omitted for brevity)]]]
 
 ```html
 <select id="start_date_year" name="start_date[year]"> ... </select>
@@ -536,24 +537,23 @@ outputs (with actual option values omitted for brevity)
 <select id="start_date_day" name="start_date[day]"> ... </select>
 ```
 
-The above inputs would result in `params[:start_date]` being a hash with keys `:year`, `:month`, `:day`. To get an actual Time or Date object you would have to extract these values and pass them to the appropriate constructor, for example
+위의 input은 `params[:start_date]` 해쉬에 `:year`, `:month`, `:day` 키를 가지도록 합니다. 실제 Time, Date 객체를 얻기 위해서는 추출된 값을 알맞은 생성자에 전달해야 합니다. 예를들어 [[[The above inputs would result in `params[:start_date]` being a hash with keys `:year`, `:month`, `:day`. To get an actual Time or Date object you would have to extract these values and pass them to the appropriate constructor, for example]]]
 
 ```ruby
 Date.civil(params[:start_date][:year].to_i, params[:start_date][:month].to_i, params[:start_date][:day].to_i)
 ```
 
-The `:prefix` option is the key used to retrieve the hash of date components from the `params` hash. Here it was set to `start_date`, if omitted it will default to `date`.
+`:prefix` 옵션은 `params` 해쉬에서 날짜 컴포넌트 키로 사용합니다. 여기서는 `start_date`로 설정되어 있고 생략하는경우 기본값은 `date`입니다. [[[The `:prefix` option is the key used to retrieve the hash of date components from the `params` hash. Here it was set to `start_date`, if omitted it will default to `date`.]]]
 
-### Model Object Helpers
+### [Model Object Helpers] 모델 객체 헬퍼
 
-`select_date` does not work well with forms that update or create Active Record objects as Active Record expects each element of the `params` hash to correspond to one attribute.
-The model object helpers for dates and times submit parameters with special names; when Active Record sees parameters with such names it knows they must be combined with the other parameters and given to a constructor appropriate to the column type. For example:
+`select_date`는 `params` 해쉬에 Active Record가 예상하는 적합한 하나의 값으로 제공되지 않기 때문에 Active Record 객체에 수정하거나 생성하는데 알맞지 않습니다. [[[`select_date` does not work well with forms that update or create Active Record objects as Active Record expects each element of the `params` hash to correspond to one attribute.]]]
+날짜와 시간을 위한 모델 객체 헬퍼는 특별한 이름을 가진 변수를 전송합니다; Active Record가 보기에 생성자에 적합한 컬럼 타입이 주어지는 형태를 가집니다. 예를들어: [[[The model object helpers for dates and times submit parameters with special names; when Active Record sees parameters with such names it knows they must be combined with the other parameters and given to a constructor appropriate to the column type. For example:]]]
 
 ```erb
 <%= date_select :person, :birth_date %>
 ```
-
-outputs (with actual option values omitted for brevity)
+결과 (실제 옵션 값은 간결함을 위해 생략) [[[outputs (with actual option values omitted for brevity)]]]
 
 ```html
 <select id="person_birth_date_1i" name="person[birth_date(1i)]"> ... </select>
@@ -561,41 +561,41 @@ outputs (with actual option values omitted for brevity)
 <select id="person_birth_date_3i" name="person[birth_date(3i)]"> ... </select>
 ```
 
-which results in a `params` hash like
+`params` 해쉬의 결과는 다음과 같습니다 [[[which results in a `params` hash like]]]
 
 ```ruby
 {:person => {'birth_date(1i)' => '2008', 'birth_date(2i)' => '11', 'birth_date(3i)' => '22'}}
 ```
 
-When this is passed to `Person.new` (or `update`), Active Record spots that these parameters should all be used to construct the `birth_date` attribute and uses the suffixed information to determine in which order it should pass these parameters to functions such as `Date.civil`.
+`Person.new` (또는 `update`)에 변수가 전달되면 Active Record는 `birth_date` 속성을 생성하는데 `Date.civil`이 동작하는것처럼 알맞은 값이 전달됩니다. [[[When this is passed to `Person.new` (or `update`), Active Record spots that these parameters should all be used to construct the `birth_date` attribute and uses the suffixed information to determine in which order it should pass these parameters to functions such as `Date.civil`.]]]
 
-### Common Options
+### [Common Options] 공통 옵션
 
-Both families of helpers use the same core set of functions to generate the individual select tags and so both accept largely the same options. In particular, by default Rails will generate year options 5 years either side of the current year. If this is not an appropriate range, the `:start_year` and `:end_year` options override this. For an exhaustive list of the available options, refer to the [API documentation](http://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html).
+두 헬퍼는 각각의 select 태그를 생성하는데 동일한 핵심 함수를 사용하고 많은 비슷한 옵션을 가집니다. 레일스는 현재 년도의 앞뒤 5년에 해당하는 년도 옵션을 생성합니다. 만약 이게 적절한 범위가 아니라면 `:start_year`, `:end_year` 옵션을 이용해 변경할 수 있습니다. 사용가능한 옵션의 완전한 목록은 [API 문서](http://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html)를 참고하시기 바랍니다. [[[Both families of helpers use the same core set of functions to generate the individual select tags and so both accept largely the same options. In particular, by default Rails will generate year options 5 years either side of the current year. If this is not an appropriate range, the `:start_year` and `:end_year` options override this. For an exhaustive list of the available options, refer to the [API documentation](http://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html).]]]
 
-As a rule of thumb you should be using `date_select` when working with model objects and `select_date` in other cases, such as a search form which filters results by date.
+경험으로 볼때 모델 객체와 연동할때는 `date_select`를 사용하고 그렇지 않고 검색 제한과 같은 다른경우에는 `select_date`를 사용하는것이 좋습니다. [[[As a rule of thumb you should be using `date_select` when working with model objects and `select_date` in other cases, such as a search form which filters results by date.]]]
 
-NOTE: In many cases the built-in date pickers are clumsy as they do not aid the user in working out the relationship between the date and the day of the week.
+NOTE: 많은 경우 브라우저 자체 날짜 선택창은 어설프고 날짜와 한주의 시작일이 연동되는것이 고려되지 않습니다. [[[In many cases the built-in date pickers are clumsy as they do not aid the user in working out the relationship between the date and the day of the week.]]]
 
-### Individual Components
+### [Individual Components] 개별 컴포넌트
 
-Occasionally you need to display just a single date component such as a year or a month. Rails provides a series of helpers for this, one for each component `select_year`, `select_month`, `select_day`, `select_hour`, `select_minute`, `select_second`. These helpers are fairly straightforward. By default they will generate an input field named after the time component (for example "year" for `select_year`, "month" for `select_month` etc.) although this can be overridden with the  `:field_name` option. The `:prefix` option works in the same way that it does for `select_date` and `select_time` and has the same default value.
+가끔 년도나 월처럼 하나의 날짜 컴포넌트만 표시할 필요가 있습니다. 레일스는 이를 위해 `select_year`, `select_month`, `select_day`, `select_hour`, `select_minute`, `select_second` 헬퍼를 제공합니다. 이 헬퍼들은 쉽게 사용할 수 있습니다. 기본값으로 컴포넌트의 이름으로 input 이름을 설정 하고(예를들어 `select_year`는 "year", `select_month`는 "month") 이는 `:field_name` 옵션으로 변경 가능 합니다. `:prefix` 옵션은 `select_date`, `select_time`에서와 기본값, 동작박식이 동일합니다. [[[Occasionally you need to display just a single date component such as a year or a month. Rails provides a series of helpers for this, one for each component `select_year`, `select_month`, `select_day`, `select_hour`, `select_minute`, `select_second`. These helpers are fairly straightforward. By default they will generate an input field named after the time component (for example "year" for `select_year`, "month" for `select_month` etc.) although this can be overridden with the  `:field_name` option. The `:prefix` option works in the same way that it does for `select_date` and `select_time` and has the same default value.]]]
 
-The first parameter specifies which value should be selected and can either be an instance of a Date, Time or DateTime, in which case the relevant component will be extracted, or a numerical value. For example
+첫번째 변수는 선택될 날짜로 Date, Time, DateTime 인스턴스이거나 컴포넌트에 적절한 값이거나 숫자입니다. 예를들어 [[[The first parameter specifies which value should be selected and can either be an instance of a Date, Time or DateTime, in which case the relevant component will be extracted, or a numerical value. For example]]]
 
 ```erb
 <%= select_year(2009) %>
 <%= select_year(Time.now) %>
 ```
 
-will produce the same output if the current year is 2009 and the value chosen by the user can be retrieved by `params[:date][:year]`.
+현재 년도가 2009년이라면 동일한 결과를 생성하고 유저가 선택한 값은 `params[:date][:year]`에서 찾을수 있습니다. [[[will produce the same output if the current year is 2009 and the value chosen by the user can be retrieved by `params[:date][:year]`.]]]
 
-Uploading Files
+[Uploading Files] 파일 업로드 
 ---------------
 
-A common task is uploading some sort of file, whether it's a picture of a person or a CSV file containing data to process. The most important thing to remember with file uploads is that the rendered form's encoding **MUST** be set to "multipart/form-data". If you use `form_for`, this is done automatically. If you use `form_tag`, you must set it yourself, as per the following example.
+사람의 사진이나 작업할 내용을 포함한 CSV 파일과 같은 것이든 파일을 업로드 하는것은 일반적인 작업입니다. 파일을 업로드 하는데 기억해야할 가장 중요한것은 form 인코딩이 **반드시** "multipart/form-data" 이어야 한다는것입니다. `form_for`를 사용하는경우 이는 자동으로 적용됩니다. `form_tag`를 사용하는경우 다음 예제와 같이 직접 설정해야합니다. [[[A common task is uploading some sort of file, whether it's a picture of a person or a CSV file containing data to process. The most important thing to remember with file uploads is that the rendered form's encoding **MUST** be set to "multipart/form-data". If you use `form_for`, this is done automatically. If you use `form_tag`, you must set it yourself, as per the following example.]]]
 
-The following two forms both upload a file.
+다음 2개의 form은 파일을 업로드 합니다. [[[The following two forms both upload a file.]]]
 
 ```erb
 <%= form_tag({action: :upload}, multipart: true) do %>
@@ -607,11 +607,11 @@ The following two forms both upload a file.
 <% end %>
 ```
 
-Rails provides the usual pair of helpers: the barebones `file_field_tag` and the model oriented `file_field`. The only difference with other helpers is that you cannot set a default value for file inputs as this would have no meaning. As you would expect in the first case the uploaded file is in `params[:picture]` and in the second case in `params[:person][:picture]`.
+레일스는 두개의 헬퍼를 제공합니다: 기본헬퍼인 `file_field_tag`, 모델과 연동된 `file_field` 헬퍼. 다른 헬퍼들과 다르게 기본값을 설정할 수 없다는것이 유일하게 다른점입니다. 첫번째 예제의 업로드 파일은 `params[:picture]`에 두번째 예제는 `params[:person][:picture]`에 전달될것을 예상할 수 있습니다. [[[Rails provides the usual pair of helpers: the barebones `file_field_tag` and the model oriented `file_field`. The only difference with other helpers is that you cannot set a default value for file inputs as this would have no meaning. As you would expect in the first case the uploaded file is in `params[:picture]` and in the second case in `params[:person][:picture]`.]]]
 
-### What Gets Uploaded
+### [What Gets Uploaded] 업로드된것은 어떻게 가져오는가
 
-The object in the `params` hash is an instance of a subclass of IO. Depending on the size of the uploaded file it may in fact be a StringIO or an instance of File backed by a temporary file. In both cases the object will have an `original_filename` attribute containing the name the file had on the user's computer and a `content_type` attribute containing the MIME type of the uploaded file. The following snippet saves the uploaded content in `#{Rails.root}/public/uploads` under the same name as the original file (assuming the form was the one in the previous example).
+`params` 해쉬에 저장된 업로드된 객체는 IO의 서브클래스 인스턴스입니다. 업로드되는 파일 사이즈에 따라서 StringIO 혹은 임시 저장된 파일의 File 인스턴스가 됩니다. 두 경우 모두 `original_filename` 속성에 사용자 컴퓨터의 파일이름을 가지고 `content_type` 속성에 업로드된 파일의 MIME 종류가 설정됩니다. 다음의 코드는 업로드된 객체를 `#{Rails.root}/public/uploads`에 원본파일과 동일한 이름으로 저장합니다.(form은 이전 예제라고 가정합니다) [[[The object in the `params` hash is an instance of a subclass of IO. Depending on the size of the uploaded file it may in fact be a StringIO or an instance of File backed by a temporary file. In both cases the object will have an `original_filename` attribute containing the name the file had on the user's computer and a `content_type` attribute containing the MIME type of the uploaded file. The following snippet saves the uploaded content in `#{Rails.root}/public/uploads` under the same name as the original file (assuming the form was the one in the previous example).]]]
 
 ```ruby
 def upload
@@ -622,13 +622,13 @@ def upload
 end
 ```
 
-Once a file has been uploaded, there are a multitude of potential tasks, ranging from where to store the files (on disk, Amazon S3, etc) and associating them with models to resizing image files and generating thumbnails. The intricacies of this are beyond the scope of this guide, but there are several libraries designed to assist with these. Two of the better known ones are [CarrierWave](https://github.com/jnicklas/carrierwave) and [Paperclip](http://www.thoughtbot.com/projects/paperclip).
+파일이 업로드되면 이미지 리사이징, 썸네일 생성을 위한 파일의 저장위치(디스크, 아마존 S3 등)와 모델객체의 연결과 같은 여러가지의 잠재적 작업이 있습니다. 이러한 작업은 본 가이드의 범위를 벗어나지만 이러한 작업을 위한 라이브러리들이 있습니다. [CarrierWave](https://github.com/jnicklas/carrierwave)와 [Paperclip](http://www.thoughtbot.com/projects/paperclip)이 가장 잘 알려진것들입니다. [[[Once a file has been uploaded, there are a multitude of potential tasks, ranging from where to store the files (on disk, Amazon S3, etc) and associating them with models to resizing image files and generating thumbnails. The intricacies of this are beyond the scope of this guide, but there are several libraries designed to assist with these. Two of the better known ones are [CarrierWave](https://github.com/jnicklas/carrierwave) and [Paperclip](http://www.thoughtbot.com/projects/paperclip).]]]
 
-NOTE: If the user has not selected a file the corresponding parameter will be an empty string.
+NOTE: 사용자가 파일을 선택하지 않으면 이에 상응하는 파라미터에는 빈 문자열이 설정됩니다. [[[If the user has not selected a file the corresponding parameter will be an empty string.]]]
 
-### Dealing with Ajax
+### [Dealing with Ajax] Ajax로 다루기
 
-Unlike other forms making an asynchronous file upload form is not as simple as providing `form_for` with `remote: true`. With an Ajax form the serialization is done by JavaScript running inside the browser and since JavaScript cannot read files from your hard drive the file cannot be uploaded. The most common workaround is to use an invisible iframe that serves as the target for the form submission.
+다른 form들과 다르게 비동기적인 파일 업로드는 `form_for`에서 제공하는 `remote: true`로 간단히 되지 않습니다. Ajax form 직렬화는 브라우저안의 자바스크립트에 의해서 실행되는데 자바스크립트는 하드 드라이브에 있는 파일을 읽을수 없기 때문에 업로드 할 수 없습니다. 가장 일반적인 해결책은 보이지 않는 iframe를 이용해 form을 전송하는것입니다. [[[Unlike other forms making an asynchronous file upload form is not as simple as providing `form_for` with `remote: true`. With an Ajax form the serialization is done by JavaScript running inside the browser and since JavaScript cannot read files from your hard drive the file cannot be uploaded. The most common workaround is to use an invisible iframe that serves as the target for the form submission.]]]
 
 Customizing Form Builders
 -------------------------
