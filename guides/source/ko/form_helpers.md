@@ -630,10 +630,10 @@ NOTE: 사용자가 파일을 선택하지 않으면 이에 상응하는 파라�
 
 다른 form들과 다르게 비동기적인 파일 업로드는 `form_for`에서 제공하는 `remote: true`로 간단히 되지 않습니다. Ajax form 직렬화는 브라우저안의 자바스크립트에 의해서 실행되는데 자바스크립트는 하드 드라이브에 있는 파일을 읽을수 없기 때문에 업로드 할 수 없습니다. 가장 일반적인 해결책은 보이지 않는 iframe를 이용해 form을 전송하는것입니다. [[[Unlike other forms making an asynchronous file upload form is not as simple as providing `form_for` with `remote: true`. With an Ajax form the serialization is done by JavaScript running inside the browser and since JavaScript cannot read files from your hard drive the file cannot be uploaded. The most common workaround is to use an invisible iframe that serves as the target for the form submission.]]]
 
-Customizing Form Builders
+[Customizing Form Builders] Customizing Form Builders
 -------------------------
 
-As mentioned previously the object yielded by `form_for` and `fields_for` is an instance of FormBuilder (or a subclass thereof). Form builders encapsulate the notion of displaying form elements for a single object. While you can of course write helpers for your forms in the usual way, you can also subclass FormBuilder and add the helpers there. For example
+이전에 언급한것처럼 `form_for`, `fields_for`의 yield된 객체는 FormBuilder의 인스턴스(혹은 상속받은 클래스의 인스턴스) 입니다. form 빌더는 한개의 객체를 위한 form 요소의 출력을 캡슐화한것입니다. 당신의 form을 위해 헬퍼를 만들수도 있고, FormBuilder를 상속받고 헬퍼를 추가할 수 있습니다. [[[As mentioned previously the object yielded by `form_for` and `fields_for` is an instance of FormBuilder (or a subclass thereof). Form builders encapsulate the notion of displaying form elements for a single object. While you can of course write helpers for your forms in the usual way, you can also subclass FormBuilder and add the helpers there. For example]]]
 
 ```erb
 <%= form_for @person do |f| %>
@@ -641,7 +641,7 @@ As mentioned previously the object yielded by `form_for` and `fields_for` is an 
 <% end %>
 ```
 
-can be replaced with
+다음과 같이 대체 가능 [[[can be replaced with]]]
 
 ```erb
 <%= form_for @person, builder: LabellingFormBuilder do |f| %>
@@ -649,7 +649,7 @@ can be replaced with
 <% end %>
 ```
 
-by defining a LabellingFormBuilder class similar to the following:
+LabellingFormBuilder 클래스는 다음과 같은 형태로 정의 [[[by defining a LabellingFormBuilder class similar to the following:]]]
 
 ```ruby
 class LabellingFormBuilder < ActionView::Helpers::FormBuilder
@@ -659,60 +659,59 @@ class LabellingFormBuilder < ActionView::Helpers::FormBuilder
 end
 ```
 
-If you reuse this frequently you could define a `labeled_form_for` helper that automatically applies the `builder: LabellingFormBuilder` option.
+만약 이를 자주 재사용하게 된다면 `labeled_form_for` 헬퍼를 만들어 자동으로 `builder: LabellingFormBuilder` 옵션이 적용되게 할 수 있습니다. [[[If you reuse this frequently you could define a `labeled_form_for` helper that automatically applies the `builder: LabellingFormBuilder` option.]]]
 
-The form builder used also determines what happens when you do
+form 빌더는 다음과 같은 상황에서도 어떤일은 할지 결정하는데 사용됩니다. [[[The form builder used also determines what happens when you do]]]
 
 ```erb
 <%= render partial: f %>
 ```
 
-If `f` is an instance of FormBuilder then this will render the `form` partial, setting the partial's object to the form builder. If the form builder is of class LabellingFormBuilder then the `labelling_form` partial would be rendered instead.
+만약 `f`가 FormBuilder 인스턴스라면 `form` partial을 사용하고 partial의 object 변수에 form 빌더를 설정합니다. form 빌더가 LabellingFormBuilder의 인스턴스인경우 `labelling_form` partial을 사용합니다. [[[If `f` is an instance of FormBuilder then this will render the `form` partial, setting the partial's object to the form builder. If the form builder is of class LabellingFormBuilder then the `labelling_form` partial would be rendered instead.]]]
 
-Understanding Parameter Naming Conventions
+[Understanding Parameter Naming Conventions] 파라미터 이름 규칙에 대한 이해
 ------------------------------------------
 
-As you've seen in the previous sections, values from forms can be at the top level of the `params` hash or nested in another hash. For example in a standard `create`
-action for a Person model, `params[:person]` would usually be a hash of all the attributes for the person to create. The `params` hash can also contain arrays, arrays of hashes and so on.
+이전 섹션에서 살펴 본것처럼 form으로부터 전송받은 값들은 `params` 해쉬 혹은 그 하위에 중첩 해쉬형태로 저장됩니다. 예를들어 Person 모델의 `create` 액션은 `params[:person]`에 person 인스턴스를 생성하기 위한 모든 속성값이 저장되어 있습니다. `params` 해쉬는 배열, 해쉬들의 배열등도 가질수 있습니다. [[[As you've seen in the previous sections, values from forms can be at the top level of the `params` hash or nested in another hash. For example in a standard `create` action for a Person model, `params[:person]` would usually be a hash of all the attributes for the person to create. The `params` hash can also contain arrays, arrays of hashes and so on.]]]
 
-Fundamentally HTML forms don't know about any sort of structured data, all they generate is name–value pairs, where pairs are just plain strings. The arrays and hashes you see in your application are the result of some parameter naming conventions that Rails uses.
+기본적으로 HTML form은 구조화된 데이터에 대해 알지 못하고 단순한 문자열인경우 모두 이름-값 형태로 생성됩니다. 어플리케이션에서 배열과 해쉬를 사용하기위해서는 레일스의 이름 규칙에 따른 결과입니다. [[[Fundamentally HTML forms don't know about any sort of structured data, all they generate is name–value pairs, where pairs are just plain strings. The arrays and hashes you see in your application are the result of some parameter naming conventions that Rails uses.]]]
 
-TIP: You may find you can try out examples in this section faster by using the console to directly invoke Racks' parameter parser. For example,
+TIP: 다음의 예제들은 Racks 파라미터 파서를 이용해 콘솔에서 빠르게 확인할 수있습니다. 예를들어, [[[You may find you can try out examples in this section faster by using the console to directly invoke Racks' parameter parser. For example,]]]
 
 ```ruby
 Rack::Utils.parse_query "name=fred&phone=0123456789"
 # => {"name"=>"fred", "phone"=>"0123456789"}
 ```
 
-### Basic Structures
+### [Basic Structures] 기본 자료구조
 
-The two basic structures are arrays and hashes. Hashes mirror the syntax used for accessing the value in `params`. For example if a form contains
+두개의 기본 자료구조는 배열과 해쉬입니다. 해쉬는 `params` 값에 접근하는 방법과 동일한 규칙을 가집니다. 예를들어 form이 다음과 같다면 [[[The two basic structures are arrays and hashes. Hashes mirror the syntax used for accessing the value in `params`. For example if a form contains]]]
 
 ```html
 <input id="person_name" name="person[name]" type="text" value="Henry"/>
 ```
 
-the `params` hash will contain
+`params` 해쉬는 다음과 같습니다 [[[the `params` hash will contain]]]
 
 ```erb
 {'person' => {'name' => 'Henry'}}
 ```
 
-and `params[:person][:name]` will retrieve the submitted value in the controller.
+그리고 컨트롤러에서는 `params[:person][:name]`와 같이 전송된 값을 조회할 수 있습니다. [[[and `params[:person][:name]` will retrieve the submitted value in the controller.]]]
 
-Hashes can be nested as many levels as required, for example
+해쉬는 원하는만큼 중첩될수 있습니다. 예를들어 [[[Hashes can be nested as many levels as required, for example]]]
 
 ```html
 <input id="person_address_city" name="person[address][city]" type="text" value="New York"/>
 ```
 
-will result in the `params` hash being
+`params` 해쉬는 다음과 같습니다 [[[will result in the `params` hash being]]]
 
 ```ruby
 {'person' => {'address' => {'city' => 'New York'}}}
 ```
 
-Normally Rails ignores duplicate parameter names. If the parameter name contains an empty set of square brackets [] then they will be accumulated in an array. If you wanted people to be able to input multiple phone numbers, you could place this in the form:
+일반적으로 레일스에서는 중복되는 파라미터 이름은 무시합니다. 만약 파라미터 이름이 빈 대괄호[]로 이루어진경우 배열로 저장됩니다. 만약 people에 여러개의 phone_number가 존재하는 경우, form에서 다음과 같이할 수 있습니다. [[[Normally Rails ignores duplicate parameter names. If the parameter name contains an empty set of square brackets [] then they will be accumulated in an array. If you wanted people to be able to input multiple phone numbers, you could place this in the form:]]]
 
 ```html
 <input name="person[phone_number][]" type="text"/>
@@ -720,11 +719,11 @@ Normally Rails ignores duplicate parameter names. If the parameter name contains
 <input name="person[phone_number][]" type="text"/>
 ```
 
-This would result in `params[:person][:phone_number]` being an array.
+이에 대한 결과는 `params[:person][:phone_number]`에 배열로 저장됩니다. [[[This would result in `params[:person][:phone_number]` being an array.]]]
 
-### Combining Them
+### [Combining Them] 조합해서 사용
 
-We can mix and match these two concepts. For example, one element of a hash might be an array as in the previous example, or you can have an array of hashes. For example a form might let you create any number of addresses by repeating the following form fragment
+우리는 두개의 컨셉을 적절히 섞어서 사용할 수 있습니다. 이전의 예제에서 한개의 해쉬 항목이 배열이 될수도 있고, 해쉬의 배열이 될수도 있습니다. 예를들어 여러개의 주소를 가지는 form조각이 반복되는 form을 만들수 있습니다. [[[We can mix and match these two concepts. For example, one element of a hash might be an array as in the previous example, or you can have an array of hashes. For example a form might let you create any number of addresses by repeating the following form fragment]]]
 
 ```html
 <input name="addresses[][line1]" type="text"/>
@@ -732,17 +731,17 @@ We can mix and match these two concepts. For example, one element of a hash migh
 <input name="addresses[][city]" type="text"/>
 ```
 
-This would result in `params[:addresses]` being an array of hashes with keys `line1`, `line2` and `city`. Rails decides to start accumulating values in a new hash whenever it encounters an input name that already exists in the current hash.
+이에대한 결과로 `params[:addresses]`는 배열이 되고 배열의 항목은 `line1`, `line2`, `city` 키를 가진 해쉬로 이루어집니다. 레일스는 이미 존재하는 해쉬와 동일한 이름이 입력되면 새로운 해쉬를 생성합니다. [[[This would result in `params[:addresses]` being an array of hashes with keys `line1`, `line2` and `city`. Rails decides to start accumulating values in a new hash whenever it encounters an input name that already exists in the current hash.]]]
 
-There's a restriction, however, while hashes can be nested arbitrarily, only one level of "arrayness" is allowed. Arrays can be usually replaced by hashes, for example instead of having an array of model objects one can have a hash of model objects keyed by their id, an array index or some other parameter.
+하지만 해쉬의 중첩에는 한개 레벨의 배열만 가질수 있다는 제약이 있습니다. 배열은 대개 해쉬로 대체가능합니다. 예를들어 모델 객체의 배열대신 모델객체의 id, 배열의 인덱스, 다른 파라미터를 키로하는  하나의 해쉬로 대체 가능합니다. [[[There's a restriction, however, while hashes can be nested arbitrarily, only one level of "arrayness" is allowed. Arrays can be usually replaced by hashes, for example instead of having an array of model objects one can have a hash of model objects keyed by their id, an array index or some other parameter.]]]
 
-WARNING: Array parameters do not play well with the `check_box` helper. According to the HTML specification unchecked checkboxes submit no value. However it is often convenient for a checkbox to always submit a value. The `check_box` helper fakes this by creating an auxiliary hidden input with the same name. If the checkbox is unchecked only the hidden input is submitted and if it is checked then both are submitted but the value submitted by the checkbox takes precedence. When working with array parameters this duplicate submission will confuse Rails since duplicate input names are how it decides when to start a new array element. It is preferable to either use `check_box_tag` or to use hashes instead of arrays.
+WARNING: 배열 파라미터는 `check_box` 헬퍼에 대해서 잘 동작하지 않습니다. HTML 스펙정의에 보면 체크되지 않은 checkbox는 값을 전송하지 않습니다. 하지만 보통 편의를 위해 checkbox의 값을 항상 전송합니다. `check_box` 헬퍼는 이를위해 동일한 이름을 가지는 hidden input을 만들어 처리합니다. checkbox가 체크되지 않은경우 hidden input의 값만 전송되고 체크된경우는 두개 모두 전송되지만 checkbox의 값을 우선사용합니다. 배열 파라미터를 이와같이 중복되게 전송하는경우 레일스는 언제 새로운 배열을 만들어야될지 결정하는데 혼란이옵니다. `check_box_tag`를 사용하거나 배열대신 해쉬를 사용하는것이 더 좋습니다. [[[Array parameters do not play well with the `check_box` helper. According to the HTML specification unchecked checkboxes submit no value. However it is often convenient for a checkbox to always submit a value. The `check_box` helper fakes this by creating an auxiliary hidden input with the same name. If the checkbox is unchecked only the hidden input is submitted and if it is checked then both are submitted but the value submitted by the checkbox takes precedence. When working with array parameters this duplicate submission will confuse Rails since duplicate input names are how it decides when to start a new array element. It is preferable to either use `check_box_tag` or to use hashes instead of arrays.]]]
 
-### Using Form Helpers
+### [Using Form Helpers] Form 헬퍼 사용
 
-The previous sections did not use the Rails form helpers at all. While you can craft the input names yourself and pass them directly to helpers such as `text_field_tag` Rails also provides higher level support. The two tools at your disposal here are the name parameter to `form_for` and `fields_for` and the `:index` option that helpers take.
+이전 섹션에서는 레일스 form 헬퍼 전부를 사용하지 않았습니다. input name을 직접 만들어 `text_field_tag`와 같이 헬퍼에 직접전달할때 레일스는 보다 높은 수준의 도움을 제공합니다. 당신의 name 파라미터를 처리를 위해 `form_for`, `fields_for` 두개의 헬퍼의 `:index` 옵션을 이용합니다. [[[The previous sections did not use the Rails form helpers at all. While you can craft the input names yourself and pass them directly to helpers such as `text_field_tag` Rails also provides higher level support. The two tools at your disposal here are the name parameter to `form_for` and `fields_for` and the `:index` option that helpers take.]]]
 
-You might want to render a form with a set of edit fields for each of a person's addresses. For example:
+당신은 각 사람마다 여러개의 주소를 가지는 form을 렌더링할수 있습니다. 예를들어: [[[You might want to render a form with a set of edit fields for each of a person's addresses. For example:]]]
 
 ```erb
 <%= form_for @person do |person_form| %>
@@ -755,7 +754,7 @@ You might want to render a form with a set of edit fields for each of a person's
 <% end %>
 ```
 
-Assuming the person had two addresses, with ids 23 and 45 this would create output similar to this:
+한 사람이 2개의 주소를 가진다고 가정하고, id는 23, 45라면 출력은 다음과 같을것입니다: [[[Assuming the person had two addresses, with ids 23 and 45 this would create output similar to this:]]]
 
 ```html
 <form accept-charset="UTF-8" action="/people/1" class="edit_person" id="edit_person_1" method="post">
@@ -765,15 +764,15 @@ Assuming the person had two addresses, with ids 23 and 45 this would create outp
 </form>
 ```
 
-This will result in a `params` hash that looks like
+`params` 해쉬의 결과는 다음과 같습니다 [[[This will result in a `params` hash that looks like]]]
 
 ```ruby
 {'person' => {'name' => 'Bob', 'address' => {'23' => {'city' => 'Paris'}, '45' => {'city' => 'London'}}}}
 ```
 
-Rails knows that all these inputs should be part of the person hash because you called `fields_for` on the first form builder. By specifying an `:index` option you're telling Rails that instead of naming the inputs `person[address][city]` it should insert that index surrounded by [] between the address and the city. If you pass an Active Record object as we did then Rails will call `to_param` on it, which by default returns the database id. This is often useful as it is then easy to locate which Address record should be modified. You can pass numbers with some other significance, strings or even `nil` (which will result in an array parameter being created).
+레일스는 form 빌더로부터 `fields_for`가 호출되었기 때문에 이러한 input들이 person 해쉬의 일부라는것을 알고 있습니다. `:index` 옵션은 레일스에게 `person[address][city]` 대신 배열을 의미하는 []로 address와 city 사이를 감싸라고 알립니다. 만약 Active Record 객체를 전달한다면 레일스는 `to_param`을 호출하고 기본값으로 데이터베이스의 id를 리턴합니다. 이는 수정해야할 Address를 알아내는데 유용합니다. 중요한 숫자나 문자열, `nil`을 전달할 수 있습니다(배열 파라미터 결과에 나타낼 값). [[[Rails knows that all these inputs should be part of the person hash because you called `fields_for` on the first form builder. By specifying an `:index` option you're telling Rails that instead of naming the inputs `person[address][city]` it should insert that index surrounded by [] between the address and the city. If you pass an Active Record object as we did then Rails will call `to_param` on it, which by default returns the database id. This is often useful as it is then easy to locate which Address record should be modified. You can pass numbers with some other significance, strings or even `nil` (which will result in an array parameter being created).]]]
 
-To create more intricate nestings, you can specify the first part of the input name (`person[address]` in the previous example) explicitly, for example
+보다 복잡한 중첩을 생성하기 위해 input name의 첫번째 부분(이전 예제의 `person[address]`)을 명시할 수 있습니다. 예를들어 [[[To create more intricate nestings, you can specify the first part of the input name (`person[address]` in the previous example) explicitly, for example]]]
 
 ```erb
 <%= fields_for 'person[address][primary]', address, index: address do |address_form| %>
@@ -781,15 +780,15 @@ To create more intricate nestings, you can specify the first part of the input n
 <% end %>
 ```
 
-will create inputs like
+다음과 같은 결과를 생성합니다 [[[will create inputs like]]]
 
 ```html
 <input id="person_address_primary_1_city" name="person[address][primary][1][city]" type="text" value="bologna" />
 ```
 
-As a general rule the final input name is the concatenation of the name given to `fields_for`/`form_for`, the index value and the name of the attribute. You can also pass an `:index` option directly to helpers such as `text_field`, but it is usually less repetitive to specify this at the form builder level rather than on individual input controls.
+일반적인 규칙으로 결과의 input name은 `fields_for`/`form_for`에 주어진 name, index 값, input의 name이 추가된 형태입니다. `:index` 옵션을 `text_field`와 같은 헬퍼에 직접 전달할수도 있지만 개별 input에 지정하기보다는 일반적으로 반복적인 작업을 줄이기위해 form 빌더 레벨에 지정합니다. [[[As a general rule the final input name is the concatenation of the name given to `fields_for`/`form_for`, the index value and the name of the attribute. You can also pass an `:index` option directly to helpers such as `text_field`, but it is usually less repetitive to specify this at the form builder level rather than on individual input controls.]]]
 
-As a shortcut you can append [] to the name and omit the `:index` option. This is the same as specifying `index: address` so
+손쉬운 방법으로 name에 []를 추가해 `:index` 옵션을 제거할 수 있습니다. 이는 `index: address` 옵션과 동일합니다 [[[As a shortcut you can append [] to the name and omit the `:index` option. This is the same as specifying `index: address` so]]]
 
 ```erb
 <%= fields_for 'person[address][primary][]', address do |address_form| %>
@@ -797,7 +796,7 @@ As a shortcut you can append [] to the name and omit the `:index` option. This i
 <% end %>
 ```
 
-produces exactly the same output as the previous example.
+생성된 결과는 이전의 예제와 동일합니다. [[[produces exactly the same output as the previous example.]]]
 
 Forms to external resources
 ---------------------------
