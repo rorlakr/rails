@@ -400,11 +400,11 @@ TIP: 특정 명령에 대한 도움말 메뉴를 보려면 `help <command-name>`
 
 * `thread list`는 모든 쓰레드들과 그들의 상태 목록을 보기 위해 사용됩니다. + 문자와 숫자는 현재 실행중인 쓰레드를 나타냅니다. [[[`thread list` is used to list all threads and their statuses. The plus + character and the number indicates the current thread of execution.]]]
 
-* `thread stop _n_`는 _n_번 쓰레드를 정지시킵니다. [[[`thread stop _n_` stop thread _n_.]]]
+* `thread stop _n_`는 _n_ 번 쓰레드를 정지시킵니다. [[[`thread stop _n_` stop thread _n_.]]]
 
-* `thread resume _n_`는 _n_번 쓰레드를 재시작합니다. [[[`thread resume _n_` resumes thread _n_.]]]
+* `thread resume _n_`는 _n_ 번 쓰레드를 재시작합니다. [[[`thread resume _n_` resumes thread _n_.]]]
 
-* `thread switch _n_`는 현재 쓰레트 컨텍스트를 _n_번 쓰레드로 바꿉니다. [[[`thread switch _n_` switches the current thread context to _n_.]]]
+* `thread switch _n_`는 현재 쓰레트 컨텍스트를 _n_ 번 쓰레드로 바꿉니다. [[[`thread switch _n_` switches the current thread context to _n_.]]]
 
 본 명령은 다른 경우들 중에서 동시 쓰레드를 디버깅할 때 유용하며 코드상에 경쟁 조건이 있는지 확인할 필요가 있습니다. [[[This command is very helpful, among other occasions, when you are debugging concurrent threads and need to verify that there are no race conditions in your code.]]]
 
@@ -477,7 +477,7 @@ TIP: `p` (print)와 `pp` (pretty print) 명령은 콘솔에 루비 표현식을 
 1: @recent_comments =
 ```
 
-표시 목록 안의 변수들은 스택 내부로 이동한 후 그 값들과 함께 출력될 것입니다. 변수 표시를 중단하려면 `undisplay _n_`를 사용하십시오. _n_은 변수 번호(마지막 예제에 있는 1)입니다.[[[The variables inside the displaying list will be printed with their values after you move in the stack. To stop displaying a variable use `undisplay _n_` where _n_ is the variable number (1 in the last example).]]]
+표시 목록 안의 변수들은 스택 내부로 이동한 후 그 값들과 함께 출력될 것입니다. 변수 표시를 중단하려면 `undisplay _n_`를 사용하십시오. _n_ 은 변수 번호(마지막 예제에 있는 1)입니다.[[[The variables inside the displaying list will be printed with their values after you move in the stack. To stop displaying a variable use `undisplay _n_` where _n_ is the variable number (1 in the last example).]]]
 
 ### Step by Step
 
@@ -565,11 +565,11 @@ Loading development environment (Rails 3.2.13)
 
 `break` (혹은 `b`) 명령으로 동적으로 중단점을 넣을 수 있습니다. 중단점을 수동으로 넣는 세 가지 방법이 있습니다:[[[You can add breakpoints dynamically with the command `break` (or just `b`). There are 3 possible ways of adding breakpoints manually:]]]
 
-* `break line`: 현재 소스파일의 _line_에 중단점을 설정합니다. [[[`break line`: set breakpoint in the _line_ in the current source file.]]]
+* `break line`: 현재 소스파일의 _line_ 에 중단점을 설정합니다. [[[`break line`: set breakpoint in the _line_ in the current source file.]]]
 
-* `break file:line [if expression]`: 중단점을 _file_ 내부의 _line_에 설정합니다. _expression_이 주어진 경우, 표현식이 _true_로 평가되어야 디버거가 실행됩니다. [[[`break file:line [if expression]`: set breakpoint in the _line_ number inside the _file_. If an _expression_ is given it must evaluated to _true_ to fire up the debugger.]]]
+* `break file:line [if expression]`: 중단점을 _file_ 내부의 _line_ 에 설정합니다. _expression_ 이 주어진 경우, 표현식이 _true_ 로 평가되어야 디버거가 실행됩니다. [[[`break file:line [if expression]`: set breakpoint in the _line_ number inside the _file_. If an _expression_ is given it must evaluated to _true_ to fire up the debugger.]]]
 
-* `break class(.|\#)method [if expression]`: 중단점을 _class_ 내에 정의된 _method_ 내에 설정합니다.(. 과 \#는 각각 클래스와 인스턴스 메서드를 위한 것입니다) _expression_은 file:line에서와 같은 방식으로 작동합니다. [[[`break class(.|\#)method [if expression]`: set breakpoint in _method_ (. and \# for class and instance method respectively) defined in _class_. The _expression_ works the same way as with file:line.]]]
+* `break class(.|\#)method [if expression]`: 중단점을 _class_ 내에 정의된 _method_ 내에 설정합니다.(. 과 \#는 각각 클래스와 인스턴스 메서드를 위한 것입니다) _expression_ 은 file:line에서와 같은 방식으로 작동합니다. [[[`break class(.|\#)method [if expression]`: set breakpoint in _method_ (. and \# for class and instance method respectively) defined in _class_. The _expression_ works the same way as with file:line.]]]
 
 ```
 (rdb:5) break 10
@@ -584,7 +584,7 @@ Num Enb What
   1 y   at filters.rb:10
 ```
 
-중단점을 삭제하려면: _n_번 중단점을 삭제하려면 `delete _n_` 명령을 사용하십시오. 만약 숫자가 지정되어 있지 않다면, 현재 활성화된 모든 중단점을 삭제합니다. [[[To delete breakpoints: use the command `delete _n_` to remove the breakpoint number _n_. If no number is specified, it deletes all breakpoints that are currently active..]]]
+중단점을 삭제하려면: _n_ 번 중단점을 삭제하려면 `delete _n_` 명령을 사용하십시오. 만약 숫자가 지정되어 있지 않다면, 현재 활성화된 모든 중단점을 삭제합니다. [[[To delete breakpoints: use the command `delete _n_` to remove the breakpoint number _n_. If no number is specified, it deletes all breakpoints that are currently active..]]]
 
 ```
 (rdb:5) delete 1
@@ -596,7 +596,7 @@ No breakpoints.
 
 * `enable breakpoints`: 프로그램을 중단하기 위해 단일 _breakpoints_ 리스트 혹은 리스트가 지정되지 않은 경우에는 전체를 허용합니다. 이것은 중단점을 생성했을 때의 기본 상태입니다. [[[`enable breakpoints`: allow a list _breakpoints_ or all of them if no list is specified, to stop your program. This is the default state when you create a breakpoint.]]]
 
-* `disable breakpoints`: 프로그램상의 _breakpoints_는 무효화될 것입니다. [[[`disable breakpoints`: the _breakpoints_ will have no effect on your program.]]]
+* `disable breakpoints`: 프로그램상의 _breakpoints_ 는 무효화될 것입니다. [[[`disable breakpoints`: the _breakpoints_ will have no effect on your program.]]]
 
 ### Catching Exceptions
 
@@ -616,9 +616,9 @@ No breakpoints.
 
 아래 두 명령은 디버거로부터 에디터로 코드를 열 수 있도록 해 줍니다: [[[Two commands allow you to open code from the debugger into an editor:]]]
 
-* `edit [file:line]`: EDITOR 환경 변수에 의해 지정된 에디터를 사용하여 _file_을 수정합니다. 특정 _line_도 부여할 수 있습니다. [[[`edit [file:line]`: edit _file_ using the editor specified by the EDITOR environment variable. A specific _line_ can also be given.]]]
+* `edit [file:line]`: EDITOR 환경 변수에 의해 지정된 에디터를 사용하여 _file_ 을 수정합니다. 특정 _line_ 도 부여할 수 있습니다. [[[`edit [file:line]`: edit _file_ using the editor specified by the EDITOR environment variable. A specific _line_ can also be given.]]]
 
-* `tmate _n_` (단축 `tm`): 현재 파일을 텍스트메이트에서 엽니다. _n_이 지정되어 있다면, n번째 프레임을 사용합니다. [[[`tmate _n_` (abbreviated `tm`): open the current file in TextMate. It uses n-th frame if _n_ is specified.]]]
+* `tmate _n_` (단축 `tm`): 현재 파일을 텍스트메이트에서 엽니다. _n_ 이 지정되어 있다면, n번째 프레임을 사용합니다. [[[`tmate _n_` (abbreviated `tm`): open the current file in TextMate. It uses n-th frame if _n_ is specified.]]]
 
 ### Quitting
 
@@ -634,7 +634,7 @@ No breakpoints.
 
 * `set autolist`: 모든 중단점에서 `list` 명령을 수행합니다. [[[`set autolist`: Execute `list` command on every breakpoint.]]]
 
-* `set listsize _n_`: 목록에 모여줄 소스 라인 수를 기본값에서 _n_으로 설정합니다. [[[`set listsize _n_`: Set number of source lines to list by default to _n_.]]]
+* `set listsize _n_`: 목록에 모여줄 소스 라인 수를 기본값에서 _n_ 으로 설정합니다. [[[`set listsize _n_`: Set number of source lines to list by default to _n_.]]]
 
 * `set forcestep`: `next`와 `step` 명령이 항상 새 라인으로 이동하도록 강제합니다. [[[`set forcestep`: Make sure the `next` and `step` commands always move to a new line]]]
 
