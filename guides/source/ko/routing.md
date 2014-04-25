@@ -256,7 +256,7 @@ class Ad < ActiveRecord::Base
 end
 ```
 
-내포 라우트는 라우팅의 관계를 캡쳐할 수 있게 해줍니다. 이 경우, 다음과 같은 라우트선언을 포함할 수 있습니다. [[[Nested routes allow you to capture this relationship in your routing. In this case, you could include this route declaration:]]]
+중첩 라우트는 라우팅의 관계를 캡쳐할 수 있게 해줍니다. 이 경우, 다음과 같은 라우트선언을 포함할 수 있습니다. [[[Nested routes allow you to capture this relationship in your routing. In this case, you could include this route declaration:]]]
 
 ```ruby
 resources :magazines do
@@ -290,7 +290,7 @@ resources :publishers do
 end
 ```
 
-깊게-내포된 리소스는 급속도로 복잡해집니다. 이 경우, 예를 들면, 응용프로그램은 경로를 다음과 같이 인식할 것입니다.[[[Deeply-nested resources quickly become cumbersome. In this case, for example, the application would recognize paths such as:]]]
+깊게-중첩된 리소스는 급속도로 복잡해집니다. 이 경우, 예를 들면, 응용프로그램은 경로를 다음과 같이 인식할 것입니다.[[[Deeply-nested resources quickly become cumbersome. In this case, for example, the application would recognize paths such as:]]]
 
 ```
 /publishers/1/magazines/2/photos/3
@@ -302,7 +302,7 @@ TIP: 리소스는 1 레벨 이상으로 중첩되어서는 안됩니다. [[[TIP:
 
 #### Shallow Nesting
 
-(위에서 추천한 바와 같이) 깊은 내포를 피하는 한 가지 방법은 부모 아래 범주화된(scoped) 액션의 컬렉션을 생성하여 멤버 액션을 내포하지 않고, 계층의 의미를 갖는 것입니다. 다시 말해, 단지 최소한의 정보로 고유하게 리소스를 식별하는 라우트를 만들는 방법은 다음과 같습니다:[[[One way to avoid deep nesting (as recommended above) is to generate the collection actions scoped under the parent, so as to get a sense of the hierarchy, but to not nest the member actions. In other words, to only build routes with the minimal amount of information to uniquely identify the resource, like this:]]]
+(위에서 추천한 바와 같이) 깊은 중첩을 피하는 한 가지 방법은 부모 아래 범주화된(scoped) 액션의 컬렉션을 생성하여 멤버 액션을 내포하지 않고, 계층의 의미를 갖는 것입니다. 다시 말해, 단지 최소한의 정보로 고유하게 리소스를 식별하는 라우트를 만들는 방법은 다음과 같습니다:[[[One way to avoid deep nesting (as recommended above) is to generate the collection actions scoped under the parent, so as to get a sense of the hierarchy, but to not nest the member actions. In other words, to only build routes with the minimal amount of information to uniquely identify the resource, like this:]]]
 
 ```ruby
 resources :posts do
@@ -311,7 +311,7 @@ end
 resources :comments, only: [:show, :edit, :update, :destroy]
 ```
 
-본 아이디어는 기술적인 라우트(descriptive routes)와 깊은 내포 사이에서 절충합니다. 그렇게 하기 위한 축약 문법이 있는데, `:shallow` 옵션으로 할 수 있습니다. [[[This idea strikes a balance between descriptive routes and deep nesting. There exists shorthand syntax to achieve just that, via the `:shallow` option:]]]
+본 아이디어는 기술적인 라우트(descriptive routes)와 깊은 중첩 사이에서 절충합니다. 그렇게 하기 위한 축약 문법이 있는데, `:shallow` 옵션으로 할 수 있습니다. [[[This idea strikes a balance between descriptive routes and deep nesting. There exists shorthand syntax to achieve just that, via the `:shallow` option:]]]
 
 ```ruby
 resources :posts do
@@ -329,7 +329,7 @@ resources :posts, shallow: true do
 end
 ```
 
-DSL의 `shallow` 메서드는 모든 내포가 얕아진 범위를 내부에 만듭니다. 이것은 이전 예제와 같은 라우트를 생성합니다. [[[The `shallow` method of the DSL creates a scope inside of which every nesting is shallow. This generates the same routes as the previous example:]]]
+DSL의 `shallow` 메서드는 모든 중첩이 얕아진 범위를 내부에 만듭니다. 이것은 이전 예제와 같은 라우트를 생성합니다. [[[The `shallow` method of the DSL creates a scope inside of which every nesting is shallow. This generates the same routes as the previous example:]]]
 
 ```ruby
 shallow do
@@ -488,7 +488,7 @@ end
 
 이것은 GET 방식으로 `/photos/1/preview`를 인식하고 `params[:id]`로 전달된 값의 리소스 id를 `PhotosController`의 `preview` 액션으로 라우트합니다. 이것은 또한 `preview_photo_url`과 `preview_photo_path` 헬퍼를 생성합니다. [[[This will recognize `/photos/1/preview` with GET, and route to the `preview` action of `PhotosController`, with the resource id value passed in `params[:id]`. It will also create the `preview_photo_url` and `preview_photo_path` helpers.]]]
 
-member 라우트의 블록 내에서, 각 라우트명은 인식할 HTTP verb를 지정합니다. 여기에는 `get`, `patch`, `put`, `post`, 혹은 `delete`를 사용할 수 있습니다. 만약 중복된 `member` 라우트가 없다면, 블록을 제거하고 `:on`을 라우트에 전달할 수 있습니다. [[[Within the block of member routes, each route name specifies the HTTP verb that it will recognize. You can use `get`, `patch`, `put`, `post`, or `delete` here. If you don't have multiple `member` routes, you can also pass `:on` to a route, eliminating the block:]]]
+member 라우트의 블록 내에서, 각 라우트명은 인식할 HTTP 메서드를 지정합니다. 여기에는 `get`, `patch`, `put`, `post`, 혹은 `delete`를 사용할 수 있습니다. 만약 중복된 `member` 라우트가 없다면, 블록을 제거하고 `:on`을 라우트에 전달할 수 있습니다. [[[Within the block of member routes, each route name specifies the HTTP verb that it will recognize. You can use `get`, `patch`, `put`, `post`, or `delete` here. If you don't have multiple `member` routes, you can also pass `:on` to a route, eliminating the block:]]]
 
 ```ruby
 resources :photos do
