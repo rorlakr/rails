@@ -280,7 +280,7 @@ magazines를 위한 라우트일 뿐 아니라, 이 선언은 또한 `AdsControl
 
 #### [[[Limits to Nesting]]] 중첩의 제한
 
-만약 원한다면, 다른 충첩된 리소스 안에 리소스를 내포할 수 있습니다. 예를 들면: [[[You can nest resources within other nested resources if you like. For example:]]]
+만약 원한다면, 다른 충첩된 리소스 안에 리소스를 중첩할 수 있습니다. 예를 들면: [[[You can nest resources within other nested resources if you like. For example:]]]
 
 ```ruby
 resources :publishers do
@@ -302,7 +302,7 @@ TIP: 리소스는 1 레벨 이상으로 중첩되어서는 안됩니다. [[[TIP:
 
 #### Shallow Nesting
 
-(위에서 추천한 바와 같이) 깊은 중첩을 피하는 한 가지 방법은 부모 아래 범주화된(scoped) 액션의 컬렉션을 생성하여 멤버 액션을 내포하지 않고, 계층의 의미를 갖는 것입니다. 다시 말해, 단지 최소한의 정보로 고유하게 리소스를 식별하는 라우트를 만들는 방법은 다음과 같습니다:[[[One way to avoid deep nesting (as recommended above) is to generate the collection actions scoped under the parent, so as to get a sense of the hierarchy, but to not nest the member actions. In other words, to only build routes with the minimal amount of information to uniquely identify the resource, like this:]]]
+(위에서 추천한 바와 같이) 깊은 중첩을 피하는 한 가지 방법은 부모 아래 범주화된(scoped) 액션의 컬렉션을 생성하여 멤버 액션을 중첩하지 않고, 계층의 의미를 갖는 것입니다. 다시 말해, 단지 최소한의 정보로 고유하게 리소스를 식별하는 라우트를 만들는 방법은 다음과 같습니다: [[[One way to avoid deep nesting (as recommended above) is to generate the collection actions scoped under the parent, so as to get a sense of the hierarchy, but to not nest the member actions. In other words, to only build routes with the minimal amount of information to uniquely identify the resource, like this:]]]
 
 ```ruby
 resources :posts do
@@ -319,7 +319,7 @@ resources :posts do
 end
 ```
 
-이 코드는 첫 번째 예제와 완전히 동일한 라우트를 생성할 것입니다. 또한 `:shallow` 옵션을 부모 리소스에 지정할 수 있는데, 이 경우 모든 내포된 리소스들은 얕아지게 됩니다:[[[This will generate the exact same routes as the first example. You can also specify the `:shallow` option in the parent resource, in which case all of the nested resources will be shallow:]]]
+이 코드는 첫 번째 예제와 완전히 동일한 라우트를 생성할 것입니다. 또한 `:shallow` 옵션을 부모 리소스에 지정할 수 있는데, 이 경우 모든 중첩된 리소스들은 얕아지게 됩니다: [[[This will generate the exact same routes as the first example. You can also specify the `:shallow` option in the parent resource, in which case all of the nested resources will be shallow:]]]
 
 ```ruby
 resources :posts, shallow: true do
