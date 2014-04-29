@@ -1,54 +1,56 @@
-레일스 어플리케이션 설정하기
+[Configuring Rails Applications] 레일스 어플리케이션 설정하기
 ==============================
 
-This guide covers the configuration and initialization features available to Rails applications.
+본 가이드에서는 레일즈 어플리케이션에서 사용할 수 있는 설정과 초기화 기능을 설명하고 있습니다.
+[[[This guide covers the configuration and initialization features available to Rails applications.]]]
 
-After reading this guide, you will know:
+본 가이드를 읽은 후에는 아래와 같은 내용을 알 수 있을 것입니다. [[[After reading this guide, you will know:]]]
 
-* How to adjust the behavior of your Rails applications.
-* How to add additional code to be run at application start time.
+* 레일즈 어플리케이션의 동작을 조절하는 방법. [[[How to adjust the behavior of your Rails applications.]]]
+* 어플리케이션이 시작되는 시간에 실행되는 코드를 추가하는 방법. [[[How to add additional code to be run at application start time.]]]
 
 --------------------------------------------------------------------------------
 
 [Locations for Initialization Code] 초기화 코드 위치
 ---------------------------------
 
-Rails offers four standard spots to place initialization code:
+레일즈는 초기화 코드를 넣는 4개의 장소를 제공합니다. [[[Rails offers four standard spots to place initialization code:]]]
 
 * `config/application.rb`
-* Environment-specific configuration files
+* 특정 환경 설정 파일 [[[Environment-specific configuration files]]]
 * Initializers
 * After-initializers
 
-Running Code Before Rails
+[Running Code Before Rails] 레일즈가 실행되기 전 코드 실행하기
 -------------------------
 
-In the rare event that your application needs to run some code before Rails itself is loaded, put it above the call to `require 'rails/all'` in `config/application.rb`.
+어플리케이션은 레일즈 자체가 로드되기 전에 어떤 코드의 실행을 필요로합니다. `config/application.rb`에서 상위에 `require 'rails/all'`를 입력합니다. [[[In the rare event that your application needs to run some code before Rails itself is loaded, put it above the call to `require 'rails/all'` in `config/application.rb`.]]]
 
-Configuring Rails Components
+[Configuring Rails Components] 레일즈 컴포넌트 설정하기
 ----------------------------
 
-In general, the work of configuring Rails means configuring the components of Rails, as well as configuring Rails itself. The configuration file `config/application.rb` and environment-specific configuration files (such as `config/environments/production.rb`) allow you to specify the various settings that you want to pass down to all of the components.
+일반적으로, 레일즈의 설정 작업은 레일즈 자체의 설정 뿐만아니라 레일즈  컴포넌트의 설정을 의미합니다. 구성 파일 `config/application.rb` 및 특정 환경 구성 파일들(`config/environments/production.rb`와 같은)은 모든 컴포넌트들이 하위로 전달 하고자하는 다양한 설정을 지정할 수 있습니다.
+[[[In general, the work of configuring Rails means configuring the components of Rails, as well as configuring Rails itself. The configuration file `config/application.rb` and environment-specific configuration files (such as `config/environments/production.rb`) allow you to specify the various settings that you want to pass down to all of the components.]]]
 
-For example, the default `config/application.rb` file includes this setting:
+예를들면, `config/application.rb` 파일에 기본적으로 아래와 같은 설정이 되어있습니다. [[[For example, the default `config/application.rb` file includes this setting:]]]
 
 ```ruby
 config.filter_parameters += [:password]
 ```
 
-This is a setting for Rails itself. If you want to pass settings to individual Rails components, you can do so via the same `config` object in `config/application.rb`:
+이것은 레일즈를 위한 설정입니다. 만약 개별 레일즈 컴포넌트들을 설정하고 싶다면, 아래와 같이 `config/application.rb` 안에서 `config` 객체를 통해 이용할 수 있습니다. [[[This is a setting for Rails itself. If you want to pass settings to individual Rails components, you can do so via the same `config` object in `config/application.rb`:]]]
 
 ```ruby
 config.active_record.schema_format = :ruby
 ```
 
-Rails will use that particular setting to configure Active Record.
+레일즈는 엑티브 레코드를 구성하기 위해 특정 설정을 사용합니다.  [[[Rails will use that particular setting to configure Active Record.]]]
 
-### Rails General Configuration
+### [Rails General Configuration] 레일즈 일반적인 구성
+이 구성 방식은 `Rails::Railtie` 객체와 `Rails::Engine` 또는 `Rails::Application` 같은 하위 클래스에서 호출 할 수 있습니다.
+[[[These configuration methods are to be called on a `Rails::Railtie` object, such as a subclass of `Rails::Engine` or `Rails::Application`.]]]
 
-These configuration methods are to be called on a `Rails::Railtie` object, such as a subclass of `Rails::Engine` or `Rails::Application`.
-
-* `config.after_initialize` takes a block which will be run _after_ Rails has finished initializing the application. That includes the initialization of the framework itself, engines, and all the application's initializers in `config/initializers`. Note that this block _will_ be run for rake tasks. Useful for configuring values set up by other initializers:
+* `config.after_initialize`의 블럭은 레일즈가 어플리케이션의 초기화를 _마친후에_ 실행됩니다. `config/initializers`에 프레임워크 자체의 초기화, 엔진 및 모든 어플리케이션의 초기화가 포함되어 있습니다. 주목할 것은 이 블럭이 rake 작업을 위해 _실행될 것_ 입니다. 아래와 같이 다른 initializer에 의해 설정된 값들을 설정 하는데에 유용합니다. [[[`config.after_initialize` takes a block which will be run _after_ Rails has finished initializing the application. That includes the initialization of the framework itself, engines, and all the application's initializers in `config/initializers`. Note that this block _will_ be run for rake tasks. Useful for configuring values set up by other initializers:]]]
 
     ```ruby
     config.after_initialize do
@@ -56,110 +58,128 @@ These configuration methods are to be called on a `Rails::Railtie` object, such 
     end
     ```
 
-* `config.asset_host` sets the host for the assets. Useful when CDNs are used for hosting assets, or when you want to work around the concurrency constraints builtin in browsers using different domain aliases. Shorter version of `config.action_controller.asset_host`.
+* `config.asset_host`는 에셋에 대한 호스트를 설정합니다. CDN을 이용하여 에셋들을 호스팅 하는 경우, 또는 다른 도메인 별칭을 사용하여 브라우저에서 동시성 제약을 해결하고자 할때 유용합니다. `config.action_controller.asset_host`의 축약 버전입니다.[[[`config.asset_host` sets the host for the assets. Useful when CDNs are used for hosting assets, or when you want to work around the concurrency constraints builtin in browsers using different domain aliases. Shorter version of `config.action_controller.asset_host`.]]]
 
-* `config.autoload_once_paths` accepts an array of paths from which Rails will autoload constants that won't be wiped per request. Relevant if `config.cache_classes` is false, which is the case in development mode by default. Otherwise, all autoloading happens only once. All elements of this array must also be in `autoload_paths`. Default is an empty array.
+* `config.autoload_once_paths`는 요청에 따라 변하지 않고 자동으로 로드 될 경로를 배열로 받습니다. 개발 모드일 경우 `config.cache_classes`는 false가 기본값 입니다. 그렇지 않으면 모든 자동 로딩의 경우는 한번만 이루어 집니다. 이 배열의 모든 요소들은 `autoload_paths`에 있어야 합니다.
+기본 값으로는 빈 배열입니다.
+[[[`config.autoload_once_paths` accepts an array of paths from which Rails will autoload constants that won't be wiped per request. Relevant if `config.cache_classes` is false, which is the case in development mode by default. Otherwise, all autoloading happens only once. All elements of this array must also be in `autoload_paths`. Default is an empty array.]]]
 
-* `config.autoload_paths` accepts an array of paths from which Rails will autoload constants. Default is all directories under `app`.
+* `config.autoload_paths`는 자동으로 로드 될 경로를 배열로 받습니다. 기본 값은 `app` 하위의 모든 디렉토리입니다.
+[[[`config.autoload_paths` accepts an array of paths from which Rails will autoload constants. Default is all directories under `app`.]]]
 
-* `config.cache_classes` controls whether or not application classes and modules should be reloaded on each request. Defaults to false in development mode, and true in test and production modes. Can also be enabled with `threadsafe!`.
+* `config.cache_classes`는 어플리케이션 클래스와 모듈이 각각의 요청에 다시 로드되어야 할지 말지를 정합니다. 기본값으로는 개발 모드에선 false이며, 테스트, 배포 모드에서는 true 입니다. 또한 `threadsafe!`를 활성화 할 수 있습니다.
+[[[`config.cache_classes` controls whether or not application classes and modules should be reloaded on each request. Defaults to false in development mode, and true in test and production modes. Can also be enabled with `threadsafe!`.]]]
 
-* `config.action_view.cache_template_loading` controls whether or not templates should be reloaded on each request. Defaults to whatever is set for `config.cache_classes`.
+* `config.action_view.cache_template_loading`는 각각의 요청에 템플릿이 다시 로드되어야 할지 말지를 정합니다. 기본 값은 `config.cache_classes`에 따라 설정됩니다.[[[`config.action_view.cache_template_loading` controls whether or not templates should be reloaded on each request. Defaults to whatever is set for `config.cache_classes`.]]]
 
-* `config.cache_store` configures which cache store to use for Rails caching. Options include one of the symbols `:memory_store`, `:file_store`, `:mem_cache_store`, `:null_store`, or an object that implements the cache API. Defaults to `:file_store` if the directory `tmp/cache` exists, and to `:memory_store` otherwise.
+* `config.cache_store`는 레일즈 캐싱에 사용할 캐시 저장소를 구성합니다. 옵션은 하나의 기호를 포함한 `:memory_store`, `:file_store`, `:mem_cache_store`, `:null_store` 또는 cache API로 구현한 객체입니다. 기본적으로 `tmp/cache` 디렉토리가 존재할 경우 `:file_store`가 사용되며, 그렇지 않을 경우엔 `:memory_store`가 사용됩니다.
+[[[`config.cache_store` configures which cache store to use for Rails caching. Options include one of the symbols `:memory_store`, `:file_store`, `:mem_cache_store`, `:null_store`, or an object that implements the cache API. Defaults to `:file_store` if the directory `tmp/cache` exists, and to `:memory_store` otherwise.]]]
 
-* `config.colorize_logging` specifies whether or not to use ANSI color codes when logging information. Defaults to true.
+* `config.colorize_logging`는 로그 정보를 기록할때 ANSI 컬러 코드로 사용할지 말지를 정합니다. 기본값은 true입니다. [[[`config.colorize_logging` specifies whether or not to use ANSI color codes when logging information. Defaults to true.]]]
 
-* `config.consider_all_requests_local` is a flag. If true then any error will cause detailed debugging information to be dumped in the HTTP response, and the `Rails::Info` controller will show the application runtime context in `/rails/info/properties`. True by default in development and test environments, and false in production mode. For finer-grained control, set this to false and implement `local_request?` in controllers to specify which requests should provide debugging information on errors.
+* `config.consider_all_requests_local`의 값이 true일 경우 HTTP 응답에 오류를 야기한 자세한 디버깅 정보가 포함되고, `Rails::Info` 컨트롤러는 `/rails/info/properties`에서 어플리케이션 런타임 컨텍스트를 보여줄 것 입니다. 개발 및 테스트 환경에선 기본적으로 true이고 배포 환경은 false로 설정 되어 있습니다. 세분화 된 제어를 위해선, false로 설정하고 컨트롤러에서 `local_request?`를 구현하여 요청의 에러에 대한 디버깅 정보를 제공해야 합니다.
+[[[`config.consider_all_requests_local` is a flag. If true then any error will cause detailed debugging information to be dumped in the HTTP response, and the `Rails::Info` controller will show the application runtime context in `/rails/info/properties`. True by default in development and test environments, and false in production mode. For finer-grained control, set this to false and implement `local_request?` in controllers to specify which requests should provide debugging information on errors.]]]
 
-* `config.console` allows you to set class that will be used as console you run `rails console`. It's best to run it in `console` block:
+* `config.console`는 `rails console`를 실행할때 사용되는 클래스를 설정할 수 있습니다. `console` 블럭안에서 실행하는 것이 좋습니다: 
+[[[`config.console` allows you to set class that will be used as console you run `rails console`. It's best to run it in `console` block:]]]
 
     ```ruby
     console do
-      # this block is called only when running console,
-      # so we can safely require pry here
+      # 이 블럭은 콘솔을 실행할때 호출됩니다. [[[# this block is called only when running console,]]]
+      # 여기서 require pry를 사용할 수 있습니다. [[[# so we can safely require pry here]]]
       require "pry"
       config.console = Pry
     end
     ```
 
-* `config.dependency_loading` is a flag that allows you to disable constant autoloading setting it to false. It only has effect if `config.cache_classes` is true, which it is by default in production mode. This flag is set to false by `config.threadsafe!`.
+* `config.dependency_loading`는 false일 때 자동로딩을 해제할 수 있습니다. 이는 `config.cache_classes`가 true일때 작동되며, 배포 환경에선 기본적으로 적용됩니다. 이 값은 `config.threadsafe!`에 의해 false로 설정되어 있습니다.
+ [[[`config.dependency_loading` is a flag that allows you to disable constant autoloading setting it to false. It only has effect if `config.cache_classes` is true, which it is by default in production mode. This flag is set to false by `config.threadsafe!`.]]]
 
-* `config.eager_load` when true, eager loads all registered `config.eager_load_namespaces`. This includes your application, engines, Rails frameworks and any other registered namespace.
+* `config.eager_load`가 true 일 때, 등록된 모든 `config.eager_load_namespaces`가 즉시 로드 됩니다. 이것은 어플리케이션, 엔진, 레일즈 프레임워크 그리고 기타 등록된 네임스페이스가 포함되어 있습니다. [[[`config.eager_load` when true, eager loads all registered `config.eager_load_namespaces`. This includes your application, engines, Rails frameworks and any other registered namespace.]]]
 
-* `config.eager_load_namespaces` registers namespaces that are eager loaded when `config.eager_load` is true. All namespaces in the list must respond to the `eager_load!` method.
+* `config.eager_load_namespaces`에 `config.eager_load`가 true 일 때 즉시 로드된 네임스페이스를 등록합니다. 목록에 있는 모든 네임스페이스는 `eager_load!` 메소드에 응답해야 합니다.
+[[[`config.eager_load_namespaces` registers namespaces that are eager loaded when `config.eager_load` is true. All namespaces in the list must respond to the `eager_load!` method.]]]
 
-* `config.eager_load_paths` accepts an array of paths from which Rails will eager load on boot if cache classes is enabled. Defaults to every folder in the `app` directory of the application.
+* `config.eager_load_paths`는 캐시 클래스들이 활성화 되어있는 경우 레일즈 부팅시 즉시 로드가 될 경로의 배열을 받습니다. 기본적으로 모든 폴더들이 어플리케이션의 `app` 디렉토리에 있습니다.
+[[[`config.eager_load_paths` accepts an array of paths from which Rails will eager load on boot if cache classes is enabled. Defaults to every folder in the `app` directory of the application.]]]
 
-* `config.encoding` sets up the application-wide encoding. Defaults to UTF-8.
+* `config.encoding`는 어플리케이션의 인코딩을 설정합니다. 기본값은 UTF-8 입니다. [[[`config.encoding` sets up the application-wide encoding. Defaults to UTF-8.]]]
 
-* `config.exceptions_app` sets the exceptions application invoked by the ShowException middleware when an exception happens. Defaults to `ActionDispatch::PublicExceptions.new(Rails.public_path)`.
+* `config.exceptions_app`는 예외가 발생할때 ShowException 미들웨어에 의해 호출되는 예외 처리 어플리케이션을 설정합니다. 기본적으로는 `ActionDispatch::PublicExceptions.new(Rails.public_path)` 입니다.
+[[[`config.exceptions_app` sets the exceptions application invoked by the ShowException middleware when an exception happens. Defaults to `ActionDispatch::PublicExceptions.new(Rails.public_path)`.]]]
 
-* `config.file_watcher` the class used to detect file updates in the filesystem when `config.reload_classes_only_on_change` is true. Must conform to `ActiveSupport::FileUpdateChecker` API.
+* `config.file_watcher`는 `config.reload_classes_only_on_change` 값이 true 일때, 파일 시스템에서 파일 업데이트를 검색하는데 사용되는 클래스입니다. `ActiveSupport::FileUpdateChecker` API를 따릅니다.
+   [[[`config.file_watcher` the class used to detect file updates in the filesystem when `config.reload_classes_only_on_change` is true. Must conform to `ActiveSupport::FileUpdateChecker` API.]]]
 
-* `config.filter_parameters` used for filtering out the parameters that you don't want shown in the logs, such as passwords or credit card numbers.
+* `config.filter_parameters`는 패스워드나 신용카드 숫자 같은 매개변수들을 로그에서 보여주지 않기 위해 사용합니다. [[[`config.filter_parameters` used for filtering out the parameters that you don't want shown in the logs, such as passwords or credit card numbers.]]]
 
-* `config.force_ssl` forces all requests to be under HTTPS protocol by using `ActionDispatch::SSL` middleware.
+* `config.force_ssl`는 모든 요청들을  `ActionDispatch::SSL` 미들웨어를 이용하여 HTTPS 프로토콜 아래로 강제합니다.
+[[[`config.force_ssl` forces all requests to be under HTTPS protocol by using `ActionDispatch::SSL` middleware.]]]
 
-* `config.log_level` defines the verbosity of the Rails logger. This option defaults to `:debug` for all modes except production, where it defaults to `:info`.
+* `config.log_level`는 레일즈 Logger의 수준을 정의합니다. 개발과 테스트 모드에선 `:debug`로 설정하고 배포 모드에선  `:info`로 설정됩니다.   [[[`config.log_level` defines the verbosity of the Rails logger. This option defaults to `:debug` for all modes except production, where it defaults to `:info`.]]]
 
-* `config.log_tags` accepts a list of methods that respond to `request` object. This makes it easy to tag log lines with debug information like subdomain and request id — both very helpful in debugging multi-user production applications.
+* `config.log_tags`는 `request` 객체로 응답받는 메소드의 목록을 받습니다.  서브도메인과 요청 id 같은 디버그 정보와 함께 태그 로그 라인를 쉽게 만듭니다. 다중 사용자 어플리케이션 디버깅에 매우 유용합니다.
+[[[`config.log_tags` accepts a list of methods that respond to `request` object. This makes it easy to tag log lines with debug information like subdomain and request id — both very helpful in debugging multi-user production applications.]]]
 
-* `config.logger` accepts a logger conforming to the interface of Log4r or the default Ruby `Logger` class. Defaults to an instance of `ActiveSupport::Logger`, with auto flushing off in production mode.
+* `config.logger`는 Logger에 적합한 Log4r의 인터페이스 또는 루비 `Logger` 클래스를 기본적으로 허용합니다. 기본적으로 배포 환경에선 auto flushing이 안되는 `ActiveSupport::Logger`의 인스턴스를 사용합니다.
+*[[[`config.logger` accepts a logger conforming to the interface of Log4r or the default Ruby `Logger` class. Defaults to an instance of `ActiveSupport::Logger`, with auto flushing off in production mode.]]]
 
-* `config.middleware` allows you to configure the application's middleware. This is covered in depth in the [Configuring Middleware](#configuring-middleware) section below.
+* `config.middleware`는 어플리케이션의 미들웨어를 구성할 수 있습니다.  이 내용은 [Configuring Middleware](#configuring-middleware)섹션에서 자세히 다룹니다.  [[[`config.middleware` allows you to configure the application's middleware. This is covered in depth in the [Configuring Middleware](#configuring-middleware) section below.]]]
 
-* `config.reload_classes_only_on_change` enables or disables reloading of classes only when tracked files change. By default tracks everything on autoload paths and is set to true. If `config.cache_classes` is true, this option is ignored.
+* `config.reload_classes_only_on_change`는 추적된 파일이 변경되었을때 클래스의 재시작을 활성화 또는 비활성화 합니다. 기본적으로 true로 설정되고 자동로드 경로에있는 모든 내용을 추적한다. `config.cache_classes`의 값이 true라면, 이 옵션은 무시됩니다. [[[`config.reload_classes_only_on_change` enables or disables reloading of classes only when tracked files change. By default tracks everything on autoload paths and is set to true. If `config.cache_classes` is true, this option is ignored.]]]
 
-* `config.secret_key_base` used for specifying a key which allows sessions for the application to be verified against a known secure key to prevent tampering. Applications get `config.secret_key_base` initialized to a random key in `config/initializers/secret_token.rb`.
+* `config.secret_key_base`는 어플리케이션의 세션을 허용하는 보안 키에 대해 검증 할 수 있는 키를 지정하는데 사용합니다.  어플리케이션은 `config/initializers/secret_token.rb`에서 랜덤키를  `config.secret_key_base`에 초기화되어 얻습니다.   [[[`config.secret_key_base` used for specifying a key which allows sessions for the application to be verified against a known secure key to prevent tampering. Applications get `config.secret_key_base` initialized to a random key in `config/initializers/secret_token.rb`.]]]
 
-* `config.serve_static_assets` configures Rails itself to serve static assets. Defaults to true, but in the production environment is turned off as the server software (e.g. Nginx or Apache) used to run the application should serve static assets instead. Unlike the default setting set this to true when running (absolutely not recommended!) or testing your app in production mode using WEBrick. Otherwise you won´t be able use page caching and requests for files that exist regularly under the public directory will anyway hit your Rails app.
+* `config.serve_static_assets`는 정적인 assets을 제공하기 위해 레일즈 자체를 설정합니다. 기본값은 true이지만 배포 환경에선 서버 소프트웨어(예: Nginx 또는 Apache)에선 꺼져있어 어플리케이션을 실행시 사용되고 대신에 정적인 assets을 제공해야만 합니다. 기본 설정과 달리 WEBrick을 이용하여 배포환경에서 앱을 테스트할때나 실행할때(절대 권장하지 않음!) true로 설정합니다.
+그렇지 않으면 페이지 캐싱과 정기적으로 public 디렉토리 아래에 존재하는 파일들의 요청이 되지 않고..
+[[[`config.serve_static_assets` configures Rails itself to serve static assets. Defaults to true, but in the production environment is turned off as the server software (e.g. Nginx or Apache) used to run the application should serve static assets instead. Unlike the default setting set this to true when running (absolutely not recommended!) or testing your app in production mode using WEBrick. Otherwise you won´t be able use page caching and requests for files that exist regularly under the public directory will anyway hit your Rails app.]]]
 
-* `config.session_store` is usually set up in `config/initializers/session_store.rb` and specifies what class to use to store the session. Possible values are `:cookie_store` which is the default, `:mem_cache_store`, and `:disabled`. The last one tells Rails not to deal with sessions. Custom session stores can also be specified:
+* `config.session_store`는 보통 `config/initializers/session_store.rb`에서 설정하고 세션을 저장하기 위해 사용하는 클래스를 지정합니다. 가능한 값은 `:cookie_store`가 기본값으로 있고, `:mem_cache_store`와 `:disabled`가 있습니다.  아래와 같이 커스텀 세션 저장소를 지정할 수 있습니다. [[[`config.session_store` is usually set up in `config/initializers/session_store.rb` and specifies what class to use to store the session. Possible values are `:cookie_store` which is the default, `:mem_cache_store`, and `:disabled`. The last one tells Rails not to deal with sessions. Custom session stores can also be specified:]]]
 
     ```ruby
     config.session_store :my_custom_store
     ```
 
-    This custom store must be defined as `ActionDispatch::Session::MyCustomStore`.
+    이 커스텀 저장소는 `ActionDispatch::Session::MyCustomStore`으로 정의해야 합니다. [[[This custom store must be defined as `ActionDispatch::Session::MyCustomStore`.]]]
 
-* `config.time_zone` sets the default time zone for the application and enables time zone awareness for Active Record.
+* `config.time_zone`은 어플리케이션의 기본적인 시간대를 설정하고 Active Record의 시간대 인식을 가능하게 합니다. [[[`config.time_zone` sets the default time zone for the application and enables time zone awareness for Active Record.]]]
 
-* `config.beginning_of_week` sets the default beginning of week for the application. Accepts a valid week day symbol (e.g. `:monday`).
+* `config.beginning_of_week`는 어플리케이션의 시작주의 요일을 설정합니다.  요일을 심볼로 받습니다. (예: `:monday`). [[[`config.beginning_of_week` sets the default beginning of week for the application. Accepts a valid week day symbol (e.g. `:monday`).]]]
 
-* `config.whiny_nils` enables or disables warnings when a certain set of methods are invoked on `nil` and it does not respond to them. Defaults to true in development and test environments.
+* `config.whiny_nils`은 특정 메소드가 `nil` 을 호출하거나 아무 응답이 없을때 경고를 활성화 또는 비활성화 합니다. 기본적으로 개발 환경과 테스트 환경에선 true입니다. 
+()4.0 부턴 사용되지 않는다 함)[[[`config.whiny_nils` enables or disables warnings when a certain set of methods are invoked on `nil` and it does not respond to them. Defaults to true in development and test environments.]]]
 
-### Configuring Assets
+### [Configuring Assets] 에셋 구성하기
 
-* `config.assets.enabled` a flag that controls whether the asset pipeline is enabled. It is explicitly initialized in `config/application.rb`.
+* `config.assets.enabled`은 asset pipeline을 사용할지를 설정합니다. 이는 명시적으로 `config/application.rb`에서 초기화 됩니다. [[[`config.assets.enabled` a flag that controls whether the asset pipeline is enabled. It is explicitly initialized in `config/application.rb`.]]]
 
-* `config.assets.compress` a flag that enables the compression of compiled assets. It is explicitly set to true in `config/production.rb`.
+* `config.assets.compress`는 컴파일된 asset의 압축을 활성화합니다. 이는 명시적으로 `config/production.rb`에서 true로 설정됩니다.   [[[`config.assets.compress` a flag that enables the compression of compiled assets. It is explicitly set to true in `config/production.rb`.]]]
 
-* `config.assets.css_compressor` defines the CSS compressor to use. It is set by default by `sass-rails`. The unique alternative value at the moment is `:yui`, which uses the `yui-compressor` gem.
+* `config.assets.css_compressor`는 CSS 컴프레서를 정의합니다. 기본값은 `sass-rails`입니다.  현재 유일한 대안은  `yui-compressor` 젬을 사용하는 `:yui` 입니다. [[[`config.assets.css_compressor` defines the CSS compressor to use. It is set by default by `sass-rails`. The unique alternative value at the moment is `:yui`, which uses the `yui-compressor` gem.]]]
 
-* `config.assets.js_compressor` defines the JavaScript compressor to use. Possible values are `:closure`, `:uglifier` and `:yui` which require the use of the `closure-compiler`, `uglifier` or `yui-compressor` gems respectively.
+* `config.assets.js_compressor`는 Javascript 컴프레서를 정의합니다. 가능한 값으로는 `:closure`, `:uglifier` and `:yui` 들이 있고 각각  `closure-compiler`, `uglifier` or `yui-compressor` 젬을 사용합니다. [[[`config.assets.js_compressor` defines the JavaScript compressor to use. Possible values are `:closure`, `:uglifier` and `:yui` which require the use of the `closure-compiler`, `uglifier` or `yui-compressor` gems respectively.]]]
 
-* `config.assets.paths` contains the paths which are used to look for assets. Appending paths to this configuration option will cause those paths to be used in the search for assets.
+* `config.assets.paths`는 에셋을 찾기 위해 사용되는 경로가 포함됩니다. 설정 옵션에 경로를 추가하면 그 경로가 에셋에 대한 검색에 사용됩니다.  [[[`config.assets.paths` contains the paths which are used to look for assets. Appending paths to this configuration option will cause those paths to be used in the search for assets.]]]
 
-* `config.assets.precompile` allows you to specify additional assets (other than `application.css` and `application.js`) which are to be precompiled when `rake assets:precompile` is run.
+* `config.assets.precompile`는  `rake assets:precompile` 실행할때 미리 컴파일될 추가적인 에셋들을 (`application.css` 와 `application.js` 이외의) 지정할 수 있습니다. [[[`config.assets.precompile` allows you to specify additional assets (other than `application.css` and `application.js`) which are to be precompiled when `rake assets:precompile` is run.]]]
 
-* `config.assets.prefix` defines the prefix where assets are served from. Defaults to `/assets`.
+* `config.assets.prefix`는 에셋에서 제공되는 접두사를 정합니다. 기본값으로는 `/assets` 입니다. [[[`config.assets.prefix` defines the prefix where assets are served from. Defaults to `/assets`.]]]
 
-* `config.assets.digest` enables the use of MD5 fingerprints in asset names. Set to `true` by default in `production.rb`.
+* `config.assets.digest`은 asset 이름의 MD5 fingerprints를 사용을 활성화합니다. `production.rb`에서 기본적으로 `true`로 설정됩니다.  [[[`config.assets.digest` enables the use of MD5 fingerprints in asset names. Set to `true` by default in `production.rb`.]]]
 
-* `config.assets.debug` disables the concatenation and compression of assets. Set to `true` by default in `development.rb`.
+* `config.assets.debug`는 에셋의 압축과 연결을 해제합니다. `development.rb`에서 기본적으로 `true`로 설정됩니다.   [[[`config.assets.debug` disables the concatenation and compression of assets. Set to `true` by default in `development.rb`.]]]
 
-* `config.assets.cache_store` defines the cache store that Sprockets will use. The default is the Rails file store.
+* `config.assets.cache_store`는 Sprockets이 사용할 캐시 저장소를 정의합니다. 기본값으로는 레일즈 파일 저장소입니다. [[[`config.assets.cache_store` defines the cache store that Sprockets will use. The default is the Rails file store.]]]
 
-* `config.assets.version` is an option string that is used in MD5 hash generation. This can be changed to force all files to be recompiled.
+* `config.assets.version`은 MD5 해쉬 생성에 사용되는 옵션 문자열입니다. 이는 모든 파일들을 다시 재컴파일하고 강제로 변경할 수 있습니다.  [[[`config.assets.version` is an option string that is used in MD5 hash generation. This can be changed to force all files to be recompiled.]]]
 
-* `config.assets.compile` is a boolean that can be used to turn on live Sprockets compilation in production.
+* `config.assets.compile`은 배포 환경에서 Sprockets 컴파일이 이용될수있도록 하는 boolean 입니다.  [[[`config.assets.compile` is a boolean that can be used to turn on live Sprockets compilation in production.]]]
 
-* `config.assets.logger` accepts a logger conforming to the interface of Log4r or the default Ruby `Logger` class. Defaults to the same configured at `config.logger`. Setting `config.assets.logger` to false will turn off served assets logging.
+* `config.assets.logger`는 Log4r의 인터페이스 또는 기본 루비 `Logger` 클래스에 적절한 Logger 받습니다.  기본적으로 `config.logger`와 구성이 같습니다. `config.assets.logger`을 false로 세팅하면 에셋 로깅의 작동이 중지될 것 입니다. [[[`config.assets.logger` accepts a logger conforming to the interface of Log4r or the default Ruby `Logger` class. Defaults to the same configured at `config.logger`. Setting `config.assets.logger` to false will turn off served assets logging.]]]
 
-### Configuring Generators
+### [Configuring Generators] 제네레이터 구성하기
 
-Rails allows you to alter what generators are used with the `config.generators` method. This method takes a block:
+레일즈는 `config.generators` 메소드를 사용하여 제네레이터를 변경할 수 있습니다. 이 메소드는 아래와 같이 블럭을 사용합니다.  [[[Rails allows you to alter what generators are used with the `config.generators` method. This method takes a block:]]]
 
 ```ruby
 config.generators do |g|
@@ -168,85 +188,86 @@ config.generators do |g|
 end
 ```
 
-The full set of methods that can be used in this block are as follows:
+블럭에서 사용할 수 있는 메소드의 전체 세팅은 다음과 같습니다. [[[The full set of methods that can be used in this block are as follows:]]]
 
-* `assets` allows to create assets on generating a scaffold. Defaults to `true`.
-* `force_plural` allows pluralized model names. Defaults to `false`.
-* `helper` defines whether or not to generate helpers. Defaults to `true`.
-* `integration_tool` defines which integration tool to use. Defaults to `nil`.
-* `javascripts` turns on the hook for JavaScript files in generators. Used in Rails for when the `scaffold` generator is run. Defaults to `true`.
-* `javascript_engine` configures the engine to be used (for eg. coffee) when generating assets. Defaults to `nil`.
-* `orm` defines which orm to use. Defaults to `false` and will use Active Record by default.
-* `resource_controller` defines which generator to use for generating a controller when using `rails generate resource`. Defaults to `:controller`.
-* `scaffold_controller` different from `resource_controller`, defines which generator to use for generating a _scaffolded_ controller when using `rails generate scaffold`. Defaults to `:scaffold_controller`.
-* `stylesheets` turns on the hook for stylesheets in generators. Used in Rails for when the `scaffold` generator is run, but this hook can be used in other generates as well. Defaults to `true`.
-* `stylesheet_engine` configures the stylesheet engine (for eg. sass) to be used when generating assets. Defaults to `:css`.
-* `test_framework` defines which test framework to use. Defaults to `false` and will use Test::Unit by default.
-* `template_engine` defines which template engine to use, such as ERB or Haml. Defaults to `:erb`.
+* `assets`은 scaffold를 실행으로 에셋을 생성할 수 있습니다. 기본값은 `true` 입니다. [[[`assets` allows to create assets on generating a scaffold. Defaults to `true`.]]]
+* `force_plural`는 모델 이름의 복수화를 합니다. 기본값은 `false` 입니다.   [[[`force_plural` allows pluralized model names. Defaults to `false`.]]]
+* `helper`는 제네레이트 헬퍼의 여부를 정의합니다. 기본값은 `true` 입니다. [[[`helper` defines whether or not to generate helpers. Defaults to `true`.]]]
+* `integration_tool`는 통합 도구를 사용하여 정의합니다.(?) 기본값은 `nil` 입니다. [[[`integration_tool` defines which integration tool to use. Defaults to `nil`.]]]
+* `javascripts` 제네레이터안의 자바스크립트 파일에 대해 실행합니다. `scaffold` 제네레이터가 실행될때를 위해 레일즈에서 사용됩니다. 기본값은 `true` 입니다.  [[[`javascripts` turns on the hook for JavaScript files in generators. Used in Rails for when the `scaffold` generator is run. Defaults to `true`.]]]
+* `javascript_engine`은 에셋을 생성할때 엔진을 사용하도록(예 : coffee) 구성합니다.     [[[`javascript_engine` configures the engine to be used (for eg. coffee) when generating assets. Defaults to `nil`.]]]
+* `orm` 사용하려는 orm을 정의합니다. 기본값으로는 `false`이고 Active Record를 기본적으로 사용합니다. [[[`orm` defines which orm to use. Defaults to `false` and will use Active Record by default.]]]
+* `resource_controller`는  `rails generate resource`을 이용할때 컨트롤러를 생성하기 위해 사용하는 제네레이터를 정의합니다.  기본값은 `:controller` 입니다. [[[`resource_controller` defines which generator to use for generating a controller when using `rails generate resource`. Defaults to `:controller`.]]]
+* `scaffold_controller`는 `resource_controller`와 다릅니다, `rails generate scaffold`을 이용할때 _scaffolded_ 컨트롤러를 생성하기 위해 사용하는 제네레이터를 정의합니다. 기본값은 `:scaffold_controller` 입니다.  [[[`scaffold_controller` different from `resource_controller`, defines which generator to use for generating a _scaffolded_ controller when using `rails generate scaffold`. Defaults to `:scaffold_controller`.]]]
+* `stylesheets` 제네레이터의 스타일시트에 대해 설정합니다. 레일즈에서 `scaffold` 제네레이터가 실행될때 사용되지만, 다른 제네레이터에서도 마찬가지 입니다.기본값은 `true` 입니다. [[[`stylesheets` turns on the hook for stylesheets in generators. Used in Rails for when the `scaffold` generator is run, but this hook can be used in other generates as well. Defaults to `true`.]]]
+* `stylesheet_engine`은 에셋을 생성할때 사용할 스타일시트 엔진(예: sass)을 설정합니다. 기본값은 `:css` 입니다. [[[`stylesheet_engine` configures the stylesheet engine (for eg. sass) to be used when generating assets. Defaults to `:css`.]]]
+* `test_framework`는 어떤 테스트 프레임워크를 사용할지 정의합니다. 기본값은 `false` 이고 Test::Unit을 기본적으로 사용합니다. [[[`test_framework` defines which test framework to use. Defaults to `false` and will use Test::Unit by default.]]]
+* `template_engine`는 ERB와 Haml 같은 템플릿 엔진의 사용을 정의합니다. 기본값은 `:erb` 입니다. [[[`template_engine` defines which template engine to use, such as ERB or Haml. Defaults to `:erb`.]]]
 
-### Configuring Middleware
+### [Configuring Middleware] 미들웨어 구성하기
 
-Every Rails application comes with a standard set of middleware which it uses in this order in the development environment:
+모든 레일즈 어플리케이션은 아래와 같이 개발 환경에서 사용하는 미들웨어의 표준 설정을 제공합니다. [[[Every Rails application comes with a standard set of middleware which it uses in this order in the development environment:]]]
 
-* `ActionDispatch::SSL` forces every request to be under HTTPS protocol. Will be available if `config.force_ssl` is set to `true`. Options passed to this can be configured by using `config.ssl_options`.
-* `ActionDispatch::Static` is used to serve static assets. Disabled if `config.serve_static_assets` is `false`.
-* `Rack::Lock` wraps the app in mutex so it can only be called by a single thread at a time. Only enabled when `config.cache_classes` is `false`.
-* `ActiveSupport::Cache::Strategy::LocalCache` serves as a basic memory backed cache. This cache is not thread safe and is intended only for serving as a temporary memory cache for a single thread.
-* `Rack::Runtime` sets an `X-Runtime` header, containing the time (in seconds) taken to execute the request.
-* `Rails::Rack::Logger` notifies the logs that the request has began. After request is complete, flushes all the logs.
-* `ActionDispatch::ShowExceptions` rescues any exception returned by the application and renders nice exception pages if the request is local or if `config.consider_all_requests_local` is set to `true`. If `config.action_dispatch.show_exceptions` is set to `false`, exceptions will be raised regardless.
-* `ActionDispatch::RequestId` makes a unique X-Request-Id header available to the response and enables the `ActionDispatch::Request#uuid` method.
-* `ActionDispatch::RemoteIp` checks for IP spoofing attacks and gets valid `client_ip` from request headers. Configurable with the `config.action_dispatch.ip_spoofing_check`, and `config.action_dispatch.trusted_proxies` options.
-* `Rack::Sendfile` intercepts responses whose body is being served from a file and replaces it with a server specific X-Sendfile header. Configurable with `config.action_dispatch.x_sendfile_header`.
-* `ActionDispatch::Callbacks` runs the prepare callbacks before serving the request.
-* `ActiveRecord::ConnectionAdapters::ConnectionManagement` cleans active connections after each request, unless the `rack.test` key in the request environment is set to `true`.
-* `ActiveRecord::QueryCache` caches all SELECT queries generated in a request. If any INSERT or UPDATE takes place then the cache is cleaned.
-* `ActionDispatch::Cookies` sets cookies for the request.
-* `ActionDispatch::Session::CookieStore` is responsible for storing the session in cookies. An alternate middleware can be used for this by changing the `config.action_controller.session_store` to an alternate value. Additionally, options passed to this can be configured by using `config.action_controller.session_options`.
-* `ActionDispatch::Flash` sets up the `flash` keys. Only available if `config.action_controller.session_store` is set to a value.
-* `ActionDispatch::ParamsParser` parses out parameters from the request into `params`.
-* `Rack::MethodOverride` allows the method to be overridden if `params[:_method]` is set. This is the middleware which supports the PATCH, PUT, and DELETE HTTP method types.
-* `ActionDispatch::Head` converts HEAD requests to GET requests and serves them as so.
+* `ActionDispatch::SSL`는 모든 요청을 HTTPS 프로토콜 아래로 강제 합니다. `config.force_ssl`이 `true`로 설정되어 있는 경우 사용할 수 있습니다. `config.ssl_options`를 사용하여 옵션을 설정할 수 있습니다.  [[[`ActionDispatch::SSL` forces every request to be under HTTPS protocol. Will be available if `config.force_ssl` is set to `true`. Options passed to this can be configured by using `config.ssl_options`.]]]
+* `ActionDispatch::Static`은 동적 에셋을 제공하는데 사용됩니다. 만약 `config.serve_static_assets`이 `false`일 경우 비활성화 됩니다. [[[`ActionDispatch::Static` is used to serve static assets. Disabled if `config.serve_static_assets` is `false`.]]]
+* `Rack::Lock`은 한번에 하나의 스레드로 호출될 수 있도록 뮤텍스의 어플리케이션을 래핑합니다. `config.cache_classes`가 `false` 일때만 활성화 됩니다. ?? [[[`Rack::Lock` wraps the app in mutex so it can only be called by a single thread at a time. Only enabled when `config.cache_classes` is `false`.]]]
+* `ActiveSupport::Cache::Strategy::LocalCache`은 기본 메모리 캐시를 백업 역할을 합니다. 이 캐시는 쓰레드에 안전하지 않고 하나의 쓰레드를 위한 임시 메모리 캐시를 제공하기 위한 목적이 있습니다. [[[`ActiveSupport::Cache::Strategy::LocalCache` serves as a basic memory backed cache. This cache is not thread safe and is intended only for serving as a temporary memory cache for a single thread.]]]
+* `Rack::Runtime`은 요청을 실행하는데 걸리는 시간(초)을 포함하는 `X-Runtime` 헤더를 설정합니다. [[[`Rack::Runtime` sets an `X-Runtime` header, containing the time (in seconds) taken to execute the request.]]]
+* `Rails::Rack::Logger`는 요청이 시작된 로그를 알립니다. 요청이 완료된 후에는 모든 로그를 날려버립니다. [[[`Rails::Rack::Logger` notifies the logs that the request has began. After request is complete, flushes all the logs.]]]
+* `ActionDispatch::ShowExceptions`은 어플리케이션에서 반환된 예외와 만약 요청이 로컬에서 발생한 경우 또는  `config.consider_all_requests_local` 이 값이 `true`로 설정되어있는 경우에 예외 페이지를 렌더링 합니다.!? 만약 `config.action_dispatch.show_exceptions`값이 `false` 라면, 예외에 관계없이 발생합니다.
+* [[[`ActionDispatch::ShowExceptions` rescues any exception returned by the application and renders nice exception pages if the request is local or if `config.consider_all_requests_local` is set to `true`. If `config.action_dispatch.show_exceptions` is set to `false`, exceptions will be raised regardless.]]]
+* `ActionDispatch::RequestId`는 응답을 위해 고유한 X-Request-Id 헤더를 사용할 수 있도록 하고 `ActionDispatch::Request#uuid` 메소드를 활성화합니다. [[[`ActionDispatch::RequestId` makes a unique X-Request-Id header available to the response and enables the `ActionDispatch::Request#uuid` method.]]]
+* `ActionDispatch::RemoteIp`는 IP 스푸핑 공격에 대한 확인과 요청 헤더로부터 유효한 `client_ip`를 얻습니다.  `config.action_dispatch.ip_spoofing_check`와 `config.action_dispatch.trusted_proxies` 옵션으로 구성되어 있습니다. [[[`ActionDispatch::RemoteIp` checks for IP spoofing attacks and gets valid `client_ip` from request headers. Configurable with the `config.action_dispatch.ip_spoofing_check`, and `config.action_dispatch.trusted_proxies` options.]]]
+* `Rack::Sendfile`은 파일에서 제공되고 있던 본문과 서버에서 특정 X-Sendfile 헤더로 대체되는 응답을 차단합니다. `config.action_dispatch.x_sendfile_header`로 구성되어 있습니다. [[[`Rack::Sendfile` intercepts responses whose body is being served from a file and replaces it with a server specific X-Sendfile header. Configurable with `config.action_dispatch.x_sendfile_header`.]]]
+* `ActionDispatch::Callbacks`은 요청을 제공하기 전에 콜백을 준비하고 실행합니다. [[[`ActionDispatch::Callbacks` runs the prepare callbacks before serving the request.]]]
+* `ActiveRecord::ConnectionAdapters::ConnectionManagement`은 요청 환경에서 `rack.test`가 `true`로 설정되어 있지 않으면 각 요청 후에 활성화된 연결을 제거합니다.[[[`ActiveRecord::ConnectionAdapters::ConnectionManagement` cleans active connections after each request, unless the `rack.test` key in the request environment is set to `true`.]]]
+* `ActiveRecord::QueryCache`는 요청으로 생성된 모든 SELECT 쿼리를 캐시합니다. 만약 INSERT나 UPDATE가 발생하는 경우엔 캐시를 비웁니다. [[[`ActiveRecord::QueryCache` caches all SELECT queries generated in a request. If any INSERT or UPDATE takes place then the cache is cleaned.]]]
+* `ActionDispatch::Cookies`는 요청에 대한 쿠키들을 설정합니다. [[[`ActionDispatch::Cookies` sets cookies for the request.]]]
+* `ActionDispatch::Session::CookieStore`은 쿠키에 세션을 저장하기 위한 책임이 있습니다. `config.action_controller.session_store`의 값을 변경하여 다른 미들웨어를 사용할 수 있습니다. 또한, `config.action_controller.session_options`을 사용하여 옵션을 설정 할 수 있습니다. [[[`ActionDispatch::Session::CookieStore` is responsible for storing the session in cookies. An alternate middleware can be used for this by changing the `config.action_controller.session_store` to an alternate value. Additionally, options passed to this can be configured by using `config.action_controller.session_options`.]]]
+* `ActionDispatch::Flash`는 `flash`키를 설정합니다.  오직 `config.action_controller.session_store`의 값이 세팅됬을때만 이용 가능합니다. [[[`ActionDispatch::Flash` sets up the `flash` keys. Only available if `config.action_controller.session_store` is set to a value.]]]
+* `ActionDispatch::ParamsParser`는 `params`의 요청으로 부터 매개 변수를 분석합니다. [[[`ActionDispatch::ParamsParser` parses out parameters from the request into `params`.]]]
+* `Rack::MethodOverride`은 `params[:_method]`가 설정 되어있을때 메소드를 오버라이드(override) 할 수 있습니다. 이는 HTTP 메소드 유형인 PATCH, PUT 그리고 DELETE를 지원하는 미들웨어입니다. [[[`Rack::MethodOverride` allows the method to be overridden if `params[:_method]` is set. This is the middleware which supports the PATCH, PUT, and DELETE HTTP method types.]]]
+* `ActionDispatch::Head`는 HEAD 요청을 GET 요청으로 변환하고 그것들을 제공합니다.  [[[`ActionDispatch::Head` converts HEAD requests to GET requests and serves them as so.]]]
 
-Besides these usual middleware, you can add your own by using the `config.middleware.use` method:
+이러한 일반적인 미들웨어에 자신만의 `config.middleware.use` 메소드를 사용하여 추가할 수 있습니다.   [[[Besides these usual middleware, you can add your own by using the `config.middleware.use` method:]]]
 
 ```ruby
 config.middleware.use Magical::Unicorns
 ```
 
-This will put the `Magical::Unicorns` middleware on the end of the stack. You can use `insert_before` if you wish to add a middleware before another.
+`Magical::Unicorns` 미들웨어를 마지막 끝에 입력합니다. 다른 미들웨어를 추가하고 싶다면 `insert_before`을 이용하여 추가할 수 있습니다. [[[This will put the `Magical::Unicorns` middleware on the end of the stack. You can use `insert_before` if you wish to add a middleware before another.]]]
 
 ```ruby
 config.middleware.insert_before ActionDispatch::Head, Magical::Unicorns
 ```
 
-There's also `insert_after` which will insert a middleware after another:
+`insert_after`  다른 미들웨어 후에 추가할 수 있습니다. [[[There's also `insert_after` which will insert a middleware after another:]]]
 
 ```ruby
 config.middleware.insert_after ActionDispatch::Head, Magical::Unicorns
 ```
 
-Middlewares can also be completely swapped out and replaced with others:
+미들웨어는 완전히 다른 것들로 변경할 수 있습니다. [[[Middlewares can also be completely swapped out and replaced with others:]]]
 
 ```ruby
 config.middleware.swap ActionController::Failsafe, Lifo::Failsafe
 ```
 
-They can also be removed from the stack completely:
+그것들을 스택에서 완전히 제거할 수도 있습니다. [[[They can also be removed from the stack completely:]]]
 
 ```ruby
 config.middleware.delete "Rack::MethodOverride"
 ```
 
-### Configuring i18n
+### [Configuring i18n] i18n 구성하기
 
-* `config.i18n.default_locale` sets the default locale of an application used for i18n. Defaults to `:en`.
+* `config.i18n.default_locale`은 국제화를 위해 어플리케이션의 기본 로케일을 설정합니다. 기본값은 `:en` 입니다.  [[[`config.i18n.default_locale` sets the default locale of an application used for i18n. Defaults to `:en`.]]]
 
-* `config.i18n.load_path` sets the path Rails uses to look for locale files. Defaults to `config/locales/*.{yml,rb}`.
+* `config.i18n.load_path`는 레일즈에서 사용하는 로케일 파일의 검색 경로를 설정합니다. 기본값은 `config/locales/*.{yml,rb}` 입니다.  [[[`config.i18n.load_path` sets the path Rails uses to look for locale files. Defaults to `config/locales/*.{yml,rb}`.]]]
 
-### Configuring Active Record
+### [Configuring Active Record] Active Record 구성하기
 
-`config.active_record` includes a variety of configuration options:
+`config.active_record`는 다양한 설정 옵션을 포함합니다. [[[`config.active_record` includes a variety of configuration options:]]]
 
 * `config.active_record.logger` accepts a logger conforming to the interface of Log4r or the default Ruby Logger class, which is then passed on to any new database connections made. You can retrieve this logger by calling `logger` on either an Active Record model class or an Active Record model instance. Set to `nil` to disable logging.
 
@@ -733,4 +754,4 @@ Since the connection pooling is handled inside of ActiveRecord by default, all a
 
 Any one request will check out a connection the first time it requires access to the database, after which it will check the connection back in, at the end of the request, meaning that the additional connection slot will be available again for the next request in the queue.
 
-NOTE. If you have enabled `Rails.threadsafe!` mode then there could be a chance that several threads may be accessing multiple connections simultaneously. So depending on your current request load, you could very well have multiple threads contending for a limited amount of connections.
+NOTE. If you have enabled `Rails.threadsafe!` mode then there could be a chance that several threads may be accessing multiple connections simultaneously. So depending on your current request load, you could very well have multiple threads contending for a limited amount of connectio
