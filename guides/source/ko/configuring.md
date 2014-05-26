@@ -6,8 +6,11 @@
 
 본 가이드를 읽은 후에는 아래와 같은 내용을 알 수 있을 것입니다. [[[After reading this guide, you will know:]]]
 
-* 레일즈 어플리케이션의 동작을 조절하는 방법. [[[How to adjust the behavior of your Rails applications.]]]
-* 어플리케이션이 시작되는 시간에 실행되는 코드를 추가하는 방법. [[[How to add additional code to be run at application start time.]]]
+* 레일즈 어플리케이션의 동작을 조절하는 방법. 
+[[[How to adjust the behavior of your Rails applications.]]]
+
+* 어플리케이션이 시작되는 시간에 실행되는 코드를 추가하는 방법. 
+[[[How to add additional code to be run at application start time.]]]
 
 --------------------------------------------------------------------------------
 
@@ -17,7 +20,7 @@
 레일즈는 초기화 코드를 넣는 4개의 장소를 제공합니다. [[[Rails offers four standard spots to place initialization code:]]]
 
 * `config/application.rb`
-* 특정 환경 설정 파일 [[[Environment-specific configuration files]]]
+* 특정 환경 설정 파일 [[[ Environment-specific configuration files ]]]
 * Initializers
 * After-initializers
 
@@ -85,8 +88,8 @@ config.active_record.schema_format = :ruby
 
     ```ruby
     console do
-      # 이 블럭은 콘솔을 실행할때 호출됩니다. [[[# this block is called only when running console,]]]
-      # 여기서 require pry를 사용할 수 있습니다. [[[# so we can safely require pry here]]]
+      # this block is called only when running console,
+      # so we can safely require pry here
       require "pry"
       config.console = Pry
     end
@@ -165,7 +168,7 @@ config.active_record.schema_format = :ruby
 
 * `config.assets.prefix`는 에셋에서 제공되는 접두사를 정합니다. 기본값으로는 `/assets` 입니다. [[[`config.assets.prefix` defines the prefix where assets are served from. Defaults to `/assets`.]]]
 
-* `config.assets.digest`은 asset 이름의 MD5 fingerprints를 사용을 활성화합니다. `production.rb`에서 기본적으로 `true`로 설정됩니다.  [[[`config.assets.digest` enables the use of MD5 fingerprints in asset names. Set to `true` by default in `production.rb`.]]]
+* `config.assets.digest`은 asset 이름의 MD5 fingerprints의 사용을 활성화합니다. `production.rb`에서 기본적으로 `true`로 설정됩니다.  [[[`config.assets.digest` enables the use of MD5 fingerprints in asset names. Set to `true` by default in `production.rb`.]]]
 
 * `config.assets.debug`는 에셋의 압축과 연결을 해제합니다. `development.rb`에서 기본적으로 `true`로 설정됩니다.   [[[`config.assets.debug` disables the concatenation and compression of assets. Set to `true` by default in `development.rb`.]]]
 
@@ -173,7 +176,7 @@ config.active_record.schema_format = :ruby
 
 * `config.assets.version`은 MD5 해쉬 생성에 사용되는 옵션 문자열입니다. 이는 모든 파일들을 다시 재컴파일하고 강제로 변경할 수 있습니다.  [[[`config.assets.version` is an option string that is used in MD5 hash generation. This can be changed to force all files to be recompiled.]]]
 
-* `config.assets.compile`은 배포 환경에서 Sprockets 컴파일이 이용될수있도록 하는 boolean 입니다.  [[[`config.assets.compile` is a boolean that can be used to turn on live Sprockets compilation in production.]]]
+* `config.assets.compile`은 배포 환경에서 Sprockets 컴파일을 이용할 수 있도록 하는 boolean을 말합니다.  [[[`config.assets.compile` is a boolean that can be used to turn on live Sprockets compilation in production.]]]
 
 * `config.assets.logger`는 Log4r의 인터페이스 또는 기본 루비 `Logger` 클래스에 적절한 Logger 받습니다.  기본적으로 `config.logger`와 구성이 같습니다. `config.assets.logger`을 false로 세팅하면 에셋 로깅의 작동이 중지될 것 입니다. [[[`config.assets.logger` accepts a logger conforming to the interface of Log4r or the default Ruby `Logger` class. Defaults to the same configured at `config.logger`. Setting `config.assets.logger` to false will turn off served assets logging.]]]
 
@@ -188,21 +191,34 @@ config.generators do |g|
 end
 ```
 
-블럭에서 사용할 수 있는 메소드의 전체 세팅은 다음과 같습니다. [[[The full set of methods that can be used in this block are as follows:]]]
+블럭에서 사용할 수 있는 메소드의 세팅은 다음과 같습니다. [[[The full set of methods that can be used in this block are as follows:]]]
 
-* `assets`은 scaffold를 실행으로 에셋을 생성할 수 있습니다. 기본값은 `true` 입니다. [[[`assets` allows to create assets on generating a scaffold. Defaults to `true`.]]]
-* `force_plural`는 모델 이름의 복수화를 합니다. 기본값은 `false` 입니다.   [[[`force_plural` allows pluralized model names. Defaults to `false`.]]]
-* `helper`는 제네레이트 헬퍼의 여부를 정의합니다. 기본값은 `true` 입니다. [[[`helper` defines whether or not to generate helpers. Defaults to `true`.]]]
-* `integration_tool`는 통합 도구를 사용하여 정의합니다.(?) 기본값은 `nil` 입니다. [[[`integration_tool` defines which integration tool to use. Defaults to `nil`.]]]
-* `javascripts` 제네레이터안의 자바스크립트 파일에 대해 실행합니다. `scaffold` 제네레이터가 실행될때를 위해 레일즈에서 사용됩니다. 기본값은 `true` 입니다.  [[[`javascripts` turns on the hook for JavaScript files in generators. Used in Rails for when the `scaffold` generator is run. Defaults to `true`.]]]
-* `javascript_engine`은 에셋을 생성할때 엔진을 사용하도록(예 : coffee) 구성합니다.     [[[`javascript_engine` configures the engine to be used (for eg. coffee) when generating assets. Defaults to `nil`.]]]
-* `orm` 사용하려는 orm을 정의합니다. 기본값으로는 `false`이고 Active Record를 기본적으로 사용합니다. [[[`orm` defines which orm to use. Defaults to `false` and will use Active Record by default.]]]
-* `resource_controller`는  `rails generate resource`을 이용할때 컨트롤러를 생성하기 위해 사용하는 제네레이터를 정의합니다.  기본값은 `:controller` 입니다. [[[`resource_controller` defines which generator to use for generating a controller when using `rails generate resource`. Defaults to `:controller`.]]]
-* `scaffold_controller`는 `resource_controller`와 다릅니다, `rails generate scaffold`을 이용할때 _scaffolded_ 컨트롤러를 생성하기 위해 사용하는 제네레이터를 정의합니다. 기본값은 `:scaffold_controller` 입니다.  [[[`scaffold_controller` different from `resource_controller`, defines which generator to use for generating a _scaffolded_ controller when using `rails generate scaffold`. Defaults to `:scaffold_controller`.]]]
-* `stylesheets` 제네레이터의 스타일시트에 대해 설정합니다. 레일즈에서 `scaffold` 제네레이터가 실행될때 사용되지만, 다른 제네레이터에서도 마찬가지 입니다.기본값은 `true` 입니다. [[[`stylesheets` turns on the hook for stylesheets in generators. Used in Rails for when the `scaffold` generator is run, but this hook can be used in other generates as well. Defaults to `true`.]]]
-* `stylesheet_engine`은 에셋을 생성할때 사용할 스타일시트 엔진(예: sass)을 설정합니다. 기본값은 `:css` 입니다. [[[`stylesheet_engine` configures the stylesheet engine (for eg. sass) to be used when generating assets. Defaults to `:css`.]]]
-* `test_framework`는 어떤 테스트 프레임워크를 사용할지 정의합니다. 기본값은 `false` 이고 Test::Unit을 기본적으로 사용합니다. [[[`test_framework` defines which test framework to use. Defaults to `false` and will use Test::Unit by default.]]]
-* `template_engine`는 ERB와 Haml 같은 템플릿 엔진의 사용을 정의합니다. 기본값은 `:erb` 입니다. [[[`template_engine` defines which template engine to use, such as ERB or Haml. Defaults to `:erb`.]]]
+* `assets`은 scaffold를 실행으로 에셋을 생성할 수 있습니다. 기본값은 `true` 입니다. 
+[[[ `assets` allows to create assets on generating a scaffold. Defaults to `true`. ]]]
+* `force_plural`는 모델 이름의 복수화를 합니다. 기본값은 `false` 입니다.   
+[[[`force_plural` allows pluralized model names. Defaults to `false`.]]]
+* `helper`는 제네레이트 헬퍼의 여부를 정의합니다. 기본값은 `true` 입니다. 
+[[[`helper` defines whether or not to generate helpers. Defaults to `true`.]]]
+* `integration_tool`는 사용할 통합 도구를 정의합니다. 기본값은 `nil` 입니다. 
+[[[`integration_tool` defines which integration tool to use. Defaults to `nil`.]]]
+* `javascripts` 제네레이터안의 자바스크립트 파일에 대해 실행합니다. `scaffold` 제네레이터가 실행될때를 위해 레일즈에서 사용됩니다. 기본값은 `true` 입니다.  
+[[[`javascripts` turns on the hook for JavaScript files in generators. Used in Rails for when the `scaffold` generator is run. Defaults to `true`.]]]
+* `javascript_engine`은 에셋을 생성할때 엔진을 사용하도록(예 : coffee) 구성합니다.     
+[[[`javascript_engine` configures the engine to be used (for eg. coffee) when generating assets. Defaults to `nil`.]]]
+* `orm` 사용하려는 orm을 정의합니다. 기본값으로는 `false`이고 Active Record를 기본적으로 사용합니다. 
+[[[`orm` defines which orm to use. Defaults to `false` and will use Active Record by default.]]]
+* `resource_controller`는  `rails generate resource`을 이용할때 컨트롤러를 생성하기 위해 사용하는 제네레이터를 정의합니다.  기본값은 `:controller` 입니다. 
+[[[`resource_controller` defines which generator to use for generating a controller when using `rails generate resource`. Defaults to `:controller`.]]]
+* `scaffold_controller`는 `resource_controller`와 다릅니다, `rails generate scaffold`을 이용할때 _scaffolded_ 컨트롤러를 생성하기 위해 사용하는 제네레이터를 정의합니다. 기본값은 `:scaffold_controller` 입니다.  
+[[[`scaffold_controller` different from `resource_controller`, defines which generator to use for generating a _scaffolded_ controller when using `rails generate scaffold`. Defaults to `:scaffold_controller`.]]]
+* `stylesheets` 제네레이터의 스타일시트에 대해 설정합니다. 레일즈에서 `scaffold` 제네레이터가 실행될때 사용되지만, 다른 제네레이터에서도 마찬가지 입니다.기본값은 `true` 입니다. 
+[[[`stylesheets` turns on the hook for stylesheets in generators. Used in Rails for when the `scaffold` generator is run, but this hook can be used in other generates as well. Defaults to `true`.]]]
+* `stylesheet_engine`은 에셋을 생성할때 사용할 스타일시트 엔진(예: sass)을 설정합니다. 기본값은 `:css` 입니다. 
+[[[`stylesheet_engine` configures the stylesheet engine (for eg. sass) to be used when generating assets. Defaults to `:css`.]]]
+* `test_framework`는 어떤 테스트 프레임워크를 사용할지 정의합니다. 기본값은 `false` 이고 Test::Unit을 기본적으로 사용합니다. 
+[[[`test_framework` defines which test framework to use. Defaults to `false` and will use Test::Unit by default.]]]
+* `template_engine`는 ERB와 Haml 같은 템플릿 엔진의 사용을 정의합니다. 기본값은 `:erb` 입니다. 
+[[[`template_engine` defines which template engine to use, such as ERB or Haml. Defaults to `:erb`.]]]
 
 ### [Configuring Middleware] 미들웨어 구성하기
 
