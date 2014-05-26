@@ -166,7 +166,7 @@ config.active_record.schema_format = :ruby
 
 * `config.assets.precompile`는  `rake assets:precompile` 실행할때 미리 컴파일될 추가적인 에셋들을 (`application.css` 와 `application.js` 이외의) 지정할 수 있습니다. [[[`config.assets.precompile` allows you to specify additional assets (other than `application.css` and `application.js`) which are to be precompiled when `rake assets:precompile` is run.]]]
 
-* `config.assets.prefix`는 에셋에서 제공되는 접두사를 정합니다. 기본값으로는 `/assets` 입니다. [[[`config.assets.prefix` defines the prefix where assets are served from. Defaults to `/assets`.]]]
+* `config.assets.prefix`는 에셋을 위치시킬 경로의 접두사를 정합니다. 기본값으로는 `/assets` 입니다. [[[`config.assets.prefix` defines the prefix where assets are served from. Defaults to `/assets`.]]]
 
 * `config.assets.digest`은 asset 이름의 MD5 fingerprints의 사용을 활성화합니다. `production.rb`에서 기본적으로 `true`로 설정됩니다.  [[[`config.assets.digest` enables the use of MD5 fingerprints in asset names. Set to `true` by default in `production.rb`.]]]
 
