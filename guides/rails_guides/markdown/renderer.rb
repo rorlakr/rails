@@ -22,7 +22,7 @@ HTML
           convert_header_original(text, header_level)
         else
           %(<h#{header_level}>#{text}</h#{header_level}>)
-        end        
+        end
       end
 
       def paragraph(text)
@@ -44,6 +44,7 @@ HTML
 
       private
 
+        # added by Lucius
         def convert_header_original(text, header_level)
           text.gsub(/^\[(.*)\]\s(.*)$/) do
             linkback = %(<a href="#" class="original-link" onclick="$(this).parent().prev().toggle();return false;">{원문</a><a href="#" class="original-link">·</a><a href='#' class="original-link" onclick="$('.original-text, .original-text-h').toggle();return false;">전체}</a>)
@@ -51,6 +52,7 @@ HTML
           end
         end
 
+        # added by Lucius
         def convert_original(text)
           text = text.gsub(/\n/, " ")
           text.gsub(/^(.+?)\s*\[{3}(.+?)\]{3}$/) do
@@ -98,9 +100,9 @@ HTML
                           $1.downcase
                         end
             original_text = $2
-            if original_text =~ /\n*(.+?)\s*\[{3}(.+?)\]{3}\s*/ 
-            # if original_text =~ /^(.*)\[\[\[(.+)\]\]\]$/ 
-              original_text = convert_original(original_text) 
+            if original_text =~ /\n*(.+?)\s*\[{3}(.+?)\]{3}\s*/
+            # if original_text =~ /^(.*)\[\[\[(.+)\]\]\]$/
+              original_text = convert_original(original_text)
             else
               original_text = "<p>#{original_text}</p>"
             end
