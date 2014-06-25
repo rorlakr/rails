@@ -551,6 +551,44 @@ end
 
 세션 값에 대해서는 키 값을 `nil` 로 할당하는 반면, 쿠키 값을 삭제하기 위해서는 `cookies.delete(:key)` 를 사용해야 함을 주목하기 바랍니다. [[[Note that while for session values you set the key to `nil`, to delete a cookie value you should use `cookies.delete(:key)`.]]]
 
+레일스는 중요한 데이터를 저장하기 위한 서명된 쿠키 jar, 암호화된 쿠키 jar를 제공합니다. 서명된 쿠키 jar는 무결성을 위해 암호화 서명값을 쿠키값에 추가합니다. 암호화된 쿠키 jar는 서명하는것에 추가로 값을 암호화해서 사용자에 의해 읽을수 없도록 합니다. 자세한 정보는 [API 문서](http://api.rubyonrails.org/classes/ActionDispatch/Cookies.html)를 참고바랍니다. [[[Rails also provides a signed cookie jar and an encrypted cookie jar for storing sensitive data. The signed cookie jar appends a cryptographic signature on the cookie values to protect their integrity. The encrypted cookie jar encrypts the values in addition to signing them, so that they cannot be read by the end user. Refer to the [API documentation](http://api.rubyonrails.org/classes/ActionDispatch/Cookies.html) for more details. ]]]
+
+이러한 특별한 쿠키 jar들은 값을 문자열로 변환하거나 데이터를 읽기위해 루비 객체로 역변환 하는데 serializer를 사용합니다. [[[These special cookie jars use a serializer to serialize the assigned values into strings and deserializes them into Ruby objects on read.]]]
+
+사용하고자 하는 serializer를 지정 할 수 있습니다: [[[You can specify what serializer to use:]]]
+
+```ruby
+Rails.application.config.action_dispatch.cookies_serializer = :json
+```
+
+새로운 어플리케이션의 기본 serializer는 `:json` 입니다. 오래된 어플리케이션의 기존 쿠키와의 호환성을 위해 `serializer` 옵션이 지정되어 있지 않은경우 `:marshal`을 사용합니다. [[[The default serializer for new applications is `:json`. For compatibility with old applications with existing cookies, `:marshal` is used when `serializer` option is not specified.]]]
+
+옵션값을 `:hybrid`로 지정 할 수 있는데 이경우 레일스는 알아서 기존 쿠키를(`Marshal` 변환된) 역변환 해서 읽을수 있게 하고 다시 저장할때는 `JSON` 포맷으로 저장합니다. 이는 기존 어플리케이션을 `:json` serializer로 변경할때 유용합니다. [[[You may also set this option to `:hybrid`, in which case Rails would transparently deserialize existing (`Marshal`-serialized) cookies on read and re-write them in the `JSON` format. This is useful for migrating existing applications to the `:json` serializer.]]]
+
+또한 `load`, `dump`를 구현한 사용자가 직접 작성한 serializer를 지정할 수 있습니다: [[[It is also possible to pass a custom serializer that responds to `load` and `dump`:]]]
+
+```ruby
+Rails.application.config.action_dispatch.cookies_serializer = MyCustomSerializer
+```
+
+`:json`, `:hybrid` serializer를 사용할때, 모든 루비 객체가 JSON으로 변환되는것이 아니라는것을 유의해야합니다. 예를 들어 `Date`, `Time` 객체는 문자열로 변환되고 `Hash`의 키값도 문자열로 변경됩니다. [[[When using the `:json` or `:hybrid` serializer, you should beware that not all Ruby objects can be serialized as JSON. For example, `Date` and `Time` objects will be serialized as strings, and `Hash`es will have their keys stringified.]]]
+
+```ruby
+class CookiesController < ApplicationController
+  def set_cookie
+    cookies.encrypted[:expiration_date] = Date.tomorrow # => Thu, 20 Mar 2014
+    redirect_to action: 'read_cookie'
+  end
+
+  def read_cookie
+    cookies.encrypted[:expiration_date] # => "2014-03-20"
+  end
+end
+```
+
+이렇기에 단순한 데이터(문자열, 숫자)만 저장하는것을 권장합니다. 만약 복잡한 객체를 저장한다면, 이후 요청시마다 데이터를 읽기 위해서 변환을 직접 다루어야합니다. [[[It's advisable that you only store simple data (strings and numbers) in cookies. If you have to store complex objects, you would need to handle the conversion manually when reading the values on subsequent requests.]]]
+
+만약 세션을 쿠키 저장소에 저장한다면 이는 `session`, `flash`에도 적용됩니다. [[[If you use the cookie session store, this would apply to the `session` and `flash` hash as well.]]]
 
 [Rendering xml and json data] xml과 json 데이터 렌더링하기
 ---------------------------
