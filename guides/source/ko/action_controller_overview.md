@@ -621,7 +621,7 @@ end
 
 ```ruby
 class ApplicationController < ActionController::Base
-  before_filter :require_login
+  before_action :require_login
 
   private
 
@@ -631,24 +631,16 @@ class ApplicationController < ActionController::Base
       redirect_to new_login_url # halts request cycle
     end
   end
-
-  # logged_in? 메소드는 사용자가 로그인한 경우에는 true 값을, 그렇지 않은 경우
-  # false 값을 반환합니다. 이것은 이전에 작성했던 current_user 메소드를 !! 연산자를
-  # 이용하여 논리값으로 변환하므로써 가능합니다. 이런한 방법은 루비에서 흔하지 않으며
-  # 분명하게 특정값을 논리값으로 변환하고자 할 경우 외에는 권장하지 않습니다.
-  def logged_in?
-    !!current_user
-  end
 end
 ```
 
 위의 예에서 require_login 메소드는 에러 메시지를 플래시에 저장하고 사용자가 로그인하지 않은 상태라면 로그인 폼으로 리디렉트하게 됩니다. "before" 필터 메소드가 렌더링을 하거나 리디렉트할 경우 해당 액션은 실행되지 않을 것입니다. 만약 해당 필터이후에 실행되어야할 또 다른 필터가 있는 경우, 그 필터 또한 취소될 것입니다. [[[The method simply stores an error message in the flash and redirects to the login form if the user is not logged in. If a "before" filter renders or redirects, the action will not run. If there are additional filters scheduled to run after that filter, they are also cancelled.]]]
 
-위의 예에서, 필터가 `ApplicationController` 에 추가되기 때문에 어플리케이션내에 있는 모든 컨트롤러는 해당 필터를 상속받게 됩니다. 이것은 어플리케이션에 있는 모든 것이 사용자가 그것을 사용하기 위해서는 로그인을 하도록 요구하게 만듭니다. 이런 경우, 최초 사용자가 까지도 로그인을 할 수 없게 되므로 모든 컨트롤러나 액션이 로그인을 요구하게 해서는 안 됩니다. 따라서 `skip_before_filter` 를 사용해서 해당 필터가 특정 before 액션을 실행하지 못하도록 할 수 있습니다. [[[In this example the filter is added to `ApplicationController` and thus all controllers in the application inherit it. This will make everything in the application require the user to be logged in in order to use it. For obvious reasons (the user wouldn't be able to log in in the first place!), not all controllers or actions should require this. You can prevent this filter from running before particular actions with `skip_before_action`:]]]
+위의 예에서, 필터가 `ApplicationController` 에 추가되기 때문에 어플리케이션내에 있는 모든 컨트롤러는 해당 필터를 상속받게 됩니다. 이것은 어플리케이션에 있는 모든 것이 사용자가 그것을 사용하기 위해서는 로그인을 하도록 요구하게 만듭니다. 이런 경우, 최초 사용자가 까지도 로그인을 할 수 없게 되므로 모든 컨트롤러나 액션이 로그인을 요구하게 해서는 안 됩니다. 따라서 `skip_before_action` 를 사용해서 해당 필터가 특정 before 액션을 실행하지 못하도록 할 수 있습니다. [[[In this example the filter is added to `ApplicationController` and thus all controllers in the application inherit it. This will make everything in the application require the user to be logged in in order to use it. For obvious reasons (the user wouldn't be able to log in in the first place!), not all controllers or actions should require this. You can prevent this filter from running before particular actions with `skip_before_action`:]]]
 
 ```ruby
 class LoginsController < ApplicationController
-  skip_before_filter :require_login, only: [:new, :create]
+  skip_before_action :require_login, only: [:new, :create]
 end
 ```
 
@@ -666,7 +658,7 @@ end
 
 ```ruby
 class ChangesController < ActionController::Base
-  around_filter :wrap_in_transaction, only: :show
+  around_action :wrap_in_transaction, only: :show
 
   private
 
@@ -689,14 +681,17 @@ end
 
 ### [Other Ways to Use Filters] 필터를 사용하는 다른 방법들
 
-필터를 사용할 때 private 메소드를 작성해서 *_filter에 추가하는 것이 가장 일반적인 방법이지만, 여기에는 두가지 방법이 더 있습니다. [[[While the most common way to use filters is by creating private methods and using *_action to add them, there are two other ways to do the same thing.]]]
+필터를 사용할 때 private 메소드를 작성해서 *_action에 추가하는 것이 가장 일반적인 방법이지만, 여기에는 두가지 방법이 더 있습니다. [[[While the most common way to use filters is by creating private methods and using *_action to add them, there are two other ways to do the same thing.]]]
 
-첫번째 방법은 *_filter 메소드에 직접 블록을 사용하는 것입니다. 그 블록은 컨트롤러를 인수로 받게 되는데 위에서 언급했던 `require_login` 필터는 블록을 사용해서 다음과 같이 다시 작성할 수 있습니다: [[[The first is to use a block directly with the *_action methods. The block receives the controller as an argument, and the `require_login` filter from above could be rewritten to use a block:]]]
+첫번째 방법은 *_action 메소드에 직접 블록을 사용하는 것입니다. 그 블록은 컨트롤러를 인수로 받게 되는데 위에서 언급했던 `require_login` 필터는 블록을 사용해서 다음과 같이 다시 작성할 수 있습니다: [[[The first is to use a block directly with the *_action methods. The block receives the controller as an argument, and the `require_login` filter from above could be rewritten to use a block:]]]
 
 ```ruby
 class ApplicationController < ActionController::Base
-  before_filter do |controller|
-    redirect_to new_login_url unless controller.send(:logged_in?)
+  before_action do |controller|
+    unless controller.send(:logged_in?)
+      flash[:error] = "You must be Logged in to access this section"
+      redirect_to new_login_url
+    end
   end
 end
 ```
@@ -707,20 +702,21 @@ end
 
 ```ruby
 class ApplicationController < ActionController::Base
-  before_filter LoginFilter
+  before_action LoginFilter
 end
 
 class LoginFilter
-  def self.filter(controller)
+  def self.before(controller)
     unless controller.send(:logged_in?)
-      controller.flash[:error] = "You must be logged in"
+      controller.flash[:error] = "You must be Logged in to access this section"
       controller.redirect_to controller.new_login_url
     end
   end
 end
 ```
 
-또한, 이것은 해당 컨트롤러의 영역에서 실행되지 않고 그 컨트롤러를 인수로서 받기 때문에 그렇게 이상적인 예라고 볼 수는 없습니다. 필터 클래스는 `filter` 클래스 메소드를 가지는데 그것이 before 또는 after 필터인 여부에 따라 액션 전 또는 후에 실행됩니다. around 필터로 사용되는 클래스도 같은 `filter` 메소드를 사용할 수 있는데, 동일한 방식으로 실행될 것입니다. 그러나 이 때는 해당 액션을 실행하여 `yield` 를 해야 합니다. 다른 방법으로, `before` 와 `after` 메소드를 작성해서 액션 전후에 실행되도록 할 수도 있습니다. [[[Again, this is not an ideal example for this filter, because it's not run in the scope of the controller but gets the controller passed as an argument. The filter class has a class method `filter` which gets run before or after the action, depending on if it's a before or after filter. Classes used as around filters can also use the same `filter` method, which will get run in the same way. The method must `yield` to execute the action. Alternatively, it can have both a `before` and an `after` method that are run before and after the action.]]]
+또한, 이것은 해당 컨트롤러의 영역에서 실행되지 않고 그 컨트롤러를 인수로서 받기 때문에 그렇게 이상적인 예라고 볼 수는 없습니다. 필터 클래스는 필터의 이름과 동일한 메소드를 구현해야해서 before_action 필터는 before 메소드를 구현합니다. around 메소드는 액션을 실행하기 위해 꼭 yield 메소드를 구현해야합니다. [[[Again, this is not an ideal example for this filter, because it's not run in the scope of the controller but gets the controller passed as an argument. The filter class must implement a method with the same name as the filter, so for the before_action filter the class must implement a before method, and so on. The around method must yield to execute the action.]]]
+
 
 [Request Forgery Protection] 요청 위조방지
 --------------------------
@@ -740,7 +736,7 @@ end
 <% end %>
 ```
 
-해당 토큰이 hidden 필드로서 추가되는 방법을 알게 될 것입니다:
+해당 토큰이 hidden 필드로서 추가되는 방법을 알게 될 것입니다: [[[You will see how the token gets added as a hidden field:]]]
 
 ```html
 <form accept-charset="UTF-8" action="/users/1" method="post">
