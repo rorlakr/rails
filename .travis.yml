@@ -5,7 +5,7 @@ rvm:
 cache: bundler
 bundler_args: --without test --jobs 3 --retry 3
 before_install:
-  - openssl aes-256-cbc -K $encrypted_452262c28521_key -iv $encrypted_452262c28521_iv -in id_rsa_rorlakr_rrails_guides_travis.enc -out ~/.ssh/id_rsa_rorlakr_rrails_guides_travis -d
+  - openssl aes-256-cbc -K $encrypted_452262c28521_key -iv $encrypted_452262c28521_iv -in id_rsa_rorlakr_rrails_guides_travis.enc -out ~/.ssh/id_rsa -d
   - gem install bundler
 before_script:
   - echo -e "Host rorlab.org\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
