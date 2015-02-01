@@ -11,6 +11,44 @@ namespace :guides do
       ruby "rails_guides.rb"
     end
 
+    #############################################
+    # Tasks written by RORLAB
+    #############################################
+    namespace :html do
+      desc "Generate HTML guides from source/ko (for RORLAB)"
+      task :ko do
+        ENV["WARN_BROKEN_LINKS"] = "1" # authors can't disable this
+        ENV["GUIDES_LANGUAGE"] = "ko"
+        ENV["EDGE"] = "1"
+        # ENV["ALL"] = "1"
+        ruby "rails_guides.rb"
+      end
+      namespace :ko do
+        desc "Publish the guides to shared/rg (for ROR Lab.)"
+        task :publish => :ko do
+          require 'rake/contrib/sshpublisher'
+          mkdir_p 'pkg'
+          `tar -czf pkg/guides_ko.gz output/ko`
+          Rake::SshFilePublisher.new("deployer@rorlab.org", "/home/deployer/apps/rorlab/shared", "pkg", "guides_ko.gz").upload
+          `ssh deployer@rorlab.org 'cd /home/deployer/apps/rorlab/shared/ && tar -xvzf guides_ko.gz && rm -rf rg && mkdir rg && mv -f output/ko/* rg && rm -rf output && rm guides_ko.gz'`
+        end
+      end
+    end
+    namespace :kindle do
+      desc "Generate .mobi file. The kindlegen executable must be in your PATH. You can get it for free from http://www.amazon.com/kindlepublishing"
+      task :ko do
+        unless `kindlerb -v 2> /dev/null` =~ /kindlerb 0.1.1/
+          abort "Please install kindlegen on your path and `gem install kindlerb`"
+        end
+        unless `convert` =~ /convert/
+          abort "Please install ImageMagick`"
+        end
+        ENV['KINDLE'] = '1'
+        Rake::Task['guides:generate:html:ko'].invoke
+      end
+    end
+    #############################################
+
     desc "Generate .mobi file. The kindlegen executable must be in your PATH. You can get it for free from http://www.amazon.com/kindlepublishing"
     task :kindle do
       unless `kindlerb -v 2> /dev/null` =~ /kindlerb 0.1.1/
