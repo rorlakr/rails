@@ -7,6 +7,7 @@ bundler_args: --without test --jobs 3 --retry 3
 before_install:
   - gem install bundler
 before_script:
+  - echo -e "Host rorlab.org\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - bundle update
 script: "cd guides && bundle exec rake guides:generate:html:ko:publish ALL=1"
 branches:
