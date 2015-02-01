@@ -29,8 +29,9 @@ namespace :guides do
           require 'rake/contrib/sshpublisher'
           mkdir_p 'pkg'
           `tar -czf pkg/guides_ko.gz output/ko`
-          Rake::SshFilePublisher.new("deployer@rorlab.org", "/home/deployer/apps/rorlab/shared", "pkg", "guides_ko.gz").upload
-          `ssh deployer@rorlab.org 'cd /home/deployer/apps/rorlab/shared/ && tar -xvzf guides_ko.gz && rm -rf rg && mkdir rg && mv -f output/ko/* rg && rm -rf output && rm guides_ko.gz'`
+          Rake::SshFilePublisher.new("deployer@rorlab.org", "/home/deployer", "pkg", "guides_ko.gz").upload
+          `ssh deployer@rorlab.org 'rm -rf /home/deployer/guides && mkdir -p /home/deployer/guides && cd /home/deployer && tar -xvzf guides_ko.gz -C guides --strip-components=2 && rm guides_ko.gz'`
+         end
         end
       end
     end
