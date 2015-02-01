@@ -21,7 +21,7 @@ $ bundle exec rake guides:generate:html:ko:publish ALL=1
 
 누구라도 번역에 참가 할 수 있습니다. guides/source/ko 하위의 파일들을 번역후 `guides-ko` 브랜치에 풀리퀘스트 하면됩니다.
 
-## Code Status
+## 빌드 상태
 
 [![Build Status](https://travis-ci.org/rorlakr/rails-guides.svg?branch=guides-ko)](https://travis-ci.org/rorlakr/rails-guides)
 
