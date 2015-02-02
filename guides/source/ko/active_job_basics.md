@@ -18,34 +18,26 @@
 --------------------------------------------------------------------------------
 
 
-Introduction
+[Introduction] 개요 
 ------------
 
-Active Job is a framework for declaring jobs and making them run on a variety
-of queueing backends. These jobs can be everything from regularly scheduled
-clean-ups, to billing charges, to mailings. Anything that can be chopped up
-into small units of work and run in parallel, really.
+액티브 잡이란, 잡을 선언하여 다양한 큐 백엔드에서 실행되도록 하는 하나의 프레임워크다. 정규적으로 실행하는 시스템 정비작업, 요금청구작업, 이메일 발송작업 등 모든 것에 대한 잡을 선언할 수 있다. 작업을 작은 단위로 쪼개어 동시에 실행할 수 있다면 정말 어떤 것이라도 잡으로 선언할 수 있다. [[[Active Job is a framework for declaring jobs and making them run on a variety of queueing backends. These jobs can be everything from regularly scheduled clean-ups, to billing charges, to mailings. Anything that can be chopped up into small units of work and run in parallel, really.]]]
 
 
-The Purpose of Active Job
+[The Purpose of Active Job] 액티브 잡의 목적
 -----------------------------
-The main point is to ensure that all Rails apps will have a job infrastructure
-in place, even if it's in the form of an "immediate runner". We can then have
-framework features and other gems build on top of that, without having to
-worry about API differences between various job runners such as Delayed Job
-and Resque. Picking your queuing backend becomes more of an operational concern,
-then. And you'll be able to switch between them without having to rewrite your jobs.
+
+요점은 레일스 애플리케이션이 어떤 잡 하부구조를 가질 것이라는 것을 확인하는 것이다. 이러한 잡은 지체없이 바로 실행되는 러너의 형태를 가지더라도 상관없다. 이렇게 되면 프레임워크의 특성을 가지게 되어, Delayed Job과 Resque와 같은 다양한 잡 러너들이 각기 다른 API를 가지더라도 걱정할 필요가 없이, 이 위에서 다른 젬을 빌드할 수 있게 된다. 따라서 큐 작업을 처리하는 백엔드의 선택이 더 큰 운영상의 관심꺼리가 된다. 어떤 것을 선택하더라도 더 이상 잡을 다시 작성하지 않고도 잡 러너를 교체할 수 있을 것이다. [[[The main point is to ensure that all Rails apps will have a job infrastructure in place, even if it's in the form of an "immediate runner". We can then have framework features and other gems build on top of that, without having to worry about API differences between various job runners such as Delayed Job and Resque. Picking your queuing backend becomes more of an operational concern, then. And you'll be able to switch between them without having to rewrite your jobs.]]]
 
 
-Creating a Job
+[Creating a Job] 잡 생성하기
 --------------
 
-This section will provide a step-by-step guide to creating a job and enqueuing it.
+이 섹션에서는 잡을 생성하고 큐에 등록하는 과정을 단계별로 가이드해 줄 것이다. [[[This section will provide a step-by-step guide to creating a job and enqueuing it.]]]
 
-### Create the Job
+### [Create the Job] 잡 생성
 
-Active Job provides a Rails generator to create jobs. The following will create a
-job in `app/jobs` (with an attached test case under `test/jobs`):
+액티브 잡은 잡을 생성할 수 있도록 레일스 제너레이터를 제공한다. 아래의 명령은 `app/jobs` 디렉토리에 잡을 생성하고 `test/jobs` 디렉토리에 테스트 케이스를 작성해 줄 것이다. [[[Active Job provides a Rails generator to create jobs. The following will create a job in `app/jobs` (with an attached test case under `test/jobs`):]]]
 
 ```bash
 $ bin/rails generate job guests_cleanup
@@ -54,54 +46,56 @@ create    test/jobs/guests_cleanup_job_test.rb
 create  app/jobs/guests_cleanup_job.rb
 ```
 
-You can also create a job that will run on a specific queue:
+물론, 특정 큐에서만 실행되는 잡을 생성할 수도 있다. [[[You can also create a job that will run on a specific queue:]]]
 
 ```bash
 $ bin/rails generate job guests_cleanup --queue urgent
 ```
 
-If you don't want to use a generator, you could create your own file inside of
-`app/jobs`, just make sure that it inherits from `ActiveJob::Base`.
+잡 제너레이터를 사용하지 않을 경우에는 `app/jobs` 디렉토리에 직접 파일을 생성하고 해당 잡이 `ActiveJob::Base`로부터 상속받도록 정의하면 된다. [[[If you don't want to use a generator, you could create your own file inside of `app/jobs`, just make sure that it inherits from `ActiveJob::Base`.]]]
 
-Here's what a job looks like:
+아래에서 잡의 형태를 볼 수 있다. [[[Here's what a job looks like:]]]
 
 ```ruby
 class GuestsCleanupJob < ActiveJob::Base
   queue_as :default
 
   def perform(*args)
-    # Do something later
+    # 나중에 수행할 작업을 작성한다. Do something later
   end
 end
 ```
 
-### Enqueue the Job
+### [Enqueue the Job] 잡의 큐 등록
 
-Enqueue a job like so:
+아래와 같이 잡을 큐에 등록한다. [[[Enqueue a job like so:]]]
 
 ```ruby
+# 큐 시스템에 등록된 작업이 완료될 때 수행하도록 잡을 큐에 등록한다
 # Enqueue a job to be performed as soon the queueing system is
 # free.
 MyJob.perform_later record
 ```
 
 ```ruby
+# 내일 정오에 수행하도록 잡을 큐에 등록한다.
 # Enqueue a job to be performed tomorrow at noon.
 MyJob.set(wait_until: Date.tomorrow.noon).perform_later(record)
 ```
 
 ```ruby
+# 1주일 후에 수행하도록 잡을 큐에 등록한다.
 # Enqueue a job to be performed 1 week from now.
 MyJob.set(wait: 1.week).perform_later(record)
 ```
 
-That's it!
+이것으로 등록 작업이 끝났다. [[[That's it!]]]
 
 
-Job Execution
+[Job Execution] 잡 실행
 -------------
 
-If no adapter is set, the job is immediately executed.
+어댑터를 지정하지 않으면 잡이 즉각 실행된다. [[[If no adapter is set, the job is immediately executed.]]]
 
 ### Backends
 
