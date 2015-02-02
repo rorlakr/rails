@@ -1,3 +1,24 @@
+*   Validation errors would be raised for parent records when an association
+    was saved when the parent had `validate: false`. It should not be the
+    responsibility of the model to validate an associated object unless the
+    object was created or modified by the parent.
+
+    This fixes the issue by skipping validations if the parent record is
+    persisted, not changed, and not marked for destruction.
+
+    Fixes #17621.
+
+    *Eileen M. Uchitelle, Aaron Patterson*
+
+*   Fix n+1 query problem when eager loading nil associations (fixes #18312)
+
+    *Sammy Larbi*
+
+*   Change the default error message from `can't be blank` to `must exist` for
+    the presence validator of the `:required` option on `belongs_to`/`has_one` associations.
+
+    *Henrik Nygren*
+
 *   Fixed ActiveRecord::Relation#group method when argument is SQL reserved key word:
 
     Example:
