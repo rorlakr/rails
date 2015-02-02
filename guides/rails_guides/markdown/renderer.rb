@@ -18,6 +18,8 @@ HTML
       def header(text, header_level)
         # Always increase the heading level by, so we can use h1, h2 heading in the document
         header_level += 1
+
+        # added by Lucius from RORLAB
         if text =~ /^\[.*\]\s(.*)$/
           convert_header_original(text, header_level)
         else
@@ -26,15 +28,14 @@ HTML
       end
 
       def paragraph(text)
-        text = text.gsub(/\n/, " ")
-        if text =~ /^(TIP|IMPORTANT|CAUTION|WARNING|NOTE|INFO|TODO)[.:](.*?)/
+        if text =~ /^(TIP|IMPORTANT|CAUTION|WARNING|NOTE|INFO|TODO)[.:]/
           convert_notes(text)
         elsif text.include?('DO NOT READ THIS FILE ON GITHUB')
         elsif text =~ /^\[<sup>(\d+)\]:<\/sup> (.+)$/
           linkback = %(<a href="#footnote-#{$1}-ref"><sup>#{$1}</sup></a>)
           %(<p class="footnote" id="footnote-#{$1}">#{linkback} #{$2}</p>)
+        # added by Lucius from RORLAB
         elsif text =~ /^(.+?)\s*\[{3}(.+?)\]{3}$/
-        # elsif text =~ /(.*)\s\[\[\[(.+)\]\]\]\s*/
           convert_original(text)
         else
           text = convert_footnotes(text)
@@ -99,9 +100,9 @@ HTML
                         else
                           $1.downcase
                         end
+            # added by Lucius
             original_text = $2
             if original_text =~ /\n*(.+?)\s*\[{3}(.+?)\]{3}\s*/
-            # if original_text =~ /^(.*)\[\[\[(.+)\]\]\]$/
               original_text = convert_original(original_text)
             else
               original_text = "<p>#{original_text}</p>"

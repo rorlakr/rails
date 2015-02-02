@@ -510,7 +510,6 @@ h6 {
 @media screen and (max-width: 480px) {
   #header h1 {
     float: none;
-    width: 297px;
   }
 }
 
@@ -714,7 +713,7 @@ table td, table th { padding: 9px 10px; text-align: left; }
 }
 
 
-/* Added by ROR Lab. */
+/* Added by Lucius from RORLAB */
 #feature .wrapper ul li p {
   font-size:1em;
   margin-bottom:0;
@@ -735,14 +734,13 @@ table td, table th { padding: 9px 10px; text-align: left; }
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-} 
+}
 .original-text-h {
   border:0;
   background-color: transparent;
   padding:0;
   margin-left: 5px;
 }
-
 a.original-link {
   font-size:10px;
   margin-top:-2em;
@@ -757,4 +755,3 @@ a .original-text-h {
 .tip .original-text, .important .original-text, .caution .original-text, .warning .original-text, .note .original-text, .info .original-text, .todo .original-text {
   margin-top:-.6em;
 }
-
