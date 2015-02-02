@@ -276,11 +276,11 @@ magazines를 위한 라우트일 뿐 아니라, 이 선언은 또한 `AdsControl
 | PATCH/PUT | /magazines/:magazine_id/ads/:id      | ads#update        | update a specific ad belonging to a specific magazine                      |
 | DELETE    | /magazines/:magazine_id/ads/:id      | ads#destroy       | delete a specific ad belonging to a specific magazine                      |
 
-이것은 또한 `magazine_ads_url`와 `edit_magazine_ad_path` 같은 라우팅 펠퍼를 생성할 것입니다. 이러한 헬퍼들은 첫 번째 파라미터로서 Magazine의 인스턴스를 갖습니다. (`magazine_ads_url(@magazine)`) [[[This will also create routing helpers such as `magazine_ads_url` and `edit_magazine_ad_path`. These helpers take an instance of Magazine as the first parameter (`magazine_ads_url(@magazine)`).]]]
+이것은 또한 `magazine_ads_url`와 `edit_magazine_ad_path` 같은 라우팅 헬퍼를 생성할 것입니다. 이러한 헬퍼들은 첫 번째 파라미터로서 Magazine의 인스턴스를 갖습니다. (`magazine_ads_url(@magazine)`) [[[This will also create routing helpers such as `magazine_ads_url` and `edit_magazine_ad_path`. These helpers take an instance of Magazine as the first parameter (`magazine_ads_url(@magazine)`).]]]
 
 #### [[[Limits to Nesting]]] 중첩의 제한
 
-만약 원한다면, 다른 충첩된 리소스 안에 리소스를 중첩할 수 있습니다. 예를 들면: [[[You can nest resources within other nested resources if you like. For example:]]]
+만약 원한다면, 다른 중첩된 리소스 안에 리소스를 중첩할 수 있습니다. 예를 들면: [[[You can nest resources within other nested resources if you like. For example:]]]
 
 ```ruby
 resources :publishers do
@@ -290,7 +290,7 @@ resources :publishers do
 end
 ```
 
-깊게-중첩된 리소스는 급속도로 복잡해집니다. 이 경우, 예를 들면, 응용프로그램은 경로를 다음과 같이 인식할 것입니다.[[[Deeply-nested resources quickly become cumbersome. In this case, for example, the application would recognize paths such as:]]]
+깊게 중첩된 리소스는 급속도로 복잡해집니다. 이 경우, 예를 들면, 응용프로그램은 경로를 다음과 같이 인식할 것입니다.[[[Deeply-nested resources quickly become cumbersome. In this case, for example, the application would recognize paths such as:]]]
 
 ```
 /publishers/1/magazines/2/photos/3
@@ -302,7 +302,7 @@ TIP: 리소스는 1 레벨 이상으로 중첩되어서는 안됩니다. [[[TIP:
 
 #### Shallow Nesting
 
-(위에서 추천한 바와 같이) 깊은 중첩을 피하는 한 가지 방법은 부모 아래 범주화된(scoped) 액션의 컬렉션을 생성하여 멤버 액션을 중첩하지 않고, 계층의 의미를 갖는 것입니다. 다시 말해, 단지 최소한의 정보로 고유하게 리소스를 식별하는 라우트를 만들는 방법은 다음과 같습니다: [[[One way to avoid deep nesting (as recommended above) is to generate the collection actions scoped under the parent, so as to get a sense of the hierarchy, but to not nest the member actions. In other words, to only build routes with the minimal amount of information to uniquely identify the resource, like this:]]]
+(위에서 추천한 바와 같이) 깊은 중첩을 피하는 한 가지 방법은 부모 아래 범주화된(scoped) 액션의 컬렉션을 생성하여 멤버 액션을 중첩하지 않고, 계층의 의미를 갖는 것입니다. 다시 말해, 단지 최소한의 정보로 고유하게 리소스를 식별하는 라우트를 만드는 방법은 다음과 같습니다: [[[One way to avoid deep nesting (as recommended above) is to generate the collection actions scoped under the parent, so as to get a sense of the hierarchy, but to not nest the member actions. In other words, to only build routes with the minimal amount of information to uniquely identify the resource, like this:]]]
 
 ```ruby
 resources :posts do
@@ -399,7 +399,7 @@ concern :image_attachable do
 end
 ```
 
-이러한 배려들(concerns)은 코드 중복을 피하고 라우크간 행동을 공유하기 위해서 리소스 내부에 사용할 수 있습니다.[[[These concerns can be used in resources to avoid code duplication and share behavior across routes:]]]
+이러한 배려들(concerns)은 코드 중복을 피하고 라우트간 행동을 공유하기 위해서 리소스 내부에 사용할 수 있습니다.[[[These concerns can be used in resources to avoid code duplication and share behavior across routes:]]]
 
 ```ruby
 resources :messages, concerns: :commentable
@@ -551,7 +551,7 @@ TIP: 만약 리소스풀 라우트에 많은 추가 액션을 추가하고 있�
 get ':controller(/:action(/:id))'
 ```
 
-만약 들어오는 요청 `/photos/show/1`이 (파일 내 이전의 어떤 라우트에도 일지하지 않아) 위 라우트에 의해 처리되었다면, 결과는 `PhotosController`의 `show` 액션을 불러들일 것이고 마지막 매개변수 `"1"`을 `params[:id]`로 사용 가능하게 할 것입니다. `:action`과 `:id`는 괄호로 표시된 선택적 매개변수이기 때문에, 이 라우트는 또한 `/photos`의 들어오는 요청을 `PhotosController#index`에 라우트할 것입니다. [[[If an incoming request of `/photos/show/1` is processed by this route (because it hasn't matched any previous route in the file), then the result will be to invoke the `show` action of the `PhotosController`, and to make the final parameter `"1"` available as `params[:id]`. This route will also route the incoming request of `/photos` to `PhotosController#index`, since `:action` and `:id` are optional parameters, denoted by parentheses.]]]
+만약 들어오는 요청 `/photos/show/1`이 (파일 내 이전의 어떤 라우트에도 일치하지 않아) 위 라우트에 의해 처리되었다면, 결과는 `PhotosController`의 `show` 액션을 불러들일 것이고 마지막 매개변수 `"1"`을 `params[:id]`로 사용 가능하게 할 것입니다. `:action`과 `:id`는 괄호로 표시된 선택적 매개변수이기 때문에, 이 라우트는 또한 `/photos`의 들어오는 요청을 `PhotosController#index`에 라우트할 것입니다. [[[If an incoming request of `/photos/show/1` is processed by this route (because it hasn't matched any previous route in the file), then the result will be to invoke the `show` action of the `PhotosController`, and to make the final parameter `"1"` available as `params[:id]`. This route will also route the incoming request of `/photos` to `PhotosController#index`, since `:action` and `:id` are optional parameters, denoted by parentheses.]]]
 
 ### [Dynamic Segments] 동적 세그먼트
 
@@ -563,7 +563,7 @@ get ':controller/:action/:id/:user_id'
 
 `/photos/show/1/2`의 들어오는 경로는 `PhotosController`의 `show` 액션에 보내질 것입니다. `params[:id]`는 `"1"`, `params[:user_id]`는 2가 될 것입니다.  [[[An incoming path of `/photos/show/1/2` will be dispatched to the `show` action of the `PhotosController`. `params[:id]` will be `"1"`, and `params[:user_id]` will be `"2"`.]]]
 
-NOTE: `:controller` 경로 세그먼트와 함께 `:namespace` 혹은 `:module`을 사용할 수 있습니다. 이렇게 해야한다면, 다음과 같이 필요로 하는 네임스페이스와 일치하는 :controller상에 제약을 사용합니다. [[[NOTE: You can't use `:namespace` or `:module` with a `:controller` path segment. If you need to do this then use a constraint on :controller that matches the namespace you require. e.g:]]]
+NOTE: `:controller` 경로 세그먼트와 함께 `:namespace` 혹은 `:module`을 사용할 수 없습니다. 이렇게 해야한다면, 다음과 같이 필요로 하는 네임스페이스와 일치하는 :controller상에 제약을 사용합니다. [[[NOTE: You can't use `:namespace` or `:module` with a `:controller` path segment. If you need to do this then use a constraint on :controller that matches the namespace you require. e.g:]]]
 
 ```ruby
 get ':controller(/:action(/:id))', controller: /admin\/[^\/]+/

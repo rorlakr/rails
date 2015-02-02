@@ -1,37 +1,42 @@
-Rails on Rack
+[Rails on Rack] 루비 웹서버 인터페이스
 =============
 
-This guide covers Rails integration with Rack and interfacing with other Rack components.
+본 가이드는 Rack과 레일스를 통합하고 다른 Rack 컴포넌트와 인터페이스하는 것을 다룹니다. [[[This guide covers Rails integration with Rack and interfacing with other Rack components.]]]
 
-After reading this guide, you will know:
+본 가이드를 읽은 후에 아래와 같은 내용을 알게 될 것입니다. [[[After reading this guide, you will know:]]]
 
-* How to create Rails Metal applications.
-* How to use Rack Middlewares in your Rails applications.
-* Action Pack's internal Middleware stack.
-* How to define a custom Middleware stack.
+* 레일스 Metal 어플리케이션을 작성하는 방법 [[[How to create Rails Metal applications.]]]
+
+* 레일스 어플리케이션에서 Rack 미들웨어를 사용하는 방법 [[[How to use Rack Middlewares in your Rails applications.]]]
+
+* 액션팩의 내부 미들웨어 스택 [[[Action Pack's internal Middleware stack.]]]
+
+* 커스텀 미들웨어 스택을 정의하는 방법 [[[How to define a custom Middleware stack.]]]
 
 --------------------------------------------------------------------------------
 
-WARNING: This guide assumes a working knowledge of Rack protocol and Rack concepts such as middlewares, url maps and `Rack::Builder`.
+WARNING: 본 가이드는 Rack 프로토콜과 미들웨어, url 맵, `Rack::Builder`와 같은 Rack 개념에 대한 관련 지식을 가지고 있는 것으로 가정합니다. [[[This guide assumes a working knowledge of Rack protocol and Rack concepts such as middlewares, url maps and `Rack::Builder`.]]]
 
 Introduction to Rack
 --------------------
 
-Rack provides a minimal, modular and adaptable interface for developing web applications in Ruby. By wrapping HTTP requests and responses in the simplest way possible, it unifies and distills the API for web servers, web frameworks, and software in between (the so-called middleware) into a single method call.
+Rack은 루비로 웹어플리케이션을 개발할 때 사용할 수 있는, 최소한의, 모듈방식의, 어댑터로 연결할 수 있는 인터페이스를 제공합니다.
+Rack은 가능한한 가장 간단한 방식으로 요청과 응답을 포장하여, 웹서버, 웹프레임워크, 그리고 이들 사이의 존재하는 소프트웨어(미들웨어)에 대한 API를 하나의 메소드 호출로 통합하여 추출한 것입니다. [[[Rack provides a minimal, modular and adaptable interface for developing web applications in Ruby. By wrapping HTTP requests and responses in the simplest way possible, it unifies and distills the API for web servers, web frameworks, and software in between (the so-called middleware) into a single method call.]]]
 
 - [Rack API Documentation](http://rack.rubyforge.org/doc/)
 
-Explaining Rack is not really in the scope of this guide. In case you are not familiar with Rack's basics, you should check out the [Resources](#resources) section below.
+Rack을 설명하는 것을 본 가이드의 범위를 벗어나는 것입니다. Rack에 대한 기본지식이 없는 경우 아래에 있는 [Resources](#resources)를 점검해 보기 바랍니다. [[[Explaining Rack is not really in the scope of this guide. In case you are not familiar with Rack's basics, you should check out the [Resources](#resources) section below.]]]
 
 Rails on Rack
 -------------
 
-### Rails Application's Rack Object
+### [Rails Application's Rack Object] 레일스 어플리케이션의 Rack 객체
 
-`ApplicationName::Application` is the primary Rack application object of a Rails
+
+[[[`ApplicationName::Application` is the primary Rack application object of a Rails
 application. Any Rack compliant web server should be using
 `ApplicationName::Application` object to serve a Rails
-application. `Rails.application` refers to the same application object.
+application. `Rails.application` refers to the same application object.]]]
 
 ### `rails server`
 
