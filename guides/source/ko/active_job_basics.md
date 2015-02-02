@@ -1,17 +1,19 @@
 **DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
 
-Active Job Basics
+[Active Job Basics] 액티브 잡 기초
 =================
 
-This guide provides you with all you need to get started in creating,
-enqueueing and executing background jobs.
+이 가이드는 백그라운드 잡을 생성하고, 큐에 등록하고, 실행하는데 필요한 모든 내용을 다룬다. [[[This guide provides you with all you need to get started in creating, enqueueing and executing background jobs.]]]
 
-After reading this guide, you will know:
+이 가이드에서 다루게 될 내용을 아래와 같다. [[[After reading this guide, you will know:]]]
 
-* How to create jobs.
-* How to enqueue jobs.
-* How to run jobs in the background.
-* How to send emails from your application async.
+* 잡 생성법 [[[How to create jobs.]]]
+
+* 잡 큐 등록법 [[[How to enqueue jobs.]]]
+
+* 백그라운드 잡 실행법[[[How to run jobs in the background.]]]
+
+* 애플리케이션에서 비동기적 이메일 발송법 [[[How to send emails from your application async.]]]
 
 --------------------------------------------------------------------------------
 
