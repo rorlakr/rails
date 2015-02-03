@@ -1,47 +1,39 @@
 **DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
 
-Ruby on Rails 4.2 Release Notes
+[Ruby on Rails 4.2 Release Notes] 루비온레일스 4.2 릴리스 노트
 ===============================
 
-Highlights in Rails 4.2:
+레일스 4.2 하이라이트 [[[Highlights in Rails 4.2:]]]
 
-* Active Job
-* Asynchronous mails
-* Adequate Record
-* Web Console
-* Foreign key support
+* 액티브 잡 [[[Active Job]]]
 
-These release notes cover only the major changes. To learn about other
-features, bug fixes, and changes, please refer to the changelogs or check out
-the [list of commits](https://github.com/rails/rails/commits/4-2-stable) in
-the main Rails repository on GitHub.
+* 비동기 메일 [[[Asynchronous mails]]]
+
+* 애디키트 레코드 [[[Adequate Record]]]
+
+* 웹 콘솔 [[[Web Console]]]
+
+* 외래키 지원 [[[Foreign key support]]]
+
+여기서는 주요 변경내용만을 설명한다. 이외에도 새로 추가된 기능과 수정된 버그, 그리고 기타 변경내용을 알고자 한다면 깃헙의 레일스 저장소에서 변경로그나 [커밋 목록](https://github.com/rails/rails/commits/4-2-stable)을 참고하기 바란다. [[[These release notes cover only the major changes. To learn about other features, bug fixes, and changes, please refer to the changelogs or check out the [list of commits](https://github.com/rails/rails/commits/4-2-stable) in the main Rails repository on GitHub.]]]
 
 --------------------------------------------------------------------------------
 
-Upgrading to Rails 4.2
+[Upgrading to Rails 4.2] 레일스 4.2로 업그레이드하기
 ----------------------
 
-If you're upgrading an existing application, it's a great idea to have good test
-coverage before going in. You should also first upgrade to Rails 4.1 in case you
-haven't and make sure your application still runs as expected before attempting
-to upgrade to Rails 4.2. A list of things to watch out for when upgrading is
-available in the guide [Upgrading Ruby on
-Rails](upgrading_ruby_on_rails.html#upgrading-from-rails-4-1-to-rails-4-2).
+기존 애플리케이션을 업그레이드할 경우에는, 사전에 테스트 커버리지를 잘 유지하는 것이 좋다. 아직 레일스 4.1로 업그레이드하지 못한 상태라면 먼저 4.1 버전으로 업그레이드하고 레이스 4.2로 업그레이드하기 전에 애플리케이션이 제대로 실행되는 것을 확인해야 한다. [루비온레일스 업그레이드하기](upgrading_ruby_on_rails.html#upgrading-from-rails-4-1-to-rails-4-2) 가이드에서 업그레이드시에 주의해서 봐야할 목록을 볼 수 있다. [[[If you're upgrading an existing application, it's a great idea to have good test coverage before going in. You should also first upgrade to Rails 4.1 in case you haven't and make sure your application still runs as expected before attempting to upgrade to Rails 4.2. A list of things to watch out for when upgrading is available in the guide [Upgrading Ruby on Rails](upgrading_ruby_on_rails.html#upgrading-from-rails-4-1-to-rails-4-2).]]]
 
 
-Major Features
+[Major Features] 주요 기능
 --------------
 
-### Active Job
+### [Active Job] 액티브 잡
 
-Active Job is a new framework in Rails 4.2. It is a common interface on top of
-queuing systems like [Resque](https://github.com/resque/resque), [Delayed
-Job](https://github.com/collectiveidea/delayed_job),
-[Sidekiq](https://github.com/mperham/sidekiq), and more.
+액티브 잡은 레일스 4.2에서 처음으로 도입한 새로운 프레임워크다. 액티브 잡은 [Resque](https://github.com/resque/resque), [Delayed Job](https://github.com/collectiveidea/delayed_job), [Sidekiq](https://github.com/mperham/sidekiq) 등과 같은 큐 등록 시스템 기반 위에서 동작하는 일반화된 인터페이스다. [[[Active Job is a new framework in Rails 4.2. It is a common interface on top of queuing systems like [Resque](https://github.com/resque/resque), [Delayed Job](https://github.com/collectiveidea/delayed_job), [Sidekiq](https://github.com/mperham/sidekiq), and more.]]]
 
-Jobs written with the Active Job API run on any of the supported queues thanks
-to their respective adapters. Active Job comes pre-configured with an inline
-runner that executes jobs right away.
+
+Jobs written with the Active Job API run on any of the supported queues thanks to their respective adapters. Active Job comes pre-configured with an inline runner that executes jobs right away.
 
 Jobs often need to take Active Record objects as arguments. Active Job passes
 object references as URIs (uniform resource identifiers) instead of marshaling
