@@ -64,7 +64,7 @@ end
 See the [Active Job Basics](active_job_basics.html) guide for more
 information.
 
-### Asynchronous Mails
+### [Asynchronous Mails] 비동기적 이메일
 
 Building on top of Active Job, Action Mailer now comes with a `deliver_later`
 method that sends emails via the queue, so it doesn't block the controller or
