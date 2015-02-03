@@ -406,7 +406,7 @@ require ::File.expand_path('../config/environment',  __FILE__)
 Loading Rails
 -------------
 
-The next line in `config/application.rb` is:
+`config/application.rb`의 다음 라인은 이렇습니다: [[[The next line in `config/application.rb` is:]]]
 
 ```ruby
 require 'rails/all'
@@ -414,7 +414,7 @@ require 'rails/all'
 
 ### `railties/lib/rails/all.rb`
 
-This file is responsible for requiring all the individual frameworks of Rails:
+이 파일은 레일즈의 모든 개별 프레임워크들을 모두 요구합니다: [[[This file is responsible for requiring all the individual frameworks of Rails:]]]
 
 ```ruby
 require "rails"
@@ -433,25 +433,25 @@ require "rails"
 end
 ```
 
-This is where all the Rails frameworks are loaded and thus made
+이 곳은 모든 레일즈 프레임워크들이 로드되어 애플리케이션을 사용 가능하도록 만들어 주는 부분입니다. 우리는 프레임워크 내부적으로 어떤 일이 발생하는지 자세히 들여다보진 않을 것이지만, 당신 스스로 찾아보고, 시도해보는 것을 장려합니다. [[[This is where all the Rails frameworks are loaded and thus made
 available to the application. We won't go into detail of what happens
 inside each of those frameworks, but you're encouraged to try and
-explore them on your own.
+explore them on your own.]]]
 
-For now, just keep in mind that common functionality like Rails engines,
-I18n and Rails configuration are all being defined here.
+이제, 레일즈 엔진, I18n, 레일즈 설정들과 같은 일반 기능들은 이 곳에 정의되어 있다는 것만 명심하십시오. [[[For now, just keep in mind that common functionality like Rails engines,
+I18n and Rails configuration are all being defined here.]]]
 
 ### Back to `config/environment.rb`
 
-When `config/application.rb` has finished loading Rails, and defined
+`config/application.rb`가 레일즈를 로드하고, 애플리케이션 네임스페이스 정의를 완료했을 때, 우리는 애플리케이션이 초기화 되어있는 `config/environment.rb`로 돌아갑니다. 예를 들어, 만약 애플리케이션이 `Blog`라는 이름이라면, 우리는 `rails/application.rb` 안에 정의된 `Blog::Application.initialize!`를 발견할 수 있을 것입니다. [[[When `config/application.rb` has finished loading Rails, and defined
 the application namespace, we go back to `config/environment.rb`,
 where the application is initialized. For example, if the application was called
 `Blog`, here we would find `Blog::Application.initialize!`, which is
-defined in `rails/application.rb`
+defined in `rails/application.rb`]]]
 
 ### `railties/lib/rails/application.rb`
 
-The `initialize!` method looks like this:
+`initialize!` 메소드는 이러한 형태를 갖습니다: [[[The `initialize!` method looks like this:]]]
 
 ```ruby
 def initialize!(group=:default) #:nodoc:
@@ -462,20 +462,20 @@ def initialize!(group=:default) #:nodoc:
 end
 ```
 
-As you can see, you can only initialize an app once. This is also where the initializers are run.
+보시다시피, 당신은 앱을 단 한번만 초기화할 수 있습니다. 이 곳은 또한 이니셜라이져들이 실행되는 곳이기도 합니다. [[[As you can see, you can only initialize an app once. This is also where the initializers are run.]]]
 
 TODO: review this
 
-The initializers code itself is tricky. What Rails is doing here is it
+이니셜라이져 코드는 그 자체로도 까다롭습니다. 레일즈가 이 곳에서 하는 일은 모든 클래스 조상들을 가로지르며 `initializers` 메소드를 찾아 정렬하고, 실행합니다. 예를 들어, `Engine` 클래스는 `initializers` 메소드를 제공함으로써 모든 사용 가능한 엔진들을 만들게 됩니다. [[[The initializers code itself is tricky. What Rails is doing here is it
 traverses all the class ancestors looking for an `initializers` method,
 sorting them and running them. For example, the `Engine` class will make
-all the engines available by providing the `initializers` method.
+all the engines available by providing the `initializers` method.]]]
 
-After this is done we go back to `Rack::Server`
+이후에 우리는 다시 `Rack::Server`로 돌아갑니다. [[[After this is done we go back to `Rack::Server`]]]
 
 ### Rack: lib/rack/server.rb
 
-Last time we left when the `app` method was being defined:
+우리는 이전에 `app` 메소드를 정의하고 넘어갔습니다: [[[Last time we left when the `app` method was being defined:]]]
 
 ```ruby
 def app
@@ -491,8 +491,8 @@ def app
 end
 ```
 
-At this point `app` is the Rails app itself (a middleware), and what
-happens next is Rack will call all the provided middlewares:
+이 지점에서 `app`은 그 자체가 레일즈 앱이 되고, 그 이후에는 Rack이 모든 제공되는 미들웨어들을 호출할 것입니다: [[[At this point `app` is the Rails app itself (a middleware), and what
+happens next is Rack will call all the provided middlewares:]]]
 
 ```ruby
 def build_app(app)
@@ -506,16 +506,16 @@ def build_app(app)
 end
 ```
 
-Remember, `build_app` was called (by wrapped_app) in the last line of `Server#start`.
-Here's how it looked like when we left:
+기억하십시오. `build_app`은 (wrapped_app 에 의해) `Server#start`의 마지막 라인에 호출되었습니다. 우리가 남겨둔 시점에 그것은 이런 형태입니다: [[[Remember, `build_app` was called (by wrapped_app) in the last line of `Server#start`.
+Here's how it looked like when we left:]]]
 
 ```ruby
 server.run wrapped_app, options, &blk
 ```
 
-At this point, the implementation of `server.run` will depend on the
+이 때, `server.run`의 구현은 당신이 사용하는 서버에 따라 달라집니다. 예를 들어, 당신이 Mongrel을 사용하고 있다면, `run` 메소드는 이런 형태일 것입니다: [[[At this point, the implementation of `server.run` will depend on the
 server you're using. For example, if you were using Mongrel, here's what
-the `run` method would look like:
+the `run` method would look like:]]]
 
 ```ruby
 def self.run(app, options={})
@@ -551,10 +551,10 @@ def self.run(app, options={})
 end
 ```
 
-We won't dig into the server configuration itself, but this is
-the last piece of our journey in the Rails initialization process.
+우리는 서버 설정 자체를 파고들진 않지만, 이것은 레일즈 초기화 과정에서 우리 여정의 마지막 부분입니다. [[[We won't dig into the server configuration itself, but this is
+the last piece of our journey in the Rails initialization process.]]]
 
-This high level overview will help you understand when your code is
+이 높은 수준의 개요는 당신의 코드가 언제, 어떻게 실행되는지 이해하는 데에 도움을 주고, 종합해서 더 좋은 레일즈 개발자가 될 수 있도록 도와줄 것입니다. 아직 많은 것들이 알고 싶다면, 레일즈 소스 코드는 이 다음 단계로 가는 데에 그 자체로도 최고의 장이 될 것입니다. [[[This high level overview will help you understand when your code is
 executed and how, and overall become a better Rails developer. If you
 still want to know more, the Rails source code itself is probably the
-best place to go next.
+best place to go next.]]]
