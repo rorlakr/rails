@@ -1,38 +1,38 @@
-The Rails Initialization Process
-================================
+[The Rails Initialization Process] 레일즈 초기화 프로세스
+====================================================
 
-This guide explains the internals of the initialization process in Rails
-as of Rails 4. It is an extremely in-depth guide and recommended for advanced Rails developers.
+이 가이드는 레일즈 4의 초기화 내부 작업에 대해 설명합니다. 이는 매우 심도있는 가이드이며 숙련된 레일즈 개발자들에게 권합니다. [[[This guide explains the internals of the initialization process in Rails
+as of Rails 4. It is an extremely in-depth guide and recommended for advanced Rails developers.]]]
 
-After reading this guide, you will know:
+이 가이드를 읽은 후, 다음과 같은 것들을 익히게 됩니다: [[[After reading this guide, you will know:]]]
 
-* How to use `rails server`.
+* `rails server` 사용법. [[[How to use `rails server`.]]]
 
 --------------------------------------------------------------------------------
 
-This guide goes through every method call that is
+이 가이드는 기본적으로 레일즈 4 애플리케이션의 루비 온 레일즈 스택을 부트하기 위해 필요한 모든 메소드 호출을 하나하나 자세히 설명하면서 진행됩니다. 이 가이드에서, 우리는 당신의 앱을 부트하기 위해 +rails server+를 호출할 때 어떤 일이 발생하는지에 초점을 둘 것입니다. [[[This guide goes through every method call that is
 required to boot up the Ruby on Rails stack for a default Rails 4
 application, explaining each part in detail along the way. For this
 guide, we will be focusing on what happens when you execute +rails
-server+ to boot your app.
+server+ to boot your app.]]]
 
-NOTE: Paths in this guide are relative to Rails or a Rails application unless otherwise specified.
+NOTE: 다른 방법으로 특정하지 않았다면 이 가이드의 경로들은 레일즈 혹은 레일즈 애플리케이션에 상대적인 경로들입니다. [[[Paths in this guide are relative to Rails or a Rails application unless otherwise specified.]]]
 
-TIP: If you want to follow along while browsing the Rails [source
+TIP: 만일 레일즈 [소스코드](https://github.com/rails/rails)를 탐색하며 따라오고 싶다면, `t` 단축키를 이용하여 GitHub 파일 탐색기를 열어 파일을 빠르게 찾아가며 보길 권장합니다. [[[If you want to follow along while browsing the Rails [source
 code](https://github.com/rails/rails), we recommend that you use the `t`
 key binding to open the file finder inside GitHub and find files
-quickly.
+quickly.]]]
 
 Launch!
 -------
 
-Now we finally boot and initialize the app. It all starts with your app's
+이제 우리는 드디어 앱을 부트하고, 초기화합니다. 이는 모두 `bin/rails` 실행 명령으로 시작됩니다. 레일즈 애플리케이션은 보통 `rails console` 혹은 `rails server`를 실행하여 시작됩니다. [[[Now we finally boot and initialize the app. It all starts with your app's
 `bin/rails` executable. A Rails application is usually started by running
-`rails console` or `rails server`.
+`rails console` or `rails server`.]]]
 
 ### `bin/rails`
 
-This file is as follows:
+이 파일은 아래와 같습니다: [[[This file is as follows:]]]
 
 ```ruby
 #!/usr/bin/env ruby
@@ -41,11 +41,11 @@ require File.expand_path('../../config/boot',  __FILE__)
 require 'rails/commands'
 ```
 
-The `APP_PATH` constant will be used later in `rails/commands`. The `config/boot` file referenced here is the `config/boot.rb` file in our application which is responsible for loading Bundler and setting it up.
+`APP_PATH` 상수는 나중에 `rails/commands`에서 쓰이게 됩니다. 여기서 참조된 `config/boot` 파일은 우리 애플리케이션에서 Bundler를 로드하고 설정하는 역할을 하는 `config/boot.rb` 파일 입니다. [[[The `APP_PATH` constant will be used later in `rails/commands`. The `config/boot` file referenced here is the `config/boot.rb` file in our application which is responsible for loading Bundler and setting it up.]]]
 
 ### `config/boot.rb`
 
-`config/boot.rb` contains:
+`config/boot.rg` 파일은 다음과 같은 내용을 포함합니다: [[[`config/boot.rb` contains:]]]
 
 ```ruby
 # Set up gems listed in the Gemfile.
@@ -54,12 +54,12 @@ ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
 require 'bundler/setup' if File.exists?(ENV['BUNDLE_GEMFILE'])
 ```
 
-In a standard Rails application, there's a `Gemfile` which declares all
+표준 레일즈 애플리케이션에는, 애플리케이션의 모든 의존성을 정의하는 `Gemfile`이 있습니다. `config/boot.rb`는 `ENV['BUNDLE_GEMFILE']`에 이 파일의 위치를 지정합니다. 만일 Gemfile이 존재할 경우, `bundler/setup`이 요구됩니다. [[[In a standard Rails application, there's a `Gemfile` which declares all
 dependencies of the application. `config/boot.rb` sets
 `ENV['BUNDLE_GEMFILE']` to the location of this file. If the Gemfile
-exists, `bundler/setup` is then required.
+exists, `bundler/setup` is then required.]]]
 
-A standard Rails application depends on several gems, specifically:
+표준 레일즈 애플리케이션은 몇가지 gem들에 의존하는데, 특히: [[[A standard Rails application depends on several gems, specifically:]]]
 
 * abstract
 * actionmailer
