@@ -89,7 +89,7 @@ exists, `bundler/setup` is then required.]]]
 
 ### `rails/commands.rb`
 
-Once `config/boot.rb` has finished, the next file that is required is `rails/commands` which will execute a command based on the arguments passed in. In this case, the `ARGV` array simply contains `server` which is extracted into the `command` variable using these lines:
+`config/boot.rb`가 끝나면, 다음으로 필요한 파일은 전달된 매개변수를 바탕으로 명령을 실행하는 `rails/commands` 입니다. 이 경우, `ARGV` 배열은 단순히 이 라인들을 이용하여 `command` 변수로 추출된 `server`를 포함합니다. [[[Once `config/boot.rb` has finished, the next file that is required is `rails/commands` which will execute a command based on the arguments passed in. In this case, the `ARGV` array simply contains `server` which is extracted into the `command` variable using these lines:]]]
 
 ```ruby
 ARGV << '--help' if ARGV.empty?
@@ -107,10 +107,10 @@ command = ARGV.shift
 command = aliases[command] || command
 ```
 
-TIP: As you can see, an empty ARGV list will make Rails show the help
-snippet.
+TIP: 보시다시피, 비어있는 ARGV 리스트는 레일즈가 도움말 문구를 보여주도록 합니다. [[[As you can see, an empty ARGV list will make Rails show the help
+snippet.]]]
 
-If we used `s` rather than `server`, Rails will use the `aliases` defined in the file and match them to their respective commands. With the `server` command, Rails will run this code:
+만약 `server` 대신 `s`를 사용한다면, 레일즈는 파일에 정의된 `aliases`를 이용하고, 그들 각각의 명령어에 대응시킵니다. `server` 커맨드로, 레일즈는 이 코드를 실행합니다. [[[If we used `s` rather than `server`, Rails will use the `aliases` defined in the file and match them to their respective commands. With the `server` command, Rails will run this code:]]]
 
 ```ruby
 when 'server'
@@ -129,7 +129,7 @@ when 'server'
   end
 ```
 
-This file will change into the Rails root directory (a path two directories up from `APP_PATH` which points at `config/application.rb`), but only if the `config.ru` file isn't found. This then requires `rails/commands/server` which sets up the `Rails::Server` class.
+이 파일은 레일즈의 루트 디렉토리(`config/application.rb`를 가리키는 `APP_PATH`의 두 단계 상위 디렉토리)로 변경되지만, 이는 `config.ru` 파일을 찾을 수 없을 경우 뿐입니다. 그럴 경우 이 파일은 `Rails::Server` 클래스를 세팅하는 `rails/commands/server`를 요구합니다. [[[This file will change into the Rails root directory (a path two directories up from `APP_PATH` which points at `config/application.rb`), but only if the `config.ru` file isn't found. This then requires `rails/commands/server` which sets up the `Rails::Server` class.]]]
 
 ```ruby
 require 'fileutils'
@@ -140,16 +140,16 @@ module Rails
   class Server < ::Rack::Server
 ```
 
-`fileutils` and `optparse` are standard Ruby libraries which provide helper functions for working with files and parsing options.
+`fileutils`와 `optparse`는 파일들과 옵션 파싱 작업시 helper 함수들을 제공해주는 표준 루비 라이브러리 [[[`fileutils` and `optparse` are standard Ruby libraries which provide helper functions for working with files and parsing options.]]]
 
 ### `actionpack/lib/action_dispatch.rb`
 
-Action Dispatch is the routing component of the Rails framework.
-It adds functionality like routing, session, and common middlewares.
+Action Dispatch는 레일즈 프레임워크의 라우팅 컴포넌트입니다. 라우팅, 세션, 일반 미들웨어와 같은 기능을 제공합니다. [[[Action Dispatch is the routing component of the Rails framework.
+It adds functionality like routing, session, and common middlewares.]]]
 
 ### `rails/commands/server.rb`
 
-The `Rails::Server` class is defined in this file by inheriting from `Rack::Server`. When `Rails::Server.new` is called, this calls the `initialize` method in `rails/commands/server.rb`:
+`Rails::Server` 클래스는 `Rack::Server`로부터 상속받아 이 파일에 정의되어 있습니다. `Rails::Server.new`가 호출되면, 이 클래스는 `rails/commands/server.rb` 안의 `initialize` 메소드를 호출합니다. [[[The `Rails::Server` class is defined in this file by inheriting from `Rack::Server`. When `Rails::Server.new` is called, this calls the `initialize` method in `rails/commands/server.rb`:]]]
 
 ```ruby
 def initialize(*)
@@ -158,13 +158,13 @@ def initialize(*)
 end
 ```
 
-Firstly, `super` is called which calls the `initialize` method on `Rack::Server`.
+처음으로, `Rack::Server`의 `initialize` 메소드를 호출하는 `super`가 호출됩니다. [[[Firstly, `super` is called which calls the `initialize` method on `Rack::Server`.]]]
 
 ### Rack: `lib/rack/server.rb`
 
-`Rack::Server` is responsible for providing a common server interface for all Rack-based applications, which Rails is now a part of.
+`Rack::Server`는 이제는 레일즈 또한 그 일부가 된 모든 Rack 기반 애플리케이션들을 위한 일반 서버 인터페이스를 제공하는 역할을 합니다. [[[`Rack::Server` is responsible for providing a common server interface for all Rack-based applications, which Rails is now a part of.]]]
 
-The `initialize` method in `Rack::Server` simply sets a couple of variables:
+`Rack::Server`의 `initialize` 메소드는 단순히 두 가지 변수를 세팅합니다. [[[The `initialize` method in `Rack::Server` simply sets a couple of variables:]]]
 
 ```ruby
 def initialize(options = nil)
