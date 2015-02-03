@@ -26,7 +26,7 @@ quickly.]]]
 [Launch!] 실행하기!
 -------
 
-이제 드디어 앱을 부트하고, 초기화한다. 이는 모두 `bin/rails` 실행 명령으로 시작된다. 레일스 애플리케이션은 보통 `rails console` 혹은 `rails server`를 실행하여 시작된다. [[[Now we finally boot and initialize the app. It all starts with your app's
+이제 드디어 앱을 부트하고, 초기화한다. 이는 모두 `bin/rails` 실행 명령으로 시작한다. 레일스 애플리케이션은 보통 `rails console` 혹은 `rails server`를 실행하여 시작한다. [[[Now we finally boot and initialize the app. It all starts with your app's
 `bin/rails` executable. A Rails application is usually started by running
 `rails console` or `rails server`.]]]
 
@@ -54,7 +54,7 @@ ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
 require 'bundler/setup' if File.exists?(ENV['BUNDLE_GEMFILE'])
 ```
 
-표준 레일스 애플리케이션에는, 애플리케이션의 모든 의존성을 정의하는 `Gemfile`이 있다. `config/boot.rb`는 `ENV['BUNDLE_GEMFILE']`에 이 파일의 위치를 지정한다. 만일 Gemfile이 존재할 경우, `bundler/setup`이 요구된다. [[[In a standard Rails application, there's a `Gemfile` which declares all
+표준 레일스 애플리케이션에는, 애플리케이션의 모든 의존성을 정의하는 `Gemfile`이 있다. `config/boot.rb`는 `ENV['BUNDLE_GEMFILE']`에 이 파일의 위치를 지정한다. 만일 Gemfile이 존재할 경우, `bundler/setup`을 요구한다. [[[In a standard Rails application, there's a `Gemfile` which declares all
 dependencies of the application. `config/boot.rb` sets
 `ENV['BUNDLE_GEMFILE']` to the location of this file. If the Gemfile
 exists, `bundler/setup` is then required.]]]
@@ -158,7 +158,7 @@ def initialize(*)
 end
 ```
 
-처음으로, `Rack::Server`의 `initialize` 메소드를 호출하는 `super`가 호출된다. [[[Firstly, `super` is called which calls the `initialize` method on `Rack::Server`.]]]
+처음으로, `Rack::Server`의 `initialize` 메소드를 호출하는 `super`를 호출한다. [[[Firstly, `super` is called which calls the `initialize` method on `Rack::Server`.]]]
 
 ### Rack: `lib/rack/server.rb`
 
@@ -183,7 +183,7 @@ def set_environment
 end
 ```
 
-사실, `options` 메소드는 꽤 많은 것을 한다. 이 메소드는 `Rack::Server`에 이와 같이 정의된다: [[[In fact, the `options` method here does quite a lot. This method is defined in `Rack::Server` like this:]]]
+사실, `options` 메소드는 꽤 많은 것을 한다. 이 메소드는 `Rack::Server`에 이와 같이 정의한다: [[[In fact, the `options` method here does quite a lot. This method is defined in `Rack::Server` like this:]]]
 
 ```ruby
 def options
@@ -191,7 +191,7 @@ def options
 end
 ```
 
-그리고 `parse_options`는 이와 같이 정의된다: [[[Then `parse_options` is defined like this:]]]
+그리고 `parse_options`는 이와 같이 정의한다: [[[Then `parse_options` is defined like this:]]]
 
 ```ruby
 def parse_options(args)
@@ -208,7 +208,7 @@ def parse_options(args)
 end
 ```
 
-`default_options`는 이렇게 설정된다: [[[With the `default_options` set to this:]]]
+`default_options`는 이렇게 설정한다: [[[With the `default_options` set to this:]]]
 
 ```ruby
 def default_options
@@ -223,7 +223,7 @@ def default_options
 end
 ```
 
-`REQUEST_METHOD` 키가 `ENV`에 존재하지 않아 그 라인을 건너뛸 수 있다. 그 다음 라인은 `Rack::Server`에 명확하게 정의된 `opt_parser`로부터 options에 병합된다. [[[There is no `REQUEST_METHOD` key in `ENV` so we can skip over that line. The next line merges in the options from `opt_parser` which is defined plainly in `Rack::Server`]]]
+`REQUEST_METHOD` 키가 `ENV`에 존재하지 않아 그 라인을 건너뛸 수 있다. 그 다음 라인은 `Rack::Server`에 명확하게 정의된 `opt_parser`로부터 options에 병합한다. [[[There is no `REQUEST_METHOD` key in `ENV` so we can skip over that line. The next line merges in the options from `opt_parser` which is defined plainly in `Rack::Server`]]]
 
 ```ruby
 def opt_parser
@@ -251,13 +251,13 @@ set earlier) is required.]]]
 
 ### `config/application`
 
-`require APP_PATH`가 실행될 때, `config/application.rb`가 로드된다. 이 파일은 앱 안에 존재하며, 필요에 따라 자유롭게 변경할 수 있다. [[[When `require APP_PATH` is executed, `config/application.rb` is loaded.
+`require APP_PATH`가 실행될 때, `config/application.rb`를 로드한다. 이 파일은 앱 안에 존재하며, 필요에 따라 자유롭게 변경할 수 있다. [[[When `require APP_PATH` is executed, `config/application.rb` is loaded.
 This file exists in your app and it's free for you to change based
 on your needs.]]]
 
 ### `Rails::Server#start`
 
-`config/application`이 로드된 후, `server.start`가 호출된다. 이 메소드는 다음과 같이 정의되어 있다: [[[After `config/application` is loaded, `server.start` is called. This method is defined like this:]]]
+`config/application`이 로드된 후, `server.start`를 호출한다. 이 메소드는 다음과 같이 정의되어 있다: [[[After `config/application` is loaded, `server.start` is called. This method is defined like this:]]]
 
 ```ruby
 def start
@@ -352,7 +352,7 @@ thus memorized by now).]]]
 @wrapped_app ||= build_app app
 ```
 
-`app` 메소드는 이렇게 정의된다: [[[The `app` method here is defined like so:]]]
+`app` 메소드는 이렇게 정의한다: [[[The `app` method here is defined like so:]]]
 
 ```ruby
 def app
@@ -368,7 +368,7 @@ def app
 end
 ```
 
-`options[:config]` 값은 기본적으로 이러한 내용을 포함하는 `config.ru`으로 설정된다: [[[The `options[:config]` value defaults to `config.ru` which contains this:]]]
+`options[:config]` 값은 기본적으로 이러한 내용을 포함하는 `config.ru`으로 설정한다: [[[The `options[:config]` value defaults to `config.ru` which contains this:]]]
 
 ```ruby
 # This file is used by Rack-based servers to start the application.
