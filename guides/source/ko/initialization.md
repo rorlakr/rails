@@ -23,7 +23,7 @@ code](https://github.com/rails/rails), we recommend that you use the `t`
 key binding to open the file finder inside GitHub and find files
 quickly.]]]
 
-Launch!
+[Launch!] 실행하기!
 -------
 
 이제 우리는 드디어 앱을 부트하고, 초기화합니다. 이는 모두 `bin/rails` 실행 명령으로 시작됩니다. 레일즈 애플리케이션은 보통 `rails console` 혹은 `rails server`를 실행하여 시작됩니다. [[[Now we finally boot and initialize the app. It all starts with your app's
@@ -129,7 +129,7 @@ when 'server'
   end
 ```
 
-이 파일은 레일즈의 루트 디렉토리(`config/application.rb`를 가리키는 `APP_PATH`의 두 단계 상위 디렉토리)로 변경되지만, 이는 `config.ru` 파일을 찾을 수 없을 경우 뿐입니다. 그럴 경우 이 파일은 `Rails::Server` 클래스를 세팅하는 `rails/commands/server`를 요구합니다. [[[This file will change into the Rails root directory (a path two directories up from `APP_PATH` which points at `config/application.rb`), but only if the `config.ru` file isn't found. This then requires `rails/commands/server` which sets up the `Rails::Server` class.]]]
+이 파일은 레일즈의 루트 디렉토리(`config/application.rb`를 가리키는 `APP_PATH`의 두 단계 상위 디렉토리)로 변경되지만, 이는 `config.ru` 파일을 찾을 수 없을 경우 뿐입니다. 그럴 경우 이 파일은 `Rails::Server` 클래스를 설정하는 `rails/commands/server`를 요구합니다. [[[This file will change into the Rails root directory (a path two directories up from `APP_PATH` which points at `config/application.rb`), but only if the `config.ru` file isn't found. This then requires `rails/commands/server` which sets up the `Rails::Server` class.]]]
 
 ```ruby
 require 'fileutils'
@@ -164,7 +164,7 @@ end
 
 `Rack::Server`는 이제는 레일즈 또한 그 일부가 된 모든 Rack 기반 애플리케이션들을 위한 일반 서버 인터페이스를 제공하는 역할을 합니다. [[[`Rack::Server` is responsible for providing a common server interface for all Rack-based applications, which Rails is now a part of.]]]
 
-`Rack::Server`의 `initialize` 메소드는 단순히 두 가지 변수를 세팅합니다. [[[The `initialize` method in `Rack::Server` simply sets a couple of variables:]]]
+`Rack::Server`의 `initialize` 메소드는 단순히 두 가지 변수를 설정합니다. [[[The `initialize` method in `Rack::Server` simply sets a couple of variables:]]]
 
 ```ruby
 def initialize(options = nil)
@@ -173,9 +173,9 @@ def initialize(options = nil)
 end
 ```
 
-In this case, `options` will be `nil` so nothing happens in this method.
+이 경우, `options`는 `nil`이 되어 이 메소드에서는 아무일도 발생하지 않습니다. [[[In this case, `options` will be `nil` so nothing happens in this method.]]]
 
-After `super` has finished in `Rack::Server`, we jump back to `rails/commands/server.rb`. At this point, `set_environment` is called within the context of the `Rails::Server` object and this method doesn't appear to do much at first glance:
+`Rack::Server`에서 `super`가 끝난 후, 우리는 다시 `rails/commands/server.rb`로 넘어갑니다. 이 지점에서, `set_environment`는 `Rails::Server`의 문맥 안에서 호출되고, 이 메소드는 처음에는 많은 일을 하지 않게 보입니다: [[[After `super` has finished in `Rack::Server`, we jump back to `rails/commands/server.rb`. At this point, `set_environment` is called within the context of the `Rails::Server` object and this method doesn't appear to do much at first glance:]]]
 
 ```ruby
 def set_environment
@@ -183,7 +183,7 @@ def set_environment
 end
 ```
 
-In fact, the `options` method here does quite a lot. This method is defined in `Rack::Server` like this:
+사실, `options` 메소드는 꽤 많은 것을 합니다. 이 메소드는 `Rack::Server`에 이와 같이 정의됩니다: [[[In fact, the `options` method here does quite a lot. This method is defined in `Rack::Server` like this:]]]
 
 ```ruby
 def options
@@ -191,7 +191,7 @@ def options
 end
 ```
 
-Then `parse_options` is defined like this:
+그리고 `parse_options`는 이와 같이 정의됩니다: [[[Then `parse_options` is defined like this:]]]
 
 ```ruby
 def parse_options(args)
@@ -208,7 +208,7 @@ def parse_options(args)
 end
 ```
 
-With the `default_options` set to this:
+`default_options`는 이렇게 설정됩니다: [[[With the `default_options` set to this:]]]
 
 ```ruby
 def default_options
@@ -223,7 +223,7 @@ def default_options
 end
 ```
 
-There is no `REQUEST_METHOD` key in `ENV` so we can skip over that line. The next line merges in the options from `opt_parser` which is defined plainly in `Rack::Server`
+`REQUEST_METHOD` 키가 `ENV`에 존재하지 않아 우리는 그 라인을 건너뛸 수 있습니다. 그 다음 라인은 `Rack::Server`에 명확하게 정의된 `opt_parser`로부터 options에 병합됩니다. [[[There is no `REQUEST_METHOD` key in `ENV` so we can skip over that line. The next line merges in the options from `opt_parser` which is defined plainly in `Rack::Server`]]]
 
 ```ruby
 def opt_parser
@@ -231,7 +231,7 @@ def opt_parser
 end
 ```
 
-The class **is** defined in `Rack::Server`, but is overwritten in `Rails::Server` to take different arguments. Its `parse!` method begins like this:
+클래스는 `Rack::Server`에 정의되어있지만, 다른 매개변수들을 받기 위해 `Rails:Server`에 덮어씌워져 있습니다. 그의 `parse!` 메소드는 이와 같이 시작합니다: [[[The class **is** defined in `Rack::Server`, but is overwritten in `Rails::Server` to take different arguments. Its `parse!` method begins like this:]]]
 
 ```ruby
 def parse!(args)
@@ -244,20 +244,20 @@ def parse!(args)
   ...
 ```
 
-This method will set up keys for the `options` which Rails will then be
+이 메소드는 레일즈가 그 서버를 어떻게 실행할지 결정할 수 있도록 해주는 `options`의 키들을 설정합니다. `initialize`가 끝난 후, 우리는 (더 먼저 설정된) `APP_PATH`가 요구되는 `rails/server`로 돌아갑니다. [[[This method will set up keys for the `options` which Rails will then be
 able to use to determine how its server should run. After `initialize`
 has finished, we jump back into `rails/server` where `APP_PATH` (which was
-set earlier) is required.
+set earlier) is required.]]]
 
 ### `config/application`
 
-When `require APP_PATH` is executed, `config/application.rb` is loaded.
+`require APP_PATH`가 실행될 때, `config/application.rb`가 로드됩니다. 이 파일은 당신의 앱에 존재하며, 당신의 필요에 따라 자유롭게 변경할 수 있습니다. [[[When `require APP_PATH` is executed, `config/application.rb` is loaded.
 This file exists in your app and it's free for you to change based
-on your needs.
+on your needs.]]]
 
 ### `Rails::Server#start`
 
-After `config/application` is loaded, `server.start` is called. This method is defined like this:
+`config/application`이 로드된 후, `server.start`가 호출됩니다. 이 메소드는 다음과 같이 정의되어 있습니다: [[[After `config/application` is loaded, `server.start` is called. This method is defined like this:]]]
 
 ```ruby
 def start
@@ -290,15 +290,15 @@ ensure
 end
 ```
 
-This is where the first output of the Rails initialization happens. This
+여기는 레일즈 초기화의 첫 출력이 발생하는 부분입니다. 이 메소드는 `INT` 시그널에 함정을 만들기 때문에, 당신이 서버에 `CTRL-C`를 할 경우 프로세스를 종료시킬 것입니다. 이 코드에서 볼 수 있듯이, 이는 `tmp/cache`, `tmp/pids`, `tmp/sessions`, 그리고 `tmp/sockets` 디렉토리를 생성합니다. 그리고 `ActiveSupport::Logger`의 인스턴스를 생성하고 할당하기 전에 Rack 앱을 생성하는 `wrapped_app`을 호출합니다. [[[This is where the first output of the Rails initialization happens. This
 method creates a trap for `INT` signals, so if you `CTRL-C` the server,
 it will exit the process. As we can see from the code here, it will
 create the `tmp/cache`, `tmp/pids`, `tmp/sessions` and `tmp/sockets`
 directories. It then calls `wrapped_app` which is responsible for
 creating the Rack app, before creating and assigning an
-instance of `ActiveSupport::Logger`.
+instance of `ActiveSupport::Logger`.]]]
 
-The `super` method will call `Rack::Server.start` which begins its definition like this:
+`super` 메소드는 이런 식으로 그의 정의를 시작하는 `Rack::Server.start`을 호출합니다: [[[The `super` method will call `Rack::Server.start` which begins its definition like this:]]]
 
 ```ruby
 def start &blk
@@ -344,15 +344,15 @@ def start &blk
 end
 ```
 
-The interesting part for a Rails app is the last line, `server.run`. Here we encounter the `wrapped_app` method again, which this time
+레일즈 앱의 흥미로운 부분은 마지막 줄인 `server.run`입니다. 여기서 우리는 `wrapped_app` 메소드를 다시 만나게 되는데, 이제 우리는 더 탐색해야 할 시간입니다. (비록 이전에 실행되었지만, 지금 다시 떠오르게 됩니다.) [[[The interesting part for a Rails app is the last line, `server.run`. Here we encounter the `wrapped_app` method again, which this time
 we're going to explore more (even though it was executed before, and
-thus memorized by now).
+thus memorized by now).]]]
 
 ```ruby
 @wrapped_app ||= build_app app
 ```
 
-The `app` method here is defined like so:
+`app` 메소드는 이렇게 정의됩니다: [[[The `app` method here is defined like so:]]]
 
 ```ruby
 def app
@@ -368,7 +368,7 @@ def app
 end
 ```
 
-The `options[:config]` value defaults to `config.ru` which contains this:
+`options[:config]` 값은 기본적으로 이러한 내용을 포함하는 `config.ru`으로 설정됩니다: [[[The `options[:config]` value defaults to `config.ru` which contains this:]]]
 
 ```ruby
 # This file is used by Rack-based servers to start the application.
@@ -378,14 +378,14 @@ run <%= app_const %>
 ```
 
 
-The `Rack::Builder.parse_file` method here takes the content from this `config.ru` file and parses it using this code:
+`Rack::Builder.parse_file` 메소드는 `config.ru` 파일로부터 내용을 가져와 다음 코드를 사용하여 파싱합니다: [[[The `Rack::Builder.parse_file` method here takes the content from this `config.ru` file and parses it using this code:]]]
 
 ```ruby
 app = eval "Rack::Builder.new {( " + cfgfile + "\n )}.to_app",
     TOPLEVEL_BINDING, config
 ```
 
-The `initialize` method of `Rack::Builder` will take the block here and execute it within an instance of `Rack::Builder`. This is where the majority of the initialization process of Rails happens. The `require` line for `config/environment.rb` in `config.ru` is the first to run:
+`Rack::Builder`의 `initialize` 메소드는 이 블록을 가져와 `Rack::Builder`의 인스턴스 내부에서 실행합니다. 이 곳이 레일즈의 초기화 프로세스의 많은 부분이 발생하는 곳입니다. `config.ur`의 `config/environment.rb`을 다루는 `require` 라인이 실행을 위한 가장 첫 부분 입니다: [[[The `initialize` method of `Rack::Builder` will take the block here and execute it within an instance of `Rack::Builder`. This is where the majority of the initialization process of Rails happens. The `require` line for `config/environment.rb` in `config.ru` is the first to run:]]]
 
 ```ruby
 require ::File.expand_path('../config/environment',  __FILE__)
@@ -393,15 +393,15 @@ require ::File.expand_path('../config/environment',  __FILE__)
 
 ### `config/environment.rb`
 
-This file is the common file required by `config.ru` (`rails server`) and Passenger. This is where these two ways to run the server meet; everything before this point has been Rack and Rails setup.
+이 파일은 `config.ru`와 Passenger가 요구하는 일반 파일입니다. 이 곳은 서버를 실행하는 두 가지 방법이 만나는 부분입니다; 이 지점 이전의 모든 것들은 Rack과 레일즈 설정에 존재합니다. [[[This file is the common file required by `config.ru` (`rails server`) and Passenger. This is where these two ways to run the server meet; everything before this point has been Rack and Rails setup.]]]
 
-This file begins with requiring `config/application.rb`.
+이 파일은 `config/application.rb`를 필요로 하면서 시작합니다. [[[This file begins with requiring `config/application.rb`.]]]
 
 ### `config/application.rb`
 
-This file requires `config/boot.rb`, but only if it hasn't been required before, which would be the case in `rails server` but **wouldn't** be the case with Passenger.
+이 파일은 `config/boot.rb`를 요구하지만, 이전에 요구되지 않은 `rails server`의 경우에만 해당하고, Passenger의 경우에는 해당하지 **않습니다**. [[[This file requires `config/boot.rb`, but only if it hasn't been required before, which would be the case in `rails server` but **wouldn't** be the case with Passenger.]]]
 
-Then the fun begins!
+이제 재미있는 것들이 시작됩니다![[[Then the fun begins!]]]
 
 Loading Rails
 -------------
