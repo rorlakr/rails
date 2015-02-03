@@ -1,24 +1,25 @@
 **DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
 
-Ruby on Rails 4.2 Release Notes
+[Ruby on Rails 4.2 Release Notes] 루비온레일스 4.2 릴리스 노트
 ===============================
 
-Highlights in Rails 4.2:
+레일스 4.2 하이라이트 [[[Highlights in Rails 4.2:]]]
 
-* Active Job
-* Asynchronous mails
-* Adequate Record
-* Web Console
-* Foreign key support
+* 액티브 잡 [[[Active Job]]]
 
-These release notes cover only the major changes. To learn about other
-features, bug fixes, and changes, please refer to the changelogs or check out
-the [list of commits](https://github.com/rails/rails/commits/4-2-stable) in
-the main Rails repository on GitHub.
+* 비동기적 이메일 [[[Asynchronous mails]]]
+
+* 애디키트 레코드 [[[Adequate Record]]]
+
+* 웹 콘솔 [[[Web Console]]]
+
+* 외래키 지원 [[[Foreign key support]]]
+
+이번 릴리스 노트에서는 주요 변경내용만 설명한다. 다른 기능, 오류 수정, 그리고 기타 다른 변경내용을 알고자 한다면 깃헙 레일스 저장소에 있는 [커밋 목록](https://github.com/rails/rails/commits/4-2-stable)이나 변경로그를 참고하기 바란다. [[[These release notes cover only the major changes. To learn about other features, bug fixes, and changes, please refer to the changelogs or check out the [list of commits](https://github.com/rails/rails/commits/4-2-stable) in the main Rails repository on GitHub.]]]
 
 --------------------------------------------------------------------------------
 
-Upgrading to Rails 4.2
+[Upgrading to Rails 4.2] 레일스 4.2로 업그레이드하기
 ----------------------
 
 If you're upgrading an existing application, it's a great idea to have good test
@@ -29,10 +30,10 @@ available in the guide [Upgrading Ruby on
 Rails](upgrading_ruby_on_rails.html#upgrading-from-rails-4-1-to-rails-4-2).
 
 
-Major Features
+[Major Features] 주요 기능
 --------------
 
-### Active Job
+### [Active Job] 액티브 잡
 
 Active Job is a new framework in Rails 4.2. It is a common interface on top of
 queuing systems like [Resque](https://github.com/resque/resque), [Delayed
@@ -63,7 +64,7 @@ end
 See the [Active Job Basics](active_job_basics.html) guide for more
 information.
 
-### Asynchronous Mails
+### [Asynchronous Mails] 비동기적 이메일
 
 Building on top of Active Job, Action Mailer now comes with a `deliver_later`
 method that sends emails via the queue, so it doesn't block the controller or
