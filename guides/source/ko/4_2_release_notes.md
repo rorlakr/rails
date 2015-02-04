@@ -7,7 +7,7 @@
 
 * 액티브 잡 [[[Active Job]]]
 
-* 비동기적 이메일 [[[Asynchronous mails]]]
+* 비동기 메일 [[[Asynchronous mails]]]
 
 * 애디키트 레코드 [[[Adequate Record]]]
 
@@ -15,19 +15,14 @@
 
 * 외래키 지원 [[[Foreign key support]]]
 
-이번 릴리스 노트에서는 주요 변경내용만 설명한다. 다른 기능, 오류 수정, 그리고 기타 다른 변경내용을 알고자 한다면 깃헙 레일스 저장소에 있는 [커밋 목록](https://github.com/rails/rails/commits/4-2-stable)이나 변경로그를 참고하기 바란다. [[[These release notes cover only the major changes. To learn about other features, bug fixes, and changes, please refer to the changelogs or check out the [list of commits](https://github.com/rails/rails/commits/4-2-stable) in the main Rails repository on GitHub.]]]
+이번 릴리스 노트에서는 주요 변경내용만을 설명한다. 다른 기능이나 , 오류 수정, 그리고 기타 다른 변경내용을 알고자 한다면 깃헙 레일스 저장소에 있는 변경로그나 [커밋 목록](https://github.com/rails/rails/commits/4-2-stable)을 참고하기 바란다. [[[These release notes cover only the major changes. To learn about other features, bug fixes, and changes, please refer to the changelogs or check out the [list of commits](https://github.com/rails/rails/commits/4-2-stable) in the main Rails repository on GitHub.]]]
 
 --------------------------------------------------------------------------------
 
 [Upgrading to Rails 4.2] 레일스 4.2로 업그레이드하기
 ----------------------
 
-If you're upgrading an existing application, it's a great idea to have good test
-coverage before going in. You should also first upgrade to Rails 4.1 in case you
-haven't and make sure your application still runs as expected before attempting
-to upgrade to Rails 4.2. A list of things to watch out for when upgrading is
-available in the guide [Upgrading Ruby on
-Rails](upgrading_ruby_on_rails.html#upgrading-from-rails-4-1-to-rails-4-2).
+기존 애플리케이션을 업그레이드할 때는 먼저 테스트 커버리지를 높이는 것이 좋다. 먼저 레일스 4.1로 업그레이드한 후 애플리케이션 실행시에 문제가 없다는 것을 확인한 후 레일스 4.2로 업그레이드해야 한다. [[[If you're upgrading an existing application, it's a great idea to have good test coverage before going in. You should also first upgrade to Rails 4.1 in case you haven't and make sure your application still runs as expected before attempting to upgrade to Rails 4.2. A list of things to watch out for when upgrading is available in the guide [Upgrading Ruby on Rails](upgrading_ruby_on_rails.html#upgrading-from-rails-4-1-to-rails-4-2).]]]
 
 
 [Major Features] 주요 기능
@@ -35,20 +30,12 @@ Rails](upgrading_ruby_on_rails.html#upgrading-from-rails-4-1-to-rails-4-2).
 
 ### [Active Job] 액티브 잡
 
-Active Job is a new framework in Rails 4.2. It is a common interface on top of
-queuing systems like [Resque](https://github.com/resque/resque), [Delayed
-Job](https://github.com/collectiveidea/delayed_job),
-[Sidekiq](https://github.com/mperham/sidekiq), and more.
+액티브 잡은 레일스 4.2에서 새로 도입한 프레임워크이며 [Resque](https://github.com/resque/resque), [Delayed Job](https://github.com/collectiveidea/delayed_job), [Sidekiq](https://github.com/mperham/sidekiq) 등과 같은 큐 등록 시스템 기반 위에 인터페이스를 일반화한 것이다. [[[Active Job is a new framework in Rails 4.2. It is a common interface on top of queuing systems like [Resque](https://github.com/resque/resque), [Delayed Job](https://github.com/collectiveidea/delayed_job), [Sidekiq](https://github.com/mperham/sidekiq), and more.]]]
 
-Jobs written with the Active Job API run on any of the supported queues thanks
-to their respective adapters. Active Job comes pre-configured with an inline
-runner that executes jobs right away.
+액티브 잡 API로 작성한 잡은 각각에 대한 내장 어댑터 덕분에 어떤 지원 큐에서도 실행된다. 액티브 잡은 잡을 즉시 실행하는 인라인 러너로 미리 설정되어 있다. [[[Jobs written with the Active Job API run on any of the supported queues thanks to their respective adapters. Active Job comes pre-configured with an inline runner that executes jobs right away.]]]
 
-Jobs often need to take Active Record objects as arguments. Active Job passes
-object references as URIs (uniform resource identifiers) instead of marshaling
-the object itself. The new [Global ID](https://github.com/rails/globalid)
-library builds URIs and looks up the objects they reference. Passing Active
-Record objects as job arguments just works by using Global ID internally.
+
+Jobs often need to take Active Record objects as arguments. Active Job passes object references as URIs (uniform resource identifiers) instead of marshaling the object itself. The new [Global ID](https://github.com/rails/globalid) library builds URIs and looks up the objects they reference. Passing Active Record objects as job arguments just works by using Global ID internally.
 
 For example, if `trashable` is an Active Record object, then this job runs
 just fine with no serialization involved:
