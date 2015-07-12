@@ -16,14 +16,14 @@
 [The Object Life Cycle] 객체 라이프 사이클(객체가 생성해서 삭제하기 까지 일련의 과정)
 ---------------------
 
-레일스 애플리케이셜이 정상 동작하면서, 객체를 생성하고, 수정하고, 삭제합니다. 액티브 레코드가 <em>객체 라이프 사이클</em>의 단계마다 연력하여 사용하는 후크를 제공하여 애플리케이션과 데이타를 제어할 수 있습니다. [[[During the normal operation of a Rails application, objects may be created, updated, and destroyed. Active Record provides hooks into this <em>object life cycle</em> so that you can control your application and its data.]]]
+레일스 애플리케이션이 정상 동작하면서, 객체를 생성하고, 수정하고, 삭제합니다. 액티브 레코드가 <em>객체 라이프 사이클</em>의 단계마다 연결하여 사용하는 후크를 제공하여 애플리케이션과 데이타를 제어할 수 있습니다. [[[During the normal operation of a Rails application, objects may be created, updated, and destroyed. Active Record provides hooks into this <em>object life cycle</em> so that you can control your application and its data.]]]
 
 콜백은 반사신경처럼 객체 상태가 다른 상태로 바뀌기 전과 후에 처리방법을 실행하도록 합니다. [[[Callbacks allow you to trigger logic before or after an alteration of an object's state.]]]
 
 [Callbacks Overview] 콜백 개요
 ------------------
 
-콜백이라는 메소드는 객체 라이프 사이클의 특정 시점에 실행합니다. 액티브 레코드 객체를 생성하고 저장하고, 수정하고, 삭제하고, 검증하고 데이터베이스에서 불러올 때 실행할 코드를 콜백으로 작성할 수 있습니다. [[[Callbacks are methods that get called at certain moments of an object's life cycle. With callbacks it is possible to write code that will run whenever an Active Record object is created, saved, updated, deleted, validated, or loaded from the database.]]]
+콜백은 객체 라이프 사이클의 특정 시점에 실행하는 메소드입니다. 액티브 레코드 객체를 생성하고 저장하고, 수정하고, 삭제하고, 검증하고 데이터베이스에서 불러올 때 실행할 코드를 콜백으로 작성할 수 있습니다. [[[Callbacks are methods that get called at certain moments of an object's life cycle. With callbacks it is possible to write code that will run whenever an Active Record object is created, saved, updated, deleted, validated, or loaded from the database.]]]
 
 ### [Callback Registration] 콜백 등록
 
@@ -44,7 +44,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-매크로에 블럭을 넘겨줄 수 있습니다. 블럭 안에 코드가 길지 않아서 한 줄로 정도일때 이렇게 쓰는 편이 좋겠습니다: [[[The macro-style class methods can also receive a block. Consider using this style if the code inside your block is so short that it fits in a single line:]]]
+매크로에 블록을 넘겨줄 수 있습니다. 블록 안에 코드가 길지 않아서 한 줄로 정도일때 이렇게 쓰는 편이 좋겠습니다: [[[The macro-style class methods can also receive a block. Consider using this style if the code inside your block is so short that it fits in a single line:]]]
 
 ```ruby
 class User < ActiveRecord::Base
@@ -81,7 +81,7 @@ end
 [Available Callbacks] 사용할 콜백 종류
 -------------------
 
-액티브 레코드에서 사용할 수 있는 콜백에 대한 목록을 나열하면서, 목록 순서대로 실행하겠습니다. [[[Here is a list with all the available Active Record callbacks, listed in the same order in which they will get called during the respective operations:]]]
+액티브 레코드에서 사용할 수 있는 콜백에 대한 목록을 실행하는 순서대로 나열하였습니다: [[[Here is a list with all the available Active Record callbacks, listed in the same order in which they will get called during the respective operations:]]]
 
 ### [Creating an Object] 객체 생성
 
@@ -111,11 +111,11 @@ end
 * `around_destroy`
 * `after_destroy`
 
-WARNING. `after_save`는 생성할 때와 수정할 때 모두 실행하지만, _after_ 를 쓰는 콜백으로 `after_create` 와 `after_update` 이 있는데, 매크로를 쓰는 순서와 관계없이 해당 콜백을 실행합니다. [[[`after_save` runs both on create and update, but always _after_ the more specific callbacks `after_create` and `after_update`, no matter the order in which the macro calls were executed.]]]
+WARNING. `after_save`는 생성할 때와 수정할 때 모두 실행하지만, 콜백 이름의 _after_ 뒤에 시점을 명확히 붙인 콜백 `after_create` 와 `after_update` 를 실행하는데, 매크로를 쓰는 순서와 무관합니다. [[[`after_save` runs both on create and update, but always _after_ the more specific callbacks `after_create` and `after_update`, no matter the order in which the macro calls were executed.]]]
 
 ### [`after_initialize` and `after_find`] `after_initialize` 와 `after_find`
 
-`after_initialize`을 실행할 때는 액티브 렉코드 객체를 처음 메모리에 올리는 두 가지 경우로 `new` 메소드로 생성하거나, 데이터베이스에서 레코드 하나를 가져올 때 입니다. 액티브 레코드의 `initialize` 메소드를 오버라이드하지 않아도 됩니다. [[[The `after_initialize` callback will be called whenever an Active Record object is instantiated, either by directly using `new` or when a record is loaded from the database. It can be useful to avoid the need to directly override your Active Record `initialize` method.]]]
+`after_initialize`을 실행할 때는 액티브 레코드 객체를 처음 메모리에 올리는 두 가지 경우로 `new` 메소드로 생성하거나, 데이터베이스에서 레코드 하나를 가져올 때 입니다. 액티브 레코드의 `initialize` 메소드를 오버라이드하지 않아도 됩니다. [[[The `after_initialize` callback will be called whenever an Active Record object is instantiated, either by directly using `new` or when a record is loaded from the database. It can be useful to avoid the need to directly override your Active Record `initialize` method.]]]
 
 `after_find` 콜백을 실행할 때는 액티브 레코드로 테이터베이스에서 레코드를 가져오는 경우입니다. `after_find`와 `after_initialize`를 둘 다 정의한 경우 `after_find`를 먼저 실행합니다. [[[The `after_find` callback will be called whenever Active Record loads a record from the database. `after_find` is called before `after_initialize` if both are defined.]]]
 
@@ -180,7 +180,7 @@ NOTE: `find_by_*` 와 `find_by_*!` 메소드는 레코드의 모든 속성에 �
 [Skipping Callbacks] 콜백을 우회하는 방법
 ------------------
 
-밸리데이션(검증)과 마찬가지로 콜백을 우회하는 방법이 있습니다. 그러나 주요 업무 규칙과 애플리케이션이 합리적으로 처리하는 방법이 콜백에 있을 수 있어서 아래의 메소드는 주의해서 사용해야 합니다. 암묵적으로 동의한 내용을 검토하지 않고 콜백을 우회하면 부적합한 데이타가 생길수도 있습니다. [[[Just as with validations, it is also possible to skip callbacks. These methods should be used with caution, however, because important business rules and application logic may be kept in callbacks. Bypassing them without understanding the potential implications may lead to invalid data.]]]
+밸리데이션(검증)과 마찬가지로 콜백을 우회하는 방법이 있습니다. 그러나 주요 업무 규칙과 애플리케이션이 합리적으로 처리하는 방법이 콜백에 있을 수 있어서 아래의 메소드는 주의해서 사용해야 합니다. 암묵적으로 동의한 내용을 검토하지 않고 콜백을 우회하면 부적합한 데이터가 생길수도 있습니다. [[[Just as with validations, it is also possible to skip callbacks. These methods should be used with caution, however, because important business rules and application logic may be kept in callbacks. Bypassing them without understanding the potential implications may lead to invalid data.]]]
 
 * `decrement`
 * `decrement_counter`
@@ -198,16 +198,16 @@ NOTE: `find_by_*` 와 `find_by_*!` 메소드는 레코드의 모든 속성에 �
 [Halting Execution] 콜백을 순서대로 실행하다가 멈추는 방법
 -----------------
 
-모델에 콜백을 새로 등록하면, 콜백을 실행할 큐에 담습니다. 큐에는 해당 모델의 밸리데이션과 등록한 콜백, 데이터베이스를 처리하는 모든 것이 순서대로 넣습니다. [[[As you start registering new callbacks for your models, they will be queued for execution. This queue will include all your model's validations, the registered callbacks, and the database operation to be executed.]]]
+모델에 콜백을 새로 등록하면, 콜백을 실행할 큐에 담습니다. 큐에는 해당 모델의 밸리데이션과 등록한 콜백, 데이터베이스를 처리하는 모든 것을 순서대로 넣습니다. [[[As you start registering new callbacks for your models, they will be queued for execution. This queue will include all your model's validations, the registered callbacks, and the database operation to be executed.]]]
 
 꼬리를 물듯 이어진 콜백은 하나의 트랜잭션으로 묶습니다. _before_ 콜백 메소드 중 하나가 `false`를 반환하거나 예외가 발생하면, 실행할 메소드가 맞물린 연결고리를 끊어버리고 데이터베이스를 롤백(ROLLBACK) 합니다; _after_ 콜백은 예외가 발생할때만 멈춤니다. [[[The whole callback chain is wrapped in a transaction. If any _before_ callback method returns exactly `false` or raises an exception, the execution chain gets halted and a ROLLBACK is issued; _after_ callbacks can only accomplish that by raising an exception.]]]
 
-WARNING. 예외를 임의로 발생하면 `save`를 기다리는 코드를 멈춤니다. `ActiveRecord::Rollback` 예외는 발생하는 즉시 액티브 레코드로 롤백하도록 알려줍니다. 이 예외는 액티브 레코드 안에서 처리하고 밖에서 예외처리하도록 건내주지 않습니다. [[[Raising an arbitrary exception may break code that expects `save` and its friends not to fail like that. The `ActiveRecord::Rollback` exception is thought precisely to tell Active Record a rollback is going on. That one is internally captured but not reraised.]]]
+WARNING. 예상하지 못한 예외가 발생하면 `save` 할 코드에서 멈추고 트랙잭션이 실패되지 않도록 합니다. `ActiveRecord::Rollback` 예외는 발생하는 즉시, 액티브 레코드가 롤백하도록 알려줍니다. 이 예외는 액티브 레코드 안에서 처리하고 밖에서 예외처리하도록 건내주지 않습니다. [[[Raising an arbitrary exception may break code that expects `save` and its friends not to fail like that. The `ActiveRecord::Rollback` exception is thought precisely to tell Active Record a rollback is going on. That one is internally captured but not reraised.]]]
 
 [Relational Callbacks] 모델 관계에 대한 콜백
 --------------------
 
-콜백은 모델 관계에 대해서도 동작하며, 모델 관계에 따라 정의할 수 있습니다. 아래와 같이 사용자 user와 게시글 post가 일대다 관계(has many)라고 하겠습니다. 사용자의 게시글을 삭제해야 할 경우는 사용자를 삭제할 때 입니다. `after_destroy` 콜백을 사용자 `User` 모델에 사용하려면 게시글 `Post`와 관계를 선언한 has_many 뒤에 씁니다: [[[Callbacks work through model relationships, and can even be defined by them. Suppose an example where a user has many posts. A user's posts should be destroyed if the user is destroyed. Let's add an `after_destroy` callback to the `User` model by way of its relationship to the `Post` model:]]]
+콜백은 모델 관계에 대해서도 동작하며, 모델 관계에 따라 정의할 수 있습니다. 아래와 같이 사용자 user와 게시글 post가 일대다 관계(has many)라고 하겠습니다. 사용자를 삭제하면 사용자의 게시글도 삭제해야 합니다. `after_destroy` 콜백을 사용자 `User` 모델에 사용하려면 게시글 `Post`와 관계를 선언한 has_many 뒤에 씁니다: [[[Callbacks work through model relationships, and can even be defined by them. Suppose an example where a user has many posts. A user's posts should be destroyed if the user is destroyed. Let's add an `after_destroy` callback to the `User` model by way of its relationship to the `Post` model:]]]
 
 ```ruby
 class User < ActiveRecord::Base
@@ -256,9 +256,9 @@ class Order < ActiveRecord::Base
 end
 ```
 
-### [Using `:if` and `:unless` with a `Proc`] `:if` 와 `:unless` 옵션 뒤에 `프록`을 쓰는 경우
+### [Using `:if` and `:unless` with a `Proc`] `:if` 와 `:unless` 옵션 뒤에 `Proc`을 쓰는 경우
 
-마지막으로, `:if` 와 `:unless` 옵션 뒤에 `프록` 객체를 사용할 수 있습니다. 이 옵션은 길지 않은 밸리데이션 메소드에 적합하며, 대체로 한 줄짜리 메소드입니다: [[[Finally, it is possible to associate `:if` and `:unless` with a `Proc` object. This option is best suited when writing short validation methods, usually one-liners:]]]
+마지막으로, `:if` 와 `:unless` 의 옵션으로 `Proc` 객체를 사용할 수 있습니다. 이 옵션은 길지 않은 밸리데이션 메소드에 적합하며, 대체로 한 줄짜리 메소드입니다: [[[Finally, it is possible to associate `:if` and `:unless` with a `Proc` object. This option is best suited when writing short validation methods, usually one-liners:]]]
 
 ```ruby
 class Order < ActiveRecord::Base

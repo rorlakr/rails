@@ -369,15 +369,15 @@ end
 
 * `:equal_to` - 이 옵션 뒤에 오는 수치/숫자와 같아야 합니다. 기본 에러 메시지는 _"%{count}와 같아야 합니다"_(_"must be equal to %{count}"_) 입니다. [[[Specifies the value must be equal to the supplied value. The default error message for this option is _"must be equal to %{count}"_.]]]
 
-* `:less_than` - 이 옵션 뒤에 오는 수치/숫자보다 작거나/적어야 합니다. 기본 에러 메시지는 _"%{count}보다 작거나/적어야 합니다"_(_"must be less than %{count}"_) 입니다. [[[Specifies the value must be less than the supplied value. The default error message for this option is _"must be less than %{count}"_.]]]
+* `:less_than` - 이 옵션 뒤에 오는 수치/숫자보다 적어야 합니다. 기본 에러 메시지는 _"%{count}보다 적어야 합니다"_(_"must be less than %{count}"_) 입니다. [[[Specifies the value must be less than the supplied value. The default error message for this option is _"must be less than %{count}"_.]]]
 
-* `:less_than_or_equal_to` - 이 옵션 뒤에 오는 수치/숫자보다 같거나 작아/적어야 합니다. 기본 에러 메시지는 _"%{count}와 같거나 보다 작아/적어야 합니다"_(_"must be less than or equal to %{count}"_) 입니다. [[[Specifies the value must be less than or equal the supplied value. The default error message for this option is _"must be less than or equal to %{count}"_.]]]
+* `:less_than_or_equal_to` - 이 옵션 뒤에 오는 수치/숫자보다 같거나 적어야 합니다. 기본 에러 메시지는 _"%{count}와 같거나 보다 적어야 합니다"_(_"must be less than or equal to %{count}"_) 입니다. [[[Specifies the value must be less than or equal the supplied value. The default error message for this option is _"must be less than or equal to %{count}"_.]]]
 
-* `:odd` - 속성 값이 홀수인지 검사하려면 true 로 설정한다. 기본 에러 메시지는 _"홀수만 됩니다"_(_"must be odd"_) 입니다. [[[Specifies the value must be an odd number if set to true. The default error message for this option is _"must be odd"_.]]]
+* `:odd` - 속성 값이 홀수인지 검사하려면 true로 설정합니다. 기본 에러 메시지는 _"홀수만 됩니다"_(_"must be odd"_) 입니다. [[[Specifies the value must be an odd number if set to true. The default error message for this option is _"must be odd"_.]]]
 
-* `:even` - 속성 값이 홀수인지 검사하려면 true 로 설정한다. 기본 에러 메시지는 _"짝수만 됩니다"_(_"must be even"_) 입니다. [[[Specifies the value must be an even number if set to true. The default error message for this option is _"must be even"_.]]]
+* `:even` - 속성 값이 홀수인지 검사하려면 true로 설정합니다. 기본 에러 메시지는 _"짝수만 됩니다"_(_"must be even"_) 입니다. [[[Specifies the value must be an even number if set to true. The default error message for this option is _"must be even"_.]]]
 
-기본 에러 메시지는 _"수치/숫자가 아닙니다"_(_"is not a number"_) 입니다. [[[The default error message is _"is not a number"_.]]]
+기본 에러 메시지는 _"에 숫자를 입력해 주세요"_(_"is not a number"_) 입니다. [[[The default error message is _"is not a number"_.]]]
 
 
 ### `presence`
@@ -411,7 +411,7 @@ end
 
 `false.blank?` 결과는 true 이라서 , 부울린 값은 `validates :field_name, inclusion: { in: [true, false] }` 이와 같이 써야 합니다. [[[Since `false.blank?` is true, if you want to validate the presence of a boolean field you should use `validates :field_name, inclusion: { in: [true, false] }`.]]]
 
-기본 에러 메시지는 _"비어 있을 수 없습니다" (_"can't be empty"_) 입니다. [[[The default error message is _"can't be empty"_.]]]
+기본 에러 메시지는 _"에 내용을 입력해 주세요"_ (_"can't be empty"_) 입니다. [[[The default error message is _"can't be empty"_.]]]
 
 ### `absence`
 
@@ -673,7 +673,7 @@ class Account < ActiveRecord::Base
 end
 ```
 
-### [Grouping Conditional validations] 조건 하나로  밸리데이션 여러 개를 묶는 방법
+### [Grouping Conditional validations] 조건 하나로 밸리데이션 여러 개를 묶는 방법
 
 간혹 여러 가지 검증을 한 가지 조건으로 실행하려고 할 때 유용한 방법으로 `with_options`를 사용할 수 있습니다. [[[Sometimes it is useful to have multiple validations use one condition, it can be easily achieved using `with_options`.]]]
 
