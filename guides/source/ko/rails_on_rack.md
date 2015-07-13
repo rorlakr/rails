@@ -234,7 +234,7 @@ Action Controller의 기능 중의 상당 부분이 미들웨어로써 구성되
 
  **`Rack::Lock`**
 
-* `env["rack.multithread]`를 false로 지정하면 어플리케이션을 Mutex로 감쌈니다.
+* `env["rack.multithread]`를 `false`로 지정하면 어플리케이션을 Mutex로 감쌈니다.
 
  [[[* Sets `env["rack.multithread"]` flag to `false` and wraps the application within a Mutex.]]]
 
@@ -264,19 +264,19 @@ Action Controller의 기능 중의 상당 부분이 미들웨어로써 구성되
 
  **`Rails::Rack::Logger`**
 
-* 요청이 시작되었다고 로그에 알립니다. 요청이 끝나면 모든 남깁니다(flush).
+* 요청이 시작되면 로그를 남깁니다. 요청이 끝나면 모든 로그를 날립니다.
 
  [[[* Notifies the logs that the request has began. After request is complete, flushes all the logs.]]]
 
  **`ActionDispatch::ShowExceptions`**
 
-* 어플리케이션에서 반환된 예외사항을 잡아내고, 최종 사용자를 위한 형태로 포장하는 예외 앱을 호출합니다.
+* 어플리케이션에서 반환된 예외사항을 잡아내고, 최종 사용자를 위한 형태로 포장하는 예외 어플리케이션을 호출합니다.
 
  [[[* Rescues any exception returned by the application and calls an exceptions app that will wrap it in a format for the end user.]]]
 
  **`ActionDispatch::DebugExceptions`**
 
- * 로컬의 요청인 경우 예외 로그를 기록하고 디버깅 페이지를 보여줄 책임을 가집니다.
+ * 요청이 로컬인 경우 예외 로그를 기록하고 디버깅 페이지를 보여줄 책임을 가집니다.
 
  [[[* Responsible for logging exceptions and showing a debugging page in case the request is local.]]]
 
@@ -344,7 +344,7 @@ Action Controller의 기능 중의 상당 부분이 미들웨어로써 구성되
 
 * "Conditional `GET`"의 지원을 추가함으로써, 페이지가 변하지 않으면 서버는 내용이 없는 응답을 합니다.
 
- [[[* Adds support for "Conditional `GET`" so that server responds with nothing if page wasn't changed.]]]
+[[[* Adds support for "Conditional `GET`" so that server responds with nothing if page wasn't changed.]]]
 
  **`Rack::ETag`**
 
@@ -354,11 +354,11 @@ Action Controller의 기능 중의 상당 부분이 미들웨어로써 구성되
 
 TIP: 위의 모든 미들웨어들은 커스텀된 Rack 스택에 사용될 수 있습니다. [[[TIP: It's possible to use any of the above middlewares in your custom Rack stack.]]]
 
-### [Using Rack Builder] Rack Builder 사용하기
+### Using Rack Builder
 
 다음은 레일스가 제공하는 `MiddlewareStack`대신 `Rack::Builder`로 전환하여 사용하는 방법입니다. [[[The following shows how to replace use `Rack::Builder` instead of the Rails supplied `MiddlewareStack`.]]]
 
-<strong>레일즈 있는 미들웨어 스택 제거</strong> [[[<strong>Clear the existing Rails middleware stack</strong>]]]
+<strong>레일스 있는 미들웨어 스택 제거</strong> [[[<strong>Clear the existing Rails middleware stack</strong>]]]
 
 ```ruby
 # config/application.rb
