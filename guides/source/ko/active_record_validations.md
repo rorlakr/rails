@@ -5,7 +5,7 @@
 
 본 가이드를 읽은 후에는 아래와 같은 내용을 할 수 있을 것입니다. [[[After reading this guide, you will know:]]]
 
-* 액티브 레코드 밸리데이션(검증) 헬퍼(메소드) 사용법 [[[How to use the built-in Active Record validation helpers.]]]
+* 액티브 레코드 밸리데이션(검증) 헬퍼(매크로) 사용법 [[[How to use the built-in Active Record validation helpers.]]]
 
 * 여러분이 만든 밸리데이션(검증) 메소드를 만드는 방법 [[[How to create your own custom validation methods.]]]
 
@@ -81,7 +81,7 @@ CAUTION: 테이터베이스에 있는 객체의 상태를 바꾸는 방법이 �
 * `update`
 * `update!`
 
-느낌표가 붙은 메소드(예. `save!`)는 레코드가 부적합이면 예외가 발생합니다. 느낌표가 붙지 않는 메소드는 예외가 발생하지 않습니다: `save` 와 `update` 메소드는 `false`를 반환하고, `create` 와 `update` 는 객체를 반환합니다. [[[The bang versions (e.g. `save!`) raise an exception if the record is invalid. The non-bang versions don't: `save` and `update` return `false`, `create` and `update` just return the objects.]]]
+느낌표가 붙은 메소드(예. `save!`)는 레코드가 부적합이면 예외가 발생합니다. 느낌표가 붙지 않는 메소드는 예외가 발생하지 않습니다: `save` 와 `update` 메소드는 `false`를 반환하고, `create` 는 객체를 반환합니다. [[[The bang versions (e.g. `save!`) raise an exception if the record is invalid. The non-bang versions don't: `save` and `update` return `false`, `create` just return the objects.]]]
 
 ### [Skipping Validations] 밸리데이션 무시하는 방법
 
@@ -367,17 +367,17 @@ end
 
 * `:greater_than_or_equal_to` - 이 옵션 뒤에 오는 수치/숫자보다 같거나 커야 합니다. 기본 에러 메시지는 _"%{count}와 같거나 보다 커야 합니다"_(_"must be greater than or equal to %{count}"_) 입니다. [[[Specifies the value must be greater than or equal to the supplied value. The default error message for this option is _"must be greater than or equal to %{count}"_.]]]
 
-* `:equal_to` - 이 옵션 뒤에 오는 수치/숫자와 같아야 합니다. 기본 에러 메시지는 [[[Specifies the value must be equal to the supplied value. The default error message for this option is _"must be equal to %{count}"_.]]]
+* `:equal_to` - 이 옵션 뒤에 오는 수치/숫자와 같아야 합니다. 기본 에러 메시지는 _"%{count}와 같아야 합니다"_(_"must be equal to %{count}"_) 입니다. [[[Specifies the value must be equal to the supplied value. The default error message for this option is _"must be equal to %{count}"_.]]]
 
-* `:less_than` - [[[Specifies the value must be less than the supplied value. The default error message for this option is _"must be less than %{count}"_.]]]
+* `:less_than` - 이 옵션 뒤에 오는 수치/숫자보다 적어야 합니다. 기본 에러 메시지는 _"%{count}보다 적어야 합니다"_(_"must be less than %{count}"_) 입니다. [[[Specifies the value must be less than the supplied value. The default error message for this option is _"must be less than %{count}"_.]]]
 
-* `:less_than_or_equal_to` - [[[Specifies the value must be less than or equal the supplied value. The default error message for this option is _"must be less than or equal to %{count}"_.]]]
+* `:less_than_or_equal_to` - 이 옵션 뒤에 오는 수치/숫자보다 같거나 적어야 합니다. 기본 에러 메시지는 _"%{count}와 같거나 보다 적어야 합니다"_(_"must be less than or equal to %{count}"_) 입니다. [[[Specifies the value must be less than or equal the supplied value. The default error message for this option is _"must be less than or equal to %{count}"_.]]]
 
-* `:odd` - [[[Specifies the value must be an odd number if set to true. The default error message for this option is _"must be odd"_.]]]
+* `:odd` - 속성 값이 홀수인지 검사하려면 true로 설정합니다. 기본 에러 메시지는 _"홀수만 됩니다"_(_"must be odd"_) 입니다. [[[Specifies the value must be an odd number if set to true. The default error message for this option is _"must be odd"_.]]]
 
-* `:even` - [[[Specifies the value must be an even number if set to true. The default error message for this option is _"must be even"_.]]]
+* `:even` - 속성 값이 홀수인지 검사하려면 true로 설정합니다. 기본 에러 메시지는 _"짝수만 됩니다"_(_"must be even"_) 입니다. [[[Specifies the value must be an even number if set to true. The default error message for this option is _"must be even"_.]]]
 
-기본 에러 메시지는 _"수치/숫자가 아닙니다"_(_"is not a number"_) 입니다. [[[The default error message is _"is not a number"_.]]]
+기본 에러 메시지는 _"에 숫자를 입력해 주세요"_(_"is not a number"_) 입니다. [[[The default error message is _"is not a number"_.]]]
 
 
 ### `presence`
@@ -411,7 +411,7 @@ end
 
 `false.blank?` 결과는 true 이라서 , 부울린 값은 `validates :field_name, inclusion: { in: [true, false] }` 이와 같이 써야 합니다. [[[Since `false.blank?` is true, if you want to validate the presence of a boolean field you should use `validates :field_name, inclusion: { in: [true, false] }`.]]]
 
-기본 에러 메시지는 _"비어 있지 않습니다" (_"can't be empty"_) 입니다. [[[The default error message is _"can't be empty"_.]]]
+기본 에러 메시지는 _"에 내용을 입력해 주세요"_ (_"can't be empty"_) 입니다. [[[The default error message is _"can't be empty"_.]]]
 
 ### `absence`
 
@@ -673,7 +673,7 @@ class Account < ActiveRecord::Base
 end
 ```
 
-### [Grouping Conditional validations] 밸리데이션 여러 개를 조건으로 묶는 방법
+### [Grouping Conditional validations] 조건 하나로 밸리데이션 여러 개를 묶는 방법
 
 간혹 여러 가지 검증을 한 가지 조건으로 실행하려고 할 때 유용한 방법으로 `with_options`를 사용할 수 있습니다. [[[Sometimes it is useful to have multiple validations use one condition, it can be easily achieved using `with_options`.]]]
 
