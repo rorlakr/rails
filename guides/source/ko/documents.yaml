@@ -142,7 +142,7 @@
     -
       name: Rails 제너레이터
       url: generators.html
-      description: 새로운 제너레이터를 추가하거나 Rails의 내장 제너레이터에 새로운 요소(ex: scaffold 제너레이터에 새로운 테스트 스텁을 제공하기)를 추가하는 방법에 대해서 설명합니다.
+      description: 새로운 제너레이터를 추가하거나 Rails의 내장 제너레이터에 새로운 요소(예를 들어, scaffold 제너레이터에 새로운 테스트 스텁 등)를 추가하는 방법에 대해서 설명합니다.
 -
   name: Ruby on Rails 에 기여하기
   documents:
