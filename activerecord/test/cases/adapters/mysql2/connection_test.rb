@@ -1,7 +1,7 @@
 require "cases/helper"
 require 'support/connection_helper'
 
-class MysqlConnectionTest < ActiveRecord::TestCase
+class Mysql2ConnectionTest < ActiveRecord::Mysql2TestCase
   include ConnectionHelper
 
   fixtures :comments
@@ -22,7 +22,7 @@ class MysqlConnectionTest < ActiveRecord::TestCase
     assert_raise ActiveRecord::NoDatabaseError do
       configuration = ActiveRecord::Base.configurations['arunit'].merge(database: 'inexistent_activerecord_unittest')
       connection = ActiveRecord::Base.mysql2_connection(configuration)
-      connection.exec_query('drop table if exists ex')
+      connection.drop_table 'ex', if_exists: true
     end
   end
 
@@ -84,6 +84,15 @@ class MysqlConnectionTest < ActiveRecord::TestCase
     end
   end
 
+  def test_mysql_strict_mode_specified_default
+    run_without_connection do |orig_connection|
+      ActiveRecord::Base.establish_connection(orig_connection.merge({strict: :default}))
+      global_sql_mode = ActiveRecord::Base.connection.exec_query "SELECT @@GLOBAL.sql_mode"
+      session_sql_mode = ActiveRecord::Base.connection.exec_query "SELECT @@SESSION.sql_mode"
+      assert_equal global_sql_mode.rows, session_sql_mode.rows
+    end
+  end
+
   def test_mysql_set_session_variable
     run_without_connection do |orig_connection|
       ActiveRecord::Base.establish_connection(orig_connection.deep_merge({:variables => {:default_week_format => 3}}))
@@ -121,12 +130,5 @@ class MysqlConnectionTest < ActiveRecord::TestCase
     assert_equal "SCHEMA", @subscriber.logged[0][1]
   ensure
     @connection.execute "DROP TABLE `bar_baz`"
-  end
-
-  if mysql_56?
-    def test_quote_time_usec
-      assert_equal "'1970-01-01 00:00:00.000000'", @connection.quote(Time.at(0))
-      assert_equal "'1970-01-01 00:00:00.000000'", @connection.quote(Time.at(0).to_datetime)
-    end
   end
 end

@@ -58,23 +58,6 @@ class Server < ::Rack::Server
 end
 ```
 
-Here's how it loads the middlewares:
-
-```ruby
-def middleware
-  middlewares = []
-  middlewares << [::Rack::ContentLength]
-  Hash.new(middlewares)
-end
-```
-
-`Rails::Rack::Debugger` is primarily useful only in the development environment. The following table explains the usage of the loaded middlewares:
-
-| Middleware              | Purpose                                                                           |
-| ----------------------- | --------------------------------------------------------------------------------- |
-| `Rails::Rack::Debugger` | Starts Debugger                                                                   |
-| `Rack::ContentLength`   | Counts the number of bytes in the response and set the HTTP Content-Length header |
-
 ### `rackup`
 
 To use `rackup` instead of Rails' `rails server`, you can put the following inside `config.ru` of your Rails application's root directory:
@@ -82,9 +65,6 @@ To use `rackup` instead of Rails' `rails server`, you can put the following insi
 ```ruby
 # Rails.root/config.ru
 require ::File.expand_path('../config/environment', __FILE__)
-
-use Rails::Rack::Debugger
-use Rack::ContentLength
 run Rails.application
 ```
 
@@ -254,7 +234,7 @@ Much of Action Controller's functionality is implemented as Middlewares. The fol
 
 **`ActionDispatch::RequestId`**
 
-* Makes a unique `X-Request-Id` header available to the response and enables the `ActionDispatch::Request#uuid` method.
+* Makes a unique `X-Request-Id` header available to the response and enables the `ActionDispatch::Request#request_id` method.
 
 **`Rails::Rack::Logger`**
 
@@ -329,8 +309,6 @@ Resources
 
 * [Official Rack Website](http://rack.github.io)
 * [Introducing Rack](http://chneukirchen.org/blog/archive/2007/02/introducing-rack.html)
-* [Ruby on Rack #1 - Hello Rack!](http://m.onkey.org/ruby-on-rack-1-hello-rack)
-* [Ruby on Rack #2 - The Builder](http://m.onkey.org/ruby-on-rack-2-the-builder)
 
 ### Understanding Middlewares
 

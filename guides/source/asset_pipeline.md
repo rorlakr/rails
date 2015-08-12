@@ -149,7 +149,7 @@ clients to fetch them again, even when the content of those assets has not chang
 Fingerprinting fixes these problems by avoiding query strings, and by ensuring
 that filenames are consistent based on their content.
 
-Fingerprinting is enabled by default for both the development and production 
+Fingerprinting is enabled by default for both the development and production
 environments. You can enable or disable it in your configuration through the
 `config.assets.digest` option.
 
@@ -209,7 +209,7 @@ precompiling works.
 
 NOTE: You must have an ExecJS supported runtime in order to use CoffeeScript.
 If you are using Mac OS X or Windows, you have a JavaScript runtime installed in
-your operating system. Check [ExecJS](https://github.com/sstephenson/execjs#readme) documentation to know all supported JavaScript runtimes.
+your operating system. Check [ExecJS](https://github.com/rails/execjs#readme) documentation to know all supported JavaScript runtimes.
 
 You can also disable generation of controller specific asset files by adding the
 following to your `config/application.rb` configuration:
@@ -403,13 +403,13 @@ When using the asset pipeline, paths to assets must be re-written and
 underscored in Ruby) for the following asset classes: image, font, video, audio,
 JavaScript and stylesheet.
 
-* `image-url("rails.png")` becomes `url(/assets/rails.png)`
-* `image-path("rails.png")` becomes `"/assets/rails.png"`.
+* `url(/assets/rails.png)` becomes `image-url("rails.png")` 
+* `"/assets/rails.png"` becomes `image-path("rails.png")` .
 
 The more generic form can also be used:
 
-* `asset-url("rails.png")` becomes `url(/assets/rails.png)`
-* `asset-path("rails.png")` becomes `"/assets/rails.png"`
+* `url(/assets/rails.png)` becomes `asset-url("rails.png")` 
+* `"/assets/rails.png"` becomes `asset-path("rails.png")`
 
 #### JavaScript/CoffeeScript and ERB
 
@@ -643,7 +643,7 @@ above. By default Rails assumes assets have been precompiled and will be
 served as static assets by your web server.
 
 During the precompilation phase an MD5 is generated from the contents of the
-compiled files, and inserted into the filenames as they are written to disc.
+compiled files, and inserted into the filenames as they are written to disk.
 These fingerprinted names are used by the Rails helpers in place of the manifest
 name.
 
@@ -667,8 +667,7 @@ anymore, delete these options from the `javascript_include_tag` and
 `stylesheet_link_tag`.
 
 The fingerprinting behavior is controlled by the `config.assets.digest`
-initialization option (which defaults to `true` for production and `false` for
-everything else).
+initialization option (which defaults to `true` for production and development).
 
 NOTE: Under normal circumstances the default `config.assets.digest` option
 should not be changed. If there are no digests in the filenames, and far-future
@@ -727,27 +726,6 @@ include, you can add them to the `precompile` array in `config/initializers/asse
 
 ```ruby
 Rails.application.config.assets.precompile += ['admin.js', 'admin.css', 'swfObject.js']
-```
-
-Or, you can opt to precompile all assets with something like this:
-
-```ruby
-# config/initializers/assets.rb
-Rails.application.config.assets.precompile << Proc.new do |path|
-  if path =~ /\.(css|js)\z/
-    full_path = Rails.application.assets.resolve(path).to_path
-    app_assets_path = Rails.root.join('app', 'assets').to_path
-    if full_path.starts_with? app_assets_path
-      logger.info "including asset: " + full_path
-      true
-    else
-      logger.info "excluding asset: " + full_path
-      false
-    end
-  else
-    false
-  end
-end
 ```
 
 NOTE. Always specify an expected compiled filename that ends with .js or .css,
@@ -811,41 +789,6 @@ location ~ ^/assets/ {
   break;
 }
 ```
-
-#### GZip Compression
-
-When files are precompiled, Sprockets also creates a
-[gzipped](http://en.wikipedia.org/wiki/Gzip) (.gz) version of your assets. Web
-servers are typically configured to use a moderate compression ratio as a
-compromise, but since precompilation happens once, Sprockets uses the maximum
-compression ratio, thus reducing the size of the data transfer to the minimum.
-On the other hand, web servers can be configured to serve compressed content
-directly from disk, rather than deflating non-compressed files themselves.
-
-NGINX is able to do this automatically enabling `gzip_static`:
-
-```nginx
-location ~ ^/(assets)/  {
-  root /path/to/public;
-  gzip_static on; # to serve pre-gzipped version
-  expires max;
-  add_header Cache-Control public;
-}
-```
-
-This directive is available if the core module that provides this feature was
-compiled with the web server. Ubuntu/Debian packages, even `nginx-light`, have
-the module compiled. Otherwise, you may need to perform a manual compilation:
-
-```bash
-./configure --with-http_gzip_static_module
-```
-
-If you're compiling NGINX with Phusion Passenger you'll need to pass that option
-when prompted.
-
-A robust configuration for Apache is possible but tricky; please Google around.
-(Or help update this Guide if you have a good configuration example for Apache.)
 
 ### Local Precompilation
 
@@ -942,7 +885,7 @@ focus on serving application code as fast as possible.
 #### Set up a CDN to Serve Static Assets
 
 To set up your CDN you have to have your application running in production on
-the internet at a publically available URL, for example `example.com`. Next
+the internet at a publicly available URL, for example `example.com`. Next
 you'll need to sign up for a CDN service from a cloud hosting provider. When you
 do this you need to configure the "origin" of the CDN to point back at your
 website `example.com`, check your provider for documentation on configuring the
@@ -995,7 +938,7 @@ http://mycdnsubdomain.fictional-cdn.com/assets/smile.png
 
 If the CDN has a copy of `smile.png` it will serve it to the browser and your
 server doesn't even know it was requested. If the CDN does not have a copy it
-will try to find it a the "origin" `example.com/assets/smile.png` and then store
+will try to find it at the "origin" `example.com/assets/smile.png` and then store
 it for future use.
 
 If you want to serve only some assets from your CDN, you can use custom `:host`
@@ -1158,7 +1101,7 @@ The following line invokes `uglifier` for JavaScript compression.
 config.assets.js_compressor = :uglifier
 ```
 
-NOTE: You will need an [ExecJS](https://github.com/sstephenson/execjs#readme)
+NOTE: You will need an [ExecJS](https://github.com/rails/execjs#readme)
 supported runtime in order to use `uglifier`. If you are using Mac OS X or
 Windows you have a JavaScript runtime installed in your operating system.
 

@@ -17,7 +17,7 @@ require 'models/tyre'
 require 'models/minivan'
 require 'models/aircraft'
 require "models/possession"
-
+require "models/reader"
 
 class RelationTest < ActiveRecord::TestCase
   fixtures :authors, :topics, :entrants, :developers, :companies, :developers_projects, :accounts, :categories, :categorizations, :posts, :comments,
@@ -157,6 +157,17 @@ class RelationTest < ActiveRecord::TestCase
     end
   end
 
+  def test_select_with_subquery_in_from_does_not_use_original_table_name
+    relation = Comment.group(:type).select('COUNT(post_id) AS post_count, type')
+    subquery = Comment.from(relation).select('type','post_count')
+    assert_equal(relation.map(&:post_count).sort,subquery.map(&:post_count).sort)
+  end
+
+  def test_group_with_subquery_in_from_does_not_use_original_table_name
+    relation = Comment.group(:type).select('COUNT(post_id) AS post_count,type')
+    subquery = Comment.from(relation).group('type').average("post_count")
+    assert_equal(relation.map(&:post_count).sort,subquery.values.sort)
+  end
 
   def test_finding_with_conditions
     assert_equal ["David"], Author.where(:name => 'David').map(&:name)
@@ -342,7 +353,9 @@ class RelationTest < ActiveRecord::TestCase
       assert_equal 0,     Developer.none.size
       assert_equal 0,     Developer.none.count
       assert_equal true,  Developer.none.empty?
+      assert_equal true, Developer.none.none?
       assert_equal false, Developer.none.any?
+      assert_equal false, Developer.none.one?
       assert_equal false, Developer.none.many?
     end
   end
@@ -606,6 +619,51 @@ class RelationTest < ActiveRecord::TestCase
 
     assert_equal ['comments_count AS ranking'], query.select_values
     assert_equal 1, query.to_a.size
+  end
+
+  def test_preloading_with_associations_and_merges
+    post = Post.create! title: 'Uhuu', body: 'body'
+    reader = Reader.create! post_id: post.id, person_id: 1
+    comment = Comment.create! post_id: post.id, body: 'body'
+
+    assert !comment.respond_to?(:readers)
+
+    post_rel = Post.preload(:readers).joins(:readers).where(title: 'Uhuu')
+    result_comment = Comment.joins(:post).merge(post_rel).to_a.first
+    assert_equal comment, result_comment
+
+    assert_no_queries do
+      assert_equal post, result_comment.post
+      assert_equal [reader], result_comment.post.readers.to_a
+    end
+
+    post_rel = Post.includes(:readers).where(title: 'Uhuu')
+    result_comment = Comment.joins(:post).merge(post_rel).first
+    assert_equal comment, result_comment
+
+    assert_no_queries do
+      assert_equal post, result_comment.post
+      assert_equal [reader], result_comment.post.readers.to_a
+    end
+  end
+
+  def test_preloading_with_associations_default_scopes_and_merges
+    post = Post.create! title: 'Uhuu', body: 'body'
+    reader = Reader.create! post_id: post.id, person_id: 1
+
+    post_rel = PostWithPreloadDefaultScope.preload(:readers).joins(:readers).where(title: 'Uhuu')
+    result_post = PostWithPreloadDefaultScope.all.merge(post_rel).to_a.first
+
+    assert_no_queries do
+      assert_equal [reader], result_post.readers.to_a
+    end
+
+    post_rel = PostWithIncludesDefaultScope.includes(:readers).where(title: 'Uhuu')
+    result_post = PostWithIncludesDefaultScope.all.merge(post_rel).to_a.first
+
+    assert_no_queries do
+      assert_equal [reader], result_post.readers.to_a
+    end
   end
 
   def test_loading_with_one_association
@@ -895,7 +953,7 @@ class RelationTest < ActiveRecord::TestCase
 
   def test_delete_all_with_unpermitted_relation_raises_error
     assert_raises(ActiveRecord::ActiveRecordError) { Author.limit(10).delete_all }
-    assert_raises(ActiveRecord::ActiveRecordError) { Author.uniq.delete_all }
+    assert_raises(ActiveRecord::ActiveRecordError) { Author.distinct.delete_all }
     assert_raises(ActiveRecord::ActiveRecordError) { Author.group(:name).delete_all }
     assert_raises(ActiveRecord::ActiveRecordError) { Author.having('SUM(id) < 3').delete_all }
     assert_raises(ActiveRecord::ActiveRecordError) { Author.offset(10).delete_all }
@@ -1100,6 +1158,38 @@ class RelationTest < ActiveRecord::TestCase
 
     assert posts.many?
     assert ! posts.limit(1).many?
+  end
+
+  def test_none?
+    posts = Post.all
+    assert_queries(1) do
+      assert ! posts.none? # Uses COUNT()
+    end
+
+    assert ! posts.loaded?
+
+    assert_queries(1) do
+      assert posts.none? {|p| p.id < 0 }
+      assert ! posts.none? {|p| p.id == 1 }
+    end
+
+    assert posts.loaded?
+  end
+
+  def test_one
+    posts = Post.all
+    assert_queries(1) do
+      assert ! posts.one? # Uses COUNT()
+    end
+
+    assert ! posts.loaded?
+
+    assert_queries(1) do
+      assert ! posts.one? {|p| p.id < 3 }
+      assert posts.one? {|p| p.id == 1 }
+    end
+
+    assert posts.loaded?
   end
 
   def test_build
@@ -1448,14 +1538,17 @@ class RelationTest < ActiveRecord::TestCase
     assert_equal ['Foo', 'Foo'], query.map(&:name)
     assert_sql(/DISTINCT/) do
       assert_equal ['Foo'], query.distinct.map(&:name)
-      assert_equal ['Foo'], query.uniq.map(&:name)
+      assert_deprecated { assert_equal ['Foo'], query.uniq.map(&:name) }
     end
     assert_sql(/DISTINCT/) do
       assert_equal ['Foo'], query.distinct(true).map(&:name)
-      assert_equal ['Foo'], query.uniq(true).map(&:name)
+      assert_deprecated { assert_equal ['Foo'], query.uniq(true).map(&:name) }
     end
     assert_equal ['Foo', 'Foo'], query.distinct(true).distinct(false).map(&:name)
-    assert_equal ['Foo', 'Foo'], query.uniq(true).uniq(false).map(&:name)
+
+    assert_deprecated do
+      assert_equal ['Foo', 'Foo'], query.uniq(true).uniq(false).map(&:name)
+    end
   end
 
   def test_doesnt_add_having_values_if_options_are_blank
@@ -1612,6 +1705,10 @@ class RelationTest < ActiveRecord::TestCase
     assert_sql(/^((?!ORDER).)*$/) { Post.all.find_by(author_id: 2) }
   end
 
+  test "find_by requires at least one argument" do
+    assert_raises(ArgumentError) { Post.all.find_by }
+  end
+
   test "find_by! with hash conditions returns the first matching record" do
     assert_equal posts(:eager_other), Post.order(:id).find_by!(author_id: 2)
   end
@@ -1632,6 +1729,10 @@ class RelationTest < ActiveRecord::TestCase
     assert_raises(ActiveRecord::RecordNotFound) do
       Post.all.find_by!("1 = 0")
     end
+  end
+
+  test "find_by! requires at least one argument" do
+    assert_raises(ArgumentError) { Post.all.find_by! }
   end
 
   test "loaded relations cannot be mutated by multi value methods" do

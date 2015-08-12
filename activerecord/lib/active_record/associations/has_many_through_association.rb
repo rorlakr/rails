@@ -38,12 +38,10 @@ module ActiveRecord
       def insert_record(record, validate = true, raise = false)
         ensure_not_nested
 
-        if record.new_record?
-          if raise
-            record.save!(:validate => validate)
-          else
-            return unless record.save(:validate => validate)
-          end
+        if raise
+          record.save!(:validate => validate)
+        else
+          return unless record.save(:validate => validate)
         end
 
         save_through_record(record)
@@ -160,9 +158,9 @@ module ActiveRecord
 
           if through_reflection.collection? && update_through_counter?(method)
             update_counter(-count, through_reflection)
+          else
+            update_counter(-count)
           end
-
-          update_counter(-count)
         end
 
         def through_records_for(record)

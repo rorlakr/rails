@@ -1,3 +1,4 @@
+require 'active_support/duration'
 require 'active_support/values/time_zone'
 require 'active_support/core_ext/object/acts_like'
 
@@ -169,12 +170,13 @@ module ActiveSupport
       end
     end
 
-    def encode_with(coder)
-      if coder.respond_to?(:represent_object)
-        coder.represent_object(nil, utc)
-      else
-        coder.represent_scalar(nil, utc.strftime("%Y-%m-%d %H:%M:%S.%9NZ"))
-      end
+    def init_with(coder) #:nodoc:
+      initialize(coder['utc'], coder['zone'], coder['time'])
+    end
+
+    def encode_with(coder) #:nodoc:
+      coder.tag = '!ruby/object:ActiveSupport::TimeWithZone'
+      coder.map = { 'utc' => utc, 'zone' => time_zone, 'time' => time }
     end
 
     # Returns a string of the object's date and time in the format used by
@@ -245,14 +247,14 @@ module ActiveSupport
     end
 
     def eql?(other)
-      utc.eql?(other)
+      other.eql?(utc)
     end
 
     def hash
       utc.hash
     end
 
-    # Adds an interval of time to the current object's time and return that
+    # Adds an interval of time to the current object's time and returns that
     # value as a new TimeWithZone object.
     #
     #   Time.zone = 'Eastern Time (US & Canada)' # => 'Eastern Time (US & Canada)'

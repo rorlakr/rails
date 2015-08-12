@@ -224,13 +224,6 @@ module ActiveSupport
         @zones ||= zones_map.values.sort
       end
 
-      def zones_map
-        @zones_map ||= begin
-          MAPPING.each_key {|place| self[place]} # load all the zones
-          @lazy_zones_map
-        end
-      end
-
       # Locate a specific time zone object. If the argument is a string, it
       # is interpreted to mean the name of the timezone to locate. If it is a
       # numeric value it is either the hour offset, or the second offset, of the
@@ -257,6 +250,14 @@ module ActiveSupport
       def us_zones
         @us_zones ||= all.find_all { |z| z.name =~ /US|Arizona|Indiana|Hawaii|Alaska/ }
       end
+
+      private
+        def zones_map
+          @zones_map ||= begin
+            MAPPING.each_key {|place| self[place]} # load all the zones
+            @lazy_zones_map
+          end
+        end
     end
 
     include Comparable
@@ -347,24 +348,31 @@ module ActiveSupport
     #
     #   Time.zone.parse('Mar 2000') # => Wed, 01 Mar 2000 00:00:00 HST -10:00
     def parse(str, now=now())
-      parts = Date._parse(str, false)
-      return if parts.empty?
+      parts_to_time(Date._parse(str, false), now)
+    end
 
-      time = Time.new(
-        parts.fetch(:year, now.year),
-        parts.fetch(:mon, now.month),
-        parts.fetch(:mday, parts[:year] || parts[:mon] ? 1 : now.day),
-        parts.fetch(:hour, 0),
-        parts.fetch(:min, 0),
-        parts.fetch(:sec, 0) + parts.fetch(:sec_fraction, 0),
-        parts.fetch(:offset, 0)
-      )
-
-      if parts[:offset]
-        TimeWithZone.new(time.utc, self)
-      else
-        TimeWithZone.new(nil, self, time)
-      end
+    # Parses +str+ according to +format+ and returns an ActiveSupport::TimeWithZone.
+    #
+    # Assumes that +str+ is a time in the time zone +self+,
+    # unless +format+ includes an explicit time zone.
+    # (This is the same behavior as +parse+.)
+    # In either case, the returned TimeWithZone has the timezone of +self+.
+    #
+    #   Time.zone = 'Hawaii'                   # => "Hawaii"
+    #   Time.zone.strptime('1999-12-31 14:00:00', '%Y-%m-%d %H:%M:%S') # => Fri, 31 Dec 1999 14:00:00 HST -10:00
+    #
+    # If upper components are missing from the string, they are supplied from
+    # TimeZone#now:
+    #
+    #   Time.zone.now                              # => Fri, 31 Dec 1999 14:00:00 HST -10:00
+    #   Time.zone.strptime('22:30:00', '%H:%M:%S') # => Fri, 31 Dec 1999 22:30:00 HST -10:00
+    #
+    # However, if the date component is not provided, but any other upper
+    # components are supplied, then the day of the month defaults to 1:
+    #
+    #   Time.zone.strptime('Mar 2000', '%b %Y') # => Wed, 01 Mar 2000 00:00:00 HST -10:00
+    def strptime(str, format, now=now())
+      parts_to_time(DateTime._strptime(str, format), now)
     end
 
     # Returns an ActiveSupport::TimeWithZone instance representing the current
@@ -420,7 +428,36 @@ module ActiveSupport
       tzinfo.periods_for_local(time)
     end
 
+    def init_with(coder) #:nodoc:
+      initialize(coder['name'])
+    end
+
+    def encode_with(coder) #:nodoc:
+      coder.tag ="!ruby/object:#{self.class}"
+      coder.map = { 'name' => tzinfo.name }
+    end
+
     private
+      def parts_to_time(parts, now)
+        return if parts.empty?
+
+        time = Time.new(
+          parts.fetch(:year, now.year),
+          parts.fetch(:mon, now.month),
+          parts.fetch(:mday, parts[:year] || parts[:mon] ? 1 : now.day),
+          parts.fetch(:hour, 0),
+          parts.fetch(:min, 0),
+          parts.fetch(:sec, 0) + parts.fetch(:sec_fraction, 0),
+          parts.fetch(:offset, 0)
+        )
+
+        if parts[:offset]
+          TimeWithZone.new(time.utc, self)
+        else
+          TimeWithZone.new(nil, self, time)
+        end
+      end
+
       def time_now
         Time.now
       end

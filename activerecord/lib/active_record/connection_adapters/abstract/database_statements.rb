@@ -40,8 +40,9 @@ module ActiveRecord
 
       # Returns a single value from a record
       def select_value(arel, name = nil, binds = [])
-        if result = select_one(arel, name, binds)
-          result.values.first
+        arel, binds = binds_from_relation arel, binds
+        if result = select_rows(to_sql(arel, binds), name, binds).first
+          result.first
         end
       end
 
@@ -136,7 +137,7 @@ module ActiveRecord
       #
       # In order to get around this problem, #transaction will emulate the effect
       # of nested transactions, by using savepoints:
-      # http://dev.mysql.com/doc/refman/5.0/en/savepoint.html
+      # http://dev.mysql.com/doc/refman/5.6/en/savepoint.html
       # Savepoints are supported by MySQL and PostgreSQL. SQLite3 version >= '3.6.8'
       # supports savepoints.
       #
@@ -188,8 +189,8 @@ module ActiveRecord
       # You should consult the documentation for your database to understand the
       # semantics of these different levels:
       #
-      # * http://www.postgresql.org/docs/9.1/static/transaction-iso.html
-      # * https://dev.mysql.com/doc/refman/5.0/en/set-transaction.html
+      # * http://www.postgresql.org/docs/current/static/transaction-iso.html
+      # * https://dev.mysql.com/doc/refman/5.6/en/set-transaction.html
       #
       # An <tt>ActiveRecord::TransactionIsolationError</tt> will be raised if:
       #
@@ -201,16 +202,14 @@ module ActiveRecord
       # isolation level. However, support is disabled for MySQL versions below 5,
       # because they are affected by a bug[http://bugs.mysql.com/bug.php?id=39170]
       # which means the isolation level gets persisted outside the transaction.
-      def transaction(options = {})
-        options.assert_valid_keys :requires_new, :joinable, :isolation
-
-        if !options[:requires_new] && current_transaction.joinable?
-          if options[:isolation]
+      def transaction(requires_new: nil, isolation: nil, joinable: true)
+        if !requires_new && current_transaction.joinable?
+          if isolation
             raise ActiveRecord::TransactionIsolationError, "cannot set isolation when joining a transaction"
           end
           yield
         else
-          transaction_manager.within_new_transaction(options) { yield }
+          transaction_manager.within_new_transaction(isolation: isolation, joinable: joinable) { yield }
         end
       rescue ActiveRecord::Rollback
         # rollbacks are silently swallowed

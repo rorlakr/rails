@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 require "cases/helper"
 require 'support/connection_helper'
 
-class PostgresqlDomainTest < ActiveRecord::TestCase
+class PostgresqlDomainTest < ActiveRecord::PostgreSQLTestCase
   include ConnectionHelper
 
   class PostgresqlDomain < ActiveRecord::Base
@@ -20,7 +19,7 @@ class PostgresqlDomainTest < ActiveRecord::TestCase
   end
 
   teardown do
-    @connection.execute 'DROP TABLE IF EXISTS postgresql_domains'
+    @connection.drop_table 'postgresql_domains', if_exists: true
     @connection.execute 'DROP DOMAIN IF EXISTS custom_money'
     reset_connection
   end
@@ -32,7 +31,6 @@ class PostgresqlDomainTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = PostgresqlDomain.type_for_attribute("price")
-    assert type.number?
     assert_not type.binary?
   end
 

@@ -325,19 +325,22 @@ module ActiveSupport
       def read_multi(*names)
         options = names.extract_options!
         options = merged_options(options)
-        results = {}
-        names.each do |name|
-          key = namespaced_key(name, options)
-          entry = read_entry(key, options)
-          if entry
-            if entry.expired?
-              delete_entry(key, options)
-            else
-              results[name] = entry.value
+
+        instrument_multi(:read, names, options) do |payload|
+          results = {}
+          names.each do |name|
+            key = namespaced_key(name, options)
+            entry = read_entry(key, options)
+            if entry
+              if entry.expired?
+                delete_entry(key, options)
+              else
+                results[name] = entry.value
+              end
             end
           end
+          results
         end
-        results
       end
 
       # Fetches data from the cache, using the given keys. If there is data in
@@ -350,8 +353,11 @@ module ActiveSupport
       # Returns a hash with the data for each of the names. For example:
       #
       #   cache.write("bim", "bam")
-      #   cache.fetch_multi("bim", "boom") { |key| key * 2 }
-      #   # => { "bam" => "bam", "boom" => "boomboom" }
+      #   cache.fetch_multi("bim", "unknown_key") do |key|
+      #     "Fallback value for key: #{key}"
+      #   end
+      #   # => { "bim" => "bam",
+      #   #      "unknown_key" => "Fallback value for key: unknown_key" }
       #
       def fetch_multi(*names)
         options = names.extract_options!
@@ -527,16 +533,27 @@ module ActiveSupport
         end
 
         def instrument(operation, key, options = nil)
-          log(operation, key, options)
+          log { "Cache #{operation}: #{key}#{options.blank? ? "" : " (#{options.inspect})"}" }
 
           payload = { :key => key }
           payload.merge!(options) if options.is_a?(Hash)
           ActiveSupport::Notifications.instrument("cache_#{operation}.active_support", payload){ yield(payload) }
         end
 
-        def log(operation, key, options = nil)
+        def instrument_multi(operation, keys, options = nil)
+          log do
+            formatted_keys = keys.map { |k| "- #{k}" }.join("\n")
+            "Caches multi #{operation}:\n#{formatted_keys}#{options.blank? ? "" : " (#{options.inspect})"}"
+          end
+
+          payload = { key: keys }
+          payload.merge!(options) if options.is_a?(Hash)
+          ActiveSupport::Notifications.instrument("cache_#{operation}_multi.active_support", payload) { yield(payload) }
+        end
+
+        def log
           return unless logger && logger.debug? && !silence?
-          logger.debug("Cache #{operation}: #{key}#{options.blank? ? "" : " (#{options.inspect})"}")
+          logger.debug(yield)
         end
 
         def find_cached_entry(key, name, options)
@@ -549,9 +566,9 @@ module ActiveSupport
         def handle_expired_entry(entry, key, options)
           if entry && entry.expired?
             race_ttl = options[:race_condition_ttl].to_i
-            if race_ttl && (Time.now.to_f - entry.expires_at <= race_ttl)
-              # When an entry has :race_condition_ttl defined, put the stale entry back into the cache
-              # for a brief period while the entry is begin recalculated.
+            if (race_ttl > 0) && (Time.now.to_f - entry.expires_at <= race_ttl)
+              # When an entry has a positive :race_condition_ttl defined, put the stale entry back into the cache
+              # for a brief period while the entry is being recalculated.
               entry.expires_at = Time.now + race_ttl
               write_entry(key, entry, :expires_in => race_ttl * 2)
             else

@@ -11,13 +11,17 @@ require 'models/minivan'
 require 'models/speedometer'
 require 'models/ship_part'
 require 'models/treasure'
+require 'models/developer'
+require 'models/comment'
+require 'models/rating'
+require 'models/post'
 
 class NumericData < ActiveRecord::Base
   self.table_name = 'numeric_data'
 
-  attribute :world_population, Type::Integer.new
-  attribute :my_house_population, Type::Integer.new
-  attribute :atoms_in_universe, Type::Integer.new
+  attribute :world_population, :integer
+  attribute :my_house_population, :integer
+  attribute :atoms_in_universe, :integer
 end
 
 class CalculationsTest < ActiveRecord::TestCase
@@ -355,7 +359,10 @@ class CalculationsTest < ActiveRecord::TestCase
 
   def test_count_with_distinct
     assert_equal 4, Account.select(:credit_limit).distinct.count
-    assert_equal 4, Account.select(:credit_limit).uniq.count
+
+    assert_deprecated do
+      assert_equal 4, Account.select(:credit_limit).uniq.count
+    end
   end
 
   def test_count_with_aliased_attribute
@@ -500,8 +507,8 @@ class CalculationsTest < ActiveRecord::TestCase
     assert_equal [ topic.written_on ], relation.pluck(:written_on)
   end
 
-  def test_pluck_and_uniq
-    assert_equal [50, 53, 55, 60], Account.order(:credit_limit).uniq.pluck(:credit_limit)
+  def test_pluck_and_distinct
+    assert_equal [50, 53, 55, 60], Account.order(:credit_limit).distinct.pluck(:credit_limit)
   end
 
   def test_pluck_in_relation
@@ -625,6 +632,27 @@ class CalculationsTest < ActiveRecord::TestCase
     assert_equal [part.id], ShipPart.joins(:trinkets).pluck(:id)
   end
 
+  def test_pluck_loaded_relation
+    companies = Company.order(:id).limit(3).load
+    assert_no_queries do
+      assert_equal ['37signals', 'Summit', 'Microsoft'], companies.pluck(:name)
+    end
+  end
+
+  def test_pluck_loaded_relation_multiple_columns
+    companies = Company.order(:id).limit(3).load
+    assert_no_queries do
+      assert_equal [[1, '37signals'], [2, 'Summit'], [3, 'Microsoft']], companies.pluck(:id, :name)
+    end
+  end
+
+  def test_pluck_loaded_relation_sql_fragment
+    companies = Company.order(:name).limit(3).load
+    assert_queries 1 do
+      assert_equal ['37signals', 'Apex', 'Ex Nihilo'], companies.pluck('DISTINCT name')
+    end
+  end
+
   def test_grouped_calculation_with_polymorphic_relation
     part = ShipPart.create!(name: "has trinket")
     part.trinkets.create!
@@ -635,5 +663,22 @@ class CalculationsTest < ActiveRecord::TestCase
   def test_calculation_grouped_by_association_doesnt_error_when_no_records_have_association
     Client.update_all(client_of: nil)
     assert_equal({ nil => Client.count }, Client.group(:firm).count)
+  end
+
+  def test_should_reference_correct_aliases_while_joining_tables_of_has_many_through_association
+    assert_nothing_raised ActiveRecord::StatementInvalid do
+      developer = Developer.create!(name: 'developer')
+      developer.ratings.includes(comment: :post).where(posts: { id: 1 }).count
+    end
+  end
+
+  def test_sum_uses_enumerable_version_when_block_is_given
+    block_called = false
+    relation = Client.all.load
+
+    assert_no_queries do
+      assert_equal 0, relation.sum { block_called = true; 0 }
+    end
+    assert block_called
   end
 end

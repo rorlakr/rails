@@ -26,7 +26,14 @@ module ActiveSupport
     class MemCacheStore < Store
       ESCAPE_KEY_CHARS = /[\x00-\x20%\x7F-\xFF]/n
 
-      def self.build_mem_cache(*addresses)
+      # Creates a new Dalli::Client instance with specified addresses and options.
+      # By default address is equal localhost:11211.
+      #
+      #   ActiveSupport::Cache::MemCacheStore.build_mem_cache
+      #     # => #<Dalli::Client:0x007f98a47d2028 @servers=["localhost:11211"], @options={}, @ring=nil>
+      #   ActiveSupport::Cache::MemCacheStore.build_mem_cache('localhost:10290')
+      #     # => #<Dalli::Client:0x007f98a47b3a60 @servers=["localhost:10290"], @options={}, @ring=nil>
+      def self.build_mem_cache(*addresses) # :nodoc:
         addresses = addresses.flatten
         options = addresses.extract_options!
         addresses = ["localhost:11211"] if addresses.empty?
@@ -66,14 +73,17 @@ module ActiveSupport
       def read_multi(*names)
         options = names.extract_options!
         options = merged_options(options)
-        keys_to_names = Hash[names.map{|name| [escape_key(namespaced_key(name, options)), name]}]
-        raw_values = @data.get_multi(keys_to_names.keys, :raw => true)
-        values = {}
-        raw_values.each do |key, value|
-          entry = deserialize_entry(value)
-          values[keys_to_names[key]] = entry.value unless entry.expired?
+
+        instrument_multi(:read, names, options) do
+          keys_to_names = Hash[names.map{|name| [escape_key(namespaced_key(name, options)), name]}]
+          raw_values = @data.get_multi(keys_to_names.keys, :raw => true)
+          values = {}
+          raw_values.each do |key, value|
+            entry = deserialize_entry(value)
+            values[keys_to_names[key]] = entry.value unless entry.expired?
+          end
+          values
         end
-        values
       end
 
       # Increment a cached value. This method uses the memcached incr atomic

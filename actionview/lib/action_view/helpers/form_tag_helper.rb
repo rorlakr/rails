@@ -80,18 +80,17 @@ module ActionView
       # associated records. <tt>option_tags</tt> is a string containing the option tags for the select box.
       #
       # ==== Options
-      # * <tt>:multiple</tt> - If set to true the selection will allow multiple choices.
+      # * <tt>:multiple</tt> - If set to true, the selection will allow multiple choices.
       # * <tt>:disabled</tt> - If set to true, the user will not be able to use this input.
       # * <tt>:include_blank</tt> - If set to true, an empty option will be created. If set to a string, the string will be used as the option's content and the value will be empty.
       # * <tt>:prompt</tt> - Create a prompt option with blank value and the text asking user to select something.
-      # * <tt>:selected</tt> - Provide a default selected value. It should be of the exact type as the provided options.
       # * Any other key creates standard HTML attributes for the tag.
       #
       # ==== Examples
       #   select_tag "people", options_from_collection_for_select(@people, "id", "name")
       #   # <select id="people" name="people"><option value="1">David</option></select>
       #
-      #   select_tag "people", options_from_collection_for_select(@people, "id", "name"), selected: ["1", "David"]
+      #   select_tag "people", options_from_collection_for_select(@people, "id", "name", "1")
       #   # <select id="people" name="people"><option value="1" selected="selected">David</option></select>
       #
       #   select_tag "people", "<option>David</option>".html_safe
@@ -141,15 +140,15 @@ module ActionView
           end
 
           if include_blank
-            option_tags = content_tag(:option, include_blank, value: '').safe_concat(option_tags)
+            option_tags = content_tag("option".freeze, include_blank, value: '').safe_concat(option_tags)
           end
         end
 
         if prompt = options.delete(:prompt)
-          option_tags = content_tag(:option, prompt, value: '').safe_concat(option_tags)
+          option_tags = content_tag("option".freeze, prompt, value: '').safe_concat(option_tags)
         end
 
-        content_tag :select, option_tags, { "name" => html_name, "id" => sanitize_to_id(name) }.update(options.stringify_keys)
+        content_tag "select".freeze, option_tags, { "name" => html_name, "id" => sanitize_to_id(name) }.update(options.stringify_keys)
       end
 
       # Creates a standard text field; use these text fields to input smaller chunks of text like a username
@@ -449,8 +448,9 @@ module ActionView
       # <tt>reset</tt>button or a generic button which can be used in
       # JavaScript, for example. You can use the button tag as a regular
       # submit tag but it isn't supported in legacy browsers. However,
-      # the button tag allows richer labels such as images and emphasis,
-      # so this helper will also accept a block.
+      # the button tag does allow for richer labels such as images and emphasis,
+      # so this helper will also accept a block. By default, it will create
+      # a button tag with type `submit`, if type is not given.
       #
       # ==== Options
       # * <tt>:data</tt> - This option can be used to add custom data attributes.
@@ -473,12 +473,24 @@ module ActionView
       #   button_tag
       #   # => <button name="button" type="submit">Button</button>
       #
+      #   button_tag 'Reset', type: 'reset'
+      #   # => <button name="button" type="reset">Reset</button>
+      #
+      #   button_tag 'Button', type: 'button'
+      #   # => <button name="button" type="button">Button</button>
+      #
+      #   button_tag 'Reset', type: 'reset', disabled: true
+      #   # => <button name="button" type="reset" disabled="disabled">Reset</button>
+      #
       #   button_tag(type: 'button') do
       #     content_tag(:strong, 'Ask me!')
       #   end
       #   # => <button name="button" type="button">
       #   #     <strong>Ask me!</strong>
       #   #    </button>
+      #
+      #   button_tag "Save", data: { confirm: "Are you sure?" }
+      #   # => <button name="button" type="submit" data-confirm="Are you sure?">Save</button>
       #
       #   button_tag "Checkout", data: { disable_with: "Please wait..." }
       #   # => <button data-disable-with="Please wait..." name="button" type="submit">Checkout</button>
@@ -556,7 +568,7 @@ module ActionView
       #   # => <fieldset class="format"><p><input id="name" name="name" type="text" /></p></fieldset>
       def field_set_tag(legend = nil, options = nil, &block)
         output = tag(:fieldset, options, true)
-        output.safe_concat(content_tag(:legend, legend)) unless legend.blank?
+        output.safe_concat(content_tag("legend".freeze, legend)) unless legend.blank?
         output.concat(capture(&block)) if block_given?
         output.safe_concat("</fieldset>")
       end

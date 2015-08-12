@@ -623,32 +623,6 @@ class DirtyTest < ActiveRecord::TestCase
     end
   end
 
-  test "defaults with type that implements `type_cast_for_database`" do
-    type = Class.new(ActiveRecord::Type::Value) do
-      def type_cast(value)
-        value.to_i
-      end
-
-      def type_cast_for_database(value)
-        value.to_s
-      end
-    end
-
-    model_class = Class.new(ActiveRecord::Base) do
-      self.table_name = 'numeric_data'
-      attribute :foo, type.new, default: 1
-    end
-
-    model = model_class.new
-    assert_not model.foo_changed?
-
-    model = model_class.new(foo: 1)
-    assert_not model.foo_changed?
-
-    model = model_class.new(foo: '1')
-    assert_not model.foo_changed?
-  end
-
   test "in place mutation detection" do
     pirate = Pirate.create!(catchphrase: "arrrr")
     pirate.catchphrase << " matey!"
@@ -711,7 +685,7 @@ class DirtyTest < ActiveRecord::TestCase
   test "attribute_will_change! doesn't try to save non-persistable attributes" do
     klass = Class.new(ActiveRecord::Base) do
       self.table_name = 'people'
-      attribute :non_persisted_attribute, ActiveRecord::Type::String.new
+      attribute :non_persisted_attribute, :string
     end
 
     record = klass.new(first_name: "Sean")
@@ -727,6 +701,22 @@ class DirtyTest < ActiveRecord::TestCase
     pirate.catchphrase = "arrrr matey!"
 
     assert pirate.catchphrase_changed?(from: "arrrr", to: "arrrr matey!")
+  end
+
+  test "getters with side effects are allowed" do
+    klass = Class.new(Pirate) do
+      def catchphrase
+        if super.blank?
+          update_attribute(:catchphrase, "arr") # what could possibly go wrong?
+        end
+        super
+      end
+    end
+
+    pirate = klass.create!(catchphrase: "lol")
+    pirate.update_attribute(:catchphrase, nil)
+
+    assert_equal "arr", pirate.catchphrase
   end
 
   private

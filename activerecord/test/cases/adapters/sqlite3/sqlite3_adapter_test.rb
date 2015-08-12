@@ -1,4 +1,3 @@
-# encoding: utf-8
 require "cases/helper"
 require 'models/owner'
 require 'tempfile'
@@ -6,10 +5,10 @@ require 'support/ddl_helper'
 
 module ActiveRecord
   module ConnectionAdapters
-    class SQLite3AdapterTest < ActiveRecord::TestCase
+    class SQLite3AdapterTest < ActiveRecord::SQLite3TestCase
       include DdlHelper
 
-      self.use_transactional_fixtures = false
+      self.use_transactional_tests = false
 
       class DualEncoding < ActiveRecord::Base
       end
@@ -23,7 +22,7 @@ module ActiveRecord
       def test_bad_connection
         assert_raise ActiveRecord::NoDatabaseError do
           connection = ActiveRecord::Base.sqlite3_connection(adapter: "sqlite3", database: "/tmp/should/_not/_exist/-cinco-dog.db")
-          connection.exec_query('drop table if exists ex')
+          connection.drop_table 'ex', if_exists: true
         end
       end
 
@@ -192,7 +191,7 @@ module ActiveRecord
         binary.save!
         assert_equal str, binary.data
       ensure
-        DualEncoding.connection.execute('DROP TABLE IF EXISTS dual_encodings')
+        DualEncoding.connection.drop_table 'dual_encodings', if_exists: true
       end
 
       def test_type_cast_should_not_mutate_encoding
@@ -422,14 +421,14 @@ module ActiveRecord
       end
 
       def test_statement_closed
-        db = SQLite3::Database.new(ActiveRecord::Base.
+        db = ::SQLite3::Database.new(ActiveRecord::Base.
                                    configurations['arunit']['database'])
-        statement = SQLite3::Statement.new(db,
+        statement = ::SQLite3::Statement.new(db,
                                            'CREATE TABLE statement_test (number integer not null)')
-        statement.stubs(:step).raises(SQLite3::BusyException, 'busy')
+        statement.stubs(:step).raises(::SQLite3::BusyException, 'busy')
         statement.stubs(:columns).once.returns([])
         statement.expects(:close).once
-        SQLite3::Statement.stubs(:new).returns(statement)
+        ::SQLite3::Statement.stubs(:new).returns(statement)
 
         assert_raises ActiveRecord::StatementInvalid do
           @conn.exec_query 'select * from statement_test'

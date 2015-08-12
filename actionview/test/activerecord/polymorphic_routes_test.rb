@@ -113,7 +113,7 @@ class PolymorphicRoutesTest < ActionController::TestCase
 
   def test_passing_routes_proxy
     with_namespaced_routes(:blog) do
-      proxy = ActionDispatch::Routing::RoutesProxy.new(_routes, self)
+      proxy = ActionDispatch::Routing::RoutesProxy.new(_routes, self, _routes.url_helpers)
       @blog_post.save
       assert_url "http://example.com/posts/#{@blog_post.id}", [proxy, @blog_post]
     end
@@ -208,7 +208,7 @@ class PolymorphicRoutesTest < ActionController::TestCase
         @series.save
         polymorphic_url([nil, @series])
       end
-      assert_match(/undefined method `series_url' for/, exception.message)
+      assert_match(/undefined method `series_url'/, exception.message)
     end
   end
 

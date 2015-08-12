@@ -73,6 +73,15 @@ class TimestampTest < ActiveRecord::TestCase
     assert_equal @previously_updated_at, @developer.updated_at
   end
 
+  def test_touching_updates_timestamp_with_given_time
+    previously_updated_at = @developer.updated_at 
+    new_time = Time.utc(2015, 2, 16, 0, 0, 0) 
+    @developer.touch(time: new_time) 
+
+    assert_not_equal previously_updated_at, @developer.updated_at 
+    assert_equal new_time, @developer.updated_at 
+  end
+
   def test_touching_an_attribute_updates_timestamp
     previously_created_at = @developer.created_at
     @developer.touch(:created_at)
@@ -89,6 +98,18 @@ class TimestampTest < ActiveRecord::TestCase
     task.touch(:ending)
     assert_not_equal previous_value, task.ending
     assert_in_delta Time.now, task.ending, 1
+  end
+
+  def test_touching_an_attribute_updates_timestamp_with_given_time
+    previously_updated_at = @developer.updated_at 
+    previously_created_at = @developer.created_at
+    new_time = Time.utc(2015, 2, 16, 4, 54, 0) 
+    @developer.touch(:created_at, time: new_time)
+
+    assert_not_equal previously_created_at, @developer.created_at
+    assert_not_equal previously_updated_at, @developer.updated_at
+    assert_equal new_time, @developer.created_at
+    assert_equal new_time, @developer.updated_at
   end
 
   def test_touching_many_attributes_updates_them
@@ -425,11 +446,22 @@ class TimestampTest < ActiveRecord::TestCase
     toy = Toy.first
     assert_equal [:created_at, :updated_at], toy.send(:all_timestamp_attributes_in_model)
   end
+
+  def test_index_is_created_for_both_timestamps
+    ActiveRecord::Base.connection.create_table(:foos, force: true) do |t|
+      t.timestamps(:foos, null: true, index: true)
+    end
+
+    indexes = ActiveRecord::Base.connection.indexes('foos')
+    assert_equal ['created_at', 'updated_at'], indexes.flat_map(&:columns).sort
+  ensure
+    ActiveRecord::Base.connection.drop_table(:foos)
+  end
 end
 
 class TimestampsWithoutTransactionTest < ActiveRecord::TestCase
   include DdlHelper
-  self.use_transactional_fixtures = false
+  self.use_transactional_tests = false
 
   class TimestampAttributePost < ActiveRecord::Base
     attr_accessor :created_at, :updated_at

@@ -20,7 +20,7 @@ After reading this guide, you will know:
 What is Active Record?
 ----------------------
 
-Active Record is the M in [MVC](getting_started.html#the-mvc-architecture) - the
+Active Record is the M in [MVC](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) - the
 model - which is the layer of the system responsible for representing business
 data and logic. Active Record facilitates the creation and use of business
 objects whose data requires persistent storage to a database. It is an
@@ -38,7 +38,7 @@ object on how to write to and read from the database.
 
 ### Object Relational Mapping
 
-Object-Relational Mapping, commonly referred to as its abbreviation ORM, is
+Object Relational Mapping, commonly referred to as its abbreviation ORM, is
 a technique that connects the rich objects of an application to tables in
 a relational database management system. Using ORM, the properties and
 relationships of the objects in an application can be easily stored and
@@ -74,8 +74,8 @@ By default, Active Record uses some naming conventions to find out how the
 mapping between models and database tables should be created. Rails will
 pluralize your class names to find the respective database table. So, for
 a class `Book`, you should have a database table called **books**. The Rails
-pluralization mechanisms are very powerful, being capable to pluralize (and
-singularize) both regular and irregular words. When using class names composed
+pluralization mechanisms are very powerful, being capable of pluralizing (and
+singularizing) both regular and irregular words. When using class names composed
 of two or more words, the model class name should follow the Ruby conventions,
 using the CamelCase form, while the table name must contain the words separated
 by underscores. Examples:
@@ -122,7 +122,7 @@ to Active Record instances:
 * `(association_name)_type` - Stores the type for
   [polymorphic associations](association_basics.html#polymorphic-associations).
 * `(table_name)_count` - Used to cache the number of belonging objects on
-  associations. For example, a `comments_count` column in a `Articles` class that
+  associations. For example, a `comments_count` column in an `Article` class that
   has many instances of `Comment` will cache the number of existent comments
   for each article.
 
@@ -173,18 +173,18 @@ name that should be used:
 
 ```ruby
 class Product < ActiveRecord::Base
-  self.table_name = "PRODUCT"
+  self.table_name = "my_products"
 end
 ```
 
 If you do so, you will have to define manually the class name that is hosting
-the fixtures (class_name.yml) using the `set_fixture_class` method in your test
+the fixtures (my_products.yml) using the `set_fixture_class` method in your test
 definition:
 
 ```ruby
-class FunnyJoke < ActiveSupport::TestCase
-  set_fixture_class funny_jokes: Joke
-  fixtures :funny_jokes
+class ProductTest < ActiveSupport::TestCase
+  set_fixture_class my_products: Product
+  fixtures :my_products
   ...
 end
 ```
@@ -260,7 +260,7 @@ david = User.find_by(name: 'David')
 
 ```ruby
 # find all users named David who are Code Artists and sort by created_at in reverse chronological order
-users = User.where(name: 'David', occupation: 'Code Artist').order('created_at DESC')
+users = User.where(name: 'David', occupation: 'Code Artist').order(created_at: :desc)
 ```
 
 You can learn more about querying an Active Record model in the [Active Record

@@ -61,10 +61,16 @@ module ActiveRecord
     end
   end
 
-  class HasManyThroughCantAssociateThroughHasOneOrManyReflection < ActiveRecordError #:nodoc:
+  class ThroughCantAssociateThroughHasOneOrManyReflection < ActiveRecordError #:nodoc:
     def initialize(owner, reflection)
       super("Cannot modify association '#{owner.class.name}##{reflection.name}' because the source reflection class '#{reflection.source_reflection.class_name}' is associated to '#{reflection.through_reflection.class_name}' via :#{reflection.source_reflection.macro}.")
     end
+  end
+
+  class HasManyThroughCantAssociateThroughHasOneOrManyReflection < ThroughCantAssociateThroughHasOneOrManyReflection #:nodoc:
+  end
+
+  class HasOneThroughCantAssociateThroughHasOneOrManyReflection < ThroughCantAssociateThroughHasOneOrManyReflection #:nodoc:
   end
 
   class HasManyThroughCantAssociateNewRecords < ActiveRecordError #:nodoc:
@@ -79,10 +85,16 @@ module ActiveRecord
     end
   end
 
-  class HasManyThroughNestedAssociationsAreReadonly < ActiveRecordError #:nodoc:
+  class ThroughNestedAssociationsAreReadonly < ActiveRecordError #:nodoc:
     def initialize(owner, reflection)
       super("Cannot modify association '#{owner.class.name}##{reflection.name}' because it goes through more than one other association.")
     end
+  end
+
+  class HasManyThroughNestedAssociationsAreReadonly < ThroughNestedAssociationsAreReadonly #:nodoc:
+  end
+
+  class HasOneThroughNestedAssociationsAreReadonly < ThroughNestedAssociationsAreReadonly #:nodoc:
   end
 
   class EagerLoadPolymorphicError < ActiveRecordError #:nodoc:
@@ -113,19 +125,19 @@ module ActiveRecord
 
     # These classes will be loaded when associations are created.
     # So there is no need to eager load them.
-    autoload :Association,           'active_record/associations/association'
-    autoload :SingularAssociation,   'active_record/associations/singular_association'
-    autoload :CollectionAssociation, 'active_record/associations/collection_association'
-    autoload :ForeignAssociation,    'active_record/associations/foreign_association'
-    autoload :CollectionProxy,       'active_record/associations/collection_proxy'
+    autoload :Association
+    autoload :SingularAssociation
+    autoload :CollectionAssociation
+    autoload :ForeignAssociation
+    autoload :CollectionProxy
 
-    autoload :BelongsToAssociation,            'active_record/associations/belongs_to_association'
-    autoload :BelongsToPolymorphicAssociation, 'active_record/associations/belongs_to_polymorphic_association'
-    autoload :HasManyAssociation,              'active_record/associations/has_many_association'
-    autoload :HasManyThroughAssociation,       'active_record/associations/has_many_through_association'
-    autoload :HasOneAssociation,               'active_record/associations/has_one_association'
-    autoload :HasOneThroughAssociation,        'active_record/associations/has_one_through_association'
-    autoload :ThroughAssociation,              'active_record/associations/through_association'
+    autoload :BelongsToAssociation
+    autoload :BelongsToPolymorphicAssociation
+    autoload :HasManyAssociation
+    autoload :HasManyThroughAssociation
+    autoload :HasOneAssociation
+    autoload :HasOneThroughAssociation
+    autoload :ThroughAssociation
 
     module Builder #:nodoc:
       autoload :Association,           'active_record/associations/builder/association'
@@ -139,26 +151,20 @@ module ActiveRecord
     end
 
     eager_autoload do
-      autoload :Preloader,        'active_record/associations/preloader'
-      autoload :JoinDependency,   'active_record/associations/join_dependency'
-      autoload :AssociationScope, 'active_record/associations/association_scope'
-      autoload :AliasTracker,     'active_record/associations/alias_tracker'
+      autoload :Preloader
+      autoload :JoinDependency
+      autoload :AssociationScope
+      autoload :AliasTracker
     end
-
-    # Clears out the association cache.
-    def clear_association_cache #:nodoc:
-      @association_cache.clear if persisted?
-    end
-
-    # :nodoc:
-    attr_reader :association_cache
 
     # Returns the association instance for the given name, instantiating it if it doesn't already exist
     def association(name) #:nodoc:
       association = association_instance_get(name)
 
       if association.nil?
-        raise AssociationNotFoundError.new(self, name) unless reflection = self.class._reflect_on_association(name)
+        unless reflection = self.class._reflect_on_association(name)
+          raise AssociationNotFoundError.new(self, name)
+        end
         association = reflection.association_class.new(self, reflection)
         association_instance_set(name, association)
       end
@@ -166,8 +172,32 @@ module ActiveRecord
       association
     end
 
+    def association_cached?(name) # :nodoc
+      @association_cache.key?(name)
+    end
+
+    def initialize_dup(*) # :nodoc:
+      @association_cache = {}
+      super
+    end
+
+    def reload(*) # :nodoc:
+      clear_association_cache
+      super
+    end
+
     private
-      # Returns the specified association instance if it responds to :loaded?, nil otherwise.
+      # Clears out the association cache.
+      def clear_association_cache # :nodoc:
+        @association_cache.clear if persisted?
+      end
+
+      def init_internals # :nodoc:
+        @association_cache = {}
+        super
+      end
+
+      # Returns the specified association instance if it exists, nil otherwise.
       def association_instance_get(name)
         @association_cache[name]
       end
@@ -248,7 +278,6 @@ module ActiveRecord
     #   others.find(*args)                |   X   |    X     |    X
     #   others.exists?                    |   X   |    X     |    X
     #   others.distinct                   |   X   |    X     |    X
-    #   others.uniq                       |   X   |    X     |    X
     #   others.reset                      |   X   |    X     |    X
     #
     # === Overriding generated methods
@@ -267,7 +296,7 @@ module ActiveRecord
     #   end
     #
     # If your model class is <tt>Project</tt>, the module is
-    # named <tt>Project::GeneratedFeatureMethods</tt>. The GeneratedFeatureMethods module is
+    # named <tt>Project::GeneratedAssociationMethods</tt>. The GeneratedAssociationMethods module is
     # included in the model class immediately after the (anonymous) generated attributes methods
     # module, meaning an association will override the methods for an attribute with the same name.
     #
@@ -938,20 +967,16 @@ module ActiveRecord
     # The +traps+ association on +Dungeon+ and the +dungeon+ association on +Trap+ are
     # the inverse of each other and the inverse of the +dungeon+ association on +EvilWizard+
     # is the +evil_wizard+ association on +Dungeon+ (and vice-versa). By default,
-    # Active Record doesn't know anything about these inverse relationships and so no object
-    # loading optimization is possible. For example:
+    # Active Record can guess the inverse of the association based on the name
+    # of the class. The result is the following:
     #
     #    d = Dungeon.first
     #    t = d.traps.first
-    #    d.level == t.dungeon.level # => true
-    #    d.level = 10
-    #    d.level == t.dungeon.level # => false
+    #    d.object_id == t.dungeon.object_id # => true
     #
     # The +Dungeon+ instances +d+ and <tt>t.dungeon</tt> in the above example refer to
-    # the same object data from the database, but are actually different in-memory copies
-    # of that data. Specifying the <tt>:inverse_of</tt> option on associations lets you tell
-    # Active Record about inverse relationships and it will optimise object loading. For
-    # example, if we changed our model definitions to:
+    # the same in-memory instance since the association matches the name of the class.
+    # The result would be the same if we added +:inverse_of+ to our model definitions:
     #
     #    class Dungeon < ActiveRecord::Base
     #      has_many :traps, inverse_of: :dungeon
@@ -966,14 +991,13 @@ module ActiveRecord
     #      belongs_to :dungeon, inverse_of: :evil_wizard
     #    end
     #
-    # Then, from our code snippet above, +d+ and <tt>t.dungeon</tt> are actually the same
-    # in-memory instance and our final <tt>d.level == t.dungeon.level</tt> will return +true+.
-    #
     # There are limitations to <tt>:inverse_of</tt> support:
     #
     # * does not work with <tt>:through</tt> associations.
     # * does not work with <tt>:polymorphic</tt> associations.
     # * for +belongs_to+ associations +has_many+ inverse associations are ignored.
+    #
+    # For more information, see the documentation for the +:inverse_of+ option.
     #
     # == Deleting from associations
     #
@@ -1001,7 +1025,7 @@ module ActiveRecord
     # can affect what it does.
     #
     # Note that <tt>:dependent</tt> option is ignored for +has_one+ <tt>:through</tt> associations.
-    # 
+    #
     # === Delete or destroy?
     #
     # +has_many+ and +has_and_belongs_to_many+ associations have the methods <tt>destroy</tt>,
@@ -1014,7 +1038,7 @@ module ActiveRecord
     # record(s) being removed so that callbacks are run. However <tt>delete</tt> and <tt>delete_all</tt> will either
     # do the deletion according to the strategy specified by the <tt>:dependent</tt> option, or
     # if no <tt>:dependent</tt> option is given, then it will follow the default strategy.
-    # The default strategy is <tt>:nullify</tt> (set the foreign keys to <tt>nil</tt>), except for
+    # The default strategy is to do nothing (leave the foreign keys with the parent ids set), except for
     # +has_many+ <tt>:through</tt>, where the default strategy is <tt>delete_all</tt> (delete
     # the join records, without running their callbacks).
     #
@@ -1386,7 +1410,7 @@ module ActiveRecord
       #   has_one :last_comment, -> { order 'posted_on' }, class_name: "Comment"
       #   has_one :project_manager, -> { where role: 'project_manager' }, class_name: "Person"
       #   has_one :attachment, as: :attachable
-      #   has_one :boss, readonly: :true
+      #   has_one :boss, -> { readonly }
       #   has_one :club, through: :membership
       #   has_one :primary_address, -> { where primary: true }, through: :addressables, source: :addressable
       #   has_one :credit_card, required: true
@@ -1438,7 +1462,7 @@ module ActiveRecord
       # when you access the associated object.
       #
       # Scope examples:
-      #   belongs_to :user, -> { where(id: 2) }
+      #   belongs_to :firm, -> { where(id: 2) }
       #   belongs_to :user, -> { joins(:friends) }
       #   belongs_to :level, ->(level) { where("game_level > ?", level.current) }
       #
@@ -1502,10 +1526,14 @@ module ActiveRecord
       #   object that is the inverse of this <tt>belongs_to</tt> association. Does not work in
       #   combination with the <tt>:polymorphic</tt> options.
       #   See ActiveRecord::Associations::ClassMethods's overview on Bi-directional associations for more detail.
+      # [:optional]
+      #   When set to +true+, the association will not have its presence validated.
       # [:required]
       #   When set to +true+, the association will also have its presence validated.
       #   This will validate the association itself, not the id. You can use
       #   +:inverse_of+ to avoid an extra query during validation.
+      #   NOTE: <tt>required</tt> is set to <tt>true</tt> by default and is deprecated. If
+      #   you don't want to have association presence validated, use <tt>optional: true</tt>.
       #
       # Option examples:
       #   belongs_to :firm, foreign_key: "client_of"
@@ -1514,11 +1542,11 @@ module ActiveRecord
       #   belongs_to :valid_coupon, ->(o) { where "discounts > ?", o.payments_count },
       #                             class_name: "Coupon", foreign_key: "coupon_id"
       #   belongs_to :attachable, polymorphic: true
-      #   belongs_to :project, readonly: true
+      #   belongs_to :project, -> { readonly }
       #   belongs_to :post, counter_cache: true
-      #   belongs_to :company, touch: true
+      #   belongs_to :comment, touch: true
       #   belongs_to :company, touch: :employees_last_updated_at
-      #   belongs_to :company, required: true
+      #   belongs_to :user, optional: true
       def belongs_to(name, scope = nil, options = {})
         reflection = Builder::BelongsTo.build(self, name, scope, options)
         Reflection.add_reflection self, name, reflection
@@ -1543,10 +1571,7 @@ module ActiveRecord
       #
       #   class CreateDevelopersProjectsJoinTable < ActiveRecord::Migration
       #     def change
-      #       create_table :developers_projects, id: false do |t|
-      #         t.integer :developer_id
-      #         t.integer :project_id
-      #       end
+      #       create_join_table :developers, :projects
       #     end
       #   end
       #
@@ -1696,16 +1721,14 @@ module ActiveRecord
 
         join_model = builder.through_model
 
-        # FIXME: we should move this to the internal constants. Also people
-        # should never directly access this constant so I'm not happy about
-        # setting it.
         const_set join_model.name, join_model
+        private_constant join_model.name
 
         middle_reflection = builder.middle_reflection join_model
 
         Builder::HasMany.define_callbacks self, middle_reflection
         Reflection.add_reflection self, middle_reflection.name, middle_reflection
-        middle_reflection.parent_reflection = [name.to_s, habtm_reflection]
+        middle_reflection.parent_reflection = habtm_reflection
 
         include Module.new {
           class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -1721,12 +1744,12 @@ module ActiveRecord
         hm_options[:through] = middle_reflection.name
         hm_options[:source] = join_model.right_reflection.name
 
-        [:before_add, :after_add, :before_remove, :after_remove, :autosave, :validate, :join_table, :class_name].each do |k|
+        [:before_add, :after_add, :before_remove, :after_remove, :autosave, :validate, :join_table, :class_name, :extend].each do |k|
           hm_options[k] = options[k] if options.key? k
         end
 
         has_many name, scope, hm_options, &extension
-        self._reflections[name.to_s].parent_reflection = [name.to_s, habtm_reflection]
+        self._reflections[name.to_s].parent_reflection = habtm_reflection
       end
     end
   end

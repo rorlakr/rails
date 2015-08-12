@@ -245,12 +245,14 @@ class HasOneThroughAssociationsTest < ActiveRecord::TestCase
     assert_not_nil @member_detail.member_type
     @member_detail.destroy
     assert_queries(1) do
-      assert_not_nil @member_detail.member_type(true)
+      @member_detail.association(:member_type).reload
+      assert_not_nil @member_detail.member_type
     end
 
     @member_detail.member.destroy
     assert_queries(1) do
-      assert_nil @member_detail.member_type(true)
+      @member_detail.association(:member_type).reload
+      assert_nil @member_detail.member_type
     end
   end
 
@@ -342,6 +344,19 @@ class HasOneThroughAssociationsTest < ActiveRecord::TestCase
       Class.new(ActiveRecord::Base) do
         has_one :thing, through: :other_thing, counter_cache: true
       end
+    end
+  end
+
+  def test_association_force_reload_with_only_true_is_deprecated
+    member = Member.find(1)
+
+    assert_deprecated { member.club(true) }
+  end
+
+  def test_has_one_through_associations_are_mutable_unless_through_belongs_to
+    member_detail = MemberDetail.new(member: @member)
+    assert_raise(ActiveRecord::HasOneThroughCantAssociateThroughHasOneOrManyReflection) do
+      member_detail.membership = Membership.new
     end
   end
 end

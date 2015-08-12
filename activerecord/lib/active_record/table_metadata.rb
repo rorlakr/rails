@@ -1,6 +1,7 @@
 module ActiveRecord
   class TableMetadata # :nodoc:
     delegate :foreign_type, :foreign_key, to: :association, prefix: true
+    delegate :association_primary_key, to: :association
 
     def initialize(klass, arel_table, association = nil)
       @klass = klass
@@ -40,7 +41,7 @@ module ActiveRecord
       association = klass._reflect_on_association(table_name)
       if association && !association.polymorphic?
         association_klass = association.klass
-        arel_table = association_klass.arel_table
+        arel_table = association_klass.arel_table.alias(table_name)
       else
         type_caster = TypeCaster::Connection.new(klass, table_name)
         association_klass = nil

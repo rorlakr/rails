@@ -88,7 +88,7 @@ module ActionDispatch
         end
 
         def custom_routes
-          partitioned_routes.last
+          routes.custom_routes
         end
 
         def filter_routes(path)
@@ -121,7 +121,8 @@ module ActionDispatch
         end
 
         def match_head_routes(routes, req)
-          head_routes = match_routes(routes, req)
+          verb_specific_routes = routes.reject { |route| route.verb == // }
+          head_routes = match_routes(verb_specific_routes, req)
 
           if head_routes.empty?
             begin

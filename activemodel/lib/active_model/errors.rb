@@ -3,6 +3,7 @@
 require 'active_support/core_ext/array/conversions'
 require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/object/deep_dup'
+require 'active_support/core_ext/string/filters'
 
 module ActiveModel
   # == Active \Model \Errors
@@ -33,20 +34,20 @@ module ActiveModel
   #       send(attr)
   #     end
   #
-  #     def Person.human_attribute_name(attr, options = {})
+  #     def self.human_attribute_name(attr, options = {})
   #       attr
   #     end
   #
-  #     def Person.lookup_ancestors
+  #     def self.lookup_ancestors
   #       [self]
   #     end
   #   end
   #
-  # The last three methods are required in your object for Errors to be
+  # The last three methods are required in your object for +Errors+ to be
   # able to generate error messages correctly and also handle multiple
-  # languages. Of course, if you extend your object with ActiveModel::Translation
+  # languages. Of course, if you extend your object with <tt>ActiveModel::Translation</tt>
   # you will not need to implement the last two. Likewise, using
-  # ActiveModel::Validations will handle the validation related methods
+  # <tt>ActiveModel::Validations</tt> will handle the validation related methods
   # for you.
   #
   # The above allows you to do:
@@ -72,7 +73,7 @@ module ActiveModel
     #   end
     def initialize(base)
       @base     = base
-      @messages = {}
+      @messages = Hash.new { |messages, attribute| messages[attribute] = [] }
       @details  = Hash.new { |details, attribute| details[attribute] = [] }
     end
 
@@ -101,37 +102,47 @@ module ActiveModel
     def include?(attribute)
       messages[attribute].present?
     end
-    # aliases include?
     alias :has_key? :include?
-    # aliases include?
     alias :key? :include?
 
     # Get messages for +key+.
     #
     #   person.errors.messages   # => {:name=>["cannot be nil"]}
     #   person.errors.get(:name) # => ["cannot be nil"]
-    #   person.errors.get(:age)  # => nil
+    #   person.errors.get(:age)  # => []
     def get(key)
+      ActiveSupport::Deprecation.warn(<<-MESSAGE.squish)
+        ActiveModel::Errors#get is deprecated and will be removed in Rails 5.1.
+
+        To achieve the same use model.errors[:#{key}].
+      MESSAGE
+
       messages[key]
     end
 
     # Set messages for +key+ to +value+.
     #
-    #   person.errors.get(:name) # => ["cannot be nil"]
+    #   person.errors[:name] # => ["cannot be nil"]
     #   person.errors.set(:name, ["can't be nil"])
-    #   person.errors.get(:name) # => ["can't be nil"]
+    #   person.errors[:name] # => ["can't be nil"]
     def set(key, value)
+      ActiveSupport::Deprecation.warn(<<-MESSAGE.squish)
+        ActiveModel::Errors#set is deprecated and will be removed in Rails 5.1.
+
+        Use model.errors.add(:#{key}, #{value.inspect}) instead.
+      MESSAGE
+
       messages[key] = value
     end
 
     # Delete messages for +key+. Returns the deleted messages.
     #
-    #   person.errors.get(:name)    # => ["cannot be nil"]
+    #   person.errors[:name]    # => ["cannot be nil"]
     #   person.errors.delete(:name) # => ["cannot be nil"]
-    #   person.errors.get(:name)    # => nil
+    #   person.errors[:name]    # => []
     def delete(key)
-      messages.delete(key)
       details.delete(key)
+      messages.delete(key)
     end
 
     # When passed a symbol or a name of a method, returns an array of errors
@@ -140,7 +151,7 @@ module ActiveModel
     #   person.errors[:name]  # => ["cannot be nil"]
     #   person.errors['name'] # => ["cannot be nil"]
     def [](attribute)
-      get(attribute.to_sym) || set(attribute.to_sym, [])
+      messages[attribute.to_sym]
     end
 
     # Adds to the supplied attribute the supplied error message.
@@ -148,7 +159,13 @@ module ActiveModel
     #   person.errors[:name] = "must be set"
     #   person.errors[:name] # => ['must be set']
     def []=(attribute, error)
-      self[attribute] << error
+      ActiveSupport::Deprecation.warn(<<-MESSAGE.squish)
+        ActiveModel::Errors#[]= is deprecated and will be removed in Rails 5.1.
+
+        Use model.errors.add(:#{attribute}, #{error.inspect}) instead.
+      MESSAGE
+
+      messages[attribute.to_sym] << error
     end
 
     # Iterates through each error key, value pair in the error messages hash.
@@ -167,7 +184,7 @@ module ActiveModel
     #   end
     def each
       messages.each_key do |attribute|
-        self[attribute].each { |error| yield attribute, error }
+        messages[attribute].each { |error| yield attribute, error }
       end
     end
 
@@ -180,6 +197,7 @@ module ActiveModel
     def size
       values.flatten.size
     end
+    alias :count :size
 
     # Returns all message values.
     #
@@ -197,35 +215,15 @@ module ActiveModel
       messages.keys
     end
 
-    # Returns an array of error messages, with the attribute name included.
-    #
-    #   person.errors.add(:name, :blank, message: "can't be blank")
-    #   person.errors.add(:name, :not_specified, message: "must be specified")
-    #   person.errors.to_a # => ["name can't be blank", "name must be specified"]
-    def to_a
-      full_messages
-    end
-
-    # Returns the number of error messages.
-    #
-    #   person.errors.add(:name, :blank, message: "can't be blank")
-    #   person.errors.count # => 1
-    #   person.errors.add(:name, :not_specified, message: "must be specified")
-    #   person.errors.count # => 2
-    def count
-      to_a.size
-    end
-
     # Returns +true+ if no errors are found, +false+ otherwise.
     # If the error message is a string it can be empty.
     #
     #   person.errors.full_messages # => ["name cannot be nil"]
     #   person.errors.empty?        # => false
     def empty?
-      all? { |k, v| v && v.empty? && !v.is_a?(String) }
+      size.zero?
     end
-    # aliases empty?
-    alias_method :blank?, :empty?
+    alias :blank? :empty?
 
     # Returns an xml formatted representation of the Errors hash.
     #
@@ -317,8 +315,8 @@ module ActiveModel
         raise exception, full_message(attribute, message)
       end
 
-      details[attribute.to_sym] << detail
-      self[attribute] << message
+      details[attribute.to_sym]  << detail
+      messages[attribute.to_sym] << message
     end
 
     # Will add an error message to each of the attributes in +attributes+
@@ -328,6 +326,14 @@ module ActiveModel
     #   person.errors.messages
     #   # => {:name=>["can't be empty"]}
     def add_on_empty(attributes, options = {})
+      ActiveSupport::Deprecation.warn(<<-MESSAGE.squish)
+        ActiveModel::Errors#add_on_empty is deprecated and will be removed in Rails 5.1
+
+        To achieve the same use:
+
+          errors.add(attribute, :empty, options) if value.nil? || value.empty?
+      MESSAGE
+
       Array(attributes).each do |attribute|
         value = @base.send(:read_attribute_for_validation, attribute)
         is_empty = value.respond_to?(:empty?) ? value.empty? : false
@@ -342,6 +348,14 @@ module ActiveModel
     #   person.errors.messages
     #   # => {:name=>["can't be blank"]}
     def add_on_blank(attributes, options = {})
+      ActiveSupport::Deprecation.warn(<<-MESSAGE.squish)
+        ActiveModel::Errors#add_on_blank is deprecated and will be removed in Rails 5.1
+
+        To achieve the same use:
+
+          errors.add(attribute, :empty, options) if value.blank?
+      MESSAGE
+
       Array(attributes).each do |attribute|
         value = @base.send(:read_attribute_for_validation, attribute)
         add(attribute, :blank, options) if value.blank?
@@ -372,6 +386,7 @@ module ActiveModel
     def full_messages
       map { |attribute, message| full_message(attribute, message) }
     end
+    alias :to_a :full_messages
 
     # Returns all the full error messages for a given attribute in an array.
     #
@@ -384,7 +399,7 @@ module ActiveModel
     #   person.errors.full_messages_for(:name)
     #   # => ["Name is too short (minimum is 5 characters)", "Name can't be blank"]
     def full_messages_for(attribute)
-      (get(attribute) || []).map { |message| full_message(attribute, message) }
+      messages[attribute].map { |message| full_message(attribute, message) }
     end
 
     # Returns a full message for a given attribute.
@@ -437,7 +452,6 @@ module ActiveModel
         defaults = []
       end
 
-      defaults << options.delete(:message)
       defaults << :"#{@base.class.i18n_scope}.errors.messages.#{type}" if @base.class.respond_to?(:i18n_scope)
       defaults << :"errors.attributes.#{attribute}.#{type}"
       defaults << :"errors.messages.#{type}"
@@ -446,6 +460,7 @@ module ActiveModel
       defaults.flatten!
 
       key = defaults.shift
+      defaults = options.delete(:message) if options[:message]
       value = (attribute != :base ? @base.send(:read_attribute_for_validation, attribute) : nil)
 
       options = {
@@ -489,5 +504,16 @@ module ActiveModel
   #   person.valid?
   #   # => ActiveModel::StrictValidationFailed: Name can't be blank
   class StrictValidationFailed < StandardError
+  end
+
+  # Raised when unknown attributes are supplied via mass assignment.
+  class UnknownAttributeError < NoMethodError
+    attr_reader :record, :attribute
+
+    def initialize(record, attribute)
+      @record = record
+      @attribute = attribute
+      super("unknown attribute '#{attribute}' for #{@record.class}.")
+    end
   end
 end

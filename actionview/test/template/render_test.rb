@@ -1,4 +1,3 @@
-# encoding: utf-8
 require 'abstract_unit'
 require 'controller/fake_models'
 
@@ -8,7 +7,10 @@ end
 module RenderTestCases
   def setup_view(paths)
     @assigns = { :secret => 'in the sauce' }
-    @view = ActionView::Base.new(paths, @assigns)
+    @view = Class.new(ActionView::Base) do
+      def view_cache_dependencies; end
+    end.new(paths, @assigns)
+
     @controller_view = TestController.new.view_context
 
     # Reload and register danish language for testing
@@ -62,9 +64,10 @@ module RenderTestCases
 
   def test_render_template_with_a_missing_partial_of_another_format
     @view.lookup_context.formats = [:html]
-    assert_raise ActionView::Template::Error, "Missing partial /_missing with {:locale=>[:en], :formats=>[:json], :handlers=>[:erb, :builder]}" do
+    e = assert_raise ActionView::Template::Error do
       @view.render(:template => "with_format", :formats => [:json])
     end
+    assert_includes(e.message, "Missing partial /_missing with {:locale=>[:en], :formats=>[:json], :variants=>[], :handlers=>[:raw, :erb, :builder, :ruby]}.")
   end
 
   def test_render_file_with_locale
@@ -172,18 +175,12 @@ module RenderTestCases
     assert_equal "only partial", @view.render("test/partial_only", :counter_counter => 5)
   end
 
-  def test_render_partial_with_invalid_name
-    e = assert_raises(ArgumentError) { @view.render(:partial => "test/200") }
-    assert_equal "The partial name (test/200) is not a valid Ruby identifier; " +
-      "make sure your partial name starts with underscore, " +
-      "and is followed by any combination of letters, numbers and underscores.", e.message
+  def test_render_partial_with_number
+    assert_nothing_raised { @view.render(:partial => "test/200") }
   end
 
   def test_render_partial_with_missing_filename
-    e = assert_raises(ArgumentError) { @view.render(:partial => "test/") }
-    assert_equal "The partial name (test/) is not a valid Ruby identifier; " +
-      "make sure your partial name starts with underscore, " +
-      "and is followed by any combination of letters, numbers and underscores.", e.message
+    assert_raises(ActionView::MissingTemplate) { @view.render(:partial => "test/") }
   end
 
   def test_render_partial_with_incompatible_object
@@ -191,11 +188,12 @@ module RenderTestCases
     assert_equal "'#{nil.inspect}' is not an ActiveModel-compatible object. It must implement :to_partial_path.", e.message
   end
 
+  def test_render_partial_starting_with_a_capital
+    assert_nothing_raised { @view.render(:partial => 'test/FooBar') }
+  end
+
   def test_render_partial_with_hyphen
-    e = assert_raises(ArgumentError) { @view.render(:partial => "test/a-in") }
-    assert_equal "The partial name (test/a-in) is not a valid Ruby identifier; " +
-      "make sure your partial name starts with underscore, " +
-      "and is followed by any combination of letters, numbers and underscores.", e.message
+    assert_nothing_raised { @view.render(:partial => "test/a-in") }
   end
 
   def test_render_partial_with_invalid_option_as
@@ -280,6 +278,14 @@ module RenderTestCases
 
   def test_render_partial_with_nil_collection_should_return_nil
     assert_nil @view.render(:partial => "test/customer", :collection => nil)
+  end
+
+  def test_render_partial_without_object_does_not_put_partial_name_to_local_assigns
+    assert_equal 'false', @view.render(partial: 'test/partial_name_in_local_assigns')
+  end
+
+  def test_render_partial_with_nil_object_puts_partial_name_to_local_assigns
+    assert_equal 'true', @view.render(partial: 'test/partial_name_in_local_assigns', object: nil)
   end
 
   def test_render_partial_with_nil_values_in_collection
@@ -602,4 +608,48 @@ class LazyViewRenderTest < ActiveSupport::TestCase
   ensure
     silence_warnings { Encoding.default_external = old }
   end
+end
+
+class CachedCollectionViewRenderTest < CachedViewRenderTest
+  class CachedCustomer < Customer; end
+
+  teardown do
+    ActionView::PartialRenderer.collection_cache.clear
+  end
+
+  test "with custom key" do
+    customer = Customer.new("david")
+    key = cache_key([customer, 'key'], "test/_customer")
+
+    ActionView::PartialRenderer.collection_cache.write(key, 'Hello')
+
+    assert_equal "Hello",
+      @view.render(partial: "test/customer", collection: [customer], cache: ->(item) { [item, 'key'] })
+  end
+
+  test "automatic caching with inferred cache name" do
+    customer = CachedCustomer.new("david")
+    key = cache_key(customer, "test/_cached_customer")
+
+    ActionView::PartialRenderer.collection_cache.write(key, 'Cached')
+
+    assert_equal "Cached",
+      @view.render(partial: "test/cached_customer", collection: [customer])
+  end
+
+  test "automatic caching with as name" do
+    customer = CachedCustomer.new("david")
+    key = cache_key(customer, "test/_cached_customer_as")
+
+    ActionView::PartialRenderer.collection_cache.write(key, 'Cached')
+
+    assert_equal "Cached",
+      @view.render(partial: "test/cached_customer_as", collection: [customer], as: :buyer)
+  end
+
+  private
+    def cache_key(names, virtual_path)
+      digest = ActionView::Digestor.digest name: virtual_path, finder: @view.lookup_context, dependencies: []
+      @view.fragment_cache_key([ *Array(names), digest ])
+    end
 end

@@ -9,6 +9,7 @@ require 'active_support/testing/isolation'
 require 'active_support/testing/constant_lookup'
 require 'active_support/testing/time_helpers'
 require 'active_support/testing/file_fixtures'
+require 'active_support/testing/composite_filter'
 require 'active_support/core_ext/kernel/reporting'
 
 module ActiveSupport
@@ -36,17 +37,17 @@ module ActiveSupport
       # Possible values are +:random+, +:parallel+, +:alpha+, +:sorted+.
       # Defaults to +:random+.
       def test_order
-        test_order = ActiveSupport.test_order
-
-        if test_order.nil?
-          test_order = :random
-          self.test_order = test_order
-        end
-
-        test_order
+        ActiveSupport.test_order ||= :random
       end
 
-      alias :my_tests_are_order_dependent! :i_suck_and_my_tests_are_order_dependent!
+      def run(reporter, options = {})
+        if options[:patterns] && options[:patterns].any? { |p| p =~ /:\d+/ }
+          options[:filter] = \
+            Testing::CompositeFilter.new(self, options[:filter], options[:patterns])
+        end
+
+        super
+      end
     end
 
     alias_method :method_name, :name
@@ -75,7 +76,7 @@ module ActiveSupport
     alias :assert_not_respond_to :refute_respond_to
     alias :assert_not_same :refute_same
 
-    # Fails if the block raises an exception.
+    # Reveals the intention that the block should not raise any exception.
     #
     #   assert_nothing_raised do
     #     ...

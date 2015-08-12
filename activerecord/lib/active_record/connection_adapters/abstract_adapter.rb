@@ -1,12 +1,9 @@
-require 'date'
-require 'bigdecimal'
-require 'bigdecimal/util'
 require 'active_record/type'
 require 'active_support/core_ext/benchmark'
 require 'active_record/connection_adapters/schema_cache'
+require 'active_record/connection_adapters/sql_type_metadata'
 require 'active_record/connection_adapters/abstract/schema_dumper'
 require 'active_record/connection_adapters/abstract/schema_creation'
-require 'monitor'
 require 'arel/collectors/bind'
 require 'arel/collectors/sql_string'
 
@@ -69,7 +66,6 @@ module ActiveRecord
       include DatabaseLimits
       include QueryCache
       include ActiveSupport::Callbacks
-      include MonitorMixin
       include ColumnDumper
 
       SIMPLE_INT = /\A\d+\z/
@@ -111,6 +107,18 @@ module ActiveRecord
         @prepared_statements = false
       end
 
+      class Version
+        include Comparable
+
+        def initialize(version_string)
+          @version = version_string.split('.').map(&:to_i)
+        end
+
+        def <=>(version_string)
+          @version <=> version_string.split('.').map(&:to_i)
+        end
+      end
+
       class BindCollector < Arel::Collectors::Bind
         def compile(bvs, conn)
           casted_binds = conn.prepare_binds_for_database(bvs)
@@ -140,12 +148,20 @@ module ActiveRecord
         SchemaCreation.new self
       end
 
+      # this method must only be called while holding connection pool's mutex
       def lease
-        synchronize do
-          unless in_use?
-            @owner = Thread.current
+        if in_use?
+          msg = 'Cannot lease connection, '
+          if @owner == Thread.current
+            msg << 'it is already leased by the current thread.'
+          else
+            msg << "it is already in use by a different thread: #{@owner}. " <<
+                   "Current thread: #{Thread.current}."
           end
+          raise ActiveRecordError, msg
         end
+
+        @owner = Thread.current
       end
 
       def schema_cache=(cache)
@@ -153,6 +169,7 @@ module ActiveRecord
         @schema_cache = cache
       end
 
+      # this method must only be called while holding connection pool's mutex
       def expire
         @owner = nil
       end
@@ -244,6 +261,11 @@ module ActiveRecord
         false
       end
 
+      # Does this adapter support datetime with precision?
+      def supports_datetime_with_precision?
+        false
+      end
+
       # This is meant to be implemented by the adapters that support extensions
       def disable_extension(name)
       end
@@ -260,18 +282,6 @@ module ActiveRecord
       # A list of index algorithms, to be filled by adapters that support them.
       def index_algorithms
         {}
-      end
-
-      # QUOTING ==================================================
-
-      # Quote date/time values for use in SQL input. Includes microseconds
-      # if the value is a Time responding to usec.
-      def quoted_date(value) #:nodoc:
-        if value.acts_like?(:time) && value.respond_to?(:usec)
-          "#{super}.#{sprintf("%06d", value.usec)}"
-        else
-          super
-        end
       end
 
       # Returns a bind substitution value given a bind +column+
@@ -366,8 +376,17 @@ module ActiveRecord
       end
 
       def case_insensitive_comparison(table, attribute, column, value)
-        table[attribute].lower.eq(table.lower(value))
+        if can_perform_case_insensitive_comparison_for?(column)
+          table[attribute].lower.eq(table.lower(value))
+        else
+          case_sensitive_comparison(table, attribute, column, value)
+        end
       end
+
+      def can_perform_case_insensitive_comparison_for?(column)
+        true
+      end
+      private :can_perform_case_insensitive_comparison_for?
 
       def current_savepoint_name
         current_transaction.savepoint_name
@@ -384,8 +403,8 @@ module ActiveRecord
         end
       end
 
-      def new_column(name, default, cast_type, sql_type = nil, null = true)
-        Column.new(name, default, cast_type, sql_type, null)
+      def new_column(name, default, sql_type_metadata = nil, null = true, default_function = nil, collation = nil)
+        Column.new(name, default, sql_type_metadata, null, default_function, collation)
       end
 
       def lookup_cast_type(sql_type) # :nodoc:
@@ -399,15 +418,15 @@ module ActiveRecord
       protected
 
       def initialize_type_map(m) # :nodoc:
-        register_class_with_limit m, %r(boolean)i,   Type::Boolean
-        register_class_with_limit m, %r(char)i,      Type::String
-        register_class_with_limit m, %r(binary)i,    Type::Binary
-        register_class_with_limit m, %r(text)i,      Type::Text
-        register_class_with_limit m, %r(date)i,      Type::Date
-        register_class_with_limit m, %r(time)i,      Type::Time
-        register_class_with_limit m, %r(datetime)i,  Type::DateTime
-        register_class_with_limit m, %r(float)i,     Type::Float
-        register_class_with_limit m, %r(int)i,       Type::Integer
+        register_class_with_limit m, %r(boolean)i,       Type::Boolean
+        register_class_with_limit m, %r(char)i,          Type::String
+        register_class_with_limit m, %r(binary)i,        Type::Binary
+        register_class_with_limit m, %r(text)i,          Type::Text
+        register_class_with_precision m, %r(date)i,      Type::Date
+        register_class_with_precision m, %r(time)i,      Type::Time
+        register_class_with_precision m, %r(datetime)i,  Type::DateTime
+        register_class_with_limit m, %r(float)i,         Type::Float
+        register_class_with_limit m, %r(int)i,           Type::Integer
 
         m.alias_type %r(blob)i,      'binary'
         m.alias_type %r(clob)i,      'text'
@@ -441,6 +460,13 @@ module ActiveRecord
         end
       end
 
+      def register_class_with_precision(mapping, key, klass) # :nodoc:
+        mapping.register_type(key) do |*args|
+          precision = extract_precision(args.last)
+          klass.new(precision: precision)
+        end
+      end
+
       def extract_scale(sql_type) # :nodoc:
         case sql_type
           when /\((\d+)\)/ then 0
@@ -453,7 +479,12 @@ module ActiveRecord
       end
 
       def extract_limit(sql_type) # :nodoc:
-        $1.to_i if sql_type =~ /\((.*)\)/
+        case sql_type
+        when /^bigint/i
+          8
+        when /\((.*)\)/
+          $1.to_i
+        end
       end
 
       def translate_exception_class(e, sql)
@@ -463,7 +494,6 @@ module ActiveRecord
           message = "#{e.class.name}: #{e.message.force_encoding sql.encoding}: #{sql}"
         end
 
-        @logger.error message if @logger
         exception = translate_exception(e, message)
         exception.set_backtrace e.backtrace
         exception

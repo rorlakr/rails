@@ -43,7 +43,7 @@ module ActiveRecord
     end
 
     def value_for_database
-      type.type_cast_for_database(value)
+      type.serialize(value)
     end
 
     def changed_from?(old_value)
@@ -108,13 +108,13 @@ module ActiveRecord
 
     class FromDatabase < Attribute # :nodoc:
       def type_cast(value)
-        type.type_cast_from_database(value)
+        type.deserialize(value)
       end
     end
 
     class FromUser < Attribute # :nodoc:
       def type_cast(value)
-        type.type_cast_from_user(value)
+        type.cast(value)
       end
 
       def came_from_user?

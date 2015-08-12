@@ -1,7 +1,7 @@
 require "cases/helper"
 
-class Mysql2BooleanTest < ActiveRecord::TestCase
-  self.use_transactional_fixtures = false
+class Mysql2BooleanTest < ActiveRecord::Mysql2TestCase
+  self.use_transactional_tests = false
 
   class BooleanType < ActiveRecord::Base
     self.table_name = "mysql_booleans"

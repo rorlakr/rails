@@ -21,11 +21,11 @@ module ActionMailer
   # the mailer views, options on the mail itself such as the <tt>:from</tt> address, and attachments.
   #
   #   class ApplicationMailer < ActionMailer::Base
-  #     default from: 'from@exmaple.com'
+  #     default from: 'from@example.com'
   #     layout 'mailer'
   #   end
   #
-  #   class Notifier < ApplicationMailer
+  #   class NotifierMailer < ApplicationMailer
   #     default from: 'no-reply@example.com',
   #             return_path: 'system@example.com'
   #
@@ -88,7 +88,7 @@ module ActionMailer
   #
   # To define a template to be used with a mailing, create an <tt>.erb</tt> file with the same
   # name as the method in your mailer model. For example, in the mailer defined above, the template at
-  # <tt>app/views/notifier/welcome.text.erb</tt> would be used to generate the email.
+  # <tt>app/views/notifier_mailer/welcome.text.erb</tt> would be used to generate the email.
   #
   # Variables defined in the methods of your mailer model are accessible as instance variables in their
   # corresponding view.
@@ -134,25 +134,28 @@ module ActionMailer
   #
   # = Sending mail
   #
-  # Once a mailer action and template are defined, you can deliver your message or create it and save it
-  # for delivery later:
+  # Once a mailer action and template are defined, you can deliver your message or defer its creation and
+  # delivery for later:
   #
-  #   Notifier.welcome(User.first).deliver_now # sends the email
-  #   mail = Notifier.welcome(User.first)      # => an ActionMailer::MessageDelivery object
-  #   mail.deliver_now                    # sends the email
+  #   NotifierMailer.welcome(User.first).deliver_now # sends the email
+  #   mail = NotifierMailer.welcome(User.first)      # => an ActionMailer::MessageDelivery object
+  #   mail.deliver_now                               # generates and sends the email now
   #
-  # The <tt>ActionMailer::MessageDelivery</tt> class is a wrapper around a <tt>Mail::Message</tt> object. If
-  # you want direct access to the <tt>Mail::Message</tt> object you can call the <tt>message</tt> method on
-  # the <tt>ActionMailer::MessageDelivery</tt> object.
+  # The <tt>ActionMailer::MessageDelivery</tt> class is a wrapper around a delegate that will call
+  # your method to generate the mail. If you want direct access to delegator, or <tt>Mail::Message</tt>,
+  # you can call the <tt>message</tt> method on the <tt>ActionMailer::MessageDelivery</tt> object.
   #
-  #   Notifier.welcome(User.first).message     # => a Mail::Message object
+  #   NotifierMailer.welcome(User.first).message     # => a Mail::Message object
   #
-  # Action Mailer is nicely integrated with Active Job so you can send emails in the background (example: outside
-  # of the request-response cycle, so the user doesn't have to wait on it):
+  # Action Mailer is nicely integrated with Active Job so you can generate and send emails in the background
+  # (example: outside of the request-response cycle, so the user doesn't have to wait on it):
   #
-  #   Notifier.welcome(User.first).deliver_later # enqueue the email sending to Active Job
+  #   NotifierMailer.welcome(User.first).deliver_later # enqueue the email sending to Active Job
+  #
+  # Note that <tt>deliver_later</tt> will execute your method from the background job.
   #
   # You never instantiate your mailer class. Rather, you just call the method you defined on the class itself.
+  # All instance methods are expected to return a message object to be sent.
   #
   # = Multipart Emails
   #
@@ -179,7 +182,7 @@ module ActionMailer
   #
   # Sending attachment in emails is easy:
   #
-  #   class Notifier < ApplicationMailer
+  #   class NotifierMailer < ApplicationMailer
   #     def welcome(recipient)
   #       attachments['free_book.pdf'] = File.read('path/to/file.pdf')
   #       mail(to: recipient, subject: "New account information")
@@ -195,7 +198,7 @@ module ActionMailer
   # If you need to send attachments with no content, you need to create an empty view for it,
   # or add an empty body parameter like this:
   #
-  #     class Notifier < ApplicationMailer
+  #     class NotifierMailer < ApplicationMailer
   #       def welcome(recipient)
   #         attachments['free_book.pdf'] = File.read('path/to/file.pdf')
   #         mail(to: recipient, subject: "New account information", body: "")
@@ -207,7 +210,7 @@ module ActionMailer
   # You can also specify that a file should be displayed inline with other HTML. This is useful
   # if you want to display a corporate logo or a photo.
   #
-  #   class Notifier < ApplicationMailer
+  #   class NotifierMailer < ApplicationMailer
   #     def welcome(recipient)
   #       attachments.inline['photo.png'] = File.read('path/to/photo.png')
   #       mail(to: recipient, subject: "Here is what we look like")
@@ -246,7 +249,7 @@ module ActionMailer
   # Action Mailer provides some intelligent defaults for your emails, these are usually specified in a
   # default method inside the class definition:
   #
-  #   class Notifier < ApplicationMailer
+  #   class NotifierMailer < ApplicationMailer
   #     default sender: 'system@example.com'
   #   end
   #
@@ -254,8 +257,8 @@ module ActionMailer
   # <tt>ActionMailer::Base</tt> sets the following:
   #
   # * <tt>mime_version: "1.0"</tt>
-  # * <tt>charset:      "UTF-8",</tt>
-  # * <tt>content_type: "text/plain",</tt>
+  # * <tt>charset:      "UTF-8"</tt>
+  # * <tt>content_type: "text/plain"</tt>
   # * <tt>parts_order:  [ "text/plain", "text/enriched", "text/html" ]</tt>
   #
   # <tt>parts_order</tt> and <tt>charset</tt> are not actually valid <tt>Mail::Message</tt> header fields,
@@ -264,7 +267,7 @@ module ActionMailer
   # As you can pass in any header, you need to either quote the header as a string, or pass it in as
   # an underscored symbol, so the following will work:
   #
-  #   class Notifier < ApplicationMailer
+  #   class NotifierMailer < ApplicationMailer
   #     default 'Content-Transfer-Encoding' => '7bit',
   #             content_description: 'This is a description'
   #   end
@@ -272,7 +275,7 @@ module ActionMailer
   # Finally, Action Mailer also supports passing <tt>Proc</tt> objects into the default hash, so you
   # can define methods that evaluate as the message is being generated:
   #
-  #   class Notifier < ApplicationMailer
+  #   class NotifierMailer < ApplicationMailer
   #     default 'X-Special-Header' => Proc.new { my_method }
   #
   #     private
@@ -283,7 +286,7 @@ module ActionMailer
   #   end
   #
   # Note that the proc is evaluated right at the start of the mail message generation, so if you
-  # set something in the defaults using a proc, and then set the same thing inside of your
+  # set something in the default using a proc, and then set the same thing inside of your
   # mailer method, it will get over written by the mailer method.
   #
   # It is also possible to set these default options that will be used in all mailers through
@@ -297,7 +300,7 @@ module ActionMailer
   # This may be useful, for example, when you want to add default inline attachments for all
   # messages sent out by a certain mailer class:
   #
-  #   class Notifier < ApplicationMailer
+  #   class NotifierMailer < ApplicationMailer
   #     before_action :add_inline_attachment!
   #
   #     def welcome
@@ -316,8 +319,9 @@ module ActionMailer
   # callbacks in the same manner that you would use callbacks in classes that
   # inherit from <tt>ActionController::Base</tt>.
   #
-  # Note that unless you have a specific reason to do so, you should prefer using before_action
-  # rather than after_action in your Action Mailer classes so that headers are parsed properly.
+  # Note that unless you have a specific reason to do so, you should prefer
+  # using <tt>before_action</tt> rather than <tt>after_action</tt> in your
+  # Action Mailer classes so that headers are parsed properly.
   #
   # = Previewing emails
   #
@@ -325,9 +329,9 @@ module ActionMailer
   # <tt>ActionMailer::Base.preview_path</tt>. Since most emails do something interesting
   # with database data, you'll need to write some scenarios to load messages with fake data:
   #
-  #   class NotifierPreview < ActionMailer::Preview
+  #   class NotifierMailerPreview < ActionMailer::Preview
   #     def welcome
-  #       Notifier.welcome(User.first)
+  #       NotifierMailer.welcome(User.first)
   #     end
   #   end
   #
@@ -376,8 +380,8 @@ module ActionMailer
   #   * <tt>:password</tt> - If your mail server requires authentication, set the password in this setting.
   #   * <tt>:authentication</tt> - If your mail server requires authentication, you need to specify the
   #     authentication type here.
-  #     This is a symbol and one of <tt>:plain</tt> (will send the password in the clear), <tt>:login</tt> (will
-  #     send password Base64 encoded) or <tt>:cram_md5</tt> (combines a Challenge/Response mechanism to exchange
+  #     This is a symbol and one of <tt>:plain</tt> (will send the password Base64 encoded), <tt>:login</tt> (will
+  #     send the password Base64 encoded) or <tt>:cram_md5</tt> (combines a Challenge/Response mechanism to exchange
   #     information and a cryptographic Message Digest 5 algorithm to hash important information)
   #   * <tt>:enable_starttls_auto</tt> - Detects if STARTTLS is enabled in your SMTP server and starts
   #     to use it. Defaults to <tt>true</tt>.
@@ -409,6 +413,8 @@ module ActionMailer
   #
   # * <tt>deliveries</tt> - Keeps an array of all the emails sent out through the Action Mailer with
   #   <tt>delivery_method :test</tt>. Most useful for unit and functional testing.
+  #
+  # * <tt>deliver_later_queue_name</tt> - The name of the queue used with <tt>deliver_later</tt>
   class Base < AbstractController::Base
     include DeliveryMethods
     include Previews
@@ -593,6 +599,7 @@ module ActionMailer
 
     class NullMail #:nodoc:
       def body; '' end
+      def header; {} end
 
       def respond_to?(string, include_all=false)
         true
@@ -813,7 +820,7 @@ module ActionMailer
       # Set configure delivery behavior
       wrap_delivery_behavior!(headers.delete(:delivery_method), headers.delete(:delivery_method_options))
 
-      # Assign all headers except parts_order, content_type and body
+      # Assign all headers except parts_order, content_type, body, template_name, and template_path
       assignable = headers.except(:parts_order, :content_type, :body, :template_name, :template_path)
       assignable.each { |k, v| m[k] = v }
 

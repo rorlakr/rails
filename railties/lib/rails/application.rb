@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'yaml'
 require 'active_support/core_ext/hash/keys'
 require 'active_support/core_ext/object/blank'
 require 'active_support/key_generator'
@@ -6,8 +7,7 @@ require 'active_support/message_verifier'
 require 'rails/engine'
 
 module Rails
-  # In Rails 3.0, a Rails::Application object was introduced which is nothing more than
-  # an Engine but with the responsibility of coordinating the whole boot process.
+  # An Engine with the responsibility of coordinating the whole boot process.
   #
   # == Initialization
   #
@@ -159,8 +159,9 @@ module Rails
     # Implements call according to the Rack API. It simply
     # dispatches the request to the underlying middleware stack.
     def call(env)
-      env["ORIGINAL_FULLPATH"] = build_original_fullpath(env)
-      env["ORIGINAL_SCRIPT_NAME"] = env["SCRIPT_NAME"]
+      req = ActionDispatch::Request.new env
+      env["ORIGINAL_FULLPATH"] = req.fullpath
+      env["ORIGINAL_SCRIPT_NAME"] = req.script_name
       super(env)
     end
 
@@ -227,7 +228,6 @@ module Rails
       yaml = Pathname.new("#{paths["config"].existent.first}/#{name}.yml")
 
       if yaml.exist?
-        require "yaml"
         require "erb"
         (YAML.load(ERB.new(yaml.read).result) || {})[Rails.env] || {}
       else
@@ -427,9 +427,9 @@ module Rails
     # Return an array of railties respecting the order they're loaded
     # and the order specified by the +railties_order+ config.
     #
-    # While when running initializers we need engines in reverse
-    # order here when copying migrations from railties we need then in the same
-    # order as given by +railties_order+
+    # While running initializers we need engines in reverse order here when
+    # copying migrations from railties ; we need them in the order given by
+    # +railties_order+.
     def migration_railties # :nodoc:
       ordered_railties.flatten - [self]
     end
@@ -504,25 +504,13 @@ module Rails
       default_stack.build_stack
     end
 
-    def build_original_fullpath(env) #:nodoc:
-      path_info    = env["PATH_INFO"]
-      query_string = env["QUERY_STRING"]
-      script_name  = env["SCRIPT_NAME"]
-
-      if query_string.present?
-        "#{script_name}#{path_info}?#{query_string}"
-      else
-        "#{script_name}#{path_info}"
-      end
-    end
-
     def validate_secret_key_config! #:nodoc:
       if secrets.secret_key_base.blank?
         ActiveSupport::Deprecation.warn "You didn't set `secret_key_base`. " +
           "Read the upgrade documentation to learn more about this new config option."
 
         if secrets.secret_token.blank?
-          raise "Missing `secret_token` and `secret_key_base` for '#{Rails.env}' environment, set these values in `config/secrets.yml`"
+          raise "Missing `secret_key_base` for '#{Rails.env}' environment, set this value in `config/secrets.yml`"
         end
       end
     end

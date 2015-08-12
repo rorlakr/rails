@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 require "cases/helper"
 require 'support/schema_dumping_helper'
 
@@ -14,20 +14,18 @@ module PostgresqlJSONSharedTestCases
   def setup
     @connection = ActiveRecord::Base.connection
     begin
-      @connection.transaction do
-        @connection.create_table('json_data_type') do |t|
-          t.public_send column_type, 'payload', default: {} # t.json 'payload', default: {}
-          t.public_send column_type, 'settings'             # t.json 'settings'
-        end
+      @connection.create_table('json_data_type') do |t|
+        t.public_send column_type, 'payload', default: {} # t.json 'payload', default: {}
+        t.public_send column_type, 'settings'             # t.json 'settings'
       end
     rescue ActiveRecord::StatementInvalid
-      skip "do not test on PG without json"
+      skip "do not test on PostgreSQL without #{column_type} type."
     end
-    @column = JsonDataType.columns_hash['payload']
   end
 
   def teardown
-    @connection.execute 'drop table if exists json_data_type'
+    @connection.drop_table :json_data_type, if_exists: true
+    JsonDataType.reset_column_information
   end
 
   def test_column
@@ -37,7 +35,6 @@ module PostgresqlJSONSharedTestCases
     assert_not column.array?
 
     type = JsonDataType.type_for_attribute("payload")
-    assert_not type.number?
     assert_not type.binary?
   end
 
@@ -83,13 +80,13 @@ module PostgresqlJSONSharedTestCases
     type = JsonDataType.type_for_attribute("payload")
 
     data = "{\"a_key\":\"a_value\"}"
-    hash = type.type_cast_from_database(data)
+    hash = type.deserialize(data)
     assert_equal({'a_key' => 'a_value'}, hash)
-    assert_equal({'a_key' => 'a_value'}, type.type_cast_from_database(data))
+    assert_equal({'a_key' => 'a_value'}, type.deserialize(data))
 
-    assert_equal({}, type.type_cast_from_database("{}"))
-    assert_equal({'key'=>nil}, type.type_cast_from_database('{"key": null}'))
-    assert_equal({'c'=>'}','"a"'=>'b "a b'}, type.type_cast_from_database(%q({"c":"}", "\"a\"":"b \"a b"})))
+    assert_equal({}, type.deserialize("{}"))
+    assert_equal({'key'=>nil}, type.deserialize('{"key": null}'))
+    assert_equal({'c'=>'}','"a"'=>'b "a b'}, type.deserialize(%q({"c":"}", "\"a\"":"b \"a b"})))
   end
 
   def test_rewrite
@@ -191,7 +188,7 @@ module PostgresqlJSONSharedTestCases
   end
 end
 
-class PostgresqlJSONTest < ActiveRecord::TestCase
+class PostgresqlJSONTest < ActiveRecord::PostgreSQLTestCase
   include PostgresqlJSONSharedTestCases
 
   def column_type
@@ -199,7 +196,7 @@ class PostgresqlJSONTest < ActiveRecord::TestCase
   end
 end
 
-class PostgresqlJSONBTest < ActiveRecord::TestCase
+class PostgresqlJSONBTest < ActiveRecord::PostgreSQLTestCase
   include PostgresqlJSONSharedTestCases
 
   def column_type

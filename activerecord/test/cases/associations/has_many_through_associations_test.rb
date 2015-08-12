@@ -84,11 +84,11 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     subscriber   = make_model "Subscriber"
 
     subscriber.primary_key = 'nick'
-    subscription.belongs_to :book,       class: book
-    subscription.belongs_to :subscriber, class: subscriber
+    subscription.belongs_to :book,       anonymous_class: book
+    subscription.belongs_to :subscriber, anonymous_class: subscriber
 
-    book.has_many :subscriptions, class: subscription
-    book.has_many :subscribers, through: :subscriptions, class: subscriber
+    book.has_many :subscriptions, anonymous_class: subscription
+    book.has_many :subscribers, through: :subscriptions, anonymous_class: subscriber
 
     anonbook = book.first
     namebook = Book.find anonbook.id
@@ -154,10 +154,10 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     lesson_student = make_model 'LessonStudent'
     lesson_student.table_name = 'lessons_students'
 
-    lesson_student.belongs_to :lesson, :class => lesson
-    lesson_student.belongs_to :student, :class => student
-    lesson.has_many :lesson_students, :class => lesson_student
-    lesson.has_many :students, :through => :lesson_students, :class => student
+    lesson_student.belongs_to :lesson, :anonymous_class => lesson
+    lesson_student.belongs_to :student, :anonymous_class => student
+    lesson.has_many :lesson_students, :anonymous_class => lesson_student
+    lesson.has_many :students, :through => :lesson_students, :anonymous_class => student
     [lesson, lesson_student, student]
   end
 
@@ -188,7 +188,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
       assert post.people.include?(person)
     end
 
-    assert post.reload.people(true).include?(person)
+    assert post.reload.people.reload.include?(person)
   end
 
   def test_delete_all_for_with_dependent_option_destroy
@@ -229,7 +229,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     post   = posts(:thinking)
     post.people.concat [person]
     assert_equal 1, post.people.size
-    assert_equal 1, post.people(true).size
+    assert_equal 1, post.people.reload.size
   end
 
   def test_associate_existing_record_twice_should_add_to_target_twice
@@ -285,7 +285,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
       assert posts(:thinking).people.include?(new_person)
     end
 
-    assert posts(:thinking).reload.people(true).include?(new_person)
+    assert posts(:thinking).reload.people.reload.include?(new_person)
   end
 
   def test_associate_new_by_building
@@ -310,8 +310,8 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
       posts(:thinking).save
     end
 
-    assert posts(:thinking).reload.people(true).collect(&:first_name).include?("Bob")
-    assert posts(:thinking).reload.people(true).collect(&:first_name).include?("Ted")
+    assert posts(:thinking).reload.people.reload.collect(&:first_name).include?("Bob")
+    assert posts(:thinking).reload.people.reload.collect(&:first_name).include?("Ted")
   end
 
   def test_build_then_save_with_has_many_inverse
@@ -356,7 +356,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
       assert posts(:welcome).people.empty?
     end
 
-    assert posts(:welcome).reload.people(true).empty?
+    assert posts(:welcome).reload.people.reload.empty?
   end
 
   def test_destroy_association
@@ -367,7 +367,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     end
 
     assert posts(:welcome).reload.people.empty?
-    assert posts(:welcome).people(true).empty?
+    assert posts(:welcome).people.reload.empty?
   end
 
   def test_destroy_all
@@ -378,7 +378,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     end
 
     assert posts(:welcome).reload.people.empty?
-    assert posts(:welcome).people(true).empty?
+    assert posts(:welcome).people.reload.empty?
   end
 
   def test_should_raise_exception_for_destroying_mismatching_records
@@ -539,7 +539,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
   end
 
   def test_replace_association
-    assert_queries(4){posts(:welcome);people(:david);people(:michael); posts(:welcome).people(true)}
+    assert_queries(4){posts(:welcome);people(:david);people(:michael); posts(:welcome).people.reload}
 
     # 1 query to delete the existing reader (michael)
     # 1 query to associate the new reader (david)
@@ -552,8 +552,8 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
       assert !posts(:welcome).people.include?(people(:michael))
     }
 
-    assert posts(:welcome).reload.people(true).include?(people(:david))
-    assert !posts(:welcome).reload.people(true).include?(people(:michael))
+    assert posts(:welcome).reload.people.reload.include?(people(:david))
+    assert !posts(:welcome).reload.people.reload.include?(people(:michael))
   end
 
   def test_replace_order_is_preserved
@@ -592,7 +592,13 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
       assert posts(:thinking).people.collect(&:first_name).include?("Jeb")
     end
 
-    assert posts(:thinking).reload.people(true).collect(&:first_name).include?("Jeb")
+    assert posts(:thinking).reload.people.reload.collect(&:first_name).include?("Jeb")
+  end
+
+  def test_through_record_is_built_when_created_with_where
+    assert_difference("posts(:thinking).readers.count", 1) do
+      posts(:thinking).people.where(first_name: "Jeb").create
+    end
   end
 
   def test_associate_with_create_and_no_options
@@ -662,7 +668,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
   end
 
   def test_clear_associations
-    assert_queries(2) { posts(:welcome);posts(:welcome).people(true) }
+    assert_queries(2) { posts(:welcome);posts(:welcome).people.reload }
 
     assert_queries(1) do
       posts(:welcome).people.clear
@@ -672,7 +678,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
       assert posts(:welcome).people.empty?
     end
 
-    assert posts(:welcome).reload.people(true).empty?
+    assert posts(:welcome).reload.people.reload.empty?
   end
 
   def test_association_callback_ordering
@@ -744,7 +750,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
 
   def test_get_ids_for_loaded_associations
     person = people(:michael)
-    person.posts(true)
+    person.posts.reload
     assert_queries(0) do
       person.post_ids
       person.post_ids
@@ -822,14 +828,14 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     category = author.named_categories.build(:name => "Primary")
     author.save
     assert Categorization.exists?(:author_id => author.id, :named_category_name => category.name)
-    assert author.named_categories(true).include?(category)
+    assert author.named_categories.reload.include?(category)
   end
 
   def test_collection_create_with_nonstandard_primary_key_on_belongs_to
     author   = authors(:mary)
     category = author.named_categories.create(:name => "Primary")
     assert Categorization.exists?(:author_id => author.id, :named_category_name => category.name)
-    assert author.named_categories(true).include?(category)
+    assert author.named_categories.reload.include?(category)
   end
 
   def test_collection_exists
@@ -844,7 +850,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     category = author.named_categories.create(:name => "Primary")
     author.named_categories.delete(category)
     assert !Categorization.exists?(:author_id => author.id, :named_category_name => category.name)
-    assert author.named_categories(true).empty?
+    assert author.named_categories.reload.empty?
   end
 
   def test_collection_singular_ids_getter_with_string_primary_keys
@@ -865,10 +871,10 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     assert_nothing_raised do
       book = books(:awdr)
       book.subscriber_ids = [subscribers(:second).nick]
-      assert_equal [subscribers(:second)], book.subscribers(true)
+      assert_equal [subscribers(:second)], book.subscribers.reload
 
       book.subscriber_ids = []
-      assert_equal [], book.subscribers(true)
+      assert_equal [], book.subscribers.reload
     end
 
   end
@@ -954,7 +960,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     assert_equal 1, category.categorizations.where(:special => true).count
   end
 
-  def test_joining_has_many_through_with_uniq
+  def test_joining_has_many_through_with_distinct
     mary = Author.joins(:unique_categorized_posts).where(:id => authors(:mary).id).first
     assert_equal 1, mary.unique_categorized_posts.length
     assert_equal 1, mary.unique_categorized_post_ids.length
@@ -1034,14 +1040,6 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     end
   end
 
-  def test_save_should_not_raise_exception_when_join_record_has_errors
-    repair_validations(Categorization) do
-      Categorization.validate { |r| r.errors[:base] << 'Invalid Categorization' }
-      c = Category.create(:name => 'Fishing', :authors => [Author.first])
-      c.save
-    end
-  end
-
   def test_assign_array_to_new_record_builds_join_records
     c = Category.new(:name => 'Fishing', :authors => [Author.first])
     assert_equal 1, c.categorizations.size
@@ -1066,11 +1064,11 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     end
   end
 
-  def test_create_bang_returns_falsy_when_join_record_has_errors
+  def test_save_returns_falsy_when_join_record_has_errors
     repair_validations(Categorization) do
       Categorization.validate { |r| r.errors[:base] << 'Invalid Categorization' }
       c = Category.new(:name => 'Fishing', :authors => [Author.first])
-      assert !c.save
+      assert_not c.save
     end
   end
 
@@ -1159,5 +1157,18 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     post_direct = author.posts.build
     post_through = organization.posts.build
     assert_equal post_direct.author_id, post_through.author_id
+  end
+
+  def test_has_many_through_with_scope_that_should_not_be_fully_merged
+    Club.has_many :distinct_memberships, -> { distinct }, class_name: "Membership"
+    Club.has_many :special_favourites, through: :distinct_memberships, source: :member
+
+    assert_nil Club.new.special_favourites.distinct_value
+  end
+
+  def test_association_force_reload_with_only_true_is_deprecated
+    post = Post.find(1)
+
+    assert_deprecated { post.people(true) }
   end
 end

@@ -71,6 +71,7 @@ module ActiveRecord
     #
     #   Person.sum(:age) # => 4562
     def sum(*args)
+      return super if block_given?
       calculate(:sum, *args)
     end
 
@@ -130,15 +131,15 @@ module ActiveRecord
     # the plucked column names, if they can be deduced. Plucking an SQL fragment
     # returns String values by default.
     #
-    #   Person.pluck(:id)
-    #   # SELECT people.id FROM people
-    #   # => [1, 2, 3]
+    #   Person.pluck(:name)
+    #   # SELECT people.name FROM people
+    #   # => ['David', 'Jeremy', 'Jose']
     #
     #   Person.pluck(:id, :name)
     #   # SELECT people.id, people.name FROM people
     #   # => [[1, 'David'], [2, 'Jeremy'], [3, 'Jose']]
     #
-    #   Person.pluck('DISTINCT role')
+    #   Person.distinct.pluck(:role)
     #   # SELECT DISTINCT role FROM people
     #   # => ['admin', 'member', 'guest']
     #
@@ -150,6 +151,8 @@ module ActiveRecord
     #   # SELECT DATEDIFF(updated_at, created_at) FROM people
     #   # => ['0', '27761', '173']
     #
+    # See also +ids+.
+    #
     def pluck(*column_names)
       column_names.map! do |column_name|
         if column_name.is_a?(Symbol) && attribute_alias?(column_name)
@@ -157,6 +160,10 @@ module ActiveRecord
         else
           column_name.to_s
         end
+      end
+
+      if loaded? && (column_names - @klass.column_names).empty?
+        return @records.pluck(*column_names)
       end
 
       if has_include?(column_names.first)
@@ -182,13 +189,14 @@ module ActiveRecord
     private
 
     def has_include?(column_name)
-      eager_loading? || (includes_values.present? && ((column_name && column_name != :all) || references_eager_loaded_tables?))
+      eager_loading? || (includes_values.present? && column_name && column_name != :all)
     end
 
     def perform_calculation(operation, column_name)
       operation = operation.to_s.downcase
 
-      # If #count is used with #distinct / #uniq it is considered distinct. (eg. relation.distinct.count)
+      # If #count is used with #distinct (i.e. `relation.distinct.count`) it is
+      # considered distinct.
       distinct = self.distinct_value
 
       if operation == "count"
@@ -222,7 +230,7 @@ module ActiveRecord
     end
 
     def execute_simple_calculation(operation, column_name, distinct) #:nodoc:
-      # Postgresql doesn't like ORDER BY when there are no GROUP BY
+      # PostgreSQL doesn't like ORDER BY when there are no GROUP BY
       relation = unscope(:order)
 
       column_alias = column_name
@@ -353,9 +361,9 @@ module ActiveRecord
     def type_cast_calculated_value(value, type, operation = nil)
       case operation
         when 'count'   then value.to_i
-        when 'sum'     then type.type_cast_from_database(value || 0)
+        when 'sum'     then type.deserialize(value || 0)
         when 'average' then value.respond_to?(:to_d) ? value.to_d : value
-        else type.type_cast_from_database(value)
+        else type.deserialize(value)
       end
     end
 

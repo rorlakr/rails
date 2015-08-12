@@ -20,7 +20,7 @@ The best way to be sure that your application still works after upgrading is to 
 
 Rails generally stays close to the latest released Ruby version when it's released:
 
-* Rails 5 requires Ruby 2.2 or newer.
+* Rails 5 requires Ruby 2.2.2 or newer.
 * Rails 4 prefers Ruby 2.0 and requires 1.9.3 or newer.
 * Rails 3.2.x is the last branch to support Ruby 1.8.7.
 * Rails 3 and above require Ruby 1.8.7 or higher. Support for all of the previous Ruby versions has been dropped officially. You should upgrade as early as possible.
@@ -74,6 +74,23 @@ warning by adding the following configuration to your `config/application.rb`:
     config.active_support.halt_callback_chains_on_return_false = false
 
 See [#17227](https://github.com/rails/rails/pull/17227) for more details.
+
+### ActiveJob jobs now inherit from ApplicationJob by default
+
+In Rails 4.2 an ActiveJob inherits from `ActiveJob::Base`. In Rails 5.0 this
+behavior has changed to now inherit from `ApplicationJob`.
+
+When upgrading from Rails 4.2 to Rails 5.0 you need to create an
+`application_job.rb` file in `app/jobs/` and add the following content:
+
+```
+class ApplicationJob < ActiveJob::Base
+end
+```
+
+Then make sure that all your job classes inherit from it.
+
+See [#19034](https://github.com/rails/rails/pull/19034) for more details.
 
 Upgrading from Rails 4.1 to Rails 4.2
 -------------------------------------
@@ -276,6 +293,22 @@ class Notifier < ActionMailer::Base
 end
 ```
 
+### Foreign Key Support
+
+The migration DSL has been expanded to support foreign key definitions. If
+you've been using the Foreigner gem, you might want to consider removing it.
+Note that the foreign key support of Rails is a subset of Foreigner. This means
+that not every Foreigner definition can be fully replaced by its Rails
+migration DSL counterpart.
+
+The migration procedure is as follows:
+
+1. remove `gem "foreigner"` from the Gemfile.
+2. run `bundle install`.
+3. run `bin/rake db:schema:dump`.
+4. make sure that `db/schema.rb` contains every foreign key definition with
+the necessary options.
+
 Upgrading from Rails 4.0 to Rails 4.1
 -------------------------------------
 
@@ -427,7 +460,7 @@ If your application currently depend on MultiJSON directly, you have a few optio
 
 WARNING: Do not simply replace `MultiJson.dump` and `MultiJson.load` with
 `JSON.dump` and `JSON.load`. These JSON gem APIs are meant for serializing and
-deserializing arbitrary Ruby objects and are generally [unsafe](http://www.ruby-doc.org/stdlib-2.0.0/libdoc/json/rdoc/JSON.html#method-i-load).
+deserializing arbitrary Ruby objects and are generally [unsafe](http://www.ruby-doc.org/stdlib-2.2.2/libdoc/json/rdoc/JSON.html#method-i-load).
 
 #### JSON gem compatibility
 
@@ -850,6 +883,20 @@ this gem such as `whitelist_attributes` or `mass_assignment_sanitizer` options.
 
 * To re-enable the old finders, you can use the [activerecord-deprecated_finders gem](https://github.com/rails/activerecord-deprecated_finders).
 
+* Rails 4.0 has changed to default join table for `has_and_belongs_to_many` relations to strip the common prefix off the second table name. Any existing `has_and_belongs_to_many` relationship between models with a common prefix must be specified with the `join_table` option. For example:
+
+```ruby
+CatalogCategory < ActiveRecord::Base
+  has_and_belongs_to_many :catalog_products, join_table: 'catalog_categories_catalog_products'
+end
+
+CatalogProduct < ActiveRecord::Base
+  has_and_belongs_to_many :catalog_categories, join_table: 'catalog_categories_catalog_products'
+end
+```
+
+* Note that the the prefix takes scopes into account as well, so relations between `Catalog::Category` and `Catalog::Product` or `Catalog::Category` and `CatalogProduct` need to be updated similarly.
+
 ### Active Resource
 
 Rails 4.0 extracted Active Resource to its own gem. If you still need the feature you can add the [Active Resource gem](https://github.com/rails/activeresource) in your Gemfile.
@@ -879,7 +926,7 @@ Rails 4.0 extracted Active Resource to its own gem. If you still need the featur
 
 Please note that you should wait to set `secret_key_base` until you have 100% of your userbase on Rails 4.x and are reasonably sure you will not need to rollback to Rails 3.x. This is because cookies signed based on the new `secret_key_base` in Rails 4.x are not backwards compatible with Rails 3.x. You are free to leave your existing `secret_token` in place, not set the new `secret_key_base`, and ignore the deprecation warnings until you are reasonably sure that your upgrade is otherwise complete.
 
-If you are relying on the ability for external applications or Javascript to be able to read your Rails app's signed session cookies (or signed cookies in general) you should not set `secret_key_base` until you have decoupled these concerns.
+If you are relying on the ability for external applications or JavaScript to be able to read your Rails app's signed session cookies (or signed cookies in general) you should not set `secret_key_base` until you have decoupled these concerns.
 
 * Rails 4.0 encrypts the contents of cookie-based sessions if `secret_key_base` has been set. Rails 3.x signed, but did not encrypt, the contents of cookie-based session. Signed cookies are "secure" in that they are verified to have been generated by your app and are tamper-proof. However, the contents can be viewed by end users, and encrypting the contents eliminates this caveat/concern without a significant performance penalty.
 
@@ -892,6 +939,8 @@ Please read [Pull Request #9978](https://github.com/rails/rails/pull/9978) for d
 * Rails 4.0 has removed Action and Page caching from Action Pack. You will need to add the `actionpack-action_caching` gem in order to use `caches_action` and the `actionpack-page_caching` to use `caches_pages` in your controllers.
 
 * Rails 4.0 has removed the XML parameters parser. You will need to add the `actionpack-xml_parser` gem if you require this feature.
+
+* Rails 4.0 changes the default `layout` lookup set using symbols or procs that return nil. To get the "no layout" behavior, return false instead of nil. 
 
 * Rails 4.0 changes the default memcached client from `memcache-client` to `dalli`. To upgrade, simply add `gem 'dalli'` to your `Gemfile`.
 

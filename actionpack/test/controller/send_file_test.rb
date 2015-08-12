@@ -1,4 +1,3 @@
-# encoding: utf-8
 require 'abstract_unit'
 
 module TestFileUtils
@@ -35,8 +34,6 @@ class SendFileTest < ActionController::TestCase
 
   def setup
     @controller = SendFileController.new
-    @request = ActionController::TestRequest.new
-    @response = ActionController::TestResponse.new
   end
 
   def test_file_nostream

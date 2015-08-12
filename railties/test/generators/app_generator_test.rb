@@ -5,7 +5,7 @@ require 'mocha/setup' # FIXME: stop using mocha
 
 DEFAULT_APP_FILES = %w(
   .gitignore
-  README.rdoc
+  README.md
   Gemfile
   Rakefile
   config.ru
@@ -18,6 +18,7 @@ DEFAULT_APP_FILES = %w(
   app/mailers
   app/models
   app/models/concerns
+  app/jobs
   app/views/layouts
   bin/bundle
   bin/rails
@@ -43,6 +44,7 @@ DEFAULT_APP_FILES = %w(
   vendor/assets
   vendor/assets/stylesheets
   vendor/assets/javascripts
+  tmp
   tmp/cache
   tmp/cache/assets
 )
@@ -65,6 +67,11 @@ class AppGeneratorTest < Rails::Generators::TestCase
     assert_file("app/views/layouts/application.html.erb", /javascript_include_tag\s+'application', 'data-turbolinks-track' => true/)
     assert_file("app/assets/stylesheets/application.css")
     assert_file("app/assets/javascripts/application.js")
+  end
+
+  def test_application_job_file_present
+    run_generator
+    assert_file("app/jobs/application_job.rb")
   end
 
   def test_invalid_application_name_raises_an_error
@@ -209,6 +216,38 @@ class AppGeneratorTest < Rails::Generators::TestCase
     assert_file("#{app_root}/config/initializers/cookies_serializer.rb", /Rails\.application\.config\.action_dispatch\.cookies_serializer = :marshal/)
   end
 
+  def test_rails_update_does_not_create_active_record_belongs_to_required_by_default
+    app_root = File.join(destination_root, 'myapp')
+    run_generator [app_root]
+
+    FileUtils.rm("#{app_root}/config/initializers/active_record_belongs_to_required_by_default.rb")
+
+    Rails.application.config.root = app_root
+    Rails.application.class.stubs(:name).returns("Myapp")
+    Rails.application.stubs(:is_a?).returns(Rails::Application)
+
+    generator = Rails::Generators::AppGenerator.new ["rails"], { with_dispatchers: true }, destination_root: app_root, shell: @shell
+    generator.send(:app_const)
+    quietly { generator.send(:update_config_files) }
+    assert_no_file "#{app_root}/config/initializers/active_record_belongs_to_required_by_default.rb"
+  end
+
+  def test_rails_update_does_not_remove_active_record_belongs_to_required_by_default_if_already_present
+    app_root = File.join(destination_root, 'myapp')
+    run_generator [app_root]
+
+    FileUtils.touch("#{app_root}/config/initializers/active_record_belongs_to_required_by_default.rb")
+
+    Rails.application.config.root = app_root
+    Rails.application.class.stubs(:name).returns("Myapp")
+    Rails.application.stubs(:is_a?).returns(Rails::Application)
+
+    generator = Rails::Generators::AppGenerator.new ["rails"], { with_dispatchers: true }, destination_root: app_root, shell: @shell
+    generator.send(:app_const)
+    quietly { generator.send(:update_config_files) }
+    assert_file "#{app_root}/config/initializers/active_record_belongs_to_required_by_default.rb"
+  end
+
   def test_application_names_are_not_singularized
     run_generator [File.join(destination_root, "hats")]
     assert_file "hats/config/environment.rb", /Rails\.application\.initialize!/
@@ -309,6 +348,7 @@ class AppGeneratorTest < Rails::Generators::TestCase
   def test_generator_if_skip_active_record_is_given
     run_generator [destination_root, "--skip-active-record"]
     assert_no_file "config/database.yml"
+    assert_no_file "config/initializers/active_record_belongs_to_required_by_default.rb"
     assert_file "config/application.rb", /#\s+require\s+["']active_record\/railtie["']/
     assert_file "test/test_helper.rb" do |helper_content|
       assert_no_match(/fixtures :all/, helper_content)
@@ -410,18 +450,6 @@ class AppGeneratorTest < Rails::Generators::TestCase
     end
   end
 
-  def test_inclusion_of_method_source
-    run_generator
-    assert_file "Gemfile" do |content|
-      assert_gem 'method_source'
-    end
-  end
-
-  def test_inclusion_of_doc
-    run_generator
-    assert_file 'Gemfile', /gem 'sdoc',\s+'~> 0.4.0',\s+group: :doc/
-  end
-
   def test_template_from_dir_pwd
     FileUtils.cd(Rails.root)
     assert_match(/It works from file!/, run_generator([destination_root, "-m", "lib/template.rb"]))
@@ -471,7 +499,7 @@ class AppGeneratorTest < Rails::Generators::TestCase
   end
 
   def test_application_name_with_spaces
-    path = File.join(destination_root, "foo bar".shellescape)
+    path = File.join(destination_root, "foo bar")
 
     # This also applies to MySQL apps but not with SQLite
     run_generator [path, "-d", 'postgresql']
@@ -489,7 +517,7 @@ class AppGeneratorTest < Rails::Generators::TestCase
     run_generator [destination_root, "--dev"]
 
     assert_file "Gemfile" do |content|
-      assert_match(/gem 'web-console',\s+github: "rails\/web-console"/, content)
+      assert_match(/gem 'web-console',\s+github: 'rails\/web-console'/, content)
       assert_no_match(/gem 'web-console', '~> 2.0'/, content)
     end
   end
@@ -498,7 +526,7 @@ class AppGeneratorTest < Rails::Generators::TestCase
     run_generator [destination_root, "--edge"]
 
     assert_file "Gemfile" do |content|
-      assert_match(/gem 'web-console',\s+github: "rails\/web-console"/, content)
+      assert_match(/gem 'web-console',\s+github: 'rails\/web-console'/, content)
       assert_no_match(/gem 'web-console', '~> 2.0'/, content)
     end
   end
@@ -527,6 +555,14 @@ class AppGeneratorTest < Rails::Generators::TestCase
 
   def test_skip_spring
     run_generator [destination_root, "--skip-spring"]
+
+    assert_file "Gemfile" do |content|
+      assert_no_match(/spring/, content)
+    end
+  end
+
+  def test_spring_with_dev_option
+    run_generator [destination_root, "--dev"]
 
     assert_file "Gemfile" do |content|
       assert_no_match(/spring/, content)
@@ -568,6 +604,32 @@ class AppGeneratorTest < Rails::Generators::TestCase
 
     assert_file '.gitignore' do |content|
       assert_no_match(/sqlite/i, content)
+    end
+  end
+
+  def test_create_keeps
+    run_generator
+    folders_with_keep = %w(
+      app/assets/images
+      app/mailers
+      app/models
+      app/controllers/concerns
+      app/models/concerns
+      lib/tasks
+      lib/assets
+      log
+      test/fixtures
+      test/fixtures/files
+      test/controllers
+      test/mailers
+      test/models
+      test/helpers
+      test/integration
+      tmp
+      vendor/assets/stylesheets
+    )
+    folders_with_keep.each do |folder|
+      assert_file("#{folder}/.keep")
     end
   end
 

@@ -11,7 +11,6 @@ end
 require 'active_support/testing/autorun'
 require 'action_mailer'
 require 'action_mailer/test_case'
-require 'mail'
 
 # Emulate AV railtie
 require 'action_view'
@@ -42,8 +41,3 @@ def jruby_skip(message = '')
 end
 
 require 'mocha/setup' # FIXME: stop using mocha
-
-# FIXME: we have tests that depend on run order, we should fix that and
-# remove this method call.
-require 'active_support/test_case'
-ActiveSupport::TestCase.test_order = :sorted

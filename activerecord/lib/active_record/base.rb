@@ -5,7 +5,6 @@ require 'active_support/dependencies'
 require 'active_support/descendants_tracker'
 require 'active_support/time'
 require 'active_support/core_ext/module/attribute_accessors'
-require 'active_support/core_ext/class/delegating_attributes'
 require 'active_support/core_ext/array/extract_options'
 require 'active_support/core_ext/hash/deep_merge'
 require 'active_support/core_ext/hash/slice'
@@ -120,23 +119,22 @@ module ActiveRecord #:nodoc:
   # All column values are automatically available through basic accessors on the Active Record
   # object, but sometimes you want to specialize this behavior. This can be done by overwriting
   # the default accessors (using the same name as the attribute) and calling
-  # <tt>read_attribute(attr_name)</tt> and <tt>write_attribute(attr_name, value)</tt> to actually
-  # change things.
+  # +super+ to actually change things.
   #
   #   class Song < ActiveRecord::Base
   #     # Uses an integer of seconds to hold the length of the song
   #
   #     def length=(minutes)
-  #       write_attribute(:length, minutes.to_i * 60)
+  #       super(minutes.to_i * 60)
   #     end
   #
   #     def length
-  #       read_attribute(:length) / 60
+  #       super / 60
   #     end
   #   end
   #
   # You can alternatively use <tt>self[:attribute]=(value)</tt> and <tt>self[:attribute]</tt>
-  # instead of <tt>write_attribute(:attribute, value)</tt> and <tt>read_attribute(:attribute)</tt>.
+  # or <tt>write_attribute(:attribute, value)</tt> and <tt>read_attribute(:attribute)</tt>.
   #
   # == Attribute query methods
   #
@@ -258,7 +256,7 @@ module ActiveRecord #:nodoc:
   #   <tt>attributes=</tt> method. The +errors+ property of this exception contains an array of
   #   AttributeAssignmentError
   #   objects that should be inspected to determine which attributes triggered the errors.
-  # * RecordInvalid - raised by save! and create! when the record is invalid.
+  # * RecordInvalid - raised by <tt>save!</tt> and <tt>create!</tt> when the record is invalid.
   # * RecordNotFound - No record responded to the +find+ method. Either the row with the given ID doesn't exist
   #   or the row didn't meet the additional restrictions. Some +find+ calls do not raise this exception to signal
   #   nothing was found, please check its documentation for further details.
@@ -282,6 +280,7 @@ module ActiveRecord #:nodoc:
     extend Explain
     extend Enum
     extend Delegation::DelegateCache
+    extend CollectionCacheKey
 
     include Core
     include Persistence
@@ -309,10 +308,12 @@ module ActiveRecord #:nodoc:
     include Aggregations
     include Transactions
     include NoTouching
+    include TouchLater
     include Reflection
     include Serialization
     include Store
     include SecureToken
+    include Suppressor
   end
 
   ActiveSupport.run_load_hooks(:active_record, Base)

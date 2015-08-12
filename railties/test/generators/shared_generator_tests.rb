@@ -56,7 +56,7 @@ module SharedGeneratorTests
     reserved_words = %w[application destroy plugin runner test]
     reserved_words.each do |reserved|
       content = capture(:stderr){ run_generator [File.join(destination_root, reserved)] }
-      assert_match(/Invalid \w+ name #{reserved}. Please give a name which does not match one of the reserved rails words.\n/, content)
+      assert_match(/Invalid \w+ name #{reserved}. Please give a name which does not match one of the reserved rails words: application, destroy, plugin, runner, test\n/, content)
     end
   end
 
@@ -84,15 +84,6 @@ module SharedGeneratorTests
       assert_match(/The template \[.*\] could not be loaded/, content)
       assert_match(/non\/existent\/path/, content)
     end
-  end
-
-  def test_template_is_executed_when_supplied
-    path = "https://gist.github.com/josevalim/103208/raw/"
-    template = %{ say "It works!" }
-    template.instance_eval "def read; self; end" # Make the string respond to read
-
-    generator([destination_root], template: path).expects(:open).with(path, 'Accept' => 'application/x-thor-template').returns(template)
-    quietly { assert_match(/It works!/, capture(:stdout) { generator.invoke_all }) }
   end
 
   def test_template_is_executed_when_supplied_an_https_path
@@ -138,7 +129,11 @@ module SharedGeneratorTests
 
   def test_skip_keeps
     run_generator [destination_root, '--skip-keeps', '--full']
-    assert_file('.gitignore')
+
+    assert_file '.gitignore' do |content|
+      assert_no_match(/\.keep/, content)
+    end
+
     assert_no_file('app/mailers/.keep')
   end
 end

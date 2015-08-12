@@ -1,7 +1,7 @@
 module ActiveRecord
   module Type
     class Integer < Value # :nodoc:
-      include Numeric
+      include Helpers::Numeric
 
       # Column storage size in bytes.
       # 4 bytes means a MySQL int or Postgres integer as opposed to smallint etc.
@@ -16,13 +16,13 @@ module ActiveRecord
         :integer
       end
 
-      def type_cast_from_database(value)
+      def deserialize(value)
         return if value.nil?
         value.to_i
       end
 
-      def type_cast_for_database(value)
-        result = type_cast(value)
+      def serialize(value)
+        result = cast(value)
         if result
           ensure_in_range(result)
         end
@@ -46,17 +46,20 @@ module ActiveRecord
 
       def ensure_in_range(value)
         unless range.cover?(value)
-          raise RangeError, "#{value} is out of range for #{self.class} with limit #{limit || DEFAULT_LIMIT}"
+          raise RangeError, "#{value} is out of range for #{self.class} with limit #{_limit}"
         end
       end
 
       def max_value
-        limit = self.limit || DEFAULT_LIMIT
-        1 << (limit * 8 - 1) # 8 bits per byte with one bit for sign
+        1 << (_limit * 8 - 1) # 8 bits per byte with one bit for sign
       end
 
       def min_value
         -max_value
+      end
+
+      def _limit
+        self.limit || DEFAULT_LIMIT
       end
     end
   end

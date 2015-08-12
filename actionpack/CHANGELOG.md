@@ -1,3 +1,267 @@
+*   Using strings or symbols for middleware class names is deprecated.  Convert
+    things like this:
+
+      middleware.use "Foo::Bar"
+
+    to this:
+
+      middleware.use Foo::Bar
+
+*   ActionController::TestSession now accepts a default value as well as
+    a block for generating a default value based off the key provided.
+
+    This fixes calls to session#fetch in ApplicationController instances that
+    take more two arguments or a block from raising `ArgumentError: wrong
+    number of arguments (2 for 1)` when performing controller tests.
+
+    *Matthew Gerrior*
+
+*   Fix `ActionController::Parameters#fetch` overwriting `KeyError` returned by
+    default block.
+
+    *Jonas Schuber Erlandsson*, *Roque Pinel*
+
+*   `ActionController::Parameters` no longer inherits from
+    `HashWithIndifferentAccess`
+
+    Inheriting from `HashWithIndifferentAccess` allowed users to call any
+    enumerable methods on `Parameters` object, resulting in a risk of losing the
+    `permitted?` status or even getting back a pure `Hash` object instead of
+    a `Parameters` object with proper sanitization.
+
+    By not inheriting from `HashWithIndifferentAccess`, we are able to make
+    sure that all methods that are defined in `Parameters` object will return
+    a proper `Parameters` object with a correct `permitted?` flag.
+
+    *Prem Sichanugrist*
+
+*   Replaced `ActiveSupport::Concurrency::Latch` with `Concurrent::CountDownLatch`
+    from the concurrent-ruby gem.
+
+    *Jerry D'Antonio*
+
+*   Add ability to filter parameters based on parent keys.
+
+        # matches {credit_card: {code: "xxxx"}}
+        # doesn't match {file: { code: "xxxx"}}
+        config.filter_parameters += [ "credit_card.code" ]
+
+    See #13897.
+
+    *Guillaume Malette*
+
+*   Deprecate passing first parameter as `Hash` and default status code for `head` method.
+
+    *Mehmet Emin İNAÇ*
+
+*   Adds`Rack::Utils::ParameterTypeError` and `Rack::Utils::InvalidParameterError`
+    to the rescue_responses hash in `ExceptionWrapper` (Rack recommends
+    integrators serve 400s for both of these).
+
+    *Grey Baker*
+
+*   Add support for API only apps.
+    ActionController::API is added as a replacement of
+    ActionController::Base for this kind of applications.
+
+    *Santiago Pastorino & Jorge Bejar*
+
+*   Remove `assigns` and `assert_template`. Both methods have been extracted
+    into a gem at https://github.com/rails/rails-controller-testing.
+
+    See #18950.
+
+    *Alan Guo Xiang Tan*
+
+*   `FileHandler` and `Static` middleware initializers accept `index` argument
+    to configure the directory index file name. Defaults to `index` (as in
+    `index.html`).
+
+    See #20017.
+
+    *Eliot Sykes*
+
+*   Deprecate `:nothing` option for `render` method.
+
+    *Mehmet Emin İNAÇ*
+
+*   Fix `rake routes` not showing the right format when
+    nesting multiple routes.
+
+    See #18373.
+
+    *Ravil Bayramgalin*
+
+*   Add ability to override default form builder for a controller.
+
+        class AdminController < ApplicationController
+          default_form_builder AdminFormBuilder
+        end
+
+    *Kevin McPhillips*
+
+*   For actions with no corresponding templates, render `head :no_content`
+    instead of raising an error. This allows for slimmer API controller
+    methods that simply work, without needing further instructions.
+
+    See #19036.
+
+    *Stephen Bussey*
+
+*   Provide friendlier access to request variants.
+
+        request.variant = :phone
+        request.variant.phone?  # true
+        request.variant.tablet? # false
+
+        request.variant = [:phone, :tablet]
+        request.variant.phone?                  # true
+        request.variant.desktop?                # false
+        request.variant.any?(:phone, :desktop)  # true
+        request.variant.any?(:desktop, :watch)  # false
+
+    *George Claghorn*
+
+*   Fix regression where a gzip file response would have a Content-type,
+    even when it was a 304 status code.
+
+    See #19271.
+
+    *Kohei Suzuki*
+
+*   Fix handling of empty `X_FORWARDED_HOST` header in `raw_host_with_port`.
+
+    Previously, an empty `X_FORWARDED_HOST` header would cause
+    `Actiondispatch::Http:URL.raw_host_with_port` to return `nil`, causing
+    `Actiondispatch::Http:URL.host` to raise a `NoMethodError`.
+
+    *Adam Forsyth*
+
+*   Allow `Bearer` as token-keyword in `Authorization-Header`.
+
+    Aditionally to `Token`, the keyword `Bearer` is acceptable as a keyword
+    for the auth-token. The `Bearer` keyword is described in the original
+    OAuth RFC and used in libraries like Angular-JWT.
+
+    See #19094.
+
+    *Peter Schröder*
+
+*   Drop request class from RouteSet constructor.
+
+    If you would like to use a custom request class, please subclass and implement
+    the `request_class` method.
+
+    *tenderlove@ruby-lang.org*
+
+*   Fallback to `ENV['RAILS_RELATIVE_URL_ROOT']` in `url_for`.
+
+    Fixed an issue where the `RAILS_RELATIVE_URL_ROOT` environment variable is not
+    prepended to the path when `url_for` is called. If `SCRIPT_NAME` (used by Rack)
+    is set, it takes precedence.
+
+    Fixes #5122.
+
+    *Yasyf Mohamedali*
+
+*   Partitioning of routes is now done when the routes are being drawn. This
+    helps to decrease the time spent filtering the routes during the first request.
+
+    *Guo Xiang Tan*
+
+*   Fix regression in functional tests. Responses should have default headers
+    assigned.
+
+    See #18423.
+
+    *Jeremy Kemper*, *Yves Senn*
+
+*   Deprecate AbstractController#skip_action_callback in favor of individual skip_callback methods
+    (which can be made to raise an error if no callback was removed).
+
+    *Iain Beeston*
+
+*   Alias the `ActionDispatch::Request#uuid` method to `ActionDispatch::Request#request_id`.
+    Due to implementation, `config.log_tags = [:request_id]` also works in substitute
+    for `config.log_tags = [:uuid]`.
+
+    *David Ilizarov*
+
+*   Change filter on /rails/info/routes to use an actual path regexp from rails
+    and not approximate javascript version. Oniguruma supports much more
+    extensive list of features than javascript regexp engine.
+
+    Fixes #18402.
+
+    *Ravil Bayramgalin*
+
+*   Non-string authenticity tokens do not raise NoMethodError when decoding
+    the masked token.
+
+    *Ville Lautanala*
+
+*   Add `http_cache_forever` to Action Controller, so we can cache a response
+    that never gets expired.
+
+    *arthurnn*
+
+*   `ActionController#translate` supports symbols as shortcuts.
+    When a shortcut is given it also performs the lookup without the action
+    name.
+
+    *Max Melentiev*
+
+*   Expand `ActionController::ConditionalGet#fresh_when` and `stale?` to also
+    accept a collection of records as the first argument, so that the
+    following code can be written in a shorter form.
+
+        # Before
+        def index
+          @articles = Article.all
+          fresh_when(etag: @articles, last_modified: @articles.maximum(:updated_at))
+        end
+
+        # After
+        def index
+          @articles = Article.all
+          fresh_when(@articles)
+        end
+
+    *claudiob*
+
+*   Explicitly ignored wildcard verbs when searching for HEAD routes before fallback
+
+    Fixes an issue where a mounted rack app at root would intercept the HEAD
+    request causing an incorrect behavior during the fall back to GET requests.
+
+    Example:
+
+        draw do
+            get '/home' => 'test#index'
+            mount rack_app, at: '/'
+        end
+        head '/home'
+        assert_response :success
+
+    In this case, a HEAD request runs through the routes the first time and fails
+    to match anything. Then, it runs through the list with the fallback and matches
+    `get '/home'`. The original behavior would match the rack app in the first pass.
+
+    *Terence Sun*
+
+*   Migrating xhr methods to keyword arguments syntax
+    in `ActionController::TestCase` and `ActionDispatch::Integration`
+
+    Old syntax:
+
+        xhr :get, :create, params: { id: 1 }
+
+    New syntax example:
+
+        get :create, params: { id: 1 }, xhr: true
+
+    *Kir Shatrov*
+
 *   Migrating to keyword arguments syntax in `ActionController::TestCase` and
     `ActionDispatch::Integration` HTTP request methods.
 
@@ -11,13 +275,13 @@
 
 *   Preserve default url options when generating URLs.
 
-    Fixes an issue that would cause default_url_options to be lost when
+    Fixes an issue that would cause `default_url_options` to be lost when
     generating URLs with fewer positional arguments than parameters in the
     route definition.
 
     *Tekin Suleyman*
 
-*   Deprecate *_via_redirect integration test methods.
+*   Deprecate `*_via_redirect` integration test methods.
 
     Use `follow_redirect!` manually after the request call for the same behavior.
 
@@ -40,11 +304,11 @@
 
     *Jonas Baumann*
 
-*   Deprecate all *_filter callbacks in favor of *_action callbacks.
+*   Deprecate all `*_filter` callbacks in favor of `*_action` callbacks.
 
     *Rafael Mendonça França*
 
-*   Allow you to pass `prepend: false` to protect_from_forgery to have the
+*   Allow you to pass `prepend: false` to `protect_from_forgery` to have the
     verification callback appended instead of prepended to the chain.
     This allows you to let the verification step depend on prior callbacks.
 
@@ -115,7 +379,7 @@
 
 *   Ensure `append_info_to_payload` is called even if an exception is raised.
 
-    Fixes an issue where when an exception is raised in the request the additonal
+    Fixes an issue where when an exception is raised in the request the additional
     payload data is not available.
 
     See:
@@ -146,7 +410,7 @@
 
 *   Stop converting empty arrays in `params` to `nil`.
 
-    This behaviour was introduced in response to CVE-2012-2660, CVE-2012-2694
+    This behavior was introduced in response to CVE-2012-2660, CVE-2012-2694
     and CVE-2013-0155
 
     ActiveRecord now issues a safe query when passing an empty array into

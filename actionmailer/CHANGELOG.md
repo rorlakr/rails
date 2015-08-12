@@ -1,3 +1,34 @@
+*   Add `config.action_mailer.deliver_later_queue_name` configuration to set the
+    mailer queue name.
+
+    *Chris McGrath*
+
+*   `assert_emails` in block form use the given number as expected value.
+    This makes the error message much easier to understand.
+
+    *Yuji Yaginuma*
+
+*   Add support for inline images in mailer previews by using an interceptor
+    class to convert cid: urls in image src attributes to data urls.
+
+    *Andrew White*
+
+*   Mailer preview now uses `url_for` to fix links to emails for apps running on
+    a subdirectory.
+
+    *Remo Mueller*
+
+*   Mailer previews no longer crash when the `mail` method wasn't called
+    (`NullMail`).
+
+    Fixes #19849.
+
+    *Yves Senn*
+
+*   Make sure labels and values line up in mailer previews.
+
+    *Yves Senn*
+
 *   Add `assert_enqueued_emails` and `assert_no_enqueued_emails`.
 
     Example:

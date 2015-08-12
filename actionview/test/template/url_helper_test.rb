@@ -1,4 +1,3 @@
-# encoding: utf-8
 require 'abstract_unit'
 require 'minitest/mock'
 
@@ -380,6 +379,11 @@ class UrlHelperTest < ActiveSupport::TestCase
     assert_dom_equal %{<a href="/">Listing</a>}, link_to_if(true, "Listing", url_hash)
   end
 
+  def test_link_to_if_with_block
+    assert_equal "Fallback", link_to_if(false, "Showing", url_hash) { "Fallback" }
+    assert_dom_equal %{<a href="/">Listing</a>}, link_to_if(true, "Listing", url_hash) { "Fallback" }
+  end
+
   def request_for_url(url, opts = {})
     env = Rack::MockRequest.env_for("http://www.example.com#{url}", opts)
     ActionDispatch::Request.new(env)
@@ -480,6 +484,11 @@ class UrlHelperTest < ActiveSupport::TestCase
       link_to_unless_current("Listing", "http://www.example.com/")
   end
 
+  def test_link_to_unless_with_block
+    assert_dom_equal %{<a href="/">Showing</a>}, link_to_unless(false, "Showing", url_hash) { "Fallback" }
+    assert_equal "Fallback", link_to_unless(true, "Listing", url_hash) { "Fallback" }
+  end
+
   def test_mail_to
     assert_dom_equal %{<a href="mailto:david@loudthinking.com">david@loudthinking.com</a>}, mail_to("david@loudthinking.com")
     assert_dom_equal %{<a href="mailto:david@loudthinking.com">David Heinemeier Hansson</a>}, mail_to("david@loudthinking.com", "David Heinemeier Hansson")
@@ -491,10 +500,22 @@ class UrlHelperTest < ActiveSupport::TestCase
                  mail_to("david@loudthinking.com", "David Heinemeier Hansson", class: "admin")
   end
 
+  def test_mail_to_with_special_characters
+    assert_dom_equal(
+      %{<a href="mailto:%23%21%24%25%26%27%2A%2B-%2F%3D%3F%5E_%60%7B%7D%7C%7E@example.org">#!$%&amp;&#39;*+-/=?^_`{}|~@example.org</a>},
+      mail_to("#!$%&'*+-/=?^_`{}|~@example.org")
+    )
+  end
+
   def test_mail_with_options
     assert_dom_equal(
       %{<a href="mailto:me@example.com?cc=ccaddress%40example.com&amp;bcc=bccaddress%40example.com&amp;body=This%20is%20the%20body%20of%20the%20message.&amp;subject=This%20is%20an%20example%20email&amp;reply-to=foo%40bar.com">My email</a>},
       mail_to("me@example.com", "My email", cc: "ccaddress@example.com", bcc: "bccaddress@example.com", subject: "This is an example email", body: "This is the body of the message.", reply_to: "foo@bar.com")
+    )
+
+    assert_dom_equal(
+      %{<a href="mailto:me@example.com?body=This%20is%20the%20body%20of%20the%20message.&amp;subject=This%20is%20an%20example%20email">My email</a>},
+      mail_to("me@example.com", "My email", cc: '', bcc: '', subject: "This is an example email", body: "This is the body of the message.")
     )
   end
 

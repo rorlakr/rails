@@ -1,7 +1,7 @@
 require "cases/helper"
 require "active_support/core_ext/numeric/bytes"
 
-class PostgresqlIntegerTest < ActiveRecord::TestCase
+class PostgresqlIntegerTest < ActiveRecord::PostgreSQLTestCase
   class PgInteger < ActiveRecord::Base
   end
 
@@ -16,7 +16,7 @@ class PostgresqlIntegerTest < ActiveRecord::TestCase
   end
 
   teardown do
-    @connection.execute "drop table if exists pg_integers"
+    @connection.drop_table "pg_integers", if_exists: true
   end
 
   test "schema properly respects bigint ranges" do

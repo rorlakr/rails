@@ -6,70 +6,78 @@ require 'rails/engine'
 class TestCaseTest < ActionController::TestCase
   class TestController < ActionController::Base
     def no_op
-      render text: 'dummy'
+      render plain: 'dummy'
     end
 
     def set_flash
       flash["test"] = ">#{flash["test"]}<"
-      render text: 'ignore me'
+      render plain: 'ignore me'
     end
 
     def delete_flash
       flash.delete("test")
-      render :text => 'ignore me'
+      render plain: 'ignore me'
     end
 
     def set_flash_now
       flash.now["test_now"] = ">#{flash["test_now"]}<"
-      render text: 'ignore me'
+      render plain: 'ignore me'
     end
 
     def set_session
       session['string'] = 'A wonder'
       session[:symbol] = 'it works'
-      render text: 'Success'
+      render plain: 'Success'
     end
 
     def reset_the_session
       reset_session
-      render text: 'ignore me'
+      render plain: 'ignore me'
     end
 
     def render_raw_post
       raise ActiveSupport::TestCase::Assertion, "#raw_post is blank" if request.raw_post.blank?
-      render text: request.raw_post
+      render plain: request.raw_post
     end
 
     def render_body
-      render text: request.body.read
+      render plain: request.body.read
     end
 
     def test_params
-      render text: params.inspect
+      render plain: ::JSON.dump(params.to_unsafe_h)
+    end
+
+    def test_query_parameters
+      render plain: ::JSON.dump(request.query_parameters)
+    end
+
+    def test_request_parameters
+      render plain: request.request_parameters.inspect
     end
 
     def test_uri
-      render text: request.fullpath
+      render plain: request.fullpath
     end
 
     def test_format
-      render text: request.format
+      render plain: request.format
     end
 
     def test_query_string
-      render text: request.query_string
+      render plain: request.query_string
     end
 
     def test_protocol
-      render text: request.protocol
+      render plain: request.protocol
     end
 
     def test_headers
-      render text: request.headers.env.to_json
+      render plain: request.headers.env.to_json
     end
 
     def test_html_output
-      render text: <<HTML
+      render plain: <<HTML
 <html>
   <body>
     <a href="/"><img src="/images/button.png" /></a>
@@ -91,7 +99,7 @@ HTML
 
     def test_xml_output
       response.content_type = "application/xml"
-      render text: <<XML
+      render plain: <<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
   <area>area is an empty tag in HTML, raising an error if not in xml mode</area>
@@ -100,15 +108,15 @@ XML
     end
 
     def test_only_one_param
-      render text: (params[:left] && params[:right]) ? "EEP, Both here!" : "OK"
+      render plain: (params[:left] && params[:right]) ? "EEP, Both here!" : "OK"
     end
 
     def test_remote_addr
-      render text: (request.remote_addr || "not specified")
+      render plain: (request.remote_addr || "not specified")
     end
 
     def test_file_upload
-      render text: params[:file].size
+      render plain: params[:file].size
     end
 
     def test_send_file
@@ -129,13 +137,7 @@ XML
 
     def delete_cookie
       cookies.delete("foo")
-      render nothing: true
-    end
-
-    def test_assigns
-      @foo = "foo"
-      @foo_hash = { foo: :bar }
-      render nothing: true
+      head :ok
     end
 
     def test_without_body
@@ -156,8 +158,6 @@ XML
   def setup
     super
     @controller = TestController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
     @request.env['PATH_INFO'] = nil
     @routes = ActionDispatch::Routing::RouteSet.new.tap do |r|
       r.draw do
@@ -166,22 +166,11 @@ XML
     end
   end
 
-  class ViewAssignsController < ActionController::Base
-    def test_assigns
-      @foo = "foo"
-      render nothing: true
-    end
-
-    def view_assigns
-      { "bar" => "bar" }
-    end
-  end
-
   class DefaultUrlOptionsCachingController < ActionController::Base
     before_action { @dynamic_opt = 'opt' }
 
     def test_url_options_reset
-      render text: url_for(params)
+      render plain: url_for(params)
     end
 
     def default_url_options
@@ -238,7 +227,7 @@ XML
 
   def test_document_body_and_params_with_post
     post :test_params, params: { id: 1 }
-    assert_equal(%({"id"=>"1", "controller"=>"test_case_test/test", "action"=>"test_params"}), @response.body)
+    assert_equal({"id"=>"1", "controller"=>"test_case_test/test", "action"=>"test_params"}, ::JSON.parse(@response.body))
   end
 
   def test_document_body_with_post
@@ -438,30 +427,6 @@ XML
     assert_equal "OK", @response.body
   end
 
-  def test_assigns
-    process :test_assigns
-    # assigns can be accessed using assigns(key)
-    # or assigns[key], where key is a string or
-    # a symbol
-    assert_equal "foo", assigns(:foo)
-    assert_equal "foo", assigns("foo")
-    assert_equal "foo", assigns[:foo]
-    assert_equal "foo", assigns["foo"]
-
-    # but the assigned variable should not have its own keys stringified
-    expected_hash = { foo: :bar }
-    assert_equal expected_hash, assigns(:foo_hash)
-  end
-
-  def test_view_assigns
-    @controller = ViewAssignsController.new
-    process :test_assigns
-    assert_equal nil, assigns(:foo)
-    assert_equal nil, assigns[:foo]
-    assert_equal "bar", assigns(:bar)
-    assert_equal "bar", assigns[:bar]
-  end
-
   def test_should_not_impose_childless_html_tags_in_xml
     process :test_xml_output
 
@@ -518,7 +483,7 @@ XML
     assert_deprecated {
       get :test_params, page: { name: "Page name", month: '4', year: '2004', day: '6' }
     }
-    parsed_params = eval(@response.body)
+    parsed_params = ::JSON.parse(@response.body)
     assert_equal(
       {
         'controller' => 'test_case_test/test', 'action' => 'test_params',
@@ -537,7 +502,7 @@ XML
         day: '6'
       }
     }
-    parsed_params = eval(@response.body)
+    parsed_params = ::JSON.parse(@response.body)
     assert_equal(
       {
         'controller' => 'test_case_test/test', 'action' => 'test_params',
@@ -545,6 +510,18 @@ XML
       },
       parsed_params
     )
+  end
+
+  def test_query_param_named_action
+    get :test_query_parameters, params: {action: 'foobar'}
+    parsed_params = JSON.parse(@response.body)
+    assert_equal({'action' => 'foobar'}, parsed_params)
+  end
+
+  def test_request_param_named_action
+    post :test_request_parameters, params: {action: 'foobar'}
+    parsed_params = eval(@response.body)
+    assert_equal({'action' => 'foobar'}, parsed_params)
   end
 
   def test_kwarg_params_passing_with_session_and_flash
@@ -557,7 +534,7 @@ XML
       }
     }, session: { 'foo' => 'bar' }, flash: { notice: 'created' }
 
-    parsed_params = eval(@response.body)
+    parsed_params = ::JSON.parse(@response.body)
     assert_equal(
       {'controller' => 'test_case_test/test', 'action' => 'test_params',
        'page' => {'name' => "Page name", 'month' => '4', 'year' => '2004', 'day' => '6'}},
@@ -572,7 +549,7 @@ XML
     get :test_params, params: {
       page: { name: "Page name", month: 4, year: 2004, day: 6 }
     }
-    parsed_params = eval(@response.body)
+    parsed_params = ::JSON.parse(@response.body)
     assert_equal(
       {'controller' => 'test_case_test/test', 'action' => 'test_params',
        'page' => {'name' => "Page name", 'month' => '4', 'year' => '2004', 'day' => '6'}},
@@ -582,17 +559,17 @@ XML
 
   def test_params_passing_with_fixnums_when_not_html_request
     get :test_params, params: { format: 'json', count: 999 }
-    parsed_params = eval(@response.body)
+    parsed_params = ::JSON.parse(@response.body)
     assert_equal(
       {'controller' => 'test_case_test/test', 'action' => 'test_params',
-       'format' => 'json', 'count' => 999 },
+       'format' => 'json', 'count' => '999' },
       parsed_params
     )
   end
 
   def test_params_passing_path_parameter_is_string_when_not_html_request
     get :test_params, params: { format: 'json', id: 1 }
-    parsed_params = eval(@response.body)
+    parsed_params = ::JSON.parse(@response.body)
     assert_equal(
       {'controller' => 'test_case_test/test', 'action' => 'test_params',
        'format' => 'json', 'id' => '1' },
@@ -602,7 +579,7 @@ XML
 
   def test_deprecated_params_passing_path_parameter_is_string_when_not_html_request
     assert_deprecated { get :test_params, format: 'json', id: 1 }
-    parsed_params = eval(@response.body)
+    parsed_params = ::JSON.parse(@response.body)
     assert_equal(
       {'controller' => 'test_case_test/test', 'action' => 'test_params',
        'format' => 'json', 'id' => '1' },
@@ -616,7 +593,7 @@ XML
         frozen: 'icy'.freeze, frozens: ['icy'.freeze].freeze, deepfreeze: { frozen: 'icy'.freeze }.freeze
       }
     end
-    parsed_params = eval(@response.body)
+    parsed_params = ::JSON.parse(@response.body)
     assert_equal(
       {'controller' => 'test_case_test/test', 'action' => 'test_params',
        'frozen' => 'icy', 'frozens' => ['icy'], 'deepfreeze' => { 'frozen' => 'icy' }},
@@ -706,19 +683,25 @@ XML
   end
 
   def test_header_properly_reset_after_remote_http_request
-    xhr :get, :test_params
+    get :test_params, xhr: true
     assert_nil @request.env['HTTP_X_REQUESTED_WITH']
     assert_nil @request.env['HTTP_ACCEPT']
   end
 
-  def test_xhr_with_params
-    xhr :get, :test_params, params: { id: 1 }
+  def test_deprecated_xhr_with_params
+    assert_deprecated { xhr :get, :test_params, params: { id: 1 } }
 
-    assert_equal(%({"id"=>"1", "controller"=>"test_case_test/test", "action"=>"test_params"}), @response.body)
+    assert_equal({"id"=>"1", "controller"=>"test_case_test/test", "action"=>"test_params"}, ::JSON.parse(@response.body))
+  end
+
+  def test_xhr_with_params
+    get :test_params, params: { id: 1 }, xhr: true
+
+    assert_equal({"id"=>"1", "controller"=>"test_case_test/test", "action"=>"test_params"}, ::JSON.parse(@response.body))
   end
 
   def test_xhr_with_session
-    xhr :get, :set_session
+    get :set_session, xhr: true
 
     assert_equal 'A wonder', session['string'], "A value stored in the session should be available by string key"
     assert_equal 'A wonder', session[:string], "Test session hash should allow indifferent access"
@@ -726,10 +709,13 @@ XML
     assert_equal 'it works', session[:symbol], "Test session hash should allow indifferent access"
   end
 
-  def test_header_properly_reset_after_get_request
-    get :test_params
-    @request.recycle!
-    assert_nil @request.instance_variable_get("@request_method")
+  def test_deprecated_xhr_with_session
+    assert_deprecated { xhr :get, :set_session }
+
+    assert_equal 'A wonder', session['string'], "A value stored in the session should be available by string key"
+    assert_equal 'A wonder', session[:string], "Test session hash should allow indifferent access"
+    assert_equal 'it works', session['symbol'], "Test session hash should allow indifferent access"
+    assert_equal 'it works', session[:symbol], "Test session hash should allow indifferent access"
   end
 
   def test_deprecated_params_reset_between_post_requests
@@ -893,6 +879,11 @@ XML
     assert_equal File.open(path, READ_PLAIN).read, plain_file_upload.read
   end
 
+  def test_fixture_file_upload_should_be_able_access_to_tempfile
+    file = fixture_file_upload(FILES_DIR + "/mona_lisa.jpg", "image/jpg")
+    assert file.respond_to?(:tempfile), "expected tempfile should respond on fixture file object, got nothing"
+  end
+
   def test_fixture_file_upload
     post :test_file_upload,
       params: {
@@ -917,7 +908,7 @@ XML
     filename = 'mona_lisa.jpg'
     path = "#{FILES_DIR}/#{filename}"
     assert_deprecated {
-      post :test_file_upload, file: ActionDispatch::Http::UploadedFile.new(filename: path, type: "image/jpg", tempfile: File.open(path))
+      post :test_file_upload, file: Rack::Test::UploadedFile.new(path, "image/jpg", true)
     }
     assert_equal '159528', @response.body
   end
@@ -926,7 +917,7 @@ XML
     filename = 'mona_lisa.jpg'
     path = "#{FILES_DIR}/#{filename}"
     post :test_file_upload, params: {
-      file: ActionDispatch::Http::UploadedFile.new(filename: path, type: "image/jpg", tempfile: File.open(path))
+      file: Rack::Test::UploadedFile.new(path, "image/jpg", true)
     }
     assert_equal '159528', @response.body
   end
@@ -950,6 +941,51 @@ XML
   end
 end
 
+class ResponseDefaultHeadersTest < ActionController::TestCase
+  class TestController < ActionController::Base
+    def remove_header
+      headers.delete params[:header]
+      head :ok, 'C' => '3'
+    end
+  end
+
+  def before_setup
+    @original = ActionDispatch::Response.default_headers
+    @defaults = { 'A' => '1', 'B' => '2' }
+    ActionDispatch::Response.default_headers = @defaults
+    super
+  end
+
+  teardown do
+    ActionDispatch::Response.default_headers = @original
+  end
+
+  def setup
+    super
+    @controller = TestController.new
+    @request.env['PATH_INFO'] = nil
+    @routes = ActionDispatch::Routing::RouteSet.new.tap do |r|
+      r.draw do
+        get ':controller(/:action(/:id))'
+      end
+    end
+  end
+
+  test "response contains default headers" do
+    # Response headers start out with the defaults
+    assert_equal @defaults, response.headers
+
+    get :remove_header, params: { header: 'A' }
+    assert_response :ok
+
+    # After a request, the response in the test case doesn't have the
+    # defaults merged on top again.
+    assert_not_includes response.headers, 'A'
+    assert_includes response.headers, 'B'
+    assert_includes response.headers, 'C'
+  end
+end
+
 module EngineControllerTests
   class Engine < ::Rails::Engine
     isolate_namespace EngineControllerTests
@@ -961,7 +997,7 @@ module EngineControllerTests
 
   class BarController < ActionController::Base
     def index
-      render text: 'bar'
+      render plain: 'bar'
     end
   end
 
@@ -1047,7 +1083,7 @@ class AnonymousControllerTest < ActionController::TestCase
   def setup
     @controller = Class.new(ActionController::Base) do
       def index
-        render text: params[:controller]
+        render plain: params[:controller]
       end
     end.new
 
@@ -1068,11 +1104,11 @@ class RoutingDefaultsTest < ActionController::TestCase
   def setup
     @controller = Class.new(ActionController::Base) do
       def post
-        render text: request.fullpath
+        render plain: request.fullpath
       end
 
       def project
-        render text: request.fullpath
+        render plain: request.fullpath
       end
     end.new
 

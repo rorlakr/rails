@@ -1,3 +1,4 @@
+require 'action_view/renderer/partial_renderer/collection_caching'
 require 'thread_safe'
 
 module ActionView
@@ -153,23 +154,23 @@ module ActionView
   # specified globally for the entire action, but they work in a similar fashion. Imagine a list with two types
   # of users:
   #
-  #   <%# app/views/users/index.html.erb &>
+  #   <%# app/views/users/index.html.erb %>
   #   Here's the administrator:
   #   <%= render partial: "user", layout: "administrator", locals: { user: administrator } %>
   #
   #   Here's the editor:
   #   <%= render partial: "user", layout: "editor", locals: { user: editor } %>
   #
-  #   <%# app/views/users/_user.html.erb &>
+  #   <%# app/views/users/_user.html.erb %>
   #   Name: <%= user.name %>
   #
-  #   <%# app/views/users/_administrator.html.erb &>
+  #   <%# app/views/users/_administrator.html.erb %>
   #   <div id="administrator">
   #     Budget: $<%= user.budget %>
   #     <%= yield %>
   #   </div>
   #
-  #   <%# app/views/users/_editor.html.erb &>
+  #   <%# app/views/users/_editor.html.erb %>
   #   <div id="editor">
   #     Deadline: <%= user.deadline %>
   #     <%= yield %>
@@ -232,7 +233,7 @@ module ActionView
   #
   # You can also apply a layout to a block within any template:
   #
-  #   <%# app/views/users/_chief.html.erb &>
+  #   <%# app/views/users/_chief.html.erb %>
   #   <%= render(layout: "administrator", locals: { user: chief }) do %>
   #     Title: <%= chief.title %>
   #   <% end %>
@@ -249,13 +250,13 @@ module ActionView
   # If you pass arguments to "yield" then this will be passed to the block. One way to use this is to pass
   # an array to layout and treat it as an enumerable.
   #
-  #   <%# app/views/users/_user.html.erb &>
+  #   <%# app/views/users/_user.html.erb %>
   #   <div class="user">
   #     Budget: $<%= user.budget %>
   #     <%= yield user %>
   #   </div>
   #
-  #   <%# app/views/users/index.html.erb &>
+  #   <%# app/views/users/index.html.erb %>
   #   <%= render layout: @users do |user| %>
   #     Title: <%= user.title %>
   #   <% end %>
@@ -264,14 +265,14 @@ module ActionView
   #
   # You can also yield multiple times in one layout and use block arguments to differentiate the sections.
   #
-  #   <%# app/views/users/_user.html.erb &>
+  #   <%# app/views/users/_user.html.erb %>
   #   <div class="user">
   #     <%= yield user, :header %>
   #     Budget: $<%= user.budget %>
   #     <%= yield user, :footer %>
   #   </div>
   #
-  #   <%# app/views/users/index.html.erb &>
+  #   <%# app/views/users/index.html.erb %>
   #   <%= render layout: @users do |user, section| %>
   #     <%- case section when :header -%>
   #       Title: <%= user.title %>
@@ -280,6 +281,8 @@ module ActionView
   #     <%- end -%>
   #   <% end %>
   class PartialRenderer < AbstractRenderer
+    include CollectionCaching
+
     PREFIXED_PARTIAL_NAMES = ThreadSafe::Cache.new do |h, k|
       h[k] = ThreadSafe::Cache.new
     end
@@ -321,8 +324,9 @@ module ActionView
         spacer = find_template(@options[:spacer_template], @locals.keys).render(@view, @locals)
       end
 
-      result = @template ? collection_with_template : collection_without_template
-      result.join(spacer).html_safe
+      cache_collection_render do
+        @template ? collection_with_template : collection_without_template
+      end.join(spacer).html_safe
     end
 
     def render_partial
@@ -334,7 +338,7 @@ module ActionView
       end
 
       object ||= locals[as]
-      locals[as] = object
+      locals[as] = object if @has_object
 
       content = @template.render(view, locals) do |*name|
         view._layout_for(*name, &block)
@@ -343,8 +347,6 @@ module ActionView
       content = layout.render(view, locals){ content } if layout
       content
     end
-
-    private
 
     # Sets up instance variables needed for rendering a partial. This method
     # finds the options and details and extracts them. The method also contains
@@ -518,8 +520,8 @@ module ActionView
 
     def retrieve_variable(path, as)
       variable = as || begin
-        base = path[-1] == "/" ? "" : File.basename(path)
-        raise_invalid_identifier(path) unless base =~ /\A_?([a-z]\w*)(\.\w+)*\z/
+        base = path[-1] == "/".freeze ? "".freeze : File.basename(path)
+        raise_invalid_identifier(path) unless base =~ /\A_?(.*)(?:\.\w+)*\z/
         $1.to_sym
       end
       if @collection
@@ -530,8 +532,7 @@ module ActionView
     end
 
     IDENTIFIER_ERROR_MESSAGE = "The partial name (%s) is not a valid Ruby identifier; " +
-                               "make sure your partial name starts with underscore, " +
-                               "and is followed by any combination of letters, numbers and underscores."
+                               "make sure your partial name starts with underscore."
 
     OPTION_AS_ERROR_MESSAGE  = "The value (%s) of the option `as` is not a valid Ruby identifier; " +
                                "make sure it starts with lowercase letter, " +

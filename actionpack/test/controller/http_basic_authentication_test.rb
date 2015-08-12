@@ -9,19 +9,19 @@ class HttpBasicAuthenticationTest < ActionController::TestCase
     http_basic_authenticate_with :name => "David", :password => "Goliath", :only => :search
 
     def index
-      render :text => "Hello Secret"
+      render plain: "Hello Secret"
     end
 
     def display
-      render :text => 'Definitely Maybe'
+      render plain: 'Definitely Maybe' if @logged_in
     end
 
     def show
-      render :text => 'Only for loooooong credentials'
+      render plain: 'Only for loooooong credentials'
     end
 
     def search
-      render :text => 'All inline'
+      render plain: 'All inline'
     end
 
     private
@@ -36,7 +36,7 @@ class HttpBasicAuthenticationTest < ActionController::TestCase
       if authenticate_with_http_basic { |username, password| username == 'pretty' && password == 'please' }
         @logged_in = true
       else
-        request_http_basic_authentication("SuperSecret")
+        request_http_basic_authentication("SuperSecret", "Authentication Failed\n")
       end
     end
 
@@ -100,11 +100,19 @@ class HttpBasicAuthenticationTest < ActionController::TestCase
     assert_no_match(/\n/, result)
   end
 
+  test "succesful authentication with uppercase authorization scheme" do
+    @request.env['HTTP_AUTHORIZATION'] = "BASIC #{::Base64.encode64("lifo:world")}"
+    get :index
+
+    assert_response :success
+    assert_equal 'Hello Secret', @response.body, 'Authentication failed when authorization scheme BASIC'
+  end
+
   test "authentication request without credential" do
     get :display
 
     assert_response :unauthorized
-    assert_equal "HTTP Basic: Access denied.\n", @response.body
+    assert_equal "Authentication Failed\n", @response.body
     assert_equal 'Basic realm="SuperSecret"', @response.headers['WWW-Authenticate']
   end
 
@@ -113,7 +121,7 @@ class HttpBasicAuthenticationTest < ActionController::TestCase
     get :display
 
     assert_response :unauthorized
-    assert_equal "HTTP Basic: Access denied.\n", @response.body
+    assert_equal "Authentication Failed\n", @response.body
     assert_equal 'Basic realm="SuperSecret"', @response.headers['WWW-Authenticate']
   end
 
@@ -122,7 +130,6 @@ class HttpBasicAuthenticationTest < ActionController::TestCase
     get :display
 
     assert_response :success
-    assert assigns(:logged_in)
     assert_equal 'Definitely Maybe', @response.body
   end
 

@@ -6,7 +6,7 @@ require 'securerandom'
 module ActiveRecord
   module ConnectionAdapters
     class SQLite3Adapter
-      class QuotingTest < ActiveRecord::TestCase
+      class QuotingTest < ActiveRecord::SQLite3TestCase
         def setup
           @conn = Base.sqlite3_connection :database => ':memory:',
             :adapter => 'sqlite3',
@@ -87,7 +87,7 @@ module ActiveRecord
           value = "hello".encode('ascii-8bit')
           type = Type::String.new
 
-          assert_equal "'hello'", @conn.quote(type.type_cast_for_database(value))
+          assert_equal "'hello'", @conn.quote(type.serialize(value))
         end
       end
     end

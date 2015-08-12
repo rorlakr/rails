@@ -11,17 +11,15 @@ module ActiveRecord
 
       protected
 
-      # Accepts an array, hash, or string of SQL conditions and sanitizes
+      # Accepts an array or string of SQL conditions and sanitizes
       # them into a valid SQL fragment for a WHERE clause.
       #   ["name='%s' and group_id='%s'", "foo'bar", 4]  returns  "name='foo''bar' and group_id='4'"
-      #   { name: "foo'bar", group_id: 4 }  returns "name='foo''bar' and group_id='4'"
       #   "name='foo''bar' and group_id='4'" returns "name='foo''bar' and group_id='4'"
       def sanitize_sql_for_conditions(condition, table_name = self.table_name)
         return nil if condition.blank?
 
         case condition
         when Array; sanitize_sql_array(condition)
-        when Hash;  sanitize_sql_hash_for_conditions(condition, table_name)
         else        condition
         end
       end
@@ -75,7 +73,7 @@ module ActiveRecord
       def sanitize_sql_hash_for_assignment(attrs, table)
         c = connection
         attrs.map do |attr, value|
-          value = type_for_attribute(attr.to_s).type_cast_for_database(value)
+          value = type_for_attribute(attr.to_s).serialize(value)
           "#{c.quote_table_name_for_assignment(table, attr)} = #{c.quote(value)}"
         end.join(', ')
       end
@@ -121,9 +119,9 @@ module ActiveRecord
       end
 
       def replace_named_bind_variables(statement, bind_vars) #:nodoc:
-        statement.gsub(/(:?):([a-zA-Z]\w*)/) do
+        statement.gsub(/(:?):([a-zA-Z]\w*)/) do |match|
           if $1 == ':' # skip postgresql casts
-            $& # return the whole match
+            match # return the whole match
           elsif bind_vars.include?(match = $2.to_sym)
             replace_bind_variable(bind_vars[match])
           else

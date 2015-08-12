@@ -16,11 +16,11 @@ module ActiveRecord
     config.app_generators.orm :active_record, :migration => true,
                                               :timestamps => true
 
-    config.app_middleware.insert_after "::ActionDispatch::Callbacks",
-      "ActiveRecord::QueryCache"
+    config.app_middleware.insert_after ::ActionDispatch::Callbacks,
+      ActiveRecord::QueryCache
 
-    config.app_middleware.insert_after "::ActionDispatch::Callbacks",
-      "ActiveRecord::ConnectionAdapters::ConnectionManagement"
+    config.app_middleware.insert_after ::ActionDispatch::Callbacks,
+      ActiveRecord::ConnectionAdapters::ConnectionManagement
 
     config.action_dispatch.rescue_responses.merge!(
       'ActiveRecord::RecordNotFound'   => :not_found,
@@ -78,7 +78,7 @@ module ActiveRecord
 
     initializer "active_record.migration_error" do
       if config.active_record.delete(:migration_error) == :page_load
-        config.app_middleware.insert_after "::ActionDispatch::Callbacks",
+        config.app_middleware.insert_after ::ActionDispatch::Callbacks,
           "ActiveRecord::Migration::CheckPending"
       end
     end
@@ -93,11 +93,20 @@ module ActiveRecord
               cache = Marshal.load File.binread filename
               if cache.version == ActiveRecord::Migrator.current_version
                 self.connection.schema_cache = cache
+                self.connection_pool.schema_cache = cache.dup
               else
                 warn "Ignoring db/schema_cache.dump because it has expired. The current schema version is #{ActiveRecord::Migrator.current_version}, but the one in the cache is #{cache.version}."
               end
             end
           end
+        end
+      end
+    end
+
+    initializer "active_record.warn_on_records_fetched_greater_than" do
+      if config.active_record.warn_on_records_fetched_greater_than
+        ActiveSupport.on_load(:active_record) do
+          require 'active_record/relation/record_fetch_warning'
         end
       end
     end
@@ -147,8 +156,8 @@ end_warning
       ActiveSupport.on_load(:active_record) do
         ActionDispatch::Reloader.send(hook) do
           if ActiveRecord::Base.connected?
-            ActiveRecord::Base.clear_reloadable_connections!
             ActiveRecord::Base.clear_cache!
+            ActiveRecord::Base.clear_reloadable_connections!
           end
         end
       end

@@ -13,16 +13,14 @@ module ActiveSupport
       end
     end
 
-    initializer "active_support.halt_callback_chains_on_return_false", after: :load_config_initializers do |app|
-      if app.config.active_support.key? :halt_callback_chains_on_return_false
-        ActiveSupport::Callbacks::CallbackChain.halt_and_display_warning_on_return_false = \
-          app.config.active_support.halt_callback_chains_on_return_false
-      end
-    end
-
     # Sets the default value for Time.zone
     # If assigned value cannot be matched to a TimeZone, an exception will be raised.
     initializer "active_support.initialize_time_zone" do |app|
+      begin
+        TZInfo::DataSource.get
+      rescue TZInfo::DataSourceNotFound => e
+        raise e.exception "tzinfo-data is not present. Please add gem 'tzinfo-data' to your Gemfile and run bundle install"
+      end
       require 'active_support/core_ext/time/zones'
       zone_default = Time.find_zone!(app.config.time_zone)
 

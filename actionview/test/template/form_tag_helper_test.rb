@@ -210,13 +210,13 @@ class FormTagHelperTest < ActionView::TestCase
   end
 
   def test_select_tag_with_multiple
-    actual = select_tag "colors", "<option>Red</option><option>Blue</option><option>Green</option>".html_safe, :multiple => :true
-    expected = %(<select id="colors" multiple="multiple" name="colors"><option>Red</option><option>Blue</option><option>Green</option></select>)
+    actual = select_tag "colors", "<option>Red</option><option>Blue</option><option>Green</option>".html_safe, multiple: true
+    expected = %(<select id="colors" multiple="multiple" name="colors[]"><option>Red</option><option>Blue</option><option>Green</option></select>)
     assert_dom_equal expected, actual
   end
 
   def test_select_tag_disabled
-    actual = select_tag "places", "<option>Home</option><option>Work</option><option>Pub</option>".html_safe, :disabled => :true
+    actual = select_tag "places", "<option>Home</option><option>Work</option><option>Pub</option>".html_safe, disabled: true
     expected = %(<select id="places" disabled="disabled" name="places"><option>Home</option><option>Work</option><option>Pub</option></select>)
     assert_dom_equal expected, actual
   end
@@ -352,7 +352,7 @@ class FormTagHelperTest < ActionView::TestCase
   end
 
   def test_text_field_disabled
-    actual = text_field_tag "title", "Hello!", :disabled => :true
+    actual = text_field_tag "title", "Hello!", disabled: true
     expected = %(<input id="title" name="title" disabled="disabled" type="text" value="Hello!" />)
     assert_dom_equal expected, actual
   end
@@ -507,6 +507,13 @@ class FormTagHelperTest < ActionView::TestCase
     assert_dom_equal(
       %(<button name="button" type="submit" data-confirm="Are you sure?">Save</button>),
       button_tag("Save", :type => "submit", :data => { :confirm => "Are you sure?" })
+    )
+  end
+
+  def test_button_tag_with_data_disable_with_option
+    assert_dom_equal(
+      %(<button name="button" type="submit" data-disable-with="Please wait...">Checkout</button>),
+      button_tag("Checkout", data: { disable_with: "Please wait..." })
     )
   end
 

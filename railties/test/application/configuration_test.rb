@@ -690,7 +690,7 @@ module ApplicationTests
 
       _ = ActionMailer::Base
 
-      assert_equal [::MyPreviewMailInterceptor], ActionMailer::Base.preview_interceptors
+      assert_equal [ActionMailer::InlinePreviewInterceptor, ::MyPreviewMailInterceptor], ActionMailer::Base.preview_interceptors
     end
 
     test "registers multiple preview interceptors with ActionMailer" do
@@ -703,7 +703,20 @@ module ApplicationTests
 
       _ = ActionMailer::Base
 
-      assert_equal [MyPreviewMailInterceptor, MyOtherPreviewMailInterceptor], ActionMailer::Base.preview_interceptors
+      assert_equal [ActionMailer::InlinePreviewInterceptor, MyPreviewMailInterceptor, MyOtherPreviewMailInterceptor], ActionMailer::Base.preview_interceptors
+    end
+
+    test "default preview interceptor can be removed" do
+      app_file 'config/initializers/preview_interceptors.rb', <<-RUBY
+        ActionMailer::Base.preview_interceptors.delete(ActionMailer::InlinePreviewInterceptor)
+      RUBY
+
+      require "#{app_path}/config/environment"
+      require "mail"
+
+      _ = ActionMailer::Base
+
+      assert_equal [], ActionMailer::Base.preview_interceptors
     end
 
     test "registers observers with ActionMailer" do
@@ -730,6 +743,19 @@ module ApplicationTests
       _ = ActionMailer::Base
 
       assert_equal [::MyMailObserver, ::MyOtherMailObserver], ::Mail.send(:class_variable_get, "@@delivery_notification_observers")
+    end
+
+    test "allows setting the queue name for the ActionMailer::DeliveryJob" do
+      add_to_config <<-RUBY
+        config.action_mailer.deliver_later_queue_name = 'test_default'
+      RUBY
+
+      require "#{app_path}/config/environment"
+      require "mail"
+
+      _ = ActionMailer::Base
+
+      assert_equal 'test_default', ActionMailer::Base.send(:class_variable_get, "@@deliver_later_queue_name")
     end
 
     test "valid timezone is setup correctly" do

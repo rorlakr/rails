@@ -175,10 +175,24 @@ class PrimaryKeysTest < ActiveRecord::TestCase
     dashboard = Dashboard.first
     assert_equal '2', dashboard.id
   end
+
+  if current_adapter?(:PostgreSQLAdapter)
+    def test_serial_with_quoted_sequence_name
+      column = MixedCaseMonkey.columns_hash[MixedCaseMonkey.primary_key]
+      assert_equal "nextval('\"mixed_case_monkeys_monkeyID_seq\"'::regclass)", column.default_function
+      assert column.serial?
+    end
+
+    def test_serial_with_unquoted_sequence_name
+      column = Topic.columns_hash[Topic.primary_key]
+      assert_equal "nextval('topics_id_seq'::regclass)", column.default_function
+      assert column.serial?
+    end
+  end
 end
 
 class PrimaryKeyWithNoConnectionTest < ActiveRecord::TestCase
-  self.use_transactional_fixtures = false
+  self.use_transactional_tests = false
 
   unless in_memory_db?
     def test_set_primary_key_with_no_connection
@@ -199,7 +213,7 @@ end
 class PrimaryKeyAnyTypeTest < ActiveRecord::TestCase
   include SchemaDumpingHelper
 
-  self.use_transactional_fixtures = false
+  self.use_transactional_tests = false
 
   class Barcode < ActiveRecord::Base
   end
@@ -229,7 +243,7 @@ end
 
 if current_adapter?(:MysqlAdapter, :Mysql2Adapter)
   class PrimaryKeyWithAnsiQuotesTest < ActiveRecord::TestCase
-    self.use_transactional_fixtures = false
+    self.use_transactional_tests = false
 
     def test_primary_key_method_with_ansi_quotes
       con = ActiveRecord::Base.connection
@@ -245,7 +259,7 @@ if current_adapter?(:PostgreSQLAdapter, :MysqlAdapter, :Mysql2Adapter)
   class PrimaryKeyBigSerialTest < ActiveRecord::TestCase
     include SchemaDumpingHelper
 
-    self.use_transactional_fixtures = false
+    self.use_transactional_tests = false
 
     class Widget < ActiveRecord::Base
     end
@@ -260,7 +274,8 @@ if current_adapter?(:PostgreSQLAdapter, :MysqlAdapter, :Mysql2Adapter)
     end
 
     teardown do
-      @connection.execute("DROP TABLE IF EXISTS widgets")
+      @connection.drop_table :widgets, if_exists: true
+      Widget.reset_column_information
     end
 
     test "primary key column type with bigserial" do
@@ -280,6 +295,16 @@ if current_adapter?(:PostgreSQLAdapter, :MysqlAdapter, :Mysql2Adapter)
         assert_match %r{create_table "widgets", id: :bigserial}, schema
       else
         assert_match %r{create_table "widgets", id: :bigint}, schema
+      end
+    end
+
+    if current_adapter?(:MysqlAdapter, :Mysql2Adapter)
+      test "primary key column type with options" do
+        @connection.create_table(:widgets, id: :primary_key, limit: 8, force: true)
+        column = @connection.columns(:widgets).find { |c| c.name == 'id' }
+        assert column.auto_increment?
+        assert_equal :integer, column.type
+        assert_equal 8, column.limit
       end
     end
   end

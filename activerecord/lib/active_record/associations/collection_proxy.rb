@@ -227,6 +227,10 @@ module ActiveRecord
         @association.last(*args)
       end
 
+      def take(n = nil)
+        @association.take(n)
+      end
+
       # Returns a new object of the collection type that has been instantiated
       # with +attributes+ and linked to this object, but have not yet been saved.
       # You can pass an array of attributes hashes, this will return an array
@@ -466,15 +470,16 @@ module ActiveRecord
         @association.destroy_all
       end
 
-      # Deletes the +records+ supplied and removes them from the collection. For
-      # +has_many+ associations, the deletion is done according to the strategy
-      # specified by the <tt>:dependent</tt> option. Returns an array with the
+      # Deletes the +records+ supplied from the collection according to the strategy
+      # specified by the +:dependent+ option. If no +:dependent+ option is given,
+      # then it will follow the default strategy. Returns an array with the
       # deleted records.
       #
-      # If no <tt>:dependent</tt> option is given, then it will follow the default
-      # strategy. The default strategy is <tt>:nullify</tt>. This sets the foreign
-      # keys to <tt>NULL</tt>. For, +has_many+ <tt>:through</tt>, the default
-      # strategy is +delete_all+.
+      # For +has_many :through+ associations, the default deletion strategy is
+      # +:delete_all+.
+      #
+      # For +has_many+ associations, the default deletion strategy is +:nullify+.
+      # This sets the foreign keys to +NULL+.
       #
       #   class Person < ActiveRecord::Base
       #     has_many :pets # dependent: :nullify option by default
@@ -776,7 +781,7 @@ module ActiveRecord
       #   person.pets.any?  # => false
       #
       #   person.pets << Pet.new(name: 'Snoop')
-      #   person.pets.count # => 0
+      #   person.pets.count # => 1
       #   person.pets.any?  # => true
       #
       # You can also pass a +block+ to define criteria. The behavior
@@ -966,12 +971,15 @@ module ActiveRecord
       alias_method :append, :<<
 
       def prepend(*args)
-        raise NoMethodError, "prepend on association is not defined. Please use << or append"
+        raise NoMethodError, "prepend on association is not defined. Please use <<, push or append"
       end
 
       # Equivalent to +delete_all+. The difference is that returns +self+, instead
       # of an array with the deleted objects, so methods can be chained. See
       # +delete_all+ for more information.
+      # Note that because +delete_all+ removes records by directly
+      # running an SQL query into the database, the +updated_at+ column of
+      # the object is not changed.
       def clear
         delete_all
         self

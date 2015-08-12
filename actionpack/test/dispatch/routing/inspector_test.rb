@@ -26,14 +26,6 @@ module ActionDispatch
         inspector.format(ActionDispatch::Routing::ConsoleFormatter.new, options[:filter]).split("\n")
       end
 
-      def test_json_regexp_converter
-        @set.draw do
-          get '/cart', :to => 'cart#show'
-        end
-        route = ActionDispatch::Routing::RouteWrapper.new(@set.routes.first)
-        assert_equal "^\\/cart(?:\\.([^\\/.?]+))?$", route.json_regexp
-      end
-
       def test_displaying_routes_for_engines
         engine = Class.new(Rails::Engine) do
           def self.inspect
@@ -320,6 +312,22 @@ module ActionDispatch
 
         assert_equal ["Prefix Verb URI Pattern            Controller#Action",
                       "       GET  /:controller(/:action) (?-mix:api\\/[^\\/]+)#:action"], output
+      end
+
+      def test_inspect_routes_shows_resources_route_when_assets_disabled
+        @set = ActionDispatch::Routing::RouteSet.new
+        app = ActiveSupport::OrderedOptions.new
+
+        Rails.stubs(:application).returns(app)
+
+        output = draw do
+          get '/cart', to: 'cart#show'
+        end
+
+        assert_equal [
+          "Prefix Verb URI Pattern     Controller#Action",
+          "  cart GET  /cart(.:format) cart#show"
+        ], output
       end
     end
   end

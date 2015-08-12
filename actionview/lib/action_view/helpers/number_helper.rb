@@ -1,4 +1,3 @@
-# encoding: utf-8
 
 require 'active_support/core_ext/hash/keys'
 require 'active_support/core_ext/string/output_safety'
@@ -117,8 +116,8 @@ module ActionView
       #   (defaults to current locale).
       # * <tt>:precision</tt> - Sets the precision of the number
       #   (defaults to 3).
-      # * <tt>:significant</tt> - If +true+, precision will be the #
-      #   of significant_digits. If +false+, the # of fractional
+      # * <tt>:significant</tt> - If +true+, precision will be the number
+      #   of significant_digits. If +false+, the number of fractional
       #   digits (defaults to +false+).
       # * <tt>:separator</tt> - Sets the separator between the
       #   fractional and integer digits (defaults to ".").
@@ -192,8 +191,8 @@ module ActionView
       #   (defaults to current locale).
       # * <tt>:precision</tt> - Sets the precision of the number
       #   (defaults to 3).
-      # * <tt>:significant</tt> - If +true+, precision will be the #
-      #   of significant_digits. If +false+, the # of fractional
+      # * <tt>:significant</tt> - If +true+, precision will be the number
+      #   of significant_digits. If +false+, the number of fractional
       #   digits (defaults to +false+).
       # * <tt>:separator</tt> - Sets the separator between the
       #   fractional and integer digits (defaults to ".").
@@ -240,8 +239,8 @@ module ActionView
       #   (defaults to current locale).
       # * <tt>:precision</tt> - Sets the precision of the number
       #   (defaults to 3).
-      # * <tt>:significant</tt> - If +true+, precision will be the #
-      #   of significant_digits. If +false+, the # of fractional
+      # * <tt>:significant</tt> - If +true+, precision will be the number
+      #   of significant_digits. If +false+, the number of fractional
       #   digits (defaults to +true+)
       # * <tt>:separator</tt> - Sets the separator between the
       #   fractional and integer digits (defaults to ".").
@@ -280,7 +279,7 @@ module ActionView
       # See <tt>number_to_human_size</tt> if you want to print a file
       # size.
       #
-      # You can also define you own unit-quantifier names if you want
+      # You can also define your own unit-quantifier names if you want
       # to use other decimal units (eg.: 1500 becomes "1.5
       # kilometers", 0.150 becomes "150 milliliters", etc). You may
       # define a wide range of unit quantifiers, even fractional ones
@@ -292,8 +291,8 @@ module ActionView
       #   (defaults to current locale).
       # * <tt>:precision</tt> - Sets the precision of the number
       #   (defaults to 3).
-      # * <tt>:significant</tt> - If +true+, precision will be the #
-      #   of significant_digits. If +false+, the # of fractional
+      # * <tt>:significant</tt> - If +true+, precision will be the number
+      #   of significant_digits. If +false+, the number of fractional
       #   digits (defaults to +true+)
       # * <tt>:separator</tt> - Sets the separator between the
       #   fractional and integer digits (defaults to ".").

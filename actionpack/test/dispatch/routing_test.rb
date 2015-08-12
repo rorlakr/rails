@@ -167,6 +167,44 @@ class TestRoutingMapper < ActionDispatch::IntegrationTest
     assert_equal '/session/reset', reset_session_path
   end
 
+  def test_session_singleton_resource_for_api_app
+    config = ActionDispatch::Routing::RouteSet::Config.new
+    config.api_only = true
+
+    self.class.stub_controllers(config) do |routes|
+      routes.draw do
+        resource :session do
+          get :create
+          post :reset
+        end
+      end
+      @app = RoutedRackApp.new routes
+    end
+
+    get '/session'
+    assert_equal 'sessions#create', @response.body
+    assert_equal '/session', session_path
+
+    post '/session'
+    assert_equal 'sessions#create', @response.body
+
+    put '/session'
+    assert_equal 'sessions#update', @response.body
+
+    delete '/session'
+    assert_equal 'sessions#destroy', @response.body
+
+    post '/session/reset'
+    assert_equal 'sessions#reset', @response.body
+    assert_equal '/session/reset', reset_session_path
+
+    get '/session/new'
+    assert_equal 'Not Found', @response.body
+
+    get '/session/edit'
+    assert_equal 'Not Found', @response.body
+  end
+
   def test_session_info_nested_singleton_resource
     draw do
       resource :session do
@@ -507,6 +545,40 @@ class TestRoutingMapper < ActionDispatch::IntegrationTest
     get '/projects/1/edit'
     assert_equal 'project#edit', @response.body
     assert_equal '/projects/1/edit', edit_project_path(:id => '1')
+  end
+
+  def test_projects_for_api_app
+    config = ActionDispatch::Routing::RouteSet::Config.new
+    config.api_only = true
+
+    self.class.stub_controllers(config) do |routes|
+      routes.draw do
+        resources :projects, controller: :project
+      end
+      @app = RoutedRackApp.new routes
+    end
+
+    get '/projects'
+    assert_equal 'project#index', @response.body
+    assert_equal '/projects', projects_path
+
+    post '/projects'
+    assert_equal 'project#create', @response.body
+
+    get '/projects.xml'
+    assert_equal 'project#index', @response.body
+    assert_equal '/projects.xml', projects_path(format: 'xml')
+
+    get '/projects/1'
+    assert_equal 'project#show', @response.body
+    assert_equal '/projects/1', project_path(id: '1')
+
+    get '/projects/1.xml'
+    assert_equal 'project#show', @response.body
+    assert_equal '/projects/1.xml', project_path(id: '1', format: 'xml')
+
+    get '/projects/1/edit'
+    assert_equal 'Not Found', @response.body
   end
 
   def test_projects_with_post_action_and_new_path_on_collection
@@ -1428,6 +1500,15 @@ class TestRoutingMapper < ActionDispatch::IntegrationTest
 
     get '/api/v3/en/products/list'
     assert_equal 'api/v3/products#list', @response.body
+  end
+
+  def test_not_matching_shorthand_with_dynamic_parameters
+    draw do
+      get ':controller/:action/admin'
+    end
+
+    get '/finances/overview/admin'
+    assert_equal 'finances#overview', @response.body
   end
 
   def test_controller_option_with_nesting_and_leading_slash
@@ -3477,6 +3558,24 @@ class TestRoutingMapper < ActionDispatch::IntegrationTest
     assert_equal '/post/comments/new', new_comment_path
   end
 
+  def test_head_fetch_with_mount_on_root
+    draw do
+      get '/home' => 'test#index'
+      mount lambda { |env| [200, {}, [env['REQUEST_METHOD']]] }, at: '/'
+    end
+
+    # HEAD request should match `get /home` rather than the
+    # lower-precedence Rack app mounted at `/`.
+    head '/home'
+    assert_response :ok
+    assert_equal 'test#index', @response.body
+
+    # But the Rack app can still respond to its own HEAD requests.
+    head '/foobar'
+    assert_response :ok
+    assert_equal 'HEAD', @response.body
+  end
+
 private
 
   def draw(&block)
@@ -3555,7 +3654,11 @@ class TestAltApp < ActionDispatch::IntegrationTest
     end
   end
 
-  AltRoutes = ActionDispatch::Routing::RouteSet.new(AltRequest)
+  AltRoutes = Class.new(ActionDispatch::Routing::RouteSet) {
+    def request_class
+      AltRequest
+    end
+  }.new
   AltRoutes.draw do
     get "/" => TestAltApp::XHeader.new, :constraints => {:x_header => /HEADER/}
     get "/" => TestAltApp::AltApp.new
@@ -3623,7 +3726,7 @@ class TestNamespaceWithControllerOption < ActionDispatch::IntegrationTest
   module ::Admin
     class StorageFilesController < ActionController::Base
       def index
-        render :text => "admin/storage_files#index"
+        render plain: "admin/storage_files#index"
       end
     end
   end
@@ -3718,7 +3821,7 @@ class TestDefaultScope < ActionDispatch::IntegrationTest
   module ::Blog
     class PostsController < ActionController::Base
       def index
-        render :text => "blog/posts#index"
+        render plain: "blog/posts#index"
       end
     end
   end
@@ -4058,13 +4161,13 @@ end
 class TestNamedRouteUrlHelpers < ActionDispatch::IntegrationTest
   class CategoriesController < ActionController::Base
     def show
-      render :text => "categories#show"
+      render plain: "categories#show"
     end
   end
 
   class ProductsController < ActionController::Base
     def show
-      render :text => "products#show"
+      render plain: "products#show"
     end
   end
 
@@ -4159,7 +4262,7 @@ end
 class TestInvalidUrls < ActionDispatch::IntegrationTest
   class FooController < ActionController::Base
     def show
-      render :text => "foo#show"
+      render plain: "foo#show"
     end
   end
 
@@ -4444,12 +4547,25 @@ class TestUrlGenerationErrors < ActionDispatch::IntegrationTest
     error = assert_raises(ActionController::UrlGenerationError, message){ product_path(id: nil) }
     assert_equal message, error.message
   end
+
+  test "url helpers raise message with mixed parameters when generation fails " do
+    url, missing = { action: 'show', controller: 'products', id: nil, "id"=>"url-tested"}, [:id]
+    message = "No route matches #{url.inspect} missing required keys: #{missing.inspect}"
+
+    # Optimized url helper
+    error = assert_raises(ActionController::UrlGenerationError){ product_path(nil, 'id'=>'url-tested') }
+    assert_equal message, error.message
+
+    # Non-optimized url helper
+    error = assert_raises(ActionController::UrlGenerationError, message){ product_path(id: nil, 'id'=>'url-tested') }
+    assert_equal message, error.message
+  end
 end
 
 class TestDefaultUrlOptions < ActionDispatch::IntegrationTest
   class PostsController < ActionController::Base
     def archive
-      render :text => "posts#archive"
+      render plain: "posts#archive"
     end
   end
 

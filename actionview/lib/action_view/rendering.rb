@@ -59,7 +59,7 @@ module ActionView
       @_view_context_class ||= self.class.view_context_class
     end
 
-    # An instance of a view class. The default view class is ActionView::Base
+    # An instance of a view class. The default view class is ActionView::Base.
     #
     # The view class must have the following methods:
     # View.new[lookup_context, assigns, controller]
@@ -103,7 +103,7 @@ module ActionView
         view_renderer.render(context, options)
       end
 
-      # Assign the rendered format to lookup context.
+      # Assign the rendered format to look up context.
       def _process_format(format, options = {}) #:nodoc:
         super
         lookup_context.formats = [format.to_sym]

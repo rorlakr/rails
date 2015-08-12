@@ -13,7 +13,7 @@ class ERB
     # This method is also aliased as <tt>h</tt>.
     #
     # In your ERB templates, use this method to escape any unsafe content. For example:
-    #   <%=h @person.name %>
+    #   <%= h @person.name %>
     #
     #   puts html_escape('is a > 0 & a < 10?')
     #   # => is a &gt; 0 &amp; a &lt; 10?
@@ -84,6 +84,11 @@ class ERB
     # don't get converted to <tt>&quot;</tt> entities. +json_escape+ doesn't
     # automatically flag the result as HTML safe, since the raw value is unsafe to
     # use inside HTML attributes.
+    #
+    # If your JSON is being used downstream for insertion into the DOM, be aware of
+    # whether or not it is being inserted via +html()+. Most JQuery plugins do this.
+    # If that is the case, be sure to +html_escape+ or +sanitize+ any user-generated
+    # content returned by your JSON.
     #
     # If you need to output JSON elsewhere in your HTML, you can just do something
     # like this, as any unsafe characters (including quotation marks) will be
@@ -217,7 +222,7 @@ module ActiveSupport #:nodoc:
     end
 
     def encode_with(coder)
-      coder.represent_scalar nil, to_str
+      coder.represent_object nil, to_str
     end
 
     UNSAFE_STRING_METHODS.each do |unsafe_method|

@@ -3,8 +3,8 @@ require "cases/helper"
 class SchemaThing < ActiveRecord::Base
 end
 
-class SchemaAuthorizationTest < ActiveRecord::TestCase
-  self.use_transactional_fixtures = false
+class SchemaAuthorizationTest < ActiveRecord::PostgreSQLTestCase
+  self.use_transactional_tests = false
 
   TABLE_NAME = 'schema_things'
   COLUMNS = [

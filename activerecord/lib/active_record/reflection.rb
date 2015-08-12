@@ -69,9 +69,11 @@ module ActiveRecord
       def reflections
         ref = {}
         _reflections.each do |name, reflection|
-          parent_name, parent_reflection = reflection.parent_reflection
-          if parent_name
-            ref[parent_name] = parent_reflection
+          parent_reflection = reflection.parent_reflection
+
+          if parent_reflection
+            parent_name = parent_reflection.name
+            ref[parent_name.to_s] = parent_reflection
           else
             ref[name] = reflection
           end
@@ -166,8 +168,8 @@ module ActiveRecord
     # AggregateReflection and AssociationReflection are returned by the Reflection::ClassMethods.
     #
     #   MacroReflection
+    #     AggregateReflection
     #     AssociationReflection
-    #       AggregateReflection
     #       HasManyReflection
     #       HasOneReflection
     #       BelongsToReflection
@@ -196,7 +198,7 @@ module ActiveRecord
         @scope         = scope
         @options       = options
         @active_record = active_record
-        @klass         = options[:class]
+        @klass         = options[:anonymous_class]
         @plural_name   = active_record.pluralize_table_names ?
                             name.to_s.pluralize : name.to_s
       end
@@ -204,7 +206,7 @@ module ActiveRecord
       def autosave=(autosave)
         @automatic_inverse_of = false
         @options[:autosave] = autosave
-        _, parent_reflection = self.parent_reflection
+        parent_reflection = self.parent_reflection
         if parent_reflection
           parent_reflection.autosave = autosave
         end
@@ -272,7 +274,7 @@ module ActiveRecord
       end
 
       attr_reader :type, :foreign_type
-      attr_accessor :parent_reflection # [:name, Reflection]
+      attr_accessor :parent_reflection # Reflection
 
       def initialize(name, scope, options, active_record)
         super
@@ -368,6 +370,12 @@ module ActiveRecord
       # ThroughReflection.
       def chain
         [self]
+      end
+
+      # This is for clearing cache on the reflection. Useful for tests that need to compare
+      # SQL queries on associations.
+      def clear_association_scope_cache # :nodoc:
+        @association_scope_cache.clear
       end
 
       def nested?
@@ -629,7 +637,7 @@ module ActiveRecord
 
       def initialize(delegate_reflection)
         @delegate_reflection = delegate_reflection
-        @klass         = delegate_reflection.options[:class]
+        @klass         = delegate_reflection.options[:anonymous_class]
         @source_reflection_name = delegate_reflection.options[:source]
       end
 
@@ -694,7 +702,7 @@ module ActiveRecord
       def chain
         @chain ||= begin
           a = source_reflection.chain
-          b = through_reflection.chain
+          b = through_reflection.chain.map(&:dup)
 
           if options[:source_type]
             b[0] = PolymorphicReflection.new(b[0], self)
@@ -704,6 +712,15 @@ module ActiveRecord
           chain[0] = self # Use self so we don't lose the information from :source_type
           chain
         end
+      end
+
+      # This is for clearing cache on the reflection. Useful for tests that need to compare
+      # SQL queries on associations.
+      def clear_association_scope_cache # :nodoc:
+        @chain = nil
+        delegate_reflection.clear_association_scope_cache
+        source_reflection.clear_association_scope_cache
+        through_reflection.clear_association_scope_cache
       end
 
       # Consider the following example:

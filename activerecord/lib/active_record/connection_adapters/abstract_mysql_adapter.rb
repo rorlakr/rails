@@ -1,4 +1,3 @@
-require 'arel/visitors/bind_visitor'
 require 'active_support/core_ext/string/strip'
 
 module ActiveRecord
@@ -6,18 +5,43 @@ module ActiveRecord
     class AbstractMysqlAdapter < AbstractAdapter
       include Savepoints
 
-      class TableDefinition < ActiveRecord::ConnectionAdapters::TableDefinition
-        def primary_key(name, type = :primary_key, options = {})
-          options[:auto_increment] ||= type == :bigint
+      module ColumnMethods
+        def primary_key(name, type = :primary_key, **options)
+          options[:auto_increment] = true if type == :bigint
           super
         end
       end
 
-      class SchemaCreation < AbstractAdapter::SchemaCreation
-        def visit_AddColumn(o)
-          add_column_position!(super, column_options(o))
+      class ColumnDefinition < ActiveRecord::ConnectionAdapters::ColumnDefinition
+        attr_accessor :charset
+      end
+
+      class TableDefinition < ActiveRecord::ConnectionAdapters::TableDefinition
+        include ColumnMethods
+
+        def new_column_definition(name, type, options) # :nodoc:
+          column = super
+          case column.type
+          when :primary_key
+            column.type = :integer
+            column.auto_increment = true
+          end
+          column.charset = options[:charset]
+          column
         end
 
+        private
+
+        def create_column_definition(name, type)
+          ColumnDefinition.new(name, type)
+        end
+      end
+
+      class Table < ActiveRecord::ConnectionAdapters::Table
+        include ColumnMethods
+      end
+
+      class SchemaCreation < AbstractAdapter::SchemaCreation
         private
 
         def visit_DropForeignKey(name)
@@ -37,9 +61,29 @@ module ActiveRecord
           create_sql
         end
 
+        def visit_AddColumnDefinition(o)
+          add_column_position!(super, column_options(o.column))
+        end
+
         def visit_ChangeColumnDefinition(o)
           change_column_sql = "CHANGE #{quote_column_name(o.name)} #{accept(o.column)}"
           add_column_position!(change_column_sql, column_options(o.column))
+        end
+
+        def column_options(o)
+          column_options = super
+          column_options[:charset] = o.charset
+          column_options
+        end
+
+        def add_column_options!(sql, options)
+          if options[:charset]
+            sql << " CHARACTER SET #{options[:charset]}"
+          end
+          if options[:collation]
+            sql << " COLLATE #{options[:collation]}"
+          end
+          super
         end
 
         def add_column_position!(sql, options)
@@ -52,9 +96,13 @@ module ActiveRecord
         end
 
         def index_in_create(table_name, column_name, options)
-          index_name, index_type, index_columns, index_options, index_algorithm, index_using = @conn.add_index_options(table_name, column_name, options)
-          "#{index_type} INDEX #{quote_column_name(index_name)} #{index_using} (#{index_columns})#{index_options} #{index_algorithm}"
+          index_name, index_type, index_columns, _, _, index_using = @conn.add_index_options(table_name, column_name, options)
+          "#{index_type} INDEX #{quote_column_name(index_name)} #{index_using} (#{index_columns}) "
         end
+      end
+
+      def update_table_definition(table_name, base) # :nodoc:
+        Table.new(table_name, base)
       end
 
       def schema_creation
@@ -63,9 +111,9 @@ module ActiveRecord
 
       def column_spec_for_primary_key(column)
         spec = {}
-        if column.extra == 'auto_increment'
-          return unless column.limit == 8
-          spec[:id] = ':bigint'
+        if column.auto_increment?
+          spec[:id] = ':bigint' if column.bigint?
+          return if spec.empty?
         else
           spec[:id] = column.type.inspect
           spec.merge!(prepare_column_options(column).delete_if { |key, _| [:name, :type, :null].include?(key) })
@@ -73,14 +121,31 @@ module ActiveRecord
         spec
       end
 
-      class Column < ConnectionAdapters::Column # :nodoc:
-        attr_reader :collation, :strict, :extra
+      private
 
-        def initialize(name, default, cast_type, sql_type = nil, null = true, collation = nil, strict = false, extra = "")
-          @strict    = strict
-          @collation = collation
-          @extra     = extra
-          super(name, default, cast_type, sql_type, null)
+      def schema_limit(column)
+        super unless column.type == :boolean
+      end
+
+      def schema_precision(column)
+        super unless /time/ === column.sql_type && column.precision == 0
+      end
+
+      def schema_collation(column)
+        if column.collation && table_name = column.instance_variable_get(:@table_name)
+          @collation_cache ||= {}
+          @collation_cache[table_name] ||= select_one("SHOW TABLE STATUS LIKE '#{table_name}'")["Collation"]
+          column.collation.inspect if column.collation != @collation_cache[table_name]
+        end
+      end
+
+      public
+
+      class Column < ConnectionAdapters::Column # :nodoc:
+        delegate :strict, :extra, to: :sql_type_metadata, allow_nil: true
+
+        def initialize(*)
+          super
           assert_valid_default(default)
           extract_default
         end
@@ -88,7 +153,7 @@ module ActiveRecord
         def extract_default
           if blob_or_text_column?
             @default = null || strict ? nil : ''
-          elsif missing_default_forged_as_empty_string?(@default)
+          elsif missing_default_forged_as_empty_string?(default)
             @default = nil
           end
         end
@@ -106,11 +171,8 @@ module ActiveRecord
           collation && !collation.match(/_ci$/)
         end
 
-        def ==(other)
-          super &&
-            collation == other.collation &&
-            strict == other.strict &&
-            extra == other.extra
+        def auto_increment?
+          extra == 'auto_increment'
         end
 
         private
@@ -131,9 +193,32 @@ module ActiveRecord
             raise ArgumentError, "#{type} columns cannot have a default value: #{default.inspect}"
           end
         end
+      end
+
+      class MysqlTypeMetadata < DelegateClass(SqlTypeMetadata) # :nodoc:
+        attr_reader :extra, :strict
+
+        def initialize(type_metadata, extra: "", strict: false)
+          super(type_metadata)
+          @type_metadata = type_metadata
+          @extra = extra
+          @strict = strict
+        end
+
+        def ==(other)
+          other.is_a?(MysqlTypeMetadata) &&
+            attributes_for_hash == other.attributes_for_hash
+        end
+        alias eql? ==
+
+        def hash
+          attributes_for_hash.hash
+        end
+
+        protected
 
         def attributes_for_hash
-          super + [collation, strict, extra]
+          [self.class, @type_metadata, extra, strict]
         end
       end
 
@@ -188,6 +273,16 @@ module ActiveRecord
         end
       end
 
+      MAX_INDEX_LENGTH_FOR_CHARSETS_OF_4BYTES_MAXLEN = 191
+      CHARSETS_OF_4BYTES_MAXLEN = ['utf8mb4', 'utf16', 'utf16le', 'utf32']
+      def initialize_schema_migrations_table
+        if CHARSETS_OF_4BYTES_MAXLEN.include?(charset)
+          ActiveRecord::SchemaMigration.create_table(MAX_INDEX_LENGTH_FOR_CHARSETS_OF_4BYTES_MAXLEN)
+        else
+          ActiveRecord::SchemaMigration.create_table
+        end
+      end
+
       # Returns true, since this connection adapter supports migrations.
       def supports_migrations?
         true
@@ -212,7 +307,7 @@ module ActiveRecord
       #
       # http://bugs.mysql.com/bug.php?id=39170
       def supports_transaction_isolation?
-        version[0] >= 5
+        version >= '5.0.0'
       end
 
       def supports_indexes_in_create?
@@ -224,7 +319,11 @@ module ActiveRecord
       end
 
       def supports_views?
-        version[0] >= 5
+        version >= '5.0.0'
+      end
+
+      def supports_datetime_with_precision?
+        version >= '5.6.4'
       end
 
       def native_database_types
@@ -243,8 +342,8 @@ module ActiveRecord
         raise NotImplementedError
       end
 
-      def new_column(field, default, cast_type, sql_type = nil, null = true, collation = "", extra = "") # :nodoc:
-        Column.new(field, default, cast_type, sql_type, null, collation, strict_mode?, extra)
+      def new_column(field, default, sql_type_metadata = nil, null = true, default_function = nil, collation = nil) # :nodoc:
+        Column.new(field, default, sql_type_metadata, null, default_function, collation)
       end
 
       # Must return the MySQL error number from the exception, if the exception has an
@@ -285,6 +384,14 @@ module ActiveRecord
 
       def unquoted_false
         0
+      end
+
+      def quoted_date(value)
+        if supports_datetime_with_precision?
+          super
+        else
+          super.sub(/\.\d{6}\z/, '')
+        end
       end
 
       # REFERENTIAL INTEGRITY ====================================
@@ -467,8 +574,8 @@ module ActiveRecord
           each_hash(result).map do |field|
             field_name = set_field_encoding(field[:Field])
             sql_type = field[:Type]
-            cast_type = lookup_cast_type(sql_type)
-            new_column(field_name, field[:Default], cast_type, sql_type, field[:Null] == "YES", field[:Collation], field[:Extra])
+            type_metadata = fetch_type_metadata(sql_type, field[:Extra])
+            new_column(field_name, field[:Default], type_metadata, field[:Null] == "YES", nil, field[:Collation])
           end
         end
       end
@@ -501,6 +608,21 @@ module ActiveRecord
         rename_table_indexes(table_name, new_name)
       end
 
+      # Drops a table from the database.
+      #
+      # [<tt>:force</tt>]
+      #   Set to +:cascade+ to drop dependent objects as well.
+      #   Defaults to false.
+      # [<tt>:if_exists</tt>]
+      #   Set to +true+ to only drop the table if it exists.
+      #   Defaults to false.
+      # [<tt>:temporary</tt>]
+      #   Set to +true+ to drop temporary table.
+      #   Defaults to false.
+      #
+      # Although this command ignores most +options+ and the block if one is given,
+      # it can be helpful to provide these in a migration's +change+ method so it can be reverted.
+      # In that case, +options+ and the block will be used by create_table.
       def drop_table(table_name, options = {})
         execute "DROP#{' TEMPORARY' if options[:temporary]} TABLE#{' IF EXISTS' if options[:if_exists]} #{quote_table_name(table_name)}#{' CASCADE' if options[:force] == :cascade}"
       end
@@ -515,12 +637,13 @@ module ActiveRecord
         end
       end
 
-      def change_column_default(table_name, column_name, default) #:nodoc:
+      def change_column_default(table_name, column_name, default_or_changes) #:nodoc:
+        default = extract_new_default_value(default_or_changes)
         column = column_for(table_name, column_name)
         change_column table_name, column_name, column.sql_type, :default => default
       end
 
-      def change_column_null(table_name, column_name, null, default = nil)
+      def change_column_null(table_name, column_name, null, default = nil) #:nodoc:
         column = column_for(table_name, column_name)
 
         unless null || default.nil?
@@ -540,8 +663,8 @@ module ActiveRecord
       end
 
       def add_index(table_name, column_name, options = {}) #:nodoc:
-        index_name, index_type, index_columns, index_options, index_algorithm, index_using = add_index_options(table_name, column_name, options)
-        execute "CREATE #{index_type} INDEX #{quote_column_name(index_name)} #{index_using} ON #{quote_table_name(table_name)} (#{index_columns})#{index_options} #{index_algorithm}"
+        index_name, index_type, index_columns, _, index_algorithm, index_using = add_index_options(table_name, column_name, options)
+        execute "CREATE #{index_type} INDEX #{quote_column_name(index_name)} #{index_using} ON #{quote_table_name(table_name)} (#{index_columns}) #{index_algorithm}"
       end
 
       def foreign_keys(table_name)
@@ -572,40 +695,25 @@ module ActiveRecord
         end
       end
 
+      def table_options(table_name)
+        create_table_info = select_one("SHOW CREATE TABLE #{quote_table_name(table_name)}")["Create Table"]
+
+        # strip create_definitions and partition_options
+        raw_table_options = create_table_info.sub(/\A.*\n\) /m, '').sub(/\n\/\*!.*\*\/\n\z/m, '').strip
+
+        # strip AUTO_INCREMENT
+        raw_table_options.sub(/(ENGINE=\w+)(?: AUTO_INCREMENT=\d+)/, '\1')
+      end
+
       # Maps logical Rails types to MySQL-specific data types.
       def type_to_sql(type, limit = nil, precision = nil, scale = nil)
         case type.to_s
         when 'binary'
-          case limit
-          when 0..0xfff;           "varbinary(#{limit})"
-          when nil;                "blob"
-          when 0x1000..0xffffffff; "blob(#{limit})"
-          else raise(ActiveRecordError, "No binary type has character length #{limit}")
-          end
+          binary_to_sql(limit)
         when 'integer'
-          case limit
-          when 1; 'tinyint'
-          when 2; 'smallint'
-          when 3; 'mediumint'
-          when nil, 4, 11; 'int(11)'  # compatibility with MySQL default
-          when 5..8; 'bigint'
-          else raise(ActiveRecordError, "No integer type has byte size #{limit}")
-          end
+          integer_to_sql(limit)
         when 'text'
-          case limit
-          when 0..0xff;               'tinytext'
-          when nil, 0x100..0xffff;    'text'
-          when 0x10000..0xffffff;     'mediumtext'
-          when 0x1000000..0xffffffff; 'longtext'
-          else raise(ActiveRecordError, "No text type has character length #{limit}")
-          end
-        when 'datetime'
-          return super unless precision
-
-          case precision
-            when 0..6; "datetime(#{precision})"
-            else raise(ActiveRecordError, "No datetime type has precision of #{precision}. The allowed range of precision is from 0 to 6.")
-          end
+          text_to_sql(limit)
         else
           super
         end
@@ -694,11 +802,6 @@ module ActiveRecord
         m.alias_type %r(year)i,          'integer'
         m.alias_type %r(bit)i,           'binary'
 
-        m.register_type(%r(datetime)i) do |sql_type|
-          precision = extract_precision(sql_type)
-          MysqlDateTime.new(precision: precision)
-        end
-
         m.register_type(%r(enum)i) do |sql_type|
           limit = sql_type[/^enum\((.+)\)/i, 1]
             .split(',').map{|enum| enum.strip.length - 2}.max
@@ -716,15 +819,16 @@ module ActiveRecord
         end
       end
 
-      # MySQL is too stupid to create a temporary table for use subquery, so we have
-      # to give it some prompting in the form of a subsubquery. Ugh!
-      def subquery_for(key, select)
-        subsubselect = select.clone
-        subsubselect.projections = [key]
+      def extract_precision(sql_type)
+        if /time/ === sql_type
+          super || 0
+        else
+          super
+        end
+      end
 
-        subselect = Arel::SelectManager.new(select.engine)
-        subselect.project Arel.sql(key.name)
-        subselect.from subsubselect.as('__active_record_temp')
+      def fetch_type_metadata(sql_type, extra = "")
+        MysqlTypeMetadata.new(super(sql_type), extra: extra, strict: strict_mode?)
       end
 
       def add_index_length(option_strings, column_names, options = {})
@@ -766,7 +870,7 @@ module ActiveRecord
       def add_column_sql(table_name, column_name, type, options = {})
         td = create_table_definition(table_name)
         cd = td.new_column_definition(column_name, type, options)
-        schema_creation.visit_AddColumn cd
+        schema_creation.accept(AddColumnDefinition.new(cd))
       end
 
       def change_column_sql(table_name, column_name, type, options = {})
@@ -790,7 +894,7 @@ module ActiveRecord
         options = {
           default: column.default,
           null: column.null,
-          auto_increment: column.extra == "auto_increment"
+          auto_increment: column.auto_increment?
         }
 
         current_type = select_one("SHOW COLUMNS FROM #{quote_table_name(table_name)} LIKE '#{column_name}'", 'SCHEMA')["Type"]
@@ -808,8 +912,9 @@ module ActiveRecord
       end
 
       def add_index_sql(table_name, column_name, options = {})
-        index_name, index_type, index_columns = add_index_options(table_name, column_name, options)
-        "ADD #{index_type} INDEX #{index_name} (#{index_columns})"
+        index_name, index_type, index_columns, _, index_algorithm, index_using = add_index_options(table_name, column_name, options)
+        index_algorithm[0, 0] = ", " if index_algorithm.present?
+        "ADD #{index_type} INDEX #{quote_column_name(index_name)} #{index_using} (#{index_columns})#{index_algorithm}"
       end
 
       def remove_index_sql(table_name, options = {})
@@ -827,8 +932,21 @@ module ActiveRecord
 
       private
 
+      # MySQL is too stupid to create a temporary table for use subquery, so we have
+      # to give it some prompting in the form of a subsubquery. Ugh!
+      def subquery_for(key, select)
+        subsubselect = select.clone
+        subsubselect.projections = [key]
+
+        subselect = Arel::SelectManager.new(select.engine)
+        subselect.project Arel.sql(key.name)
+        # Materialized subquery by adding distinct
+        # to work with MySQL 5.7.6 which sets optimizer_switch='derived_merge=on'
+        subselect.from subsubselect.distinct.as('__active_record_temp')
+      end
+
       def version
-        @version ||= full_version.scan(/^(\d+)\.(\d+)\.(\d+)/).flatten.map(&:to_i)
+        @version ||= Version.new(full_version.match(/^\d+\.\d+\.\d+/)[0])
       end
 
       def mariadb?
@@ -836,14 +954,13 @@ module ActiveRecord
       end
 
       def supports_rename_index?
-        mariadb? ? false : (version[0] == 5 && version[1] >= 7) || version[0] >= 6
+        mariadb? ? false : version >= '5.7.6'
       end
 
       def configure_connection
         variables = @config.fetch(:variables, {}).stringify_keys
 
-        # By default, MySQL 'where id is null' selects the last inserted id.
-        # Turn this off. http://dev.rubyonrails.org/ticket/6778
+        # By default, MySQL 'where id is null' selects the last inserted id; Turn this off.
         variables['sql_auto_is_null'] = 0
 
         # Increase timeout so the server doesn't disconnect us.
@@ -851,15 +968,17 @@ module ActiveRecord
         wait_timeout = 2147483 unless wait_timeout.is_a?(Fixnum)
         variables['wait_timeout'] = self.class.type_cast_config_to_integer(wait_timeout)
 
+        defaults = [':default', :default].to_set
+
         # Make MySQL reject illegal values rather than truncating or blanking them, see
-        # http://dev.mysql.com/doc/refman/5.0/en/server-sql-mode.html#sqlmode_strict_all_tables
+        # http://dev.mysql.com/doc/refman/5.6/en/sql-mode.html#sqlmode_strict_all_tables
         # If the user has provided another value for sql_mode, don't replace it.
-        unless variables.has_key?('sql_mode')
+        unless variables.has_key?('sql_mode') || defaults.include?(@config[:strict])
           variables['sql_mode'] = strict_mode? ? 'STRICT_ALL_TABLES' : ''
         end
 
         # NAMES does not have an equals sign, see
-        # http://dev.mysql.com/doc/refman/5.0/en/set-statement.html#id944430
+        # http://dev.mysql.com/doc/refman/5.6/en/set-statement.html#id944430
         # (trailing comma because variable_assignments will always have content)
         if @config[:encoding]
           encoding = "NAMES #{@config[:encoding]}"
@@ -869,7 +988,7 @@ module ActiveRecord
 
         # Gather up all of the SET variables...
         variable_assignments = variables.map do |k, v|
-          if v == ':default' || v == :default
+          if defaults.include?(v)
             "@@SESSION.#{k} = DEFAULT" # Sets the value to the global or compile default
           elsif !v.nil?
             "@@SESSION.#{k} = #{quote(v)}"
@@ -894,24 +1013,38 @@ module ActiveRecord
         TableDefinition.new(native_database_types, name, temporary, options, as)
       end
 
-      class MysqlDateTime < Type::DateTime # :nodoc:
-        def type_cast_for_database(value)
-          if value.acts_like?(:time) && value.respond_to?(:usec)
-            result = super.to_s(:db)
-            case precision
-            when 1..6
-              "#{result}.#{sprintf("%0#{precision}d", value.usec / 10 ** (6 - precision))}"
-            else
-              result
-            end
-          else
-            super
-          end
+      def binary_to_sql(limit) # :nodoc:
+        case limit
+        when 0..0xfff;           "varbinary(#{limit})"
+        when nil;                "blob"
+        when 0x1000..0xffffffff; "blob(#{limit})"
+        else raise(ActiveRecordError, "No binary type has character length #{limit}")
+        end
+      end
+
+      def integer_to_sql(limit) # :nodoc:
+        case limit
+        when 1; 'tinyint'
+        when 2; 'smallint'
+        when 3; 'mediumint'
+        when nil, 4, 11; 'int(11)'  # compatibility with MySQL default
+        when 5..8; 'bigint'
+        else raise(ActiveRecordError, "No integer type has byte size #{limit}")
+        end
+      end
+
+      def text_to_sql(limit) # :nodoc:
+        case limit
+        when 0..0xff;               'tinytext'
+        when nil, 0x100..0xffff;    'text'
+        when 0x10000..0xffffff;     'mediumtext'
+        when 0x1000000..0xffffffff; 'longtext'
+        else raise(ActiveRecordError, "No text type has character length #{limit}")
         end
       end
 
       class MysqlString < Type::String # :nodoc:
-        def type_cast_for_database(value)
+        def serialize(value)
           case value
           when true then "1"
           when false then "0"
@@ -929,6 +1062,9 @@ module ActiveRecord
           end
         end
       end
+
+      ActiveRecord::Type.register(:string, MysqlString, adapter: :mysql)
+      ActiveRecord::Type.register(:string, MysqlString, adapter: :mysql2)
     end
   end
 end

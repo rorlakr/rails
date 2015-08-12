@@ -83,6 +83,14 @@ module ActiveSupport
           assert_equal("98a%", number_helper.number_to_percentage("98a"))
           assert_equal("NaN%", number_helper.number_to_percentage(Float::NAN))
           assert_equal("Inf%", number_helper.number_to_percentage(Float::INFINITY))
+          assert_equal("NaN%", number_helper.number_to_percentage(Float::NAN, precision: 0))
+          assert_equal("Inf%", number_helper.number_to_percentage(Float::INFINITY, precision: 0))
+          assert_equal("NaN%", number_helper.number_to_percentage(Float::NAN, precision: 1))
+          assert_equal("Inf%", number_helper.number_to_percentage(Float::INFINITY, precision: 1))
+          assert_equal("1000%", number_helper.number_to_percentage(1000, precision: nil))
+          assert_equal("1000%", number_helper.number_to_percentage(1000, precision: nil))
+          assert_equal("1000.1%", number_helper.number_to_percentage(1000.1, precision: nil))
+          assert_equal("-0.13 %", number_helper.number_to_percentage("-0.13", precision: nil, format: "%n %"))
         end
       end
 
@@ -226,15 +234,17 @@ module ActiveSupport
       end
 
       def test_number_to_human_size_with_si_prefix
-        [@instance_with_helpers, TestClassWithClassNumberHelpers, ActiveSupport::NumberHelper].each do |number_helper|
-          assert_equal '3 Bytes',    number_helper.number_to_human_size(3.14159265, :prefix => :si)
-          assert_equal '123 Bytes',  number_helper.number_to_human_size(123.0, :prefix => :si)
-          assert_equal '123 Bytes',  number_helper.number_to_human_size(123, :prefix => :si)
-          assert_equal '1.23 KB',    number_helper.number_to_human_size(1234, :prefix => :si)
-          assert_equal '12.3 KB',    number_helper.number_to_human_size(12345, :prefix => :si)
-          assert_equal '1.23 MB',    number_helper.number_to_human_size(1234567, :prefix => :si)
-          assert_equal '1.23 GB',    number_helper.number_to_human_size(1234567890, :prefix => :si)
-          assert_equal '1.23 TB',    number_helper.number_to_human_size(1234567890123, :prefix => :si)
+        assert_deprecated do
+          [@instance_with_helpers, TestClassWithClassNumberHelpers, ActiveSupport::NumberHelper].each do |number_helper|
+            assert_equal '3 Bytes',    number_helper.number_to_human_size(3.14159265, :prefix => :si)
+            assert_equal '123 Bytes',  number_helper.number_to_human_size(123.0, :prefix => :si)
+            assert_equal '123 Bytes',  number_helper.number_to_human_size(123, :prefix => :si)
+            assert_equal '1.23 KB',    number_helper.number_to_human_size(1234, :prefix => :si)
+            assert_equal '12.3 KB',    number_helper.number_to_human_size(12345, :prefix => :si)
+            assert_equal '1.23 MB',    number_helper.number_to_human_size(1234567, :prefix => :si)
+            assert_equal '1.23 GB',    number_helper.number_to_human_size(1234567890, :prefix => :si)
+            assert_equal '1.23 TB',    number_helper.number_to_human_size(1234567890123, :prefix => :si)
+          end
         end
       end
 

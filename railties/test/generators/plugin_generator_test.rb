@@ -38,7 +38,7 @@ class PluginGeneratorTest < Rails::Generators::TestCase
     assert_equal "Invalid plugin name 43things. Please give a name which does not start with numbers.\n", content
 
     content = capture(:stderr){ run_generator [File.join(destination_root, "plugin")] }
-    assert_equal "Invalid plugin name plugin. Please give a name which does not match one of the reserved rails words.\n", content
+    assert_equal "Invalid plugin name plugin. Please give a name which does not match one of the reserved rails words: application, destroy, plugin, runner, test\n", content
 
     content = capture(:stderr){ run_generator [File.join(destination_root, "Digest")] }
     assert_equal "Invalid plugin name Digest, constant Digest is already in use. Please choose another plugin name.\n", content
@@ -192,13 +192,11 @@ class PluginGeneratorTest < Rails::Generators::TestCase
 
   def test_generation_runs_bundle_install_with_full_and_mountable
     result = run_generator [destination_root, "--mountable", "--full", "--dev"]
+    assert_match(/run  bundle install/, result)
+    assert $?.success?, "Command failed: #{result}"
     assert_file "#{destination_root}/Gemfile.lock" do |contents|
       assert_match(/bukkits/, contents)
     end
-    assert_match(/run  bundle install/, result)
-    assert_match(/Using bukkits \(?0\.0\.1\)?/, result)
-    assert_match(/Your bundle is complete/, result)
-    assert_equal 1, result.scan("Your bundle is complete").size
   end
 
   def test_skipping_javascripts_without_mountable_option
@@ -315,6 +313,7 @@ class PluginGeneratorTest < Rails::Generators::TestCase
     assert_file "test/test_helper.rb" do |content|
       assert_match(/ActiveRecord::Migrator\.migrations_paths.+\.\.\/test\/dummy\/db\/migrate/, content)
       assert_match(/ActiveRecord::Migrator\.migrations_paths.+<<.+\.\.\/db\/migrate/, content)
+      assert_match(/ActionDispatch::IntegrationTest\.fixture_path = ActiveSupport::TestCase\.fixture_pat/, content)
     end
   end
 
@@ -544,6 +543,60 @@ class PluginGeneratorTest < Rails::Generators::TestCase
       assert_match name, contents
       assert_match email, contents
     end
+  end
+
+  def test_skipping_useless_folders_generation_for_api_engines
+    ['--full', '--mountable'].each do |option|
+      run_generator [destination_root, option, '--api']
+
+      assert_no_directory "app/assets"
+      assert_no_directory "app/helpers"
+      assert_no_directory "app/views"
+
+      FileUtils.rm_rf destination_root
+    end
+  end
+
+  def test_application_controller_parent_for_mountable_api_plugins
+    run_generator [destination_root, '--mountable', '--api']
+
+    assert_file "app/controllers/bukkits/application_controller.rb" do |content|
+      assert_match "ApplicationController < ActionController::API", content
+    end
+  end
+
+  def test_dummy_api_application_for_api_plugins
+    run_generator [destination_root, '--api']
+
+    assert_file "test/dummy/config/application.rb" do |content|
+      assert_match "config.api_only = true", content
+    end
+  end
+
+
+  def test_api_generators_configuration_for_api_engines
+    run_generator [destination_root, '--full', '--api']
+
+    assert_file "lib/bukkits/engine.rb" do |content|
+      assert_match "config.generators.api_only = true", content
+    end
+  end
+
+  def test_scaffold_generator_for_mountable_api_plugins
+    run_generator [destination_root, '--mountable', '--api']
+
+    capture(:stdout) do
+      `#{destination_root}/bin/rails g scaffold article`
+    end
+
+    assert_file "app/models/bukkits/article.rb"
+    assert_file "app/controllers/bukkits/articles_controller.rb" do |content|
+      assert_match "only: [:show, :update, :destroy]", content
+    end
+
+    assert_no_directory "app/assets"
+    assert_no_directory "app/helpers"
+    assert_no_directory "app/views"
   end
 
 protected

@@ -52,7 +52,7 @@ module ActiveRecord
       def type_cast_from_column(column, value) # :nodoc:
         if column
           type = lookup_cast_type_from_column(column)
-          type.type_cast_for_database(value)
+          type.serialize(value)
         else
           value
         end
@@ -63,10 +63,21 @@ module ActiveRecord
         lookup_cast_type(column.sql_type)
       end
 
+      def fetch_type_metadata(sql_type)
+        cast_type = lookup_cast_type(sql_type)
+        SqlTypeMetadata.new(
+          sql_type: sql_type,
+          type: cast_type.type,
+          limit: cast_type.limit,
+          precision: cast_type.precision,
+          scale: cast_type.scale,
+        )
+      end
+
       # Quotes a string, escaping any ' (single quote) and \ (backslash)
       # characters.
       def quote_string(s)
-        s.gsub(/\\/, '\&\&').gsub(/'/, "''") # ' (for ruby-mode)
+        s.gsub('\\'.freeze, '\&\&'.freeze).gsub("'".freeze, "''".freeze) # ' (for ruby-mode)
       end
 
       # Quotes the column name. Defaults to no quoting.
@@ -91,6 +102,11 @@ module ActiveRecord
         quote_table_name("#{table}.#{attr}")
       end
 
+      def quote_default_expression(value, column) #:nodoc:
+        value = lookup_cast_type(column.sql_type).serialize(value)
+        quote(value)
+      end
+
       def quoted_true
         "'t'"
       end
@@ -107,6 +123,8 @@ module ActiveRecord
         'f'
       end
 
+      # Quote date/time values for use in SQL input. Includes microseconds
+      # if the value is a Time responding to usec.
       def quoted_date(value)
         if value.acts_like?(:time)
           zone_conversion_method = ActiveRecord::Base.default_timezone == :utc ? :getutc : :getlocal
@@ -116,7 +134,12 @@ module ActiveRecord
           end
         end
 
-        value.to_s(:db)
+        result = value.to_s(:db)
+        if value.respond_to?(:usec) && value.usec > 0
+          "#{result}.#{sprintf("%06d", value.usec)}"
+        else
+          result
+        end
       end
 
       def prepare_binds_for_database(binds) # :nodoc:

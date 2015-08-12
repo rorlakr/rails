@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'abstract_unit'
+require 'lib/controller/fake_models'
 
 CACHE_DIR = 'test_cache'
 # Don't change '/../temp/' cavalierly or you might hose something you don't want hosed
@@ -21,8 +22,6 @@ class FragmentCachingMetalTest < ActionController::TestCase
     @controller.perform_caching = true
     @controller.cache_store = @store
     @params = { controller: 'posts', action: 'index' }
-    @request = ActionController::TestRequest.new
-    @response = ActionController::TestResponse.new
     @controller.params = @params
     @controller.request = @request
     @controller.response = @response
@@ -51,8 +50,6 @@ class FragmentCachingTest < ActionController::TestCase
     @controller.perform_caching = true
     @controller.cache_store = @store
     @params = {:controller => 'posts', :action => 'index'}
-    @request = ActionController::TestRequest.new
-    @response = ActionController::TestResponse.new
     @controller.params = @params
     @controller.request = @request
     @controller.response = @response
@@ -165,6 +162,8 @@ class FunctionalCachingController < CachingController
   end
 
   def formatted_fragment_cached_with_variant
+    request.variant = :phone if params[:v] == "phone"
+
     respond_to do |format|
       format.html.phone
       format.html
@@ -182,8 +181,6 @@ class FunctionalFragmentCachingTest < ActionController::TestCase
     @controller = FunctionalCachingController.new
     @controller.perform_caching = true
     @controller.cache_store = @store
-    @request = ActionController::TestRequest.new
-    @response = ActionController::TestResponse.new
   end
 
   def test_fragment_caching
@@ -267,9 +264,7 @@ CACHED
 
 
   def test_fragment_caching_with_variant
-    @request.variant = :phone
-
-    get :formatted_fragment_cached_with_variant, format: "html"
+    get :formatted_fragment_cached_with_variant, format: "html", params: { v: :phone }
     assert_response :success
     expected_body = "<body>\n<p>PHONE</p>\n</body>\n"
 
@@ -347,5 +342,68 @@ class ViewCacheDependencyTest < ActionController::TestCase
 
   def test_view_cache_dependencies_are_listed_in_declaration_order
     assert_equal %w(trombone flute), HasDependenciesController.new.view_cache_dependencies
+  end
+end
+
+class CollectionCacheController < ActionController::Base
+  attr_accessor :partial_rendered_times
+
+  def index
+    @customers = [Customer.new('david', params[:id] || 1)]
+  end
+
+  def index_ordered
+    @customers = [Customer.new('david', 1), Customer.new('david', 2), Customer.new('david', 3)]
+    render 'index'
+  end
+
+  def index_explicit_render
+    @customers = [Customer.new('david', 1)]
+    render partial: 'customers/customer', collection: @customers
+  end
+
+  def index_with_comment
+    @customers = [Customer.new('david', 1)]
+    render partial: 'customers/commented_customer', collection: @customers, as: :customer
+  end
+end
+
+class AutomaticCollectionCacheTest < ActionController::TestCase
+  def setup
+    super
+    @controller = CollectionCacheController.new
+    @controller.perform_caching = true
+    @controller.partial_rendered_times = 0
+    @controller.cache_store = ActiveSupport::Cache::MemoryStore.new
+    ActionView::PartialRenderer.collection_cache = @controller.cache_store
+  end
+
+  def test_collection_fetches_cached_views
+    get :index
+    assert_equal 1, @controller.partial_rendered_times
+
+    get :index
+    assert_equal 1, @controller.partial_rendered_times
+  end
+
+  def test_preserves_order_when_reading_from_cache_plus_rendering
+    get :index, params: { id: 2 }
+    get :index_ordered
+
+    assert_select ':root', "david, 1\n  david, 2\n  david, 3"
+  end
+
+  def test_explicit_render_call_with_options
+    get :index_explicit_render
+
+    assert_select ':root', "david, 1"
+  end
+
+  def test_caching_works_with_beginning_comment
+    get :index_with_comment
+    assert_equal 1, @controller.partial_rendered_times
+
+    get :index_with_comment
+    assert_equal 1, @controller.partial_rendered_times
   end
 end
