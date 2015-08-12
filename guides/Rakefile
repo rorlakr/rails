@@ -21,12 +21,15 @@ namespace :guides do
         ENV["GUIDES_LANGUAGE"] = "ko"
         ENV["EDGE"] = "1"
         # ENV["ALL"] = "1"
-        ruby "rails_guides.rb"
+
+        ruby "rails_guides_ko.rb"
       end
       namespace :ko do
         desc "Publish the guides to shared/rg (for ROR Lab.)"
+        
         task :publish => :ko do
           require 'rake/contrib/sshpublisher'
+
           mkdir_p 'pkg'
           `tar -czf pkg/guides_ko.gz output/ko`
           Rake::SshFilePublisher.new("deployer@rorlab.org", "/home/deployer", "pkg", "guides_ko.gz").upload
