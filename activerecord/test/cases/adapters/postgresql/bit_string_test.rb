@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 require "cases/helper"
 require 'support/connection_helper'
 require 'support/schema_dumping_helper'
 
-class PostgresqlBitStringTest < ActiveRecord::TestCase
+class PostgresqlBitStringTest < ActiveRecord::PostgreSQLTestCase
   include ConnectionHelper
   include SchemaDumpingHelper
 
@@ -14,12 +13,14 @@ class PostgresqlBitStringTest < ActiveRecord::TestCase
     @connection.create_table('postgresql_bit_strings', :force => true) do |t|
       t.bit :a_bit, default: "00000011", limit: 8
       t.bit_varying :a_bit_varying, default: "0011", limit: 4
+      t.bit :another_bit
+      t.bit_varying :another_bit_varying
     end
   end
 
   def teardown
     return unless @connection
-    @connection.execute 'DROP TABLE IF EXISTS postgresql_bit_strings'
+    @connection.drop_table 'postgresql_bit_strings', if_exists: true
   end
 
   def test_bit_string_column
@@ -29,7 +30,6 @@ class PostgresqlBitStringTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = PostgresqlBitString.type_for_attribute("a_bit")
-    assert_not type.number?
     assert_not type.binary?
   end
 
@@ -40,7 +40,6 @@ class PostgresqlBitStringTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = PostgresqlBitString.type_for_attribute("a_bit_varying")
-    assert_not type.number?
     assert_not type.binary?
   end
 

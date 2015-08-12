@@ -47,6 +47,15 @@ module ActiveRecord
 
   # Raised when Active Record cannot find record by given id or set of ids.
   class RecordNotFound < ActiveRecordError
+    attr_reader :model, :primary_key, :id
+
+    def initialize(message = nil, model = nil, primary_key = nil, id = nil)
+      @primary_key = primary_key
+      @model = model
+      @id = id
+
+      super(message)
+    end
   end
 
   # Raised by ActiveRecord::Base.save! and ActiveRecord::Base.create! methods when record cannot be
@@ -71,9 +80,9 @@ module ActiveRecord
   class RecordNotDestroyed < ActiveRecordError
     attr_reader :record
 
-    def initialize(record)
+    def initialize(message, record = nil)
       @record = record
-      super()
+      super(message)
     end
   end
 
@@ -178,10 +187,8 @@ module ActiveRecord
   class DangerousAttributeError < ActiveRecordError
   end
 
-  UnknownAttributeError = ActiveSupport::Deprecation::DeprecatedConstantProxy.new( # :nodoc:
-    'ActiveRecord::UnknownAttributeError', 
-    'ActiveModel::AttributeAssignment::UnknownAttributeError'
-  )
+  # Raised when unknown attributes are supplied via mass assignment.
+  UnknownAttributeError = ActiveModel::UnknownAttributeError
 
   # Raised when an error occurred while doing a mass assignment to an attribute through the
   # +attributes=+ method. The exception has an +attribute+ property that is the name of the

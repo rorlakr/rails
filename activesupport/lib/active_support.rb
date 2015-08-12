@@ -59,6 +59,7 @@ module ActiveSupport
     autoload :StringInquirer
     autoload :TaggedLogging
     autoload :XmlMini
+    autoload :ArrayInquirer
   end
 
   autoload :Rescuable
@@ -72,6 +73,14 @@ module ActiveSupport
   end
 
   cattr_accessor :test_order # :nodoc:
+
+  def self.halt_callback_chains_on_return_false
+    Callbacks::CallbackChain.halt_and_display_warning_on_return_false
+  end
+
+  def self.halt_callback_chains_on_return_false=(value)
+    Callbacks::CallbackChain.halt_and_display_warning_on_return_false = value
+  end
 end
 
 autoload :I18n, "active_support/i18n"

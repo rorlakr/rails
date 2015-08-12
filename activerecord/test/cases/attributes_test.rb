@@ -1,17 +1,17 @@
 require 'cases/helper'
 
 class OverloadedType < ActiveRecord::Base
-  attribute :overloaded_float, Type::Integer.new
-  attribute :overloaded_string_with_limit, Type::String.new(limit: 50)
-  attribute :non_existent_decimal, Type::Decimal.new
-  attribute :string_with_default, Type::String.new, default: 'the overloaded default'
+  attribute :overloaded_float, :integer
+  attribute :overloaded_string_with_limit, :string, limit: 50
+  attribute :non_existent_decimal, :decimal
+  attribute :string_with_default, :string, default: 'the overloaded default'
 end
 
 class ChildOfOverloadedType < OverloadedType
 end
 
 class GrandchildOfOverloadedType < ChildOfOverloadedType
-  attribute :overloaded_float, Type::Float.new
+  attribute :overloaded_float, :float
 end
 
 class UnoverloadedType < ActiveRecord::Base
@@ -58,7 +58,7 @@ module ActiveRecord
       data = OverloadedType.new(non_existent_decimal: 1)
 
       assert_equal BigDecimal.new(1), data.non_existent_decimal
-      assert_raise ActiveModel::AttributeAssignment::UnknownAttributeError do
+      assert_raise ActiveRecord::UnknownAttributeError do
         UnoverloadedType.new(non_existent_decimal: 1)
       end
     end
@@ -108,11 +108,11 @@ module ActiveRecord
 
     test "the given default value is cast from user" do
       custom_type = Class.new(Type::Value) do
-        def type_cast_from_user(*)
+        def cast(*)
           "from user"
         end
 
-        def type_cast_from_database(*)
+        def deserialize(*)
           "from database"
         end
       end
@@ -123,6 +123,54 @@ module ActiveRecord
       model = klass.new
 
       assert_equal "from user", model.wibble
+    end
+
+    test "procs for default values" do
+      klass = Class.new(OverloadedType) do
+        @@counter = 0
+        attribute :counter, :integer, default: -> { @@counter += 1 }
+      end
+
+      assert_equal 1, klass.new.counter
+      assert_equal 2, klass.new.counter
+    end
+
+    test "user provided defaults are persisted even if unchanged" do
+      model = OverloadedType.create!
+
+      assert_equal "the overloaded default", model.reload.string_with_default
+    end
+
+    if current_adapter?(:PostgreSQLAdapter)
+      test "array types can be specified" do
+        klass = Class.new(OverloadedType) do
+          attribute :my_array, :string, limit: 50, array: true
+          attribute :my_int_array, :integer, array: true
+        end
+
+        string_array = ConnectionAdapters::PostgreSQL::OID::Array.new(
+          Type::String.new(limit: 50))
+        int_array = ConnectionAdapters::PostgreSQL::OID::Array.new(
+          Type::Integer.new)
+        refute_equal string_array, int_array
+        assert_equal string_array, klass.type_for_attribute("my_array")
+        assert_equal int_array, klass.type_for_attribute("my_int_array")
+      end
+
+      test "range types can be specified" do
+        klass = Class.new(OverloadedType) do
+          attribute :my_range, :string, limit: 50, range: true
+          attribute :my_int_range, :integer, range: true
+        end
+
+        string_range = ConnectionAdapters::PostgreSQL::OID::Range.new(
+          Type::String.new(limit: 50))
+        int_range = ConnectionAdapters::PostgreSQL::OID::Range.new(
+          Type::Integer.new)
+        refute_equal string_range, int_range
+        assert_equal string_range, klass.type_for_attribute("my_range")
+        assert_equal int_range, klass.type_for_attribute("my_int_range")
+      end
     end
   end
 end

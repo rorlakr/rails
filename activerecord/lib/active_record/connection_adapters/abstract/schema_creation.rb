@@ -14,24 +14,27 @@ module ActiveRecord
           send m, o
         end
 
-        def visit_AddColumn(o)
-          "ADD #{accept(o)}"
-        end
+        delegate :quote_column_name, :quote_table_name, :quote_default_expression, :type_to_sql, to: :@conn
+        private :quote_column_name, :quote_table_name, :quote_default_expression, :type_to_sql
 
         private
 
           def visit_AlterTable(o)
             sql = "ALTER TABLE #{quote_table_name(o.name)} "
-            sql << o.adds.map { |col| visit_AddColumn col }.join(' ')
+            sql << o.adds.map { |col| accept col }.join(' ')
             sql << o.foreign_key_adds.map { |fk| visit_AddForeignKey fk }.join(' ')
             sql << o.foreign_key_drops.map { |fk| visit_DropForeignKey fk }.join(' ')
           end
 
           def visit_ColumnDefinition(o)
-            o.sql_type = type_to_sql(o.type, o.limit, o.precision, o.scale)
+            o.sql_type ||= type_to_sql(o.type, o.limit, o.precision, o.scale)
             column_sql = "#{quote_column_name(o.name)} #{o.sql_type}"
             add_column_options!(column_sql, column_options(o)) unless o.type == :primary_key
             column_sql
+          end
+
+          def visit_AddColumnDefinition(o)
+            "ADD #{accept(o.column)}"
           end
 
           def visit_TableDefinition(o)
@@ -67,19 +70,8 @@ module ActiveRecord
             column_options[:after] = o.after
             column_options[:auto_increment] = o.auto_increment
             column_options[:primary_key] = o.primary_key
+            column_options[:collation] = o.collation
             column_options
-          end
-
-          def quote_column_name(name)
-            @conn.quote_column_name name
-          end
-
-          def quote_table_name(name)
-            @conn.quote_table_name name
-          end
-
-          def type_to_sql(type, limit, precision, scale)
-            @conn.type_to_sql type.to_sym, limit, precision, scale
           end
 
           def add_column_options!(sql, options)
@@ -97,11 +89,6 @@ module ActiveRecord
             sql
           end
 
-          def quote_default_expression(value, column)
-            value = type_for_column(column).type_cast_for_database(value)
-            @conn.quote(value)
-          end
-
           def options_include_default?(options)
             options.include?(:default) && !(options[:null] == false && options[:default].nil?)
           end
@@ -117,10 +104,6 @@ module ActiveRecord
                 Supported values are: :nullify, :cascade, :restrict
               MSG
             end
-          end
-
-          def type_for_column(column)
-            @conn.lookup_cast_type(column.sql_type)
           end
       end
     end

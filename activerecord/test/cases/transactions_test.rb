@@ -9,7 +9,7 @@ require 'models/post'
 require 'models/movie'
 
 class TransactionTest < ActiveRecord::TestCase
-  self.use_transactional_fixtures = false
+  self.use_transactional_tests = false
   fixtures :topics, :developers, :authors, :posts
 
   def setup
@@ -175,13 +175,20 @@ class TransactionTest < ActiveRecord::TestCase
     assert topic.new_record?, "#{topic.inspect} should be new record"
   end
 
+  def test_transaction_state_is_cleared_when_record_is_persisted
+    author = Author.create! name: 'foo'
+    author.name = nil
+    assert_not author.save
+    assert_not author.new_record?
+  end
+
   def test_update_should_rollback_on_failure
     author = Author.find(1)
     posts_count = author.posts.size
     assert posts_count > 0
     status = author.update(name: nil, post_ids: [])
     assert !status
-    assert_equal posts_count, author.posts(true).size
+    assert_equal posts_count, author.posts.reload.size
   end
 
   def test_update_should_rollback_on_failure!
@@ -191,7 +198,7 @@ class TransactionTest < ActiveRecord::TestCase
     assert_raise(ActiveRecord::RecordInvalid) do
       author.update!(name: nil, post_ids: [])
     end
-    assert_equal posts_count, author.posts(true).size
+    assert_equal posts_count, author.posts.reload.size
   end
 
   def test_cancellation_from_returning_false_in_before_filter
@@ -584,6 +591,24 @@ class TransactionTest < ActiveRecord::TestCase
     assert_not topic.frozen?
   end
 
+  def test_rollback_of_frozen_records
+    topic = Topic.create.freeze
+    Topic.transaction do
+      topic.destroy
+      raise ActiveRecord::Rollback
+    end
+    assert topic.frozen?, 'frozen'
+  end
+
+  def test_rollback_for_freshly_persisted_records
+    topic = Topic.create
+    Topic.transaction do
+      topic.destroy
+      raise ActiveRecord::Rollback
+    end
+    assert topic.persisted?, 'persisted'
+  end
+
   def test_sqlite_add_column_in_transaction
     return true unless current_adapter?(:SQLite3Adapter)
 
@@ -668,7 +693,7 @@ class TransactionTest < ActiveRecord::TestCase
       end
     end
   ensure
-    connection.execute("DROP TABLE IF EXISTS transaction_without_primary_keys")
+    connection.drop_table 'transaction_without_primary_keys', if_exists: true
   end
 
   private
@@ -685,7 +710,7 @@ class TransactionTest < ActiveRecord::TestCase
 end
 
 class TransactionsWithTransactionalFixturesTest < ActiveRecord::TestCase
-  self.use_transactional_fixtures = true
+  self.use_transactional_tests = true
   fixtures :topics
 
   def test_automatic_savepoint_in_outer_transaction

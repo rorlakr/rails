@@ -2,8 +2,8 @@ require "cases/helper"
 require 'models/default'
 require 'support/schema_dumping_helper'
 
-class SchemaTest < ActiveRecord::TestCase
-  self.use_transactional_fixtures = false
+class SchemaTest < ActiveRecord::PostgreSQLTestCase
+  self.use_transactional_tests = false
 
   SCHEMA_NAME = 'test_schema'
   SCHEMA2_NAME = 'test_schema2'
@@ -384,16 +384,16 @@ class SchemaTest < ActiveRecord::TestCase
   def test_reset_pk_sequence
     sequence_name = "#{SCHEMA_NAME}.#{UNMATCHED_SEQUENCE_NAME}"
     @connection.execute "SELECT setval('#{sequence_name}', 123)"
-    assert_equal "124", @connection.select_value("SELECT nextval('#{sequence_name}')")
+    assert_equal 124, @connection.select_value("SELECT nextval('#{sequence_name}')")
     @connection.reset_pk_sequence!("#{SCHEMA_NAME}.#{UNMATCHED_PK_TABLE_NAME}")
-    assert_equal "1", @connection.select_value("SELECT nextval('#{sequence_name}')")
+    assert_equal 1, @connection.select_value("SELECT nextval('#{sequence_name}')")
   end
 
   def test_set_pk_sequence
     table_name = "#{SCHEMA_NAME}.#{PK_TABLE_NAME}"
     _, sequence_name = @connection.pk_and_sequence_for table_name
     @connection.set_pk_sequence! table_name, 123
-    assert_equal "124", @connection.select_value("SELECT nextval('#{sequence_name}')")
+    assert_equal 124, @connection.select_value("SELECT nextval('#{sequence_name}')")
     @connection.reset_pk_sequence! table_name
   end
 
@@ -441,7 +441,7 @@ class SchemaTest < ActiveRecord::TestCase
     end
 end
 
-class SchemaForeignKeyTest < ActiveRecord::TestCase
+class SchemaForeignKeyTest < ActiveRecord::PostgreSQLTestCase
   include SchemaDumpingHelper
 
   setup do
@@ -460,13 +460,13 @@ class SchemaForeignKeyTest < ActiveRecord::TestCase
     output = dump_table_schema "wagons"
     assert_match %r{\s+add_foreign_key "wagons", "my_schema\.trains", column: "train_id"$}, output
   ensure
-    @connection.execute "DROP TABLE IF EXISTS wagons"
-    @connection.execute "DROP TABLE IF EXISTS my_schema.trains"
+    @connection.drop_table "wagons", if_exists: true
+    @connection.drop_table "my_schema.trains", if_exists: true
     @connection.execute "DROP SCHEMA IF EXISTS my_schema"
   end
 end
 
-class DefaultsUsingMultipleSchemasAndDomainTest < ActiveSupport::TestCase
+class DefaultsUsingMultipleSchemasAndDomainTest < ActiveRecord::PostgreSQLTestCase
   setup do
     @connection = ActiveRecord::Base.connection
     @connection.execute "DROP SCHEMA IF EXISTS schema_1 CASCADE"
@@ -480,6 +480,7 @@ class DefaultsUsingMultipleSchemasAndDomainTest < ActiveSupport::TestCase
     @connection.create_table "defaults" do |t|
       t.text "text_col", default: "some value"
       t.string "string_col", default: "some value"
+      t.decimal "decimal_col", default: "3.14159265358979323846"
     end
     Default.reset_column_information
   end
@@ -496,6 +497,10 @@ class DefaultsUsingMultipleSchemasAndDomainTest < ActiveSupport::TestCase
 
   def test_string_defaults_in_new_schema_when_overriding_domain
     assert_equal "some value", Default.new.string_col, "Default of string column was not correctly parsed"
+  end
+
+  def test_decimal_defaults_in_new_schema_when_overriding_domain
+    assert_equal BigDecimal.new("3.14159265358979323846"), Default.new.decimal_col, "Default of decimal column was not correctly parsed"
   end
 
   def test_bpchar_defaults_in_new_schema_when_overriding_domain

@@ -42,6 +42,13 @@ class ResponseTest < ActiveSupport::TestCase
     assert_equal Encoding::UTF_8, response.body.encoding
   end
 
+  def test_response_charset_writer
+    @response.charset = 'utf-16'
+    assert_equal 'utf-16', @response.charset
+    @response.charset = nil
+    assert_equal 'utf-8', @response.charset
+  end
+
   test "simple output" do
     @response.body = "Hello, World!"
 
@@ -72,12 +79,14 @@ class ResponseTest < ActiveSupport::TestCase
 
   test "content type" do
     [204, 304].each do |c|
+      @response = ActionDispatch::Response.new
       @response.status = c.to_s
       _, headers, _ = @response.to_a
       assert !headers.has_key?("Content-Type"), "#{c} should not have Content-Type header"
     end
 
     [200, 302, 404, 500].each do |c|
+      @response = ActionDispatch::Response.new
       @response.status = c.to_s
       _, headers, _ = @response.to_a
       assert headers.has_key?("Content-Type"), "#{c} did not have Content-Type header"
@@ -169,6 +178,8 @@ class ResponseTest < ActiveSupport::TestCase
   end
 
   test "read content type without charset" do
+    jruby_skip "https://github.com/jruby/jruby/issues/3138"
+
     original = ActionDispatch::Response.default_charset
     begin
       ActionDispatch::Response.default_charset = 'utf-16'
@@ -254,10 +265,6 @@ class ResponseTest < ActiveSupport::TestCase
 end
 
 class ResponseIntegrationTest < ActionDispatch::IntegrationTest
-  def app
-    @app
-  end
-
   test "response cache control from railsish app" do
     @app = lambda { |env|
       ActionDispatch::Response.new.tap { |resp|

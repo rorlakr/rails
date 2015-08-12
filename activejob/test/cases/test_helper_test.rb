@@ -4,6 +4,7 @@ require 'active_support/core_ext/date'
 require 'jobs/hello_job'
 require 'jobs/logging_job'
 require 'jobs/nested_job'
+require 'jobs/rescue_job'
 require 'models/person'
 
 class EnqueuedJobsTest < ActiveJob::TestCase
@@ -28,6 +29,17 @@ class EnqueuedJobsTest < ActiveJob::TestCase
         HelloJob.perform_later('yves')
       end
     end
+  end
+
+  def test_assert_enqueued_jobs_message
+    HelloJob.perform_later('sean')
+    e = assert_raises Minitest::Assertion do
+      assert_enqueued_jobs 2 do
+        HelloJob.perform_later('sean')
+      end
+    end
+    assert_match "Expected: 2", e.message
+    assert_match "Actual: 1", e.message
   end
 
   def test_assert_enqueued_jobs_with_no_block
@@ -153,6 +165,17 @@ class EnqueuedJobsTest < ActiveJob::TestCase
     end
   end
 
+  def test_assert_enqueued_job_returns
+    job = assert_enqueued_with(job: LoggingJob) do
+      LoggingJob.set(wait_until: 5.minutes.from_now).perform_later(1, 2, 3)
+    end
+
+    assert_instance_of LoggingJob, job
+    assert_in_delta 5.minutes.from_now, job.scheduled_at, 1
+    assert_equal 'default', job.queue_name
+    assert_equal [1, 2, 3], job.arguments
+  end
+
   def test_assert_enqueued_job_failure
     assert_raise ActiveSupport::TestCase::Assertion do
       assert_enqueued_with(job: LoggingJob, queue: 'default') do
@@ -198,6 +221,14 @@ class EnqueuedJobsTest < ActiveJob::TestCase
 end
 
 class PerformedJobsTest < ActiveJob::TestCase
+  def test_performed_enqueue_jobs_with_only_option_doesnt_leak_outside_the_block
+    assert_equal nil, queue_adapter.filter
+    perform_enqueued_jobs only: HelloJob do
+      assert_equal HelloJob, queue_adapter.filter
+    end
+    assert_equal nil, queue_adapter.filter
+  end
+
   def test_assert_performed_jobs
     assert_nothing_raised do
       assert_performed_jobs 1 do
@@ -219,6 +250,17 @@ class PerformedJobsTest < ActiveJob::TestCase
         HelloJob.perform_later('yves')
       end
     end
+  end
+
+  def test_assert_performed_jobs_message
+    HelloJob.perform_later('sean')
+    e = assert_raises Minitest::Assertion do
+      assert_performed_jobs 2 do
+        HelloJob.perform_later('sean')
+      end
+    end
+    assert_match "Expected: 2", e.message
+    assert_match "Actual: 1", e.message
   end
 
   def test_assert_performed_jobs_with_no_block
@@ -283,10 +325,98 @@ class PerformedJobsTest < ActiveJob::TestCase
     assert_match(/0 .* but 1/, error.message)
   end
 
+  def test_assert_performed_jobs_with_only_option
+    assert_nothing_raised do
+      assert_performed_jobs 1, only: HelloJob do
+        HelloJob.perform_later('jeremy')
+        LoggingJob.perform_later
+      end
+    end
+  end
+
+  def test_assert_performed_jobs_with_only_option_as_array
+    assert_nothing_raised do
+      assert_performed_jobs 2, only: [HelloJob, LoggingJob] do
+        HelloJob.perform_later('jeremy')
+        LoggingJob.perform_later('stewie')
+        RescueJob.perform_later('david')
+      end
+    end
+  end
+
+  def test_assert_performed_jobs_with_only_option_and_none_sent
+    error = assert_raise ActiveSupport::TestCase::Assertion do
+      assert_performed_jobs 1, only: HelloJob do
+        LoggingJob.perform_later
+      end
+    end
+
+    assert_match(/1 .* but 0/, error.message)
+  end
+
+  def test_assert_performed_jobs_with_only_option_and_too_few_sent
+    error = assert_raise ActiveSupport::TestCase::Assertion do
+      assert_performed_jobs 5, only: HelloJob do
+        HelloJob.perform_later('jeremy')
+        4.times { LoggingJob.perform_later }
+      end
+    end
+
+    assert_match(/5 .* but 1/, error.message)
+  end
+
+  def test_assert_performed_jobs_with_only_option_and_too_many_sent
+    error = assert_raise ActiveSupport::TestCase::Assertion do
+      assert_performed_jobs 1, only: HelloJob do
+        2.times { HelloJob.perform_later('jeremy') }
+      end
+    end
+
+    assert_match(/1 .* but 2/, error.message)
+  end
+
+  def test_assert_no_performed_jobs_with_only_option
+    assert_nothing_raised do
+      assert_no_performed_jobs only: HelloJob do
+        LoggingJob.perform_later
+      end
+    end
+  end
+
+  def test_assert_no_performed_jobs_with_only_option_as_array
+    assert_nothing_raised do
+      assert_no_performed_jobs only: [HelloJob, RescueJob] do
+        LoggingJob.perform_later
+      end
+    end
+  end
+
+  def test_assert_no_performed_jobs_with_only_option_failure
+    error = assert_raise ActiveSupport::TestCase::Assertion do
+      assert_no_performed_jobs only: HelloJob do
+        HelloJob.perform_later('jeremy')
+        LoggingJob.perform_later
+      end
+    end
+
+    assert_match(/0 .* but 1/, error.message)
+  end
+
   def test_assert_performed_job
     assert_performed_with(job: NestedJob, queue: 'default') do
       NestedJob.perform_later
     end
+  end
+
+  def test_assert_performed_job_returns
+    job = assert_performed_with(job: NestedJob, queue: 'default') do
+      NestedJob.perform_later
+    end
+
+    assert_instance_of NestedJob, job
+    assert_nil job.scheduled_at
+    assert_equal [], job.arguments
+    assert_equal 'default', job.queue_name
   end
 
   def test_assert_performed_job_failure

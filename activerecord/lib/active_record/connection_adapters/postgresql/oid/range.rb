@@ -7,7 +7,7 @@ module ActiveRecord
         class Range < Type::Value # :nodoc:
           attr_reader :subtype, :type
 
-          def initialize(subtype, type)
+          def initialize(subtype, type = :range)
             @subtype = subtype
             @type = type
           end
@@ -30,7 +30,7 @@ module ActiveRecord
             ::Range.new(from, to, extracted[:exclude_end])
           end
 
-          def type_cast_for_database(value)
+          def serialize(value)
             if value.is_a?(::Range)
               from = type_cast_single_for_database(value.begin)
               to = type_cast_single_for_database(value.end)
@@ -40,24 +40,40 @@ module ActiveRecord
             end
           end
 
+          def ==(other)
+            other.is_a?(Range) &&
+              other.subtype == subtype &&
+              other.type == type
+          end
+
           private
 
           def type_cast_single(value)
-            infinity?(value) ? value : @subtype.type_cast_from_database(value)
+            infinity?(value) ? value : @subtype.deserialize(value)
           end
 
           def type_cast_single_for_database(value)
-            infinity?(value) ? '' : @subtype.type_cast_for_database(value)
+            infinity?(value) ? '' : @subtype.serialize(value)
           end
 
           def extract_bounds(value)
             from, to = value[1..-2].split(',')
             {
-              from:          (value[1] == ',' || from == '-infinity') ? @subtype.infinity(negative: true) : from,
-              to:            (value[-2] == ',' || to == 'infinity') ? @subtype.infinity : to,
+              from:          (value[1] == ',' || from == '-infinity') ? infinity(negative: true) : from,
+              to:            (value[-2] == ',' || to == 'infinity') ? infinity : to,
               exclude_start: (value[0] == '('),
               exclude_end:   (value[-1] == ')')
             }
+          end
+
+          def infinity(negative: false)
+            if subtype.respond_to?(:infinity)
+              subtype.infinity(negative: negative)
+            elsif negative
+              -::Float::INFINITY
+            else
+              ::Float::INFINITY
+            end
           end
 
           def infinity?(value)

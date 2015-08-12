@@ -156,16 +156,16 @@ module ActionController #:nodoc:
     # It works for both inline:
     #
     #   respond_to do |format|
-    #     format.html.any   { render text: "any"   }
-    #     format.html.phone { render text: "phone" }
+    #     format.html.any   { render html: "any"   }
+    #     format.html.phone { render html: "phone" }
     #   end
     #
     # and block syntax:
     #
     #   respond_to do |format|
     #     format.html do |variant|
-    #       variant.any(:tablet, :phablet){ render text: "any" }
-    #       variant.phone { render text: "phone" }
+    #       variant.any(:tablet, :phablet){ render html: "any" }
+    #       variant.phone { render html: "phone" }
     #     end
     #   end
     #
@@ -288,16 +288,17 @@ module ActionController #:nodoc:
         end
 
         def variant
-          if @variant.nil?
+          if @variant.empty?
             @variants[:none] || @variants[:any]
-          elsif (@variants.keys & @variant).any?
-            @variant.each do |v|
-              return @variants[v] if @variants.key?(v)
-            end
           else
-            @variants[:any]
+            @variants[variant_key]
           end
         end
+
+        private
+          def variant_key
+            @variant.find { |variant| @variants.key?(variant) } || :any
+          end
       end
     end
   end

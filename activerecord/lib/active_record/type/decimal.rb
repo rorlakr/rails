@@ -1,14 +1,14 @@
 module ActiveRecord
   module Type
     class Decimal < Value # :nodoc:
-      include Numeric
+      include Helpers::Numeric
 
       def type
         :decimal
       end
 
       def type_cast_for_schema(value)
-        value.to_s
+        value.to_s.inspect
       end
 
       private

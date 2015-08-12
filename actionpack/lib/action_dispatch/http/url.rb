@@ -67,7 +67,7 @@ module ActionDispatch
         end
 
         def path_for(options)
-          path  = options[:script_name].to_s.chomp("/")
+          path  = options[:script_name].to_s.chomp("/".freeze)
           path << options[:path] if options.key?(:path)
 
           add_trailing_slash(path) if options[:trailing_slash]
@@ -229,7 +229,7 @@ module ActionDispatch
       #   req = Request.new 'HTTP_HOST' => 'example.com:8080'
       #   req.raw_host_with_port # => "example.com:8080"
       def raw_host_with_port
-        if forwarded = env["HTTP_X_FORWARDED_HOST"]
+        if forwarded = env["HTTP_X_FORWARDED_HOST"].presence
           forwarded.split(/,\s?/).last
         else
           env['HTTP_HOST'] || "#{env['SERVER_NAME'] || env['SERVER_ADDR']}:#{env['SERVER_PORT']}"
@@ -245,7 +245,7 @@ module ActionDispatch
       #   req = Request.new 'HTTP_HOST' => 'example.com:8080'
       #   req.host # => "example.com"
       def host
-        raw_host_with_port.sub(/:\d+$/, '')
+        raw_host_with_port.sub(/:\d+$/, ''.freeze)
       end
 
       # Returns a \host:\port string for this request, such as "example.com" or

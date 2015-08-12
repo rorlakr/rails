@@ -72,7 +72,7 @@ module ActiveRecord
 
       [:create_table, :create_join_table, :rename_table, :add_column, :remove_column,
         :rename_index, :rename_column, :add_index, :remove_index, :add_timestamps, :remove_timestamps,
-        :change_column_default, :add_reference, :remove_reference, :transaction,
+        :add_reference, :remove_reference, :transaction,
         :drop_join_table, :drop_table, :execute_block, :enable_extension,
         :change_column, :execute, :remove_columns, :change_column_null,
         :add_foreign_key, :remove_foreign_key
@@ -151,18 +151,30 @@ module ActiveRecord
       end
 
       def invert_remove_index(args)
-        table, options = *args
-
-        unless options && options.is_a?(Hash) && options[:column]
-          raise ActiveRecord::IrreversibleMigration, "remove_index is only reversible if given a :column option."
+        table, options_or_column = *args
+        if (options = options_or_column).is_a?(Hash)
+          unless options[:column]
+            raise ActiveRecord::IrreversibleMigration, "remove_index is only reversible if given a :column option."
+          end
+          options = options.dup
+          [:add_index, [table, options.delete(:column), options]]
+        elsif (column = options_or_column).present?
+          [:add_index, [table, column]]
         end
-
-        options = options.dup
-        [:add_index, [table, options.delete(:column), options]]
       end
 
       alias :invert_add_belongs_to :invert_add_reference
       alias :invert_remove_belongs_to :invert_remove_reference
+
+      def invert_change_column_default(args)
+        table, column, options = *args
+
+        unless options && options.is_a?(Hash) && options.has_key?(:from) && options.has_key?(:to)
+          raise ActiveRecord::IrreversibleMigration, "change_column_default is only reversible if given a :from and :to option."
+        end
+
+        [:change_column_default, [table, column, from: options[:to], to: options[:from]]]
+      end
 
       def invert_change_column_null(args)
         args[2] = !args[2]
@@ -182,6 +194,16 @@ module ActiveRecord
         end
 
         [:remove_foreign_key, [from_table, options]]
+      end
+
+      def invert_remove_foreign_key(args)
+        from_table, to_table, remove_options = args
+        raise ActiveRecord::IrreversibleMigration, "remove_foreign_key is only reversible if given a second table" if to_table.nil? || to_table.is_a?(Hash)
+
+        reversed_args = [from_table, to_table]
+        reversed_args << remove_options if remove_options
+
+        [:add_foreign_key, reversed_args]
       end
 
       # Forwards any missing method call to the \target.

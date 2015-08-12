@@ -18,10 +18,10 @@ module ActionView
     #
     #   could become:
     #
-    #     <select name="post[category]">
-    #       <option></option>
-    #       <option>joke</option>
-    #       <option>poem</option>
+    #     <select name="post[category]" id="post_category">
+    #       <option value=""></option>
+    #       <option value="joke">joke</option>
+    #       <option value="poem">poem</option>
     #     </select>
     #
     #   Another common case is a select tag for a <tt>belongs_to</tt>-associated object.
@@ -32,11 +32,11 @@ module ActionView
     #
     #   could become:
     #
-    #     <select name="post[person_id]">
+    #     <select name="post[person_id]" id="post_person_id">
     #       <option value="">None</option>
     #       <option value="1">David</option>
-    #       <option value="2" selected="selected">Sam</option>
-    #       <option value="3">Tobias</option>
+    #       <option value="2" selected="selected">Eileen</option>
+    #       <option value="3">Rafael</option>
     #     </select>
     #
     # * <tt>:prompt</tt> - set to true or a prompt string. When the select element doesn't have a value yet, this prepends an option with a generic prompt -- "Please select" -- or the given prompt string.
@@ -45,11 +45,11 @@ module ActionView
     #
     #   could become:
     #
-    #     <select name="post[person_id]">
+    #     <select name="post[person_id]" id="post_person_id">
     #       <option value="">Select Person</option>
     #       <option value="1">David</option>
-    #       <option value="2">Sam</option>
-    #       <option value="3">Tobias</option>
+    #       <option value="2">Eileen</option>
+    #       <option value="3">Rafael</option>
     #     </select>
     #
     # * <tt>:index</tt> - like the other form helpers, +select+ can accept an <tt>:index</tt> option to manually set the ID used in the resulting output. Unlike other helpers, +select+ expects this
@@ -71,19 +71,19 @@ module ActionView
     #
     #   could become:
     #
-    #     <select name="post[category]">
-    #       <option></option>
-    #       <option>joke</option>
-    #       <option>poem</option>
-    #       <option disabled="disabled">restricted</option>
+    #     <select name="post[category]" id="post_category">
+    #       <option value=""></option>
+    #       <option value="joke">joke</option>
+    #       <option value="poem">poem</option>
+    #       <option disabled="disabled" value="restricted">restricted</option>
     #     </select>
     #
     #   When used with the <tt>collection_select</tt> helper, <tt>:disabled</tt> can also be a Proc that identifies those options that should be disabled.
     #
-    #     collection_select(:post, :category_id, Category.all, :id, :name, {disabled: lambda{|category| category.archived? }})
+    #     collection_select(:post, :category_id, Category.all, :id, :name, {disabled: -> (category) { category.archived? }})
     #
     #   If the categories "2008 stuff" and "Christmas" return true when the method <tt>archived?</tt> is called, this would return:
-    #     <select name="post[category_id]">
+    #     <select name="post[category_id]" id="post_category_id">
     #       <option value="1" disabled="disabled">2008 stuff</option>
     #       <option value="2" disabled="disabled">Christmas</option>
     #       <option value="3">Jokes</option>
@@ -109,11 +109,11 @@ module ActionView
       #
       # would become:
       #
-      #   <select name="post[person_id]">
+      #   <select name="post[person_id]" id="post_person_id">
       #     <option value=""></option>
       #     <option value="1" selected="selected">David</option>
-      #     <option value="2">Sam</option>
-      #     <option value="3">Tobias</option>
+      #     <option value="2">Eileen</option>
+      #     <option value="3">Rafael</option>
       #   </select>
       #
       # assuming the associated person has ID 1.
@@ -192,7 +192,7 @@ module ActionView
       #   collection_select(:post, :author_id, Author.all, :id, :name_with_initial, prompt: true)
       #
       # If <tt>@post.author_id</tt> is already <tt>1</tt>, this would return:
-      #   <select name="post[author_id]">
+      #   <select name="post[author_id]" id="post_author_id">
       #     <option value="">Please select</option>
       #     <option value="1" selected="selected">D. Heinemeier Hansson</option>
       #     <option value="2">D. Thomas</option>
@@ -243,7 +243,7 @@ module ActionView
       #
       # Possible output:
       #
-      #   <select name="city[country_id]">
+      #   <select name="city[country_id]" id="city_country_id">
       #     <optgroup label="Africa">
       #       <option value="1">South Africa</option>
       #       <option value="3">Somalia</option>
@@ -302,17 +302,17 @@ module ActionView
       #   # => <option value="DKK">Kroner</option>
       #
       #   options_for_select([ "VISA", "MasterCard" ], "MasterCard")
-      #   # => <option>VISA</option>
-      #   # => <option selected="selected">MasterCard</option>
+      #   # => <option value="VISA">VISA</option>
+      #   # => <option selected="selected" value="MasterCard">MasterCard</option>
       #
       #   options_for_select({ "Basic" => "$20", "Plus" => "$40" }, "$40")
       #   # => <option value="$20">Basic</option>
       #   # => <option value="$40" selected="selected">Plus</option>
       #
       #   options_for_select([ "VISA", "MasterCard", "Discover" ], ["VISA", "Discover"])
-      #   # => <option selected="selected">VISA</option>
-      #   # => <option>MasterCard</option>
-      #   # => <option selected="selected">Discover</option>
+      #   # => <option selected="selected" value="VISA">VISA</option>
+      #   # => <option value="MasterCard">MasterCard</option>
+      #   # => <option selected="selected" value="Discover">Discover</option>
       #
       # You can optionally provide HTML attributes as the last element of the array.
       #
@@ -410,7 +410,7 @@ module ActionView
       # * +collection+ - An array of objects representing the <tt><optgroup></tt> tags.
       # * +group_method+ - The name of a method which, when called on a member of +collection+, returns an
       #   array of child objects representing the <tt><option></tt> tags.
-      # * group_label_method+ - The name of a method which, when called on a member of +collection+, returns a
+      # * +group_label_method+ - The name of a method which, when called on a member of +collection+, returns a
       #   string to be used as the +label+ attribute for its <tt><optgroup></tt> tag.
       # * +option_key_method+ - The name of a method which, when called on a child object of a member of
       #   +collection+, returns a value to be used as the +value+ attribute for its <tt><option></tt> tag.
@@ -456,7 +456,7 @@ module ActionView
           option_tags = options_from_collection_for_select(
             group.send(group_method), option_key_method, option_value_method, selected_key)
 
-          content_tag(:optgroup, option_tags, label: group.send(group_label_method))
+          content_tag("optgroup".freeze, option_tags, label: group.send(group_label_method))
         end.join.html_safe
       end
 
@@ -528,7 +528,7 @@ module ActionView
         body = "".html_safe
 
         if prompt
-          body.safe_concat content_tag(:option, prompt_text(prompt), value: "")
+          body.safe_concat content_tag("option".freeze, prompt_text(prompt), value: "")
         end
 
         grouped_options.each do |container|
@@ -541,7 +541,7 @@ module ActionView
           end
 
           html_attributes = { label: label }.merge!(html_attributes)
-          body.safe_concat content_tag(:optgroup, options_for_select(container, selected_key), html_attributes)
+          body.safe_concat content_tag("optgroup".freeze, options_for_select(container, selected_key), html_attributes)
         end
 
         body
@@ -577,7 +577,7 @@ module ActionView
           end
 
           zone_options.safe_concat options_for_select(convert_zones[priority_zones], selected)
-          zone_options.safe_concat content_tag(:option, '-------------', value: '', disabled: true)
+          zone_options.safe_concat content_tag("option".freeze, '-------------', value: '', disabled: true)
           zone_options.safe_concat "\n"
 
           zones = zones - priority_zones
@@ -707,6 +707,27 @@ module ActionView
       #   collection_check_boxes(:post, :author_ids, Author.all, :id, :name_with_initial) do |b|
       #      b.label(:"data-value" => b.value) { b.check_box + b.text }
       #   end
+      #
+      # ==== Gotcha
+      #
+      # When no selection is made for a collection of checkboxes most
+      # web browsers will not send any value.
+      #
+      # For example, if we have a +User+ model with +category_ids+ field and we
+      # have the following code in our update action:
+      #
+      #   @user.update(params[:user])
+      #
+      # If no +category_ids+ are selected then we can safely assume this field
+      # will not be updated.
+      #
+      # This is possible thanks to a hidden field generated by the helper method
+      # for every collection of checkboxes.
+      # This hidden field is given the same field name as the checkboxes with a
+      # blank value.
+      #
+      # In the rare case you don't want this hidden field, you can pass the
+      # <tt>include_hidden: false</tt> option to the helper method.
       def collection_check_boxes(object, method, collection, value_method, text_method, options = {}, html_options = {}, &block)
         Tags::CollectionCheckBoxes.new(object, method, self, collection, value_method, text_method, options, html_options).render(&block)
       end

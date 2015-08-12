@@ -2,6 +2,7 @@ require 'stringio'
 require 'uri'
 require 'active_support/core_ext/kernel/singleton_class'
 require 'active_support/core_ext/object/try'
+require 'active_support/core_ext/string/strip'
 require 'rack/test'
 require 'minitest'
 
@@ -80,7 +81,7 @@ module ActionDispatch
       #
       #   xhr :get, '/feed', params: { since: 201501011400 }
       def xml_http_request(request_method, path, *args)
-        if kwarg_request?(*args)
+        if kwarg_request?(args)
           params, headers, env = args.first.values_at(:params, :headers, :env)
         else
           params = args[0]
@@ -92,11 +93,12 @@ module ActionDispatch
           end
         end
 
-        headers ||= {}
-        headers.merge!(env) if env
-        headers['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
-        headers['HTTP_ACCEPT'] ||= [Mime::JS, Mime::HTML, Mime::XML, 'text/xml', Mime::ALL].join(', ')
-        process(request_method, path, params: params, headers: headers)
+        ActiveSupport::Deprecation.warn(<<-MSG.strip_heredoc)
+          xhr and xml_http_request methods are deprecated in favor of
+          `get "/posts", xhr: true` and `post "/posts/1", xhr: true`
+        MSG
+
+        process(request_method, path, params: params, headers: headers, xhr: true)
       end
       alias xhr :xml_http_request
 
@@ -221,15 +223,6 @@ module ActionDispatch
         super()
         @app = app
 
-        # If the app is a Rails app, make url_helpers available on the session
-        # This makes app.url_for and app.foo_path available in the console
-        if app.respond_to?(:routes)
-          singleton_class.class_eval do
-            include app.routes.url_helpers
-            include app.routes.mounted_helpers
-          end
-        end
-
         reset!
       end
 
@@ -298,42 +291,45 @@ module ActionDispatch
         end
 
         def process_with_kwargs(http_method, path, *args)
-          if kwarg_request?(*args)
+          if kwarg_request?(args)
             process(http_method, path, *args)
           else
-            non_kwarg_request_warning if args.present?
+            non_kwarg_request_warning if args.any?
             process(http_method, path, { params: args[0], headers: args[1] })
           end
         end
 
-        REQUEST_KWARGS = %i(params headers env)
-        def kwarg_request?(*args)
+        REQUEST_KWARGS = %i(params headers env xhr)
+        def kwarg_request?(args)
           args[0].respond_to?(:keys) && args[0].keys.any? { |k| REQUEST_KWARGS.include?(k) }
         end
 
         def non_kwarg_request_warning
           ActiveSupport::Deprecation.warn(<<-MSG.strip_heredoc)
-            ActionDispatch::Integration::TestCase HTTP request methods will accept only
-            keyword arguments in future Rails versions.
+            ActionDispatch::IntegrationTest HTTP request methods will accept only
+            the following keyword arguments in future Rails versions:
+            #{REQUEST_KWARGS.join(', ')}
 
             Examples:
 
             get '/profile',
               params: { id: 1 },
               headers: { 'X-Extra-Header' => '123' },
-              env: { 'action_dispatch.custom' => 'custom' }
-
-            xhr :post, '/profile',
-              params: { id: 1 }
+              env: { 'action_dispatch.custom' => 'custom' },
+              xhr: true
           MSG
         end
 
         # Performs the actual request.
-        def process(method, path, params: nil, headers: nil, env: nil)
+        def process(method, path, params: nil, headers: nil, env: nil, xhr: false)
           if path =~ %r{://}
             location = URI.parse(path)
             https! URI::HTTPS === location if location.scheme
-            host! "#{location.host}:#{location.port}" if location.host
+            if url_host = location.host
+              default = Rack::Request::DEFAULT_PORTS[location.scheme]
+              url_host += ":#{location.port}" if default != location.port
+              host! url_host
+            end
             path = location.query ? "#{location.path}?#{location.query}" : location.path
           end
 
@@ -354,6 +350,13 @@ module ActionDispatch
             "CONTENT_TYPE"   => "application/x-www-form-urlencoded",
             "HTTP_ACCEPT"    => accept
           }
+
+          if xhr
+            headers ||= {}
+            headers['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
+            headers['HTTP_ACCEPT'] ||= [Mime::JS, Mime::HTML, Mime::XML, 'text/xml', Mime::ALL].join(', ')
+          end
+
           # this modifies the passed request_env directly
           if headers.present?
             Http::Headers.new(request_env).merge!(headers)
@@ -371,13 +374,13 @@ module ActionDispatch
           @request_count += 1
           @request  = ActionDispatch::Request.new(session.last_request.env)
           response = _mock_session.last_response
-          @response = ActionDispatch::TestResponse.new(response.status, response.headers, response.body)
+          @response = ActionDispatch::TestResponse.from_response(response)
           @html_document = nil
           @url_options = nil
 
-          @controller = session.last_request.env['action_controller.instance']
+          @controller = @request.controller_instance
 
-          return response.status
+          response.status
         end
 
         def build_full_uri(path, env)
@@ -388,14 +391,36 @@ module ActionDispatch
     module Runner
       include ActionDispatch::Assertions
 
-      def app
-        @app ||= nil
+      APP_SESSIONS = {}
+
+      attr_reader :app
+
+      def before_setup # :nodoc:
+        @app = nil
+        @integration_session = nil
+        super
+      end
+
+      def integration_session
+        @integration_session ||= create_session(app)
       end
 
       # Reset the current session. This is useful for testing multiple sessions
       # in a single test case.
       def reset!
-        @integration_session = Integration::Session.new(app)
+        @integration_session = create_session(app)
+      end
+
+      def create_session(app)
+        klass = APP_SESSIONS[app] ||= Class.new(Integration::Session) {
+          # If the app is a Rails app, make url_helpers available on the session
+          # This makes app.url_for and app.foo_path available in the console
+          if app.respond_to?(:routes)
+            include app.routes.url_helpers
+            include app.routes.mounted_helpers
+          end
+        }
+        klass.new(app)
       end
 
       def remove! # :nodoc:
@@ -405,12 +430,9 @@ module ActionDispatch
       %w(get post patch put head delete cookies assigns
          xml_http_request xhr get_via_redirect post_via_redirect).each do |method|
         define_method(method) do |*args|
-          reset! unless integration_session
-
           # reset the html_document variable, except for cookies/assigns calls
           unless method == 'cookies' || method == 'assigns'
             @html_document = nil
-            reset_template_assertion
           end
 
           integration_session.__send__(method, *args).tap do
@@ -438,19 +460,16 @@ module ActionDispatch
       # Copy the instance variables from the current session instance into the
       # test instance.
       def copy_session_variables! #:nodoc:
-        return unless integration_session
-        %w(controller response request).each do |var|
-          instance_variable_set("@#{var}", @integration_session.__send__(var))
-        end
+        @controller = @integration_session.controller
+        @response   = @integration_session.response
+        @request    = @integration_session.request
       end
 
       def default_url_options
-        reset! unless integration_session
         integration_session.default_url_options
       end
 
       def default_url_options=(options)
-        reset! unless integration_session
         integration_session.default_url_options = options
       end
 
@@ -460,7 +479,6 @@ module ActionDispatch
 
       # Delegate unhandled messages to the current session instance.
       def method_missing(sym, *args, &block)
-        reset! unless integration_session
         if integration_session.respond_to?(sym)
           integration_session.__send__(sym, *args, &block).tap do
             copy_session_variables!
@@ -469,11 +487,6 @@ module ActionDispatch
           super
         end
       end
-
-      private
-        def integration_session
-          @integration_session ||= nil
-        end
     end
   end
 
@@ -496,8 +509,8 @@ module ActionDispatch
   #       assert_equal 200, status
   #
   #       # post the login and follow through to the home page
-  #       post "/login", username: people(:jamis).username,
-  #         password: people(:jamis).password
+  #       post "/login", params: { username: people(:jamis).username,
+  #         password: people(:jamis).password }
   #       follow_redirect!
   #       assert_equal 200, status
   #       assert_equal "/home", path
@@ -536,7 +549,7 @@ module ActionDispatch
   #         end
   #
   #         def speak(room, message)
-  #           xml_http_request "/say/#{room.id}", message: message
+  #           post "/say/#{room.id}", xhr: true, params: { message: message }
   #           assert(...)
   #           ...
   #         end
@@ -546,8 +559,8 @@ module ActionDispatch
   #         open_session do |sess|
   #           sess.extend(CustomAssertions)
   #           who = people(who)
-  #           sess.post "/login", username: who.username,
-  #             password: who.password
+  #           sess.post "/login", params: { username: who.username,
+  #             password: who.password }
   #           assert(...)
   #         end
   #       end
@@ -566,14 +579,15 @@ module ActionDispatch
   #       get "/login"
   #       assert_response :success
   #
-  #       post_via_redirect "/login", username: users(:david).username, password: users(:david).password
+  #       post "/login", params: { username: users(:david).username, password: users(:david).password }
+  #       follow_redirect!
   #       assert_equal '/welcome', path
   #       assert_equal 'Welcome david!', flash[:notice]
   #
   #       https!(false)
   #       get "/articles/all"
   #       assert_response :success
-  #       assert assigns(:articles)
+  #       assert_select 'h1', 'Articles'
   #     end
   #   end
   #
@@ -612,7 +626,7 @@ module ActionDispatch
   #         def browses_site
   #           get "/products/all"
   #           assert_response :success
-  #           assert assigns(:products)
+  #           assert_select 'h1', 'Products'
   #         end
   #       end
   #
@@ -621,7 +635,7 @@ module ActionDispatch
   #           sess.extend(CustomDsl)
   #           u = users(user)
   #           sess.https!
-  #           sess.post "/login", username: u.username, password: u.password
+  #           sess.post "/login", params: { username: u.username, password: u.password }
   #           assert_equal '/welcome', sess.path
   #           sess.https!(false)
   #         end
@@ -650,7 +664,6 @@ module ActionDispatch
     end
 
     def url_options
-      reset! unless integration_session
       integration_session.url_options
     end
 

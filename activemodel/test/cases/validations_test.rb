@@ -1,4 +1,3 @@
-# encoding: utf-8
 require 'cases/helper'
 
 require 'models/topic'
@@ -350,6 +349,25 @@ class ValidationsTest < ActiveModel::TestCase
 
     topic.validate
     assert_not_empty topic.errors
+  end
+
+  def test_validate_with_bang
+    Topic.validates :title, presence: true
+
+    assert_raise(ActiveModel::ValidationError) do
+      Topic.new.validate!
+    end
+  end
+
+  def test_validate_with_bang_and_context
+    Topic.validates :title, presence: true, on: :context
+
+    assert_raise(ActiveModel::ValidationError) do
+      Topic.new.validate!(:context)
+    end
+
+    t = Topic.new(title: "Valid title")
+    assert t.validate!(:context)
   end
 
   def test_strict_validation_in_validates

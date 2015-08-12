@@ -39,7 +39,7 @@ module ActiveSupport
             @data = {}
           end
 
-          # Don't allow synchronizing since it isn't thread safe,
+          # Don't allow synchronizing since it isn't thread safe.
           def synchronize # :nodoc:
             yield
           end
@@ -120,7 +120,7 @@ module ActiveSupport
             super
           end
 
-          def set_cache_value(value, name, amount, options)
+          def set_cache_value(value, name, amount, options) # :nodoc:
             if local_cache
               local_cache.mute do
                 if value

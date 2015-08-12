@@ -59,9 +59,9 @@ You can find comprehensive documentation in the [Fixtures API documentation](htt
 
 #### What Are Fixtures?
 
-_Fixtures_ is a fancy word for sample data. Fixtures allow you to populate your testing database with predefined data before your tests run. Fixtures are database independent written in YAML. There is one file per model.
+_Fixtures_ is a fancy word for sample data. Fixtures allow you to populate your testing database with predefined data before your tests run. Fixtures are database independent and written in YAML. There is one file per model.
 
-You'll find fixtures under your `test/fixtures` directory. When you run `rails generate model` to create a new model fixture stubs will be automatically created and placed in this directory.
+You'll find fixtures under your `test/fixtures` directory. When you run `rails generate model` to create a new model, Rails automatically creates fixture stubs in this directory.
 
 #### YAML
 
@@ -82,7 +82,7 @@ steve:
   profession: guy with keyboard
 ```
 
-Each fixture is given a name followed by an indented list of colon-separated key/value pairs. Records are typically separated by a blank space. You can place comments in a fixture file by using the # character in the first column.
+Each fixture is given a name followed by an indented list of colon-separated key/value pairs. Records are typically separated by a blank line. You can place comments in a fixture file by using the # character in the first column.
 
 If you are working with [associations](/association_basics.html), you can simply
 define a reference node between two different fixtures. Here's an example with
@@ -120,9 +120,9 @@ user_<%= n %>:
 
 Rails by default automatically loads all fixtures from the `test/fixtures` directory for your models and controllers test. Loading involves three steps:
 
-* Remove any existing data from the table corresponding to the fixture
-* Load the fixture data into the table
-* Dump the fixture data into a method in case you want to access it directly
+1. Remove any existing data from the table corresponding to the fixture
+2. Load the fixture data into the table
+3. Dump the fixture data into a method in case you want to access it directly
 
 TIP: In order to remove existing data from the database, Rails tries to disable referential integrity triggers (like foreign keys and check constraints). If you are getting annoying permission errors on running tests, make sure the database user has privilege to disable these triggers in testing environment. (In PostgreSQL, only superusers can disable all triggers. Read more about PostgreSQL permissions [here](http://blog.endpoint.com/2012/10/postgres-system-triggers-error.html))
 
@@ -138,34 +138,32 @@ users(:david)
 users(:david).id
 
 # one can also access methods available on the User class
-email(david.girlfriend.email, david.location_tonight)
+email(david.partner.email, david.location_tonight)
 ```
 
-### Rake Tasks for Running your Tests
+To get multiple fixtures at once, you can pass in a list of fixture names. For example:
 
-Rails comes with a number of built-in rake tasks to help with testing. The
-table below lists the commands included in the default Rakefile when a Rails
-project is created.
+```ruby
+# this will return an array containing the fixtures david and steve
+users(:david, :steve)
+```
 
-| Tasks                   | Description |
-| ----------------------- | ----------- |
-| `rake test`             | Runs all tests in the `test` directory. You can also run `rake` and Rails will run all tests by default |
-| `rake test:controllers` | Runs all the controller tests from `test/controllers` |
-| `rake test:functionals` | Runs all the functional tests from `test/controllers`, `test/mailers`, and `test/functional` |
-| `rake test:helpers`     | Runs all the helper tests from `test/helpers` |
-| `rake test:integration` | Runs all the integration tests from `test/integration` |
-| `rake test:jobs`        | Runs all the job tests from `test/jobs` |
-| `rake test:mailers`     | Runs all the mailer tests from `test/mailers` |
-| `rake test:models`      | Runs all the model tests from `test/models` |
-| `rake test:units`       | Runs all the unit tests from `test/models`, `test/helpers`, and `test/unit` |
-| `rake test:db`          | Runs all tests in the `test` directory and resets the db |
+### Console Tasks for Running your Tests
+
+Rails comes with a CLI command to run tests.
+Here are some examples of how to use it:
+
+```bash
+$ bin/rails test # run all tests in the `test` directory
+$ bin/rails test test/controllers # run all tests from specific directory
+$ bin/rails test test/models/post_test.rb # run specific test
+$ bin/rails test test/models/post_test.rb:44 # run specific test and line
+```
 
 We will cover each of types Rails tests listed above in this guide.
 
-Unit Testing your Models
+Model Testing
 ------------------------
-
-In Rails, unit tests are what you write to test your models.
 
 For this guide we will be using the application we built in the [Getting Started with Rails](getting_started.html) guide.
 
@@ -178,6 +176,14 @@ create  app/models/article.rb
 create  test/models/article_test.rb
 create  test/fixtures/articles.yml
 ...
+```
+
+You can also generate the test stub for a model using the following command:
+
+```bash
+$ bin/rails generate test_unit:model article title:string body:text
+create  test/models/article_test.rb
+create  test/fixtures/articles.yml
 ```
 
 The default test stub in `test/models/article_test.rb` looks like this:
@@ -259,10 +265,10 @@ be rebuilt. This can be done by executing `bin/rake db:test:prepare`.
 
 ### Running Tests
 
-Running a test is as simple as invoking the file containing the test cases through `rake test` command.
+Running a test is as simple as invoking the file containing the test cases through `rails test` command.
 
 ```bash
-$ bin/rake test test/models/article_test.rb
+$ bin/rails test test/models/article_test.rb
 .
 
 Finished tests in 0.009262s, 107.9680 tests/s, 107.9680 assertions/s.
@@ -270,18 +276,18 @@ Finished tests in 0.009262s, 107.9680 tests/s, 107.9680 assertions/s.
 1 tests, 1 assertions, 0 failures, 0 errors, 0 skips
 ```
 
+This will run all test methods from the test case.
+
 You can also run a particular test method from the test case by running the test and providing the `test method name`.
 
 ```bash
-$ bin/rake test test/models/article_test.rb test_the_truth
+$ bin/rails test test/models/article_test.rb test_the_truth
 .
 
 Finished tests in 0.009064s, 110.3266 tests/s, 110.3266 assertions/s.
 
 1 tests, 1 assertions, 0 failures, 0 errors, 0 skips
 ```
-
-This will run all test methods from the test case.
 
 The `.` (dot) above indicates a passing test. When a test fails you see an `F`; when a test throws an error you see an `E` in its place. The last line of the output is the summary.
 
@@ -296,10 +302,10 @@ test "should not save article without title" do
 end
 ```
 
-Let us run this newly added test.
+Let us run this newly added test (where `6` is the number of line where the test is defined).
 
 ```bash
-$ bin/rake test test/models/article_test.rb test_should_not_save_article_without_title
+$ bin/rails test test/models/article_test.rb:6
 F
 
 Finished tests in 0.044632s, 22.4054 tests/s, 22.4054 assertions/s.
@@ -339,7 +345,7 @@ end
 Now the test should pass. Let us verify by running the test again:
 
 ```bash
-$ bin/rake test test/models/article_test.rb test_should_not_save_article_without_title
+$ bin/rails test test/models/article_test.rb:6
 .
 
 Finished tests in 0.047721s, 20.9551 tests/s, 20.9551 assertions/s.
@@ -347,7 +353,11 @@ Finished tests in 0.047721s, 20.9551 tests/s, 20.9551 assertions/s.
 1 tests, 1 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Now, if you noticed, we first wrote a test which fails for a desired functionality, then we wrote some code which adds the functionality and finally we ensured that our test passes. This approach to software development is referred to as _Test-Driven Development_ (TDD).
+Now, if you noticed, we first wrote a test which fails for a desired
+functionality, then we wrote some code which adds the functionality and finally
+we ensured that our test passes. This approach to software development is
+referred to as
+[_Test-Driven Development_ (TDD)](http://c2.com/cgi/wiki?TestDrivenDevelopment).
 
 #### What an error looks like
 
@@ -364,7 +374,7 @@ end
 Now you can see even more output in the console from running the tests:
 
 ```bash
-$ bin/rake test test/models/article_test.rb test_should_report_error
+$ bin/rails test test/models/article_test.rb
 E
 
 Finished tests in 0.030974s, 32.2851 tests/s, 0.0000 assertions/s.
@@ -379,17 +389,20 @@ NameError: undefined local variable or method `some_undefined_variable' for #<Ar
 
 Notice the 'E' in the output. It denotes a test with error.
 
-NOTE: The execution of each test method stops as soon as any error or an assertion failure is encountered, and the test suite continues with the next method. All test methods are executed in alphabetical order.
+NOTE: The execution of each test method stops as soon as any error or an
+assertion failure is encountered, and the test suite continues with the next
+method. All test methods are executed in random order. The
+[`config.active_support.test_order` option](configuring.html#configuring-active-support)
+can be used to configure test order.
 
 When a test fails you are presented with the corresponding backtrace. By default
 Rails filters that backtrace and will only print lines relevant to your
 application. This eliminates the framework noise and helps to focus on your
 code. However there are situations when you want to see the full
-backtrace. simply set the `BACKTRACE` environment variable to enable this
-behavior:
+backtrace. Simply set the `-b` (or `--backtrace`) argument to enable this behavior:
 
 ```bash
-$ BACKTRACE=1 bin/rake test test/models/article_test.rb
+$ bin/rails test -b test/models/article_test.rb
 ```
 
 If we want this test to pass we can modify it to use `assert_raises` like so:
@@ -409,9 +422,49 @@ This test should now pass.
 
 By now you've caught a glimpse of some of the assertions that are available. Assertions are the worker bees of testing. They are the ones that actually perform the checks to ensure that things are going as planned.
 
-There are a bunch of different types of assertions you can use that come with [`Minitest`](https://github.com/seattlerb/minitest), the default testing library used by Rails.
+Here's an extract of the assertions you can use with
+[`Minitest`](https://github.com/seattlerb/minitest), the default testing library
+used by Rails. The `[msg]` parameter is an optional string message you can
+specify to make your test failure messages clearer. It's not required.
 
-For a list of all available assertions please check the [Minitest API documentation](http://docs.seattlerb.org/minitest/), specifically [`Minitest::Assertions`](http://docs.seattlerb.org/minitest/Minitest/Assertions.html)
+| Assertion                                                        | Purpose |
+| ---------------------------------------------------------------- | ------- |
+| `assert( test, [msg] )`                                          | Ensures that `test` is true.|
+| `assert_not( test, [msg] )`                                      | Ensures that `test` is false.|
+| `assert_equal( expected, actual, [msg] )`                        | Ensures that `expected == actual` is true.|
+| `assert_not_equal( expected, actual, [msg] )`                    | Ensures that `expected != actual` is true.|
+| `assert_same( expected, actual, [msg] )`                         | Ensures that `expected.equal?(actual)` is true.|
+| `assert_not_same( expected, actual, [msg] )`                     | Ensures that `expected.equal?(actual)` is false.|
+| `assert_nil( obj, [msg] )`                                       | Ensures that `obj.nil?` is true.|
+| `assert_not_nil( obj, [msg] )`                                   | Ensures that `obj.nil?` is false.|
+| `assert_empty( obj, [msg] )`                                     | Ensures that `obj` is `empty?`.|
+| `assert_not_empty( obj, [msg] )`                                 | Ensures that `obj` is not `empty?`.|
+| `assert_match( regexp, string, [msg] )`                          | Ensures that a string matches the regular expression.|
+| `assert_no_match( regexp, string, [msg] )`                       | Ensures that a string doesn't match the regular expression.|
+| `assert_includes( collection, obj, [msg] )`                      | Ensures that `obj` is in `collection`.|
+| `assert_not_includes( collection, obj, [msg] )`                  | Ensures that `obj` is not in `collection`.|
+| `assert_in_delta( expecting, actual, [delta], [msg] )`           | Ensures that the numbers `expected` and `actual` are within `delta` of each other.|
+| `assert_not_in_delta( expecting, actual, [delta], [msg] )`       | Ensures that the numbers `expected` and `actual` are not within `delta` of each other.|
+| `assert_throws( symbol, [msg] ) { block }`                       | Ensures that the given block throws the symbol.|
+| `assert_raises( exception1, exception2, ... ) { block }`         | Ensures that the given block raises one of the given exceptions.|
+| `assert_nothing_raised( exception1, exception2, ... ) { block }` | Ensures that the given block doesn't raise one of the given exceptions.|
+| `assert_instance_of( class, obj, [msg] )`                        | Ensures that `obj` is an instance of `class`.|
+| `assert_not_instance_of( class, obj, [msg] )`                    | Ensures that `obj` is not an instance of `class`.|
+| `assert_kind_of( class, obj, [msg] )`                            | Ensures that `obj` is an instance of `class` or is descending from it.|
+| `assert_not_kind_of( class, obj, [msg] )`                        | Ensures that `obj` is not an instance of `class` and is not descending from it.|
+| `assert_respond_to( obj, symbol, [msg] )`                        | Ensures that `obj` responds to `symbol`.|
+| `assert_not_respond_to( obj, symbol, [msg] )`                    | Ensures that `obj` does not respond to `symbol`.|
+| `assert_operator( obj1, operator, [obj2], [msg] )`               | Ensures that `obj1.operator(obj2)` is true.|
+| `assert_not_operator( obj1, operator, [obj2], [msg] )`           | Ensures that `obj1.operator(obj2)` is false.|
+| `assert_predicate ( obj, predicate, [msg] )`                     | Ensures that `obj.predicate` is true, e.g. `assert_predicate str, :empty?`|
+| `assert_not_predicate ( obj, predicate, [msg] )`                 | Ensures that `obj.predicate` is false, e.g. `assert_not_predicate str, :empty?`|
+| `assert_send( array, [msg] )`                                    | Ensures that executing the method listed in `array[1]` on the object in `array[0]` with the parameters of `array[2 and up]` is true. This one is weird eh?|
+| `flunk( [msg] )`                                                 | Ensures failure. This is useful to explicitly mark a test that isn't finished yet.|
+
+The above are a subset of assertions that minitest supports. For an exhaustive &
+more up-to-date list, please check
+[Minitest API documentation](http://docs.seattlerb.org/minitest/), specifically
+[`Minitest::Assertions`](http://docs.seattlerb.org/minitest/Minitest/Assertions.html)
 
 Because of the modular nature of the testing framework, it is possible to create your own assertions. In fact, that's exactly what Rails does. It includes some specialized assertions to make your life easier.
 
@@ -424,12 +477,11 @@ Rails adds some custom assertions of its own to the `minitest` framework:
 | Assertion                                                                         | Purpose |
 | --------------------------------------------------------------------------------- | ------- |
 | `assert_difference(expressions, difference = 1, message = nil) {...}`             | Test numeric difference between the return value of an expression as a result of what is evaluated in the yielded block.|
-| `assert_no_difference(expressions, message = nil, &amp;block)`                    | Asserts that the numeric result of evaluating an expression is not changed before and after invoking the passed in block.|
+| `assert_no_difference(expressions, message = nil, &block)`                        | Asserts that the numeric result of evaluating an expression is not changed before and after invoking the passed in block.|
 | `assert_recognizes(expected_options, path, extras={}, message=nil)`               | Asserts that the routing of the given path was handled correctly and that the parsed options (given in the expected_options hash) match path. Basically, it asserts that Rails recognizes the route given by expected_options.|
 | `assert_generates(expected_path, options, defaults={}, extras = {}, message=nil)` | Asserts that the provided options can be used to generate the provided path. This is the inverse of assert_recognizes. The extras parameter is used to tell the request the names and values of additional request parameters that would be in a query string. The message parameter allows you to specify a custom error message for assertion failures.|
 | `assert_response(type, message = nil)`                                            | Asserts that the response comes with a specific status code. You can specify `:success` to indicate 200-299, `:redirect` to indicate 300-399, `:missing` to indicate 404, or `:error` to match the 500-599 range. You can also pass an explicit status number or its symbolic equivalent. For more information, see [full list of status codes](http://rubydoc.info/github/rack/rack/master/Rack/Utils#HTTP_STATUS_CODES-constant) and how their [mapping](http://rubydoc.info/github/rack/rack/master/Rack/Utils#SYMBOL_TO_STATUS_CODE-constant) works.|
 | `assert_redirected_to(options = {}, message=nil)`                                 | Assert that the redirection options passed in match those of the redirect called in the latest action. This match can be partial, such that `assert_redirected_to(controller: "weblog")` will also match the redirection of `redirect_to(controller: "weblog", action: "show")` and so on. You can also pass named routes such as `assert_redirected_to root_path` and Active Record objects such as `assert_redirected_to @article`.|
-| `assert_template(expected = nil, message=nil)`                                    | Asserts that the request was rendered with the appropriate template file.|
 
 You'll see the usage of some of these assertions in the next chapter.
 
@@ -442,10 +494,11 @@ All the basic assertions such as `assert_equal` defined in `Minitest::Assertions
 * `ActionMailer::TestCase`
 * `ActionView::TestCase`
 * `ActionDispatch::IntegrationTest`
+* `ActiveJob::TestCase`
 
 Each of these classes include `Minitest::Assertions`, allowing us to use all of the basic assertions in our tests.
 
-NOTE: For more information on `Minitest`, refer to [Minitest](http://ruby-doc.org/stdlib-2.1.0/libdoc/minitest/rdoc/MiniTest.html)
+NOTE: For more information on `Minitest`, refer to [Minitest](http://docs.seattlerb.org/minitest)
 
 Functional Tests for Your Controllers
 -------------------------------------
@@ -464,19 +517,29 @@ You should test for things such as:
 
 Now that we have used Rails scaffold generator for our `Article` resource, it has already created the controller code and tests. You can take look at the file `articles_controller_test.rb` in the `test/controllers` directory.
 
+The following command will generate a controller test case with a filled up
+test for each of the seven default actions.
+
+```bash
+$ bin/rails generate test_unit:scaffold article
+create test/controllers/articles_controller_test.rb
+```
+
 Let me take you through one such test, `test_should_get_index` from the file `articles_controller_test.rb`.
 
 ```ruby
+# articles_controller_test.rb
 class ArticlesControllerTest < ActionController::TestCase
   test "should get index" do
     get :index
     assert_response :success
-    assert_not_nil assigns(:articles)
+    assert_includes @response.body, 'Articles'
   end
 end
 ```
 
-In the `test_should_get_index` test, Rails simulates a request on the action called `index`, making sure the request was successful and also ensuring that it assigns a valid `articles` instance variable.
+In the `test_should_get_index` test, Rails simulates a request on the action called `index`, making sure the request was successful
+and also ensuring that the right response body has been generated.
 
 The `get` method kicks off the web request and populates the results into the response. It accepts 4 arguments:
 
@@ -495,13 +558,13 @@ All the keyword arguments are optional.
 Example: Calling the `:show` action, passing an `id` of 12 as the `params` and setting a `user_id` of 5 in the session:
 
 ```ruby
-get(:show, params: { 'id' => "12" }, session: { 'user_id' => 5 })
+get(:show, params: { id: 12 }, session: { user_id: 5 })
 ```
 
 Another example: Calling the `:view` action, passing an `id` of 12 as the `params`, this time with no session, but with a flash message.
 
 ```ruby
-get(:view, params: { 'id' => '12' }, flash: { 'message' => 'booya!' })
+get(:view, params: { id: 12 }, flash: { message: 'booya!' })
 ```
 
 NOTE: If you try running `test_should_create_article` test from `articles_controller_test.rb` it will fail on account of the newly added model level validation and rightly so.
@@ -514,7 +577,7 @@ test "should create article" do
     post :create, params: { article: { title: 'Some title' } }
   end
 
-  assert_redirected_to article_path(assigns(:article))
+  assert_redirected_to article_path(Article.last)
 end
 ```
 
@@ -537,14 +600,15 @@ NOTE: Functional tests do not verify whether the specified request type is accep
 
 ### Testing XHR (AJAX) requests
 
-`xhr` accepts method (listed in the section above), action name and parameters:
+To test AJAX requests, you can specify the `xhr: true` option to `get`, `post`,
+`patch`, `put`, and `delete` methods:
 
 ```ruby
-test "ajax request responds with no layout" do
-  xhr :get, :show, params: { id: articles(:first).id }
+test "ajax request" do
+  get :show, params: { id: articles(:first).id }, xhr: true
 
-  assert_template :index
-  assert_template layout: nil
+  assert_equal 'hello world', @response.body
+  assert_equal "text/javascript", @response.content_type
 end
 ```
 
@@ -552,20 +616,16 @@ end
 
 After a request has been made and processed, you will have 4 Hash objects ready for use:
 
-* `assigns` - Any objects that are stored as instance variables in actions for use in views.
 * `cookies` - Any cookies that are set.
 * `flash` - Any objects living in the flash.
 * `session` - Any object living in session variables.
 
-As is the case with normal Hash objects, you can access the values by referencing the keys by string. You can also reference them by symbol name, except for `assigns`. For example:
+As is the case with normal Hash objects, you can access the values by referencing the keys by string. You can also reference them by symbol name. For example:
 
 ```ruby
 flash["gordon"]               flash[:gordon]
 session["shmession"]          session[:shmession]
 cookies["are_good_for_u"]     cookies[:are_good_for_u]
-
-# Because you can't use assigns[:something] for historical reasons:
-assigns["something"]          assigns(:something)
 ```
 
 ### Instance Variables Available
@@ -593,46 +653,6 @@ get :index # simulate the request with custom header
 post :create # simulate the request with custom env variable
 ```
 
-### Testing Templates and Layouts
-
-Eventually, you may want to test whether a specific layout is rendered in the view of a response.
-
-#### Asserting Templates
-
-If you want to make sure that the response rendered the correct template and layout, you can use the `assert_template`
-method:
-
-```ruby
-test "index should render correct template and layout" do
-  get :index
-  assert_template :index
-  assert_template layout: "layouts/application"
-
-  # You can also pass a regular expression.
-  assert_template layout: /layouts\/application/
-end
-```
-
-NOTE: You cannot test for template and layout at the same time, with a single call to `assert_template`.
-
-WARNING: You must include the "layouts" directory name even if you save your layout file in this standard layout directory. Hence, `assert_template layout: "application"` will not work.
-
-#### Asserting Partials
-
-If your view renders any partial, when asserting for the layout, you can to assert for the partial at the same time.
-Otherwise, assertion will fail.
-
-Remember, we added the "_form" partial to our creating Articles view? Let's write an assertion for that in the `:new` action now:
-
-```ruby
-test "new should render correct layout" do
-  get :new
-  assert_template layout: "layouts/application", partial: "_form"
-end
-```
-
-This is the correct way to assert for when the view renders a partial with a given name. As identified by the `:partial` key passed to the `assert_template` call.
-
 ### Testing `flash` notices
 
 If you remember from earlier one of the Four Hashes of the Apocalypse was `flash`.
@@ -648,7 +668,7 @@ test "should create article" do
     post :create, params: { article: { title: 'Some title' } }
   end
 
-  assert_redirected_to article_path(assigns(:article))
+  assert_redirected_to article_path(Article.last)
   assert_equal 'Article was successfully created.', flash[:notice]
 end
 ```
@@ -656,7 +676,7 @@ end
 If we run our test now, we should see a failure:
 
 ```bash
-$ bin/rake test test/controllers/articles_controller_test.rb test_should_create_article
+$ bin/rails test test/controllers/articles_controller_test.rb test_should_create_article
 Run options: -n test_should_create_article --seed 32266
 
 # Running:
@@ -694,7 +714,7 @@ end
 Now if we run our tests, we should see it pass:
 
 ```bash
-$ bin/rake test test/controllers/articles_controller_test.rb test_should_create_article
+$ bin/rails test test/controllers/articles_controller_test.rb test_should_create_article
 Run options: -n test_should_create_article --seed 18981
 
 # Running:
@@ -741,7 +761,7 @@ We can also add a test for updating an existing Article.
 test "should update article" do
   article = articles(:one)
   patch :update, params: { id: article.id, article: { title: "updated" } }
-  assert_redirected_to article_path(assigns(:article))
+  assert_redirected_to article_path(article)
 end
 ```
 
@@ -780,7 +800,7 @@ class ArticlesControllerTest < ActionController::TestCase
 
   test "should update article" do
     patch :update, params: { id: @article.id, article: { title: "updated" } }
-    assert_redirected_to article_path(assigns(:article))
+    assert_redirected_to article_path(@article)
   end
 end
 ```
@@ -817,7 +837,6 @@ class ProfileControllerTest < ActionController::TestCase
 
     get :show
     assert_response :success
-    assert_equal users(:david), assigns(:user)
   end
 end
 ```
@@ -842,7 +861,7 @@ end
 I've added this file here `test/controllers/articles_routes_test.rb` and if we run the test we should see:
 
 ```bash
-$ bin/rake test test/controllers/articles_routes_test.rb
+$ bin/rails test test/controllers/articles_routes_test.rb
 
 # Running:
 
@@ -858,7 +877,7 @@ For more information on routing assertions available in Rails, see the API docum
 Testing Views
 -------------
 
-Testing the response to your request by asserting the presence of key HTML elements and their content is a common way to test the views of your application. The `assert_select` method allows you to query HTML elements of the response by using a simple yet powerful syntax.
+Testing the response to your request by asserting the presence of key HTML elements and their content is a common way to test the views of your application. Like route tests, view tests reside in `test/controllers/` or are part of controller tests. The `assert_select` method allows you to query HTML elements of the response by using a simple yet powerful syntax.
 
 There are two forms of `assert_select`:
 
@@ -919,7 +938,7 @@ assert_select_email do
 end
 ```
 
-Testing helpers
+Testing Helpers
 ---------------
 
 In order to test helpers, all you need to do is check that the output of the
@@ -1031,14 +1050,12 @@ How about testing our ability to create a new article in our blog and see the re
 test "can create an article" do
   get "/articles/new"
   assert_response :success
-  assert_template "articles/new", partial: "articles/_form"
 
   post "/articles",
     params: { article: { title: "can create", body: "article successfully." } }
   assert_response :redirect
   follow_redirect!
   assert_response :success
-  assert_template "articles/show"
   assert_select "p", "Title:\n  can create"
 end
 ```
@@ -1064,7 +1081,7 @@ Finally we can assert that our response was successful, template was rendered, a
 
 #### Taking it further
 
-We were able to successfully test a very small workflow for visiting our blog and creating a new article. If we wanted to take this further we could add tests for commenting, removing articles, or editting comments. Integration tests are a great place to experiment with all kinds of use-cases for our applications.
+We were able to successfully test a very small workflow for visiting our blog and creating a new article. If we wanted to take this further we could add tests for commenting, removing articles, or editing comments. Integration tests are a great place to experiment with all kinds of use-cases for our applications.
 
 Testing Your Mailers
 --------------------
@@ -1073,7 +1090,7 @@ Testing mailer classes requires some specific tools to do a thorough job.
 
 ### Keeping the Postman in Check
 
-Your mailer classes - like every other part of your Rails application - should be tested to ensure that it is working as expected.
+Your mailer classes - like every other part of your Rails application - should be tested to ensure that they are working as expected.
 
 The goals of testing your mailer classes are to ensure that:
 

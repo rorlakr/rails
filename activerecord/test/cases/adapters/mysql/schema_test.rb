@@ -4,7 +4,7 @@ require 'models/comment'
 
 module ActiveRecord
   module ConnectionAdapters
-    class MysqlSchemaTest < ActiveRecord::TestCase
+    class MysqlSchemaTest < ActiveRecord::MysqlTestCase
       fixtures :posts
 
       def setup
@@ -22,7 +22,7 @@ module ActiveRecord
       end
 
       teardown do
-        @connection.execute "drop table if exists mysql_doubles"
+        @connection.drop_table "mysql_doubles", if_exists: true
       end
 
       class MysqlDouble < ActiveRecord::Base

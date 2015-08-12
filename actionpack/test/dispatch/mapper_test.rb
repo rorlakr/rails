@@ -19,6 +19,10 @@ module ActionDispatch
           ActionDispatch::Request
         end
 
+        def dispatcher_class
+          RouteSet::Dispatcher
+        end
+
         def add_route(*args)
           routes << args
         end
@@ -37,8 +41,8 @@ module ActionDispatch
       end
 
       def test_mapping_requirements
-        options = { :controller => 'foo', :action => 'bar', :via => :get }
-        m = Mapper::Mapping.build({}, FakeSet.new, '/store/:name(*rest)', nil, options)
+        options = { :via => :get }
+        m = Mapper::Mapping.build({}, FakeSet.new, '/store/:name(*rest)', nil, 'foo', 'bar', nil, options)
         _, _, requirements, _ = m.to_route
         assert_equal(/.+?/, requirements[:rest])
       end

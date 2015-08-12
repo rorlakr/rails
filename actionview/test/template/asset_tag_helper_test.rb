@@ -1,4 +1,3 @@
-require 'zlib'
 require 'abstract_unit'
 require 'active_support/ordered_options'
 
@@ -180,6 +179,7 @@ class AssetTagHelperTest < ActionView::TestCase
     %(image_tag("xml.png")) => %(<img alt="Xml" src="/images/xml.png" />),
     %(image_tag("rss.gif", :alt => "rss syndication")) => %(<img alt="rss syndication" src="/images/rss.gif" />),
     %(image_tag("gold.png", :size => "20")) => %(<img alt="Gold" height="20" src="/images/gold.png" width="20" />),
+    %(image_tag("gold.png", :size => 20)) => %(<img alt="Gold" height="20" src="/images/gold.png" width="20" />),
     %(image_tag("gold.png", :size => "45x70")) => %(<img alt="Gold" height="70" src="/images/gold.png" width="45" />),
     %(image_tag("gold.png", "size" => "45x70")) => %(<img alt="Gold" height="70" src="/images/gold.png" width="45" />),
     %(image_tag("error.png", "size" => "45 x 70")) => %(<img alt="Error" src="/images/error.png" />),
@@ -238,6 +238,7 @@ class AssetTagHelperTest < ActionView::TestCase
     %(video_tag("gold.m4v", "size" => "320x240")) => %(<video height="240" src="/videos/gold.m4v" width="320"></video>),
     %(video_tag("trailer.ogg", :poster => "screenshot.png")) => %(<video poster="/images/screenshot.png" src="/videos/trailer.ogg"></video>),
     %(video_tag("error.avi", "size" => "100")) => %(<video height="100" src="/videos/error.avi" width="100"></video>),
+    %(video_tag("error.avi", "size" => 100)) => %(<video height="100" src="/videos/error.avi" width="100"></video>),
     %(video_tag("error.avi", "size" => "100 x 100")) => %(<video src="/videos/error.avi"></video>),
     %(video_tag("error.avi", "size" => "x")) => %(<video src="/videos/error.avi"></video>),
     %(video_tag("http://media.rubyonrails.org/video/rails_blog_2.mov")) => %(<video src="http://media.rubyonrails.org/video/rails_blog_2.mov"></video>),
@@ -307,6 +308,11 @@ class AssetTagHelperTest < ActionView::TestCase
 
   def test_asset_path_tag
     AssetPathToTag.each { |method, tag| assert_dom_equal(tag, eval(method)) }
+  end
+
+  def test_asset_path_tag_raises_an_error_for_nil_source
+    e = assert_raise(ArgumentError) { asset_path(nil) }
+    assert_equal("nil is not a valid asset source", e.message)
   end
 
   def test_asset_path_tag_to_not_create_duplicate_slashes
@@ -461,6 +467,14 @@ class AssetTagHelperTest < ActionView::TestCase
     options = {:size => '16x10'}
     image_tag('icon', options)
     assert_equal({:size => '16x10'}, options)
+  end
+
+  def test_image_tag_raises_an_error_for_competing_size_arguments
+    exception = assert_raise(ArgumentError) do
+      image_tag("gold.png", :height => "100", :width => "200", :size => "45x70")
+    end
+
+    assert_equal("Cannot pass a :size option with a :height or :width option", exception.message)
   end
 
   def test_favicon_link_tag

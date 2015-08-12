@@ -34,7 +34,7 @@ Launch!
 Let's start to boot and initialize the app. A Rails application is usually
 started by running `rails console` or `rails server`.
 
-### `railties/bin/rails`
+### `railties/exe/rails`
 
 The `rails` in the command `rails server` is a ruby executable in your load
 path. This executable contains the following lines:
@@ -45,7 +45,7 @@ load Gem.bin_path('railties', 'rails', version)
 ```
 
 If you try out this command in a Rails console, you would see that this loads
-`railties/bin/rails`. A part of the file `railties/bin/rails.rb` has the
+`railties/exe/rails`. A part of the file `railties/exe/rails.rb` has the
 following code:
 
 ```ruby
@@ -53,11 +53,11 @@ require "rails/cli"
 ```
 
 The file `railties/lib/rails/cli` in turn calls
-`Rails::AppRailsLoader.exec_app_rails`.
+`Rails::AppLoader.exec_app`.
 
-### `railties/lib/rails/app_rails_loader.rb`
+### `railties/lib/rails/app_loader.rb`
 
-The primary goal of the function `exec_app_rails` is to execute your app's
+The primary goal of the function `exec_app` is to execute your app's
 `bin/rails`. If the current directory does not have a `bin/rails`, it will
 navigate upwards until it finds a `bin/rails` executable. Thus one can invoke a
 `rails` command from anywhere inside a rails application.
@@ -106,6 +106,7 @@ A standard Rails application depends on several gems, specifically:
 * activemodel
 * activerecord
 * activesupport
+* activejob
 * arel
 * builder
 * bundler
@@ -163,7 +164,7 @@ throwing an error message. If the command is valid, a method of the same name
 is called.
 
 ```ruby
-COMMAND_WHITELIST = %(plugin generate destroy console server dbconsole application runner new version help)
+COMMAND_WHITELIST = %w(plugin generate destroy console server dbconsole application runner new version help)
 
 def run_command!(command)
   command = parse_command(command)
@@ -532,6 +533,7 @@ require "rails"
   action_controller
   action_view
   action_mailer
+  active_job
   rails/test_unit
   sprockets
 ).each do |framework|
@@ -555,9 +557,8 @@ I18n and Rails configuration are all being defined here.
 The rest of `config/application.rb` defines the configuration for the
 `Rails::Application` which will be used once the application is fully
 initialized. When `config/application.rb` has finished loading Rails and defined
-the application namespace, we go back to `config/environment.rb`,
-where the application is initialized. For example, if the application was called
-`Blog`, here we would find `Rails.application.initialize!`, which is
+the application namespace, we go back to `config/environment.rb`. Here, the
+application is initialized with `Rails.application.initialize!`, which is
 defined in `rails/application.rb`.
 
 ### `railties/lib/rails/application.rb`

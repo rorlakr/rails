@@ -367,7 +367,7 @@ class TransactionCallbacksTest < ActiveRecord::TestCase
 end
 
 class CallbacksOnMultipleActionsTest < ActiveRecord::TestCase
-  self.use_transactional_fixtures = false
+  self.use_transactional_tests = false
 
   class TopicWithCallbacksOnMultipleActions < ActiveRecord::Base
     self.table_name = :topics
@@ -376,6 +376,9 @@ class CallbacksOnMultipleActionsTest < ActiveRecord::TestCase
     after_commit(on: [:create, :update]) { |record| record.history << :create_and_update }
     after_commit(on: [:update, :destroy]) { |record| record.history << :update_and_destroy }
 
+    before_commit(if: :save_before_commit_history) { |record| record.history << :before_commit }
+    before_commit(if: :update_title) { |record| record.update(title: "before commit title") }
+
     def clear_history
       @history = []
     end
@@ -383,6 +386,8 @@ class CallbacksOnMultipleActionsTest < ActiveRecord::TestCase
     def history
       @history ||= []
     end
+
+    attr_accessor :save_before_commit_history, :update_title
   end
 
   def test_after_commit_on_multiple_actions
@@ -398,5 +403,82 @@ class CallbacksOnMultipleActionsTest < ActiveRecord::TestCase
     topic.clear_history
     topic.destroy
     assert_equal [:update_and_destroy, :create_and_destroy], topic.history
+  end
+
+  def test_before_commit_actions
+    topic = TopicWithCallbacksOnMultipleActions.new
+    topic.save_before_commit_history = true
+    topic.save
+
+    assert_equal [:before_commit, :create_and_update, :create_and_destroy], topic.history
+  end
+
+  def test_before_commit_update_in_same_transaction
+    topic = TopicWithCallbacksOnMultipleActions.new
+    topic.update_title = true
+    topic.save
+
+    assert_equal "before commit title", topic.title
+    assert_equal "before commit title", topic.reload.title
+  end
+end
+
+
+class TransactionEnrollmentCallbacksTest < ActiveRecord::TestCase
+
+  class TopicWithoutTransactionalEnrollmentCallbacks < ActiveRecord::Base
+    self.table_name = :topics
+
+    before_commit_without_transaction_enrollment { |r| r.history << :before_commit }
+    after_commit_without_transaction_enrollment { |r| r.history << :after_commit }
+    after_rollback_without_transaction_enrollment { |r| r.history << :rollback }
+
+    def history
+      @history ||= []
+    end
+  end
+
+  def setup
+    @topic = TopicWithoutTransactionalEnrollmentCallbacks.create!
+  end
+
+  def test_commit_does_not_run_transactions_callbacks_without_enrollment
+    @topic.transaction do
+      @topic.content = 'foo'
+      @topic.save!
+    end
+    assert @topic.history.empty?
+  end
+
+  def test_commit_run_transactions_callbacks_with_explicit_enrollment
+    @topic.transaction do
+      2.times do
+        @topic.content = 'foo'
+        @topic.save!
+      end
+      @topic.class.connection.add_transaction_record(@topic)
+    end
+    assert_equal [:before_commit, :after_commit], @topic.history
+  end
+
+  def test_rollback_does_not_run_transactions_callbacks_without_enrollment
+    @topic.transaction do
+      @topic.content = 'foo'
+      @topic.save!
+      raise ActiveRecord::Rollback
+    end
+    assert @topic.history.empty?
+  end
+
+  def test_rollback_run_transactions_callbacks_with_explicit_enrollment
+    @topic.transaction do
+      2.times do
+        @topic.content = 'foo'
+        @topic.save!
+      end
+      @topic.class.connection.add_transaction_record(@topic)
+      raise ActiveRecord::Rollback
+    end
+    assert_equal [:rollback], @topic.history
   end
 end

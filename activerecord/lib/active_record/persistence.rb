@@ -96,7 +96,8 @@ module ActiveRecord
     # Returns true if the record is persisted, i.e. it's not a new record and it was
     # not destroyed, otherwise returns false.
     def persisted?
-      !(new_record? || destroyed?)
+      sync_with_transaction_state
+      !(@new_record || @destroyed)
     end
 
     # Saves the model.
@@ -147,7 +148,7 @@ module ActiveRecord
     # Attributes marked as readonly are silently ignored if the record is
     # being updated.
     def save!(*args)
-      create_or_update(*args) || raise(RecordNotSaved.new(nil, self))
+      create_or_update(*args) || raise(RecordNotSaved.new("Failed to save the record", self))
     end
 
     # Deletes the record in the database and freezes this instance to
@@ -192,7 +193,7 @@ module ActiveRecord
     # and #destroy! raises ActiveRecord::RecordNotDestroyed.
     # See ActiveRecord::Callbacks for further details.
     def destroy!
-      destroy || raise(ActiveRecord::RecordNotDestroyed, self)
+      destroy || _raise_record_not_destroyed
     end
 
     # Returns an instance of the specified +klass+ with the attributes of the
@@ -204,11 +205,13 @@ module ActiveRecord
     # instance using the companies/company partial instead of clients/client.
     #
     # Note: The new instance will share a link to the same attributes as the original class.
-    # So any change to the attributes in either instance will affect the other.
+    # Therefore the sti column value will still be the same.
+    # Any change to the attributes on either instance will affect both instances.
+    # If you want to change the sti column as well, use +becomes!+ instead.
     def becomes(klass)
       became = klass.new
       became.instance_variable_set("@attributes", @attributes)
-      became.instance_variable_set("@changed_attributes", @changed_attributes) if defined?(@changed_attributes)
+      became.instance_variable_set("@changed_attributes", attributes_changed_by_setter)
       became.instance_variable_set("@new_record", new_record?)
       became.instance_variable_set("@destroyed", destroyed?)
       became.instance_variable_set("@errors", errors)
@@ -378,7 +381,7 @@ module ActiveRecord
     #   # => #<Account id: 1, email: 'account@example.com'>
     #
     # Attributes are reloaded from the database, and caches busted, in
-    # particular the associations cache.
+    # particular the associations cache and the QueryCache.
     #
     # If the record no longer exists in the database <tt>ActiveRecord::RecordNotFound</tt>
     # is raised. Otherwise, in addition to the in-place modification the method
@@ -414,8 +417,7 @@ module ActiveRecord
     #   end
     #
     def reload(options = nil)
-      clear_aggregation_cache
-      clear_association_cache
+      self.class.connection.clear_query_cache
 
       fresh_object =
         if options && options[:lock]
@@ -429,14 +431,17 @@ module ActiveRecord
       self
     end
 
-    # Saves the record with the updated_at/on attributes set to the current time.
+    # Saves the record with the updated_at/on attributes set to the current time
+    # or the time specified.
     # Please note that no validation is performed and only the +after_touch+,
     # +after_commit+ and +after_rollback+ callbacks are executed.
     #
+    # This method can be passed attribute names and an optional time argument.
     # If attribute names are passed, they are updated along with updated_at/on
-    # attributes.
+    # attributes. If no time argument is passed, the current time is used as default.
     #
-    #   product.touch                         # updates updated_at/on
+    #   product.touch                         # updates updated_at/on with current time
+    #   product.touch(time: Time.new(2015, 2, 16, 0, 0, 0)) # updates updated_at/on with specified time
     #   product.touch(:designed_at)           # updates the designed_at attribute and updated_at/on
     #   product.touch(:started_at, :ended_at) # updates started_at, ended_at and updated_at/on attributes
     #
@@ -460,26 +465,38 @@ module ActiveRecord
     #   ball = Ball.new
     #   ball.touch(:updated_at)   # => raises ActiveRecordError
     #
-    def touch(*names)
+    def touch(*names, time: nil)
       raise ActiveRecordError, "cannot touch on a new record object" unless persisted?
 
+      time ||= current_time_from_proper_timezone
       attributes = timestamp_attributes_for_update_in_model
       attributes.concat(names)
 
       unless attributes.empty?
-        current_time = current_time_from_proper_timezone
         changes = {}
 
         attributes.each do |column|
           column = column.to_s
-          changes[column] = write_attribute(column, current_time)
+          changes[column] = write_attribute(column, time)
         end
-
-        changes[self.class.locking_column] = increment_lock if locking_enabled?
 
         clear_attribute_changes(changes.keys)
         primary_key = self.class.primary_key
-        self.class.unscoped.where(primary_key => self[primary_key]).update_all(changes) == 1
+        scope = self.class.unscoped.where(primary_key => _read_attribute(primary_key))
+
+        if locking_enabled?
+          locking_column = self.class.locking_column
+          scope = scope.where(locking_column => _read_attribute(locking_column))
+          changes[locking_column] = increment_lock
+        end
+
+        result = scope.update_all(changes) == 1
+
+        if !result && locking_enabled?
+          raise ActiveRecord::StaleObjectError.new(self, "touch")
+        end
+
+        result
       else
         true
       end
@@ -530,6 +547,13 @@ module ActiveRecord
 
     def verify_readonly_attribute(name)
       raise ActiveRecordError, "#{name} is marked as readonly" if self.class.readonly_attributes.include?(name)
+    end
+
+    def _raise_record_not_destroyed
+      @_association_destroy_exception ||= nil
+      raise @_association_destroy_exception || RecordNotDestroyed.new("Failed to destroy the record", self)
+    ensure
+      @_association_destroy_exception = nil
     end
   end
 end

@@ -93,7 +93,7 @@ module ActiveRecord
               self.class.primary_key => id,
               lock_col => previous_lock_value,
             ).update_all(
-              attribute_names.map do |name|
+              attributes_for_update(attribute_names).map do |name|
                 [name, _read_attribute(name)]
               end.to_h
             )
@@ -184,8 +184,8 @@ module ActiveRecord
       end
     end
 
-    class LockingType < SimpleDelegator # :nodoc:
-      def type_cast_from_database(value)
+    class LockingType < DelegateClass(Type::Value) # :nodoc:
+      def deserialize(value)
         # `nil` *should* be changed to 0
         super.to_i
       end

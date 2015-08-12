@@ -85,10 +85,30 @@ module ActiveRecord
       mattr_accessor :dump_schema_after_migration, instance_writer: false
       self.dump_schema_after_migration = true
 
+      ##
+      # :singleton-method:
+      # Specifies which database schemas to dump when calling db:structure:dump.
+      # If the value is :schema_search_path (the default), any schemas listed in
+      # schema_search_path are dumped. Use :all to dump all schemas regardless
+      # of schema_search_path, or a string of comma separated schemas for a
+      # custom list.
+      mattr_accessor :dump_schemas, instance_writer: false
+      self.dump_schemas = :schema_search_path
+
+      ##
+      # :singleton-method:
+      # Specify a threshold for the size of query result sets. If the number of
+      # records in the set exceeds the threshold, a warning is logged. This can
+      # be used to identify queries which load thousands of records and
+      # potentially cause memory bloat.
+      mattr_accessor :warn_on_records_fetched_greater_than, instance_writer: false
+      self.warn_on_records_fetched_greater_than = nil
+
       mattr_accessor :maintain_test_schema, instance_accessor: false
 
+      mattr_accessor :belongs_to_required_by_default, instance_accessor: false
+
       class_attribute :default_connection_handler, instance_writer: false
-      class_attribute :find_by_statement_cache
 
       def self.connection_handler
         ActiveRecord::RuntimeRegistry.connection_handler || default_connection_handler
@@ -107,24 +127,22 @@ module ActiveRecord
         super
       end
 
-      def initialize_find_by_cache
-        self.find_by_statement_cache = {}.extend(Mutex_m)
+      def initialize_find_by_cache # :nodoc:
+        @find_by_statement_cache = {}.extend(Mutex_m)
       end
 
-      def inherited(child_class)
+      def inherited(child_class) # :nodoc:
+        # initialize cache at class definition for thread safety
         child_class.initialize_find_by_cache
         super
       end
 
-      def find(*ids)
+      def find(*ids) # :nodoc:
         # We don't have cache keys for this stuff yet
         return super unless ids.length == 1
-        # Allow symbols to super to maintain compatibility for deprecated finders until Rails 5
-        return super if ids.first.kind_of?(Symbol)
         return super if block_given? ||
                         primary_key.nil? ||
-                        default_scopes.any? ||
-                        current_scope ||
+                        scope_attributes? ||
                         columns_hash.include?(inheritance_column) ||
                         ids.first.kind_of?(Array)
 
@@ -136,25 +154,25 @@ module ActiveRecord
             Please pass the id of the object by calling `.id`
           MSG
         end
+
         key = primary_key
 
-        s = find_by_statement_cache[key] || find_by_statement_cache.synchronize {
-          find_by_statement_cache[key] ||= StatementCache.create(connection) { |params|
-            where(key => params.bind).limit(1)
-          }
+        statement = cached_find_by_statement(key) { |params|
+          where(key => params.bind).limit(1)
         }
-        record = s.execute([id], self, connection).first
+        record = statement.execute([id], self, connection).first
         unless record
-          raise RecordNotFound, "Couldn't find #{name} with '#{primary_key}'=#{id}"
+          raise RecordNotFound.new("Couldn't find #{name} with '#{primary_key}'=#{id}",
+                                   name, primary_key, id)
         end
         record
       rescue RangeError
-        raise RecordNotFound, "Couldn't find #{name} with an out of range value for '#{primary_key}'"
+        raise RecordNotFound.new("Couldn't find #{name} with an out of range value for '#{primary_key}'",
+                                 name, primary_key)
       end
 
-      def find_by(*args)
-        return super if current_scope || !(Hash === args.first) || reflect_on_all_aggregations.any?
-        return super if default_scopes.any?
+      def find_by(*args) # :nodoc:
+        return super if scope_attributes? || !(Hash === args.first) || reflect_on_all_aggregations.any?
 
         hash = args.first
 
@@ -165,19 +183,16 @@ module ActiveRecord
         # We can't cache Post.find_by(author: david) ...yet
         return super unless hash.keys.all? { |k| columns_hash.has_key?(k.to_s) }
 
-        key  = hash.keys
+        keys = hash.keys
 
-        klass = self
-        s = find_by_statement_cache[key] || find_by_statement_cache.synchronize {
-          find_by_statement_cache[key] ||= StatementCache.create(connection) { |params|
-            wheres = key.each_with_object({}) { |param,o|
-              o[param] = params.bind
-            }
-            klass.where(wheres).limit(1)
+        statement = cached_find_by_statement(keys) { |params|
+          wheres = keys.each_with_object({}) { |param, o|
+            o[param] = params.bind
           }
+          where(wheres).limit(1)
         }
         begin
-          s.execute(hash.values, self, connection).first
+          statement.execute(hash.values, self, connection).first
         rescue TypeError => e
           raise ActiveRecord::StatementInvalid.new(e.message, e)
         rescue RangeError
@@ -185,11 +200,11 @@ module ActiveRecord
         end
       end
 
-      def find_by!(*args)
-        find_by(*args) or raise RecordNotFound.new("Couldn't find #{name}")
+      def find_by!(*args) # :nodoc:
+        find_by(*args) or raise RecordNotFound.new("Couldn't find #{name}", name)
       end
 
-      def initialize_generated_modules
+      def initialize_generated_modules # :nodoc:
         generated_association_methods
       end
 
@@ -251,6 +266,12 @@ module ActiveRecord
 
       private
 
+      def cached_find_by_statement(key, &block) # :nodoc:
+        @find_by_statement_cache[key] || @find_by_statement_cache.synchronize {
+          @find_by_statement_cache[key] ||= StatementCache.create(connection, &block)
+        }
+      end
+
       def relation # :nodoc:
         relation = Relation.create(self, arel_table, predicate_builder)
 
@@ -287,17 +308,22 @@ module ActiveRecord
       _run_initialize_callbacks
     end
 
-    # Initialize an empty model object from +coder+. +coder+ must contain
-    # the attributes necessary for initializing an empty model object. For
-    # example:
+    # Initialize an empty model object from +coder+. +coder+ should be
+    # the result of previously encoding an Active Record model, using
+    # `encode_with`
     #
     #   class Post < ActiveRecord::Base
     #   end
     #
+    #   old_post = Post.new(title: "hello world")
+    #   coder = {}
+    #   old_post.encode_with(coder)
+    #
     #   post = Post.allocate
-    #   post.init_with('attributes' => { 'title' => 'hello world' })
+    #   post.init_with(coder)
     #   post.title # => 'hello world'
     def init_with(coder)
+      coder = LegacyYamlAdapter.convert(self.class, coder)
       @attributes = coder['attributes']
 
       init_internals
@@ -345,9 +371,6 @@ module ActiveRecord
 
       _run_initialize_callbacks
 
-      @aggregation_cache = {}
-      @association_cache = {}
-
       @new_record  = true
       @destroyed   = false
 
@@ -371,6 +394,7 @@ module ActiveRecord
       coder['raw_attributes'] = attributes_before_type_cast
       coder['attributes'] = @attributes
       coder['new_record'] = new_record?
+      coder['active_record_yaml_version'] = 1
     end
 
     # Returns true if +comparison_object+ is the same exact object, or +comparison_object+
@@ -484,51 +508,6 @@ module ActiveRecord
 
     private
 
-    def set_transaction_state(state) # :nodoc:
-      @transaction_state = state
-    end
-
-    def has_transactional_callbacks? # :nodoc:
-      !_rollback_callbacks.empty? || !_commit_callbacks.empty?
-    end
-
-    # Updates the attributes on this particular ActiveRecord object so that
-    # if it is associated with a transaction, then the state of the AR object
-    # will be updated to reflect the current state of the transaction
-    #
-    # The @transaction_state variable stores the states of the associated
-    # transaction. This relies on the fact that a transaction can only be in
-    # one rollback or commit (otherwise a list of states would be required)
-    # Each AR object inside of a transaction carries that transaction's
-    # TransactionState.
-    #
-    # This method checks to see if the ActiveRecord object's state reflects
-    # the TransactionState, and rolls back or commits the ActiveRecord object
-    # as appropriate.
-    #
-    # Since ActiveRecord objects can be inside multiple transactions, this
-    # method recursively goes through the parent of the TransactionState and
-    # checks if the ActiveRecord object reflects the state of the object.
-    def sync_with_transaction_state
-      update_attributes_from_transaction_state(@transaction_state, 0)
-    end
-
-    def update_attributes_from_transaction_state(transaction_state, depth)
-      @reflects_state = [false] if depth == 0
-
-      if transaction_state && transaction_state.finalized? && !has_transactional_callbacks?
-        unless @reflects_state[depth]
-          restore_transaction_record_state if transaction_state.rolledback?
-          clear_transaction_record_state
-          @reflects_state[depth] = true
-        end
-
-        if transaction_state.parent && !@reflects_state[depth+1]
-          update_attributes_from_transaction_state(transaction_state.parent, depth+1)
-        end
-      end
-    end
-
     # Under Ruby 1.9, Array#flatten will call #to_ary (recursively) on each of the elements
     # of the array, and then rescues from the possible NoMethodError. If those elements are
     # ActiveRecord::Base's, then this triggers the various method_missing's that we have,
@@ -542,8 +521,6 @@ module ActiveRecord
     end
 
     def init_internals
-      @aggregation_cache        = {}
-      @association_cache        = {}
       @readonly                 = false
       @destroyed                = false
       @marked_for_destruction   = false

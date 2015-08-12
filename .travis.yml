@@ -15,3 +15,4 @@ script: "cd guides && bundle exec rake guides:generate:html:ko:publish ALL=1"
 branches:
   only:
     - guides-ko
+

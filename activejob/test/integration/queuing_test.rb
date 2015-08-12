@@ -1,5 +1,6 @@
 require 'helper'
 require 'jobs/logging_job'
+require 'jobs/hello_job'
 require 'active_support/core_ext/numeric/time'
 
 class QueuingTest < ActiveSupport::TestCase
@@ -10,7 +11,7 @@ class QueuingTest < ActiveSupport::TestCase
   end
 
   test 'should not run jobs queued on a non-listening queue' do
-    skip if adapter_is?(:inline) || adapter_is?(:sucker_punch)
+    skip if adapter_is?(:inline, :sucker_punch, :que)
     old_queue = TestJob.queue_name
 
     begin
@@ -20,6 +21,16 @@ class QueuingTest < ActiveSupport::TestCase
       assert_not job_executed
     ensure
       TestJob.queue_name = old_queue
+    end
+  end
+
+  test 'should supply a wrapped class name to Sidekiq' do
+    skip unless adapter_is?(:sidekiq)
+    Sidekiq::Testing.fake! do
+      ::HelloJob.perform_later
+      hash = ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper.jobs.first
+      assert_equal "ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper", hash['class']
+      assert_equal "HelloJob", hash['wrapped']
     end
   end
 
@@ -35,13 +46,43 @@ class QueuingTest < ActiveSupport::TestCase
 
   test 'should run job enqueued in the future at the specified time' do
     begin
-      TestJob.set(wait: 3.seconds).perform_later @id
+      TestJob.set(wait: 5.seconds).perform_later @id
       wait_for_jobs_to_finish_for(2.seconds)
       assert_not job_executed
       wait_for_jobs_to_finish_for(10.seconds)
       assert job_executed
     rescue NotImplementedError
       skip
+    end
+  end
+
+  test 'should supply a provider_job_id when available for immediate jobs' do
+    skip unless adapter_is?(:delayed_job, :sidekiq, :qu, :que)
+    test_job = TestJob.perform_later @id
+    refute test_job.provider_job_id.nil?, 'Provider job id should be set by provider'
+  end
+
+  test 'should supply a provider_job_id when available for delayed jobs' do
+    skip unless adapter_is?(:delayed_job, :sidekiq, :que)
+    delayed_test_job = TestJob.set(wait: 1.minute).perform_later @id
+    refute delayed_test_job.provider_job_id.nil?,
+      'Provider job id should by set for delayed jobs by provider'
+  end
+
+  test 'current locale is kept while running perform_later' do
+    skip if adapter_is?(:inline)
+
+    begin
+      I18n.available_locales = [:en, :de]
+      I18n.locale = :de
+
+      TestJob.perform_later @id
+      wait_for_jobs_to_finish_for(5.seconds)
+      assert job_executed
+      assert_equal 'de', job_output
+    ensure
+      I18n.available_locales = [:en]
+      I18n.locale = :en
     end
   end
 end

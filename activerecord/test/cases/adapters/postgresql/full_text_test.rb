@@ -1,8 +1,7 @@
-# encoding: utf-8
 require "cases/helper"
 require 'support/schema_dumping_helper'
 
-class PostgresqlFullTextTest < ActiveRecord::TestCase
+class PostgresqlFullTextTest < ActiveRecord::PostgreSQLTestCase
   include SchemaDumpingHelper
   class Tsvector < ActiveRecord::Base; end
 
@@ -14,7 +13,7 @@ class PostgresqlFullTextTest < ActiveRecord::TestCase
   end
 
   teardown do
-    @connection.execute 'DROP TABLE IF EXISTS tsvectors;'
+    @connection.drop_table 'tsvectors', if_exists: true
   end
 
   def test_tsvector_column
@@ -24,7 +23,6 @@ class PostgresqlFullTextTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = Tsvector.type_for_attribute("text_vector")
-    assert_not type.number?
     assert_not type.binary?
   end
 

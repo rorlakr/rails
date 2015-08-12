@@ -349,7 +349,7 @@ end
 we get:
 
 ```ruby
-current_user.to_query('user') # => user=357-john-smith
+current_user.to_query('user') # => "user=357-john-smith"
 ```
 
 This method escapes whatever is needed, both for the key and the value:
@@ -475,7 +475,7 @@ The methods `silence_warnings` and `enable_warnings` change the value of `$VERBO
 silence_warnings { Object.const_set "RAILS_DEFAULT_LOGGER", logger }
 ```
 
-Silencing exceptions is also possible with `suppress`. This method receives an arbitrary number of exception classes. If an exception is raised during the execution of the block and is `kind_of?` any of the arguments, `suppress` captures it and returns silently. Otherwise the exception is reraised:
+Silencing exceptions is also possible with `suppress`. This method receives an arbitrary number of exception classes. If an exception is raised during the execution of the block and is `kind_of?` any of the arguments, `suppress` captures it and returns silently. Otherwise the exception is not captured:
 
 ```ruby
 # If the user is locked, the increment is lost, no big deal.
@@ -505,6 +505,8 @@ Extensions to `Module`
 ----------------------
 
 ### `alias_method_chain`
+
+**This method is deprecated in favour of using Module#prepend.**
 
 Using plain Ruby you can wrap methods with other methods, that's called _alias chaining_.
 
@@ -549,8 +551,6 @@ ActionController::TestCase.class_eval do
   alias_method_chain :process, :stringified_params
 end
 ```
-
-Rails uses `alias_method_chain` all over the code base. For example validations are added to `ActiveRecord::Base#save` by wrapping the method that way in a separate module specialized in validations.
 
 NOTE: Defined in `active_support/core_ext/module/aliasing.rb`.
 
@@ -727,7 +727,7 @@ NOTE: Defined in `active_support/core_ext/module/introspection.rb`.
 
 #### Qualified Constant Names
 
-The standard methods `const_defined?`, `const_get` , and `const_set` accept
+The standard methods `const_defined?`, `const_get`, and `const_set` accept
 bare constant names. Active Support extends this API to be able to pass
 relative qualified constant names.
 
@@ -1237,7 +1237,7 @@ Calling `dup` or `clone` on safe strings yields safe strings.
 The method `remove` will remove all occurrences of the pattern:
 
 ```ruby
-"Hello World".remove(/Hello /) => "World"
+"Hello World".remove(/Hello /) # => "World"
 ```
 
 There's also the destructive version `String#remove!`.
@@ -1936,6 +1936,8 @@ as well as adding or subtracting their results from a Time object. For example:
 (4.months + 5.years).from_now
 ```
 
+NOTE: Defined in `active_support/core_ext/numeric/time.rb`
+
 ### Formatting
 
 Enables the formatting of numbers in a variety of ways.
@@ -2182,6 +2184,27 @@ to_visit << node if visited.exclude?(node)
 
 NOTE: Defined in `active_support/core_ext/enumerable.rb`.
 
+### `without`
+
+The method `without` returns a copy of an enumerable with the specified elements
+removed:
+
+```ruby
+["David", "Rafael", "Aaron", "Todd"].without("Aaron", "Todd") # => ["David", "Rafael"]
+```
+
+NOTE: Defined in `active_support/core_ext/enumerable.rb`.
+
+### `pluck`
+
+The method `pluck` returns an array based on the given key:
+
+```ruby
+[{ name: "David" }, { name: "Rafael" }, { name: "Aaron" }].pluck(:name) # => ["David", "Rafael", "Aaron"]
+```
+
+NOTE: Defined in `active_support/core_ext/enumerable.rb`.
+
 Extensions to `Array`
 ---------------------
 
@@ -2190,14 +2213,14 @@ Extensions to `Array`
 Active Support augments the API of arrays to ease certain ways of accessing them. For example, `to` returns the subarray of elements up to the one at the passed index:
 
 ```ruby
-%w(a b c d).to(2) # => %w(a b c)
+%w(a b c d).to(2) # => ["a", "b", "c"]
 [].to(7)          # => []
 ```
 
 Similarly, `from` returns the tail from the element at the passed index to the end. If the index is greater than the length of the array, it returns an empty array.
 
 ```ruby
-%w(a b c d).from(2)  # => %w(c d)
+%w(a b c d).from(2)  # => ["c", "d"]
 %w(a b c d).from(10) # => []
 [].from(0)           # => []
 ```
@@ -2205,7 +2228,7 @@ Similarly, `from` returns the tail from the element at the passed index to the e
 The methods `second`, `third`, `fourth`, and `fifth` return the corresponding element (`first` is built-in). Thanks to social wisdom and positive constructiveness all around, `forty_two` is also available.
 
 ```ruby
-%w(a b c d).third # => c
+%w(a b c d).third # => "c"
 %w(a b c d).fifth # => nil
 ```
 
@@ -2218,7 +2241,7 @@ NOTE: Defined in `active_support/core_ext/array/access.rb`.
 This method is an alias of `Array#unshift`.
 
 ```ruby
-%w(a b c d).prepend('e')  # => %w(e a b c d)
+%w(a b c d).prepend('e')  # => ["e", "a", "b", "c", "d"]
 [].prepend(10)            # => [10]
 ```
 
@@ -2229,8 +2252,8 @@ NOTE: Defined in `active_support/core_ext/array/prepend_and_append.rb`.
 This method is an alias of `Array#<<`.
 
 ```ruby
-%w(a b c d).append('e')  # => %w(a b c d e)
-[].append([1,2])         # => [[1,2]]
+%w(a b c d).append('e')  # => ["a", "b", "c", "d", "e"]
+[].append([1,2])         # => [[1, 2]]
 ```
 
 NOTE: Defined in `active_support/core_ext/array/prepend_and_append.rb`.
@@ -2417,7 +2440,7 @@ The method `Array.wrap` wraps its argument in an array unless it is already an a
 
 Specifically:
 
-* If the argument is `nil` an empty list is returned.
+* If the argument is `nil` an empty array is returned.
 * Otherwise, if the argument responds to `to_ary` it is invoked, and if the value of `to_ary` is not `nil`, it is returned.
 * Otherwise, an array with the argument as its single element is returned.
 
@@ -2429,9 +2452,9 @@ Array.wrap(0)         # => [0]
 
 This method is similar in purpose to `Kernel#Array`, but there are some differences:
 
-* If the argument responds to `to_ary` the method is invoked. `Kernel#Array` moves on to try `to_a` if the returned value is `nil`, but `Array.wrap` returns `nil` right away.
+* If the argument responds to `to_ary` the method is invoked. `Kernel#Array` moves on to try `to_a` if the returned value is `nil`, but `Array.wrap` returns an array with the argument as its single element right away.
 * If the returned value from `to_ary` is neither `nil` nor an `Array` object, `Kernel#Array` raises an exception, while `Array.wrap` does not, it just returns the value.
-* It does not call `to_a` on the argument, though special-cases `nil` to return an empty array.
+* It does not call `to_a` on the argument, if the argument does not respond to +to_ary+ it returns an array with the argument as its single element.
 
 The last point is particularly worth comparing for some enumerables:
 
@@ -2454,7 +2477,7 @@ NOTE: Defined in `active_support/core_ext/array/wrap.rb`.
 
 ### Duplicating
 
-The method `Array.deep_dup` duplicates itself and all objects inside
+The method `Array#deep_dup` duplicates itself and all objects inside
 recursively with Active Support method `Object#deep_dup`. It works like `Array#map` with sending `deep_dup` method to each object inside.
 
 ```ruby
@@ -2676,7 +2699,7 @@ NOTE: Defined in `active_support/core_ext/hash/deep_merge.rb`.
 
 ### Deep duplicating
 
-The method `Hash.deep_dup` duplicates itself and all keys and values
+The method `Hash#deep_dup` duplicates itself and all keys and values
 inside recursively with Active Support method `Object#deep_dup`. It works like `Enumerator#each_with_object` with sending `deep_dup` method to each pair inside.
 
 ```ruby
@@ -2872,7 +2895,7 @@ The method `transform_values` accepts a block and returns a hash that has applie
 ```
 There's also the bang variant `transform_values!` that applies the block operations to values in the very receiver.
 
-NOTE: Defined in `active_support/core_text/hash/transform_values.rb`.
+NOTE: Defined in `active_support/core_ext/hash/transform_values.rb`.
 
 ### Slicing
 
@@ -3028,53 +3051,6 @@ The method `Range#overlaps?` says whether any two given ranges have non-void int
 ```
 
 NOTE: Defined in `active_support/core_ext/range/overlaps.rb`.
-
-Extensions to `Proc`
---------------------
-
-### `bind`
-
-As you surely know Ruby has an `UnboundMethod` class whose instances are methods that belong to the limbo of methods without a self. The method `Module#instance_method` returns an unbound method for example:
-
-```ruby
-Hash.instance_method(:delete) # => #<UnboundMethod: Hash#delete>
-```
-
-An unbound method is not callable as is, you need to bind it first to an object with `bind`:
-
-```ruby
-clear = Hash.instance_method(:clear)
-clear.bind({a: 1}).call # => {}
-```
-
-Active Support defines `Proc#bind` with an analogous purpose:
-
-```ruby
-Proc.new { size }.bind([]).call # => 0
-```
-
-As you see that's callable and bound to the argument, the return value is indeed a `Method`.
-
-NOTE: To do so `Proc#bind` actually creates a method under the hood. If you ever see a method with a weird name like `__bind_1256598120_237302` in a stack trace you know now where it comes from.
-
-Action Pack uses this trick in `rescue_from` for example, which accepts the name of a method and also a proc as callbacks for a given rescued exception. It has to call them in either case, so a bound method is returned by `handler_for_rescue`, thus simplifying the code in the caller:
-
-```ruby
-def handler_for_rescue(exception)
-  _, rescuer = Array(rescue_handlers).reverse.detect do |klass_name, handler|
-    ...
-  end
-
-  case rescuer
-  when Symbol
-    method(rescuer)
-  when Proc
-    rescuer.bind(self)
-  end
-end
-```
-
-NOTE: Defined in `active_support/core_ext/proc.rb`.
 
 Extensions to `Date`
 --------------------

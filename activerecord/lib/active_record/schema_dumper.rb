@@ -1,5 +1,4 @@
 require 'stringio'
-require 'active_support/core_ext/big_decimal'
 
 module ActiveRecord
   # = Active Record Schema Dumper
@@ -105,7 +104,10 @@ HEADER
       end
 
       def table(table, stream)
-        columns = @connection.columns(table)
+        columns = @connection.columns(table).map do |column|
+          column.instance_variable_set(:@table_name, table)
+          column
+        end
         begin
           tbl = StringIO.new
 
@@ -128,6 +130,10 @@ HEADER
             tbl.print ", id: false"
           end
           tbl.print ", force: :cascade"
+
+          table_options = @connection.table_options(table)
+          tbl.print ", options: #{table_options.inspect}" unless table_options.blank?
+
           tbl.puts " do |t|"
 
           # then dump all non-primary key columns
@@ -165,10 +171,10 @@ HEADER
             tbl.puts
           end
 
+          indexes(table, tbl)
+
           tbl.puts "  end"
           tbl.puts
-
-          indexes(table, tbl)
 
           tbl.rewind
           stream.print tbl.read
@@ -185,8 +191,7 @@ HEADER
         if (indexes = @connection.indexes(table)).any?
           add_index_statements = indexes.map do |index|
             statement_parts = [
-              "add_index #{remove_prefix_and_suffix(index.table).inspect}",
-              index.columns.inspect,
+              "t.index #{index.columns.inspect}",
               "name: #{index.name.inspect}",
             ]
             statement_parts << 'unique: true' if index.unique
@@ -200,11 +205,10 @@ HEADER
             statement_parts << "using: #{index.using.inspect}" if index.using
             statement_parts << "type: #{index.type.inspect}" if index.type
 
-            "  #{statement_parts.join(', ')}"
+            "    #{statement_parts.join(', ')}"
           end
 
           stream.puts add_index_statements.sort.join("\n")
-          stream.puts
         end
       end
 

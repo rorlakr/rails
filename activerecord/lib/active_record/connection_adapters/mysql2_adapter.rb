@@ -1,6 +1,6 @@
 require 'active_record/connection_adapters/abstract_mysql_adapter'
 
-gem 'mysql2', '~> 0.3.13'
+gem 'mysql2', '~> 0.3.18'
 require 'mysql2'
 
 module ActiveRecord
@@ -35,15 +35,6 @@ module ActiveRecord
         super
         @prepared_statements = false
         configure_connection
-      end
-
-      MAX_INDEX_LENGTH_FOR_UTF8MB4 = 191
-      def initialize_schema_migrations_table
-        if @config[:encoding] == 'utf8mb4'
-          ActiveRecord::SchemaMigration.create_table(MAX_INDEX_LENGTH_FOR_UTF8MB4)
-        else
-          ActiveRecord::SchemaMigration.create_table
-        end
       end
 
       def supports_explain?
@@ -263,7 +254,7 @@ module ActiveRecord
       end
 
       def full_version
-        @full_version ||= @connection.info[:version]
+        @full_version ||= @connection.server_info[:version]
       end
 
       def set_field_encoding field_name

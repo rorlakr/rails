@@ -17,7 +17,9 @@ module ActiveRecord
         value = map_enum_attribute(finder_class, attribute, value)
 
         relation = build_relation(finder_class, table, attribute, value)
-        relation = relation.where.not(finder_class.primary_key => record.id) if record.persisted?
+        if record.persisted? && finder_class.primary_key.to_s != attribute.to_s
+          relation = relation.where.not(finder_class.primary_key => record.id)
+        end
         relation = scope_relation(record, table, relation)
         relation = relation.merge(options[:conditions]) if options[:conditions]
 
@@ -61,7 +63,7 @@ module ActiveRecord
 
         column = klass.columns_hash[attribute_name]
         cast_type = klass.type_for_attribute(attribute_name)
-        value = cast_type.type_cast_for_database(value)
+        value = cast_type.serialize(value)
         value = klass.connection.type_cast(value)
         if value.is_a?(String) && column.limit
           value = value.to_s[0, column.limit]
@@ -69,13 +71,15 @@ module ActiveRecord
 
         value = Arel::Nodes::Quoted.new(value)
 
-        comparison = if !options[:case_sensitive] && value && cast_type.text?
+        comparison = if !options[:case_sensitive] && !value.nil?
           # will use SQL LOWER function before comparison, unless it detects a case insensitive collation
           klass.connection.case_insensitive_comparison(table, attribute, column, value)
         else
           klass.connection.case_sensitive_comparison(table, attribute, column, value)
         end
         klass.unscoped.where(comparison)
+      rescue RangeError
+        klass.none
       end
 
       def scope_relation(record, table, relation)

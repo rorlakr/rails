@@ -366,6 +366,12 @@ class PersistenceTest < ActiveRecord::TestCase
     end
   end
 
+  def test_update_does_not_run_sql_if_record_has_not_changed
+    topic = Topic.create(title: 'Another New Topic')
+    assert_queries(0) { topic.update(title: 'Another New Topic') }
+    assert_queries(0) { topic.update_attributes(title: 'Another New Topic') }
+  end
+
   def test_delete
     topic = Topic.find(1)
     assert_equal topic, topic.delete, 'topic.delete did not return self'
@@ -891,8 +897,35 @@ class PersistenceTest < ActiveRecord::TestCase
     assert_not post.new_record?
   end
 
+  def test_reload_via_querycache
+    ActiveRecord::Base.connection.enable_query_cache!
+    ActiveRecord::Base.connection.clear_query_cache
+    assert ActiveRecord::Base.connection.query_cache_enabled, 'cache should be on'
+    parrot = Parrot.create(:name => 'Shane')
+
+    # populate the cache with the SELECT result
+    found_parrot = Parrot.find(parrot.id)
+    assert_equal parrot.id, found_parrot.id
+
+    # Manually update the 'name' attribute in the DB directly
+    assert_equal 1, ActiveRecord::Base.connection.query_cache.length
+    ActiveRecord::Base.uncached do
+      found_parrot.name = 'Mary'
+      found_parrot.save
+    end
+
+    # Now reload, and verify that it gets the DB version, and not the querycache version
+    found_parrot.reload
+    assert_equal 'Mary', found_parrot.name
+
+    found_parrot = Parrot.find(parrot.id)
+    assert_equal 'Mary', found_parrot.name
+  ensure
+    ActiveRecord::Base.connection.disable_query_cache!
+  end
+
   class SaveTest < ActiveRecord::TestCase
-    self.use_transactional_fixtures = false
+    self.use_transactional_tests = false
 
     def test_save_touch_false
       widget = Class.new(ActiveRecord::Base) do
@@ -918,7 +951,8 @@ class PersistenceTest < ActiveRecord::TestCase
       assert_equal instance.created_at, created_at
       assert_equal instance.updated_at, updated_at
     ensure
-      ActiveRecord::Base.connection.drop_table :widgets
+      ActiveRecord::Base.connection.drop_table widget.table_name
+      widget.reset_column_information
     end
   end
 end

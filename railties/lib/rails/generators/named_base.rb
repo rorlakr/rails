@@ -18,8 +18,8 @@ module Rails
         parse_attributes! if respond_to?(:attributes)
       end
 
-      # Defines the template that would be used for the migration file.
-      # The arguments include the source template file, the migration filename etc.
+      # Overrides <tt>Thor::Actions#template</tt> so it can tell if
+      # a template is currently being created.
       no_tasks do
         def template(source, *args, &block)
           inside_template do
@@ -141,6 +141,10 @@ module Rails
           @plural_file_name ||= file_name.pluralize
         end
 
+        def fixture_file_name
+          @fixture_file_name ||= (pluralize_table_names? ? plural_file_name : file_name)
+        end
+
         def route_url
           @route_url ||= class_path.collect {|dname| "/" + dname }.join + "/" + plural_file_name
         end
@@ -177,6 +181,10 @@ module Rails
 
         def pluralize_table_names?
           !defined?(ActiveRecord::Base) || ActiveRecord::Base.pluralize_table_names
+        end
+
+        def mountable_engine?
+          defined?(ENGINE_ROOT) && namespaced?
         end
 
         # Add a class collisions name to be checked on class initialization. You

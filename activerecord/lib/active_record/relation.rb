@@ -9,12 +9,13 @@ module ActiveRecord
                             :extending, :unscope]
 
     SINGLE_VALUE_METHODS = [:limit, :offset, :lock, :readonly, :reordering,
-                            :reverse_order, :distinct, :create_with, :uniq]
+                            :reverse_order, :distinct, :create_with]
     CLAUSE_METHODS = [:where, :having, :from]
     INVALID_METHODS_FOR_DELETE_ALL = [:limit, :distinct, :offset, :group, :having]
 
     VALUE_METHODS = MULTI_VALUE_METHODS + SINGLE_VALUE_METHODS + CLAUSE_METHODS
 
+    include Enumerable
     include FinderMethods, Calculations, SpawnMethods, QueryMethods, Batches, Explain, Delegation
 
     attr_reader :table, :klass, :loaded, :predicate_builder
@@ -205,7 +206,9 @@ module ActiveRecord
     # constraint an exception may be raised, just retry:
     #
     #  begin
-    #    CreditAccount.find_or_create_by(user_id: user.id)
+    #    CreditAccount.transaction(requires_new: true) do
+    #      CreditAccount.find_or_create_by(user_id: user.id)
+    #    end
     #  rescue ActiveRecord::RecordNotUnique
     #    retry
     #  end
@@ -271,22 +274,54 @@ module ActiveRecord
       end
     end
 
+    # Returns true if there are no records.
+    def none?
+      return super if block_given?
+      empty?
+    end
+
     # Returns true if there are any records.
     def any?
-      if block_given?
-        to_a.any? { |*block_args| yield(*block_args) }
-      else
-        !empty?
-      end
+      return super if block_given?
+      !empty?
+    end
+
+    # Returns true if there is exactly one record.
+    def one?
+      return super if block_given?
+      limit_value ? to_a.one? : size == 1
     end
 
     # Returns true if there is more than one record.
     def many?
-      if block_given?
-        to_a.many? { |*block_args| yield(*block_args) }
-      else
-        limit_value ? to_a.many? : size > 1
-      end
+      return super if block_given?
+      limit_value ? to_a.many? : size > 1
+    end
+
+    # Returns a cache key that can be used to identify the records fetched by
+    # this query. The cache key is built with a fingerprint of the sql query,
+    # the number of records matched by the query and a timestamp of the last
+    # updated record. When a new record comes to match the query, or any of
+    # the existing records is updated or deleted, the cache key changes.
+    #
+    #   Product.where("name like ?", "%Cosmic Encounter%").cache_key
+    #   => "products/query-1850ab3d302391b85b8693e941286659-1-20150714212553907087000"
+    #
+    # If the collection is loaded, the method will iterate through the records
+    # to generate the timestamp, otherwise it will trigger one SQL query like:
+    #
+    #    SELECT COUNT(*), MAX("products"."updated_at") FROM "products" WHERE (name like '%Cosmic Encounter%')
+    #
+    # You can also pass a custom timestamp column to fetch the timestamp of the
+    # last updated record.
+    #
+    #   Product.where("name like ?", "%Game%").cache_key(:last_reviewed_at)
+    #
+    # You can customize the strategy to generate the key on a per model basis
+    # overriding ActiveRecord::Base#collection_cache_key.
+    def cache_key(timestamp_column = :updated_at)
+      @cache_keys ||= {}
+      @cache_keys[timestamp_column] ||= @klass.collection_cache_key(self, timestamp_column)
     end
 
     # Scope all queries to the current scope.
@@ -598,6 +633,7 @@ module ActiveRecord
     def uniq_value
       distinct_value
     end
+    deprecate uniq_value: :distinct_value
 
     # Compares two relations for equality.
     def ==(other)
@@ -630,6 +666,13 @@ module ActiveRecord
 
       "#<#{self.class.name} [#{entries.join(', ')}]>"
     end
+
+    protected
+
+      def load_records(records)
+        @records = records
+        @loaded = true
+      end
 
     private
 

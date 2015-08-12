@@ -1,11 +1,10 @@
-# encoding: utf-8
 
 require "cases/helper"
 require 'support/ddl_helper'
 
 module ActiveRecord
   module ConnectionAdapters
-    class MysqlAdapterTest < ActiveRecord::TestCase
+    class MysqlAdapterTest < ActiveRecord::MysqlTestCase
       include DdlHelper
 
       def setup
@@ -16,7 +15,7 @@ module ActiveRecord
         assert_raise ActiveRecord::NoDatabaseError do
           configuration = ActiveRecord::Base.configurations['arunit'].merge(database: 'inexistent_activerecord_unittest')
           connection = ActiveRecord::Base.mysql_connection(configuration)
-          connection.exec_query('drop table if exists ex')
+          connection.drop_table 'ex', if_exists: true
         end
       end
 
@@ -111,7 +110,7 @@ module ActiveRecord
 
           result = @conn.exec_query('SELECT status FROM ex')
 
-          assert_equal 2, result.column_types['status'].type_cast_from_database(result.last['status'])
+          assert_equal 2, result.column_types['status'].deserialize(result.last['status'])
         end
       end
 

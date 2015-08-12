@@ -5,8 +5,10 @@ require 'active_support/core_ext/hash/keys'
 gem 'mysql', '~> 2.9'
 require 'mysql'
 
-class Mysql
+class Mysql # :nodoc: all
   class Time
+    # Used for casting DateTime fields to a MySQL friendly Time.
+    # This was documented in 48498da0dfed5239ea1eafb243ce47d7e3ce9e8e
     def to_date
       Date.new(year, month, day)
     end
@@ -56,9 +58,9 @@ module ActiveRecord
     # * <tt>:password</tt> - Defaults to nothing.
     # * <tt>:database</tt> - The name of the database. No default, must be provided.
     # * <tt>:encoding</tt> - (Optional) Sets the client encoding by executing "SET NAMES <encoding>" after connection.
-    # * <tt>:reconnect</tt> - Defaults to false (See MySQL documentation: http://dev.mysql.com/doc/refman/5.0/en/auto-reconnect.html).
-    # * <tt>:strict</tt> - Defaults to true. Enable STRICT_ALL_TABLES. (See MySQL documentation: http://dev.mysql.com/doc/refman/5.0/en/server-sql-mode.html)
-    # * <tt>:variables</tt> - (Optional) A hash session variables to send as <tt>SET @@SESSION.key = value</tt> on each database connection. Use the value +:default+ to set a variable to its DEFAULT value. (See MySQL documentation: http://dev.mysql.com/doc/refman/5.0/en/set-statement.html).
+    # * <tt>:reconnect</tt> - Defaults to false (See MySQL documentation: http://dev.mysql.com/doc/refman/5.6/en/auto-reconnect.html).
+    # * <tt>:strict</tt> - Defaults to true. Enable STRICT_ALL_TABLES. (See MySQL documentation: http://dev.mysql.com/doc/refman/5.6/en/sql-mode.html)
+    # * <tt>:variables</tt> - (Optional) A hash session variables to send as <tt>SET @@SESSION.key = value</tt> on each database connection. Use the value +:default+ to set a variable to its DEFAULT value. (See MySQL documentation: http://dev.mysql.com/doc/refman/5.6/en/set-statement.html).
     # * <tt>:sslca</tt> - Necessary to use MySQL with an SSL connection.
     # * <tt>:sslkey</tt> - Necessary to use MySQL with an SSL connection.
     # * <tt>:sslcert</tt> - Necessary to use MySQL with an SSL connection.
@@ -69,34 +71,10 @@ module ActiveRecord
       ADAPTER_NAME = 'MySQL'.freeze
 
       class StatementPool < ConnectionAdapters::StatementPool
-        def initialize(connection, max = 1000)
-          super
-          @cache = Hash.new { |h,pid| h[pid] = {} }
-        end
-
-        def each(&block); cache.each(&block); end
-        def key?(key);    cache.key?(key); end
-        def [](key);      cache[key]; end
-        def length;       cache.length; end
-        def delete(key);  cache.delete(key); end
-
-        def []=(sql, key)
-          while @max <= cache.size
-            cache.shift.last[:stmt].close
-          end
-          cache[sql] = key
-        end
-
-        def clear
-          cache.each_value do |hash|
-            hash[:stmt].close
-          end
-          cache.clear
-        end
-
         private
-        def cache
-          @cache[Process.pid]
+
+        def dealloc(stmt)
+          stmt[:stmt].close
         end
       end
 
@@ -328,8 +306,8 @@ module ActiveRecord
 
       def initialize_type_map(m) # :nodoc:
         super
-        m.register_type %r(datetime)i, Fields::DateTime.new
-        m.register_type %r(time)i,     Fields::Time.new
+        register_class_with_precision m, %r(datetime)i, Fields::DateTime
+        register_class_with_precision m, %r(time)i,     Fields::Time
       end
 
       def exec_without_stmt(sql, name = 'SQL') # :nodoc:
@@ -414,8 +392,11 @@ module ActiveRecord
             # place when an error occurs. To support older MySQL versions, we
             # need to close the statement and delete the statement from the
             # cache.
-            stmt.close
-            @statements.delete sql
+            if binds.empty?
+              stmt.close
+            else
+              @statements.delete sql
+            end
             raise e
           end
 

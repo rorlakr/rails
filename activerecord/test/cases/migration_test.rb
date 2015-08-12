@@ -14,9 +14,9 @@ require MIGRATIONS_ROOT + "/decimal/1_give_me_big_numbers"
 
 class BigNumber < ActiveRecord::Base
   unless current_adapter?(:PostgreSQLAdapter, :SQLite3Adapter)
-    attribute :value_of_e, Type::Integer.new
+    attribute :value_of_e, :integer
   end
-  attribute :my_house_population, Type::Integer.new
+  attribute :my_house_population, :integer
 end
 
 class Reminder < ActiveRecord::Base; end
@@ -24,7 +24,7 @@ class Reminder < ActiveRecord::Base; end
 class Thing < ActiveRecord::Base; end
 
 class MigrationTest < ActiveRecord::TestCase
-  self.use_transactional_fixtures = false
+  self.use_transactional_tests = false
 
   fixtures :people
 
@@ -119,10 +119,6 @@ class MigrationTest < ActiveRecord::TestCase
   end
 
   def test_create_table_with_force_true_does_not_drop_nonexisting_table
-    if Person.connection.table_exists?(:testings2)
-      Person.connection.drop_table :testings2
-    end
-
     # using a copy as we need the drop_table method to
     # continue to work for the ensure block of the test
     temp_conn = Person.connection.dup
@@ -133,7 +129,7 @@ class MigrationTest < ActiveRecord::TestCase
       t.column :foo, :string
     end
   ensure
-    Person.connection.drop_table :testings2 rescue nil
+    Person.connection.drop_table :testings2, if_exists: true
   end
 
   def connection
@@ -430,8 +426,6 @@ class MigrationTest < ActiveRecord::TestCase
   end
 
   def test_create_table_with_binary_column
-    Person.connection.drop_table :binary_testings rescue nil
-
     assert_nothing_raised {
       Person.connection.create_table :binary_testings do |t|
         t.column "data", :binary, :null => false
@@ -443,7 +437,7 @@ class MigrationTest < ActiveRecord::TestCase
 
     assert_nil data_column.default
 
-    Person.connection.drop_table :binary_testings rescue nil
+    Person.connection.drop_table :binary_testings, if_exists: true
   end
 
   unless mysql_enforcing_gtid_consistency?
@@ -514,11 +508,13 @@ class MigrationTest < ActiveRecord::TestCase
   if current_adapter?(:MysqlAdapter, :Mysql2Adapter, :PostgreSQLAdapter)
     def test_out_of_range_limit_should_raise
       Person.connection.drop_table :test_limits rescue nil
-      assert_raise(ActiveRecord::ActiveRecordError, "integer limit didn't raise") do
+      e = assert_raise(ActiveRecord::ActiveRecordError, "integer limit didn't raise") do
         Person.connection.create_table :test_integer_limits, :force => true do |t|
           t.column :bigone, :integer, :limit => 10
         end
       end
+
+      assert_match(/No integer type has byte size 10/, e.message)
 
       unless current_adapter?(:PostgreSQLAdapter)
         assert_raise(ActiveRecord::ActiveRecordError, "text limit didn't raise") do
@@ -721,6 +717,8 @@ if ActiveRecord::Base.connection.supports_bulk_alter?
 end
 
 class CopyMigrationsTest < ActiveRecord::TestCase
+  include ActiveSupport::Testing::Stream
+
   def setup
   end
 
@@ -930,23 +928,4 @@ class CopyMigrationsTest < ActiveRecord::TestCase
     ActiveRecord::Base.logger = old
   end
 
-  private
-
-  def quietly
-    silence_stream(STDOUT) do
-      silence_stream(STDERR) do
-        yield
-      end
-    end
-  end
-
-  def silence_stream(stream)
-    old_stream = stream.dup
-    stream.reopen(IO::NULL)
-    stream.sync = true
-    yield
-  ensure
-    stream.reopen(old_stream)
-    old_stream.close
-  end
 end

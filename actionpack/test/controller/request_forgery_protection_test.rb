@@ -12,28 +12,12 @@ module RequestForgeryProtectionActions
     render :inline => "<%= button_to('New', '/') %>"
   end
 
-  def external_form
-    render :inline => "<%= form_tag('http://farfar.away/form', :authenticity_token => 'external_token') {} %>"
-  end
-
-  def external_form_without_protection
-    render :inline => "<%= form_tag('http://farfar.away/form', :authenticity_token => false) {} %>"
-  end
-
   def unsafe
-    render :text => 'pwn'
+    render plain: 'pwn'
   end
 
   def meta
     render :inline => "<%= csrf_meta_tags %>"
-  end
-
-  def external_form_for
-    render :inline => "<%= form_for(:some_resource, :authenticity_token => 'external_token') {} %>"
-  end
-
-  def form_for_without_protection
-    render :inline => "<%= form_for(:some_resource, :authenticity_token => false ) {} %>"
   end
 
   def form_for_remote
@@ -70,7 +54,6 @@ module RequestForgeryProtectionActions
     negotiate_same_origin
   end
 
-  def rescue_action(e) raise e end
 end
 
 # sample controllers
@@ -89,17 +72,17 @@ class RequestForgeryProtectionControllerUsingNullSession < ActionController::Bas
 
   def signed
     cookies.signed[:foo] = 'bar'
-    render :nothing => true
+    head :ok
   end
 
   def encrypted
     cookies.encrypted[:foo] = 'bar'
-    render :nothing => true
+    head :ok
   end
 
   def try_to_reset_session
     reset_session
-    render :nothing => true
+    head :ok
   end
 end
 
@@ -262,7 +245,7 @@ module RequestForgeryProtectionTests
   end
 
   def test_should_not_allow_xhr_post_without_token
-    assert_blocked { xhr :post, :index }
+    assert_blocked { post :index, xhr: true }
   end
 
   def test_should_allow_post_with_token
@@ -340,11 +323,11 @@ module RequestForgeryProtectionTests
       get :negotiate_same_origin
     end
 
-    assert_cross_origin_not_blocked { xhr :get, :same_origin_js }
-    assert_cross_origin_not_blocked { xhr :get, :same_origin_js, format: 'js'}
+    assert_cross_origin_not_blocked { get :same_origin_js, xhr: true }
+    assert_cross_origin_not_blocked { get :same_origin_js, xhr: true, format: 'js'}
     assert_cross_origin_not_blocked do
       @request.accept = 'text/javascript'
-      xhr :get, :negotiate_same_origin
+      get :negotiate_same_origin, xhr: true
     end
   end
 
@@ -366,11 +349,18 @@ module RequestForgeryProtectionTests
       get :negotiate_cross_origin
     end
 
-    assert_cross_origin_not_blocked { xhr :get, :cross_origin_js }
-    assert_cross_origin_not_blocked { xhr :get, :cross_origin_js, format: 'js' }
+    assert_cross_origin_not_blocked { get :cross_origin_js, xhr: true }
+    assert_cross_origin_not_blocked { get :cross_origin_js, xhr: true, format: 'js' }
     assert_cross_origin_not_blocked do
       @request.accept = 'text/javascript'
-      xhr :get, :negotiate_cross_origin
+      get :negotiate_cross_origin, xhr: true
+    end
+  end
+
+  def test_should_not_raise_error_if_token_is_not_a_string
+    @controller.unstub(:valid_authenticity_token?)
+    assert_blocked do
+      patch :index, params: { custom_authenticity_token: { foo: 'bar' } }
     end
   end
 
@@ -494,11 +484,10 @@ end
 class FreeCookieControllerTest < ActionController::TestCase
   def setup
     @controller = FreeCookieController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
     @token      = "cf50faa3fe97702ca1ae"
 
     SecureRandom.stubs(:base64).returns(@token)
+    super
   end
 
   def test_should_not_render_form_with_token_tag

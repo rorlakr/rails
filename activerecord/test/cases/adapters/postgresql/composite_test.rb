@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 require "cases/helper"
 require 'support/connection_helper'
 
@@ -30,7 +29,7 @@ module PostgresqlCompositeBehavior
   def teardown
     super
 
-    @connection.execute 'DROP TABLE IF EXISTS postgresql_composites'
+    @connection.drop_table 'postgresql_composites', if_exists: true
     @connection.execute 'DROP TYPE IF EXISTS full_address'
     reset_connection
     PostgresqlComposite.reset_column_information
@@ -41,7 +40,7 @@ end
 #   "unknown OID 5653508: failed to recognize type of 'address'. It will be treated as String."
 # To take full advantage of composite types, we suggest you register your own +OID::Type+.
 # See PostgresqlCompositeWithCustomOIDTest
-class PostgresqlCompositeTest < ActiveRecord::TestCase
+class PostgresqlCompositeTest < ActiveRecord::PostgreSQLTestCase
   include PostgresqlCompositeBehavior
 
   def test_column
@@ -53,7 +52,6 @@ class PostgresqlCompositeTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = PostgresqlComposite.type_for_attribute("address")
-    assert_not type.number?
     assert_not type.binary?
   end
 
@@ -79,23 +77,23 @@ class PostgresqlCompositeTest < ActiveRecord::TestCase
   end
 end
 
-class PostgresqlCompositeWithCustomOIDTest < ActiveRecord::TestCase
+class PostgresqlCompositeWithCustomOIDTest < ActiveRecord::PostgreSQLTestCase
   include PostgresqlCompositeBehavior
 
   class FullAddressType < ActiveRecord::Type::Value
     def type; :full_address end
 
-    def type_cast_from_database(value)
+    def deserialize(value)
       if value =~ /\("?([^",]*)"?,"?([^",]*)"?\)/
         FullAddress.new($1, $2)
       end
     end
 
-    def type_cast_from_user(value)
+    def cast(value)
       value
     end
 
-    def type_cast_for_database(value)
+    def serialize(value)
       return if value.nil?
       "(#{value.city},#{value.street})"
     end
@@ -116,7 +114,6 @@ class PostgresqlCompositeWithCustomOIDTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = PostgresqlComposite.type_for_attribute("address")
-    assert_not type.number?
     assert_not type.binary?
   end
 

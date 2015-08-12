@@ -68,8 +68,8 @@ module ActiveRecord
         five = columns.detect { |c| c.name == "five" } unless mysql
 
         assert_equal "hello", one.default
-        assert_equal true, connection.lookup_cast_type_from_column(two).type_cast_from_database(two.default)
-        assert_equal false, connection.lookup_cast_type_from_column(three).type_cast_from_database(three.default)
+        assert_equal true, connection.lookup_cast_type_from_column(two).deserialize(two.default)
+        assert_equal false, connection.lookup_cast_type_from_column(three).deserialize(three.default)
         assert_equal '1', four.default
         assert_equal "hello", five.default unless mysql
       end
@@ -105,7 +105,7 @@ module ActiveRecord
         eight   = columns.detect { |c| c.name == "eight_int"   }
 
         if current_adapter?(:OracleAdapter)
-          assert_equal 'NUMBER(8)', eight.sql_type
+          assert_equal 'NUMBER(19)', eight.sql_type
         elsif current_adapter?(:SQLite3Adapter)
           assert_equal 'bigint', eight.sql_type
         else
@@ -426,7 +426,7 @@ module ActiveRecord
 
     if ActiveRecord::Base.connection.supports_foreign_keys?
       class ChangeSchemaWithDependentObjectsTest < ActiveRecord::TestCase
-        self.use_transactional_fixtures = false
+        self.use_transactional_tests = false
 
         setup do
           @connection = ActiveRecord::Base.connection

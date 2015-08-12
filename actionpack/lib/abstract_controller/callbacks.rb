@@ -1,5 +1,3 @@
-require 'active_support/deprecation'
-
 module AbstractController
   module Callbacks
     extend ActiveSupport::Concern
@@ -63,13 +61,14 @@ module AbstractController
       #   impossible to skip a callback defined using an anonymous proc
       #   using #skip_action_callback
       def skip_action_callback(*names)
-        skip_before_action(*names)
-        skip_after_action(*names)
-        skip_around_action(*names)
+        ActiveSupport::Deprecation.warn('`skip_action_callback` is deprecated and will be removed in the next major version of Rails. Please use skip_before_action, skip_after_action or skip_around_action instead.')
+        skip_before_action(*names, raise: false)
+        skip_after_action(*names, raise: false)
+        skip_around_action(*names, raise: false)
       end
 
       def skip_filter(*names)
-        ActiveSupport::Deprecation.warn("#{callback}_filter is deprecated and will be removed in Rails 5.1. Use #{callback}_action instead.")
+        ActiveSupport::Deprecation.warn("`skip_filter` is deprecated and will be removed in Rails 5.1. Use skip_before_action, skip_after_action or skip_around_action instead.")
         skip_action_callback(*names)
       end
 

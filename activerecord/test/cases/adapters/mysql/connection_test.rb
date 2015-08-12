@@ -2,7 +2,7 @@ require "cases/helper"
 require 'support/connection_helper'
 require 'support/ddl_helper'
 
-class MysqlConnectionTest < ActiveRecord::TestCase
+class MysqlConnectionTest < ActiveRecord::MysqlTestCase
   include ConnectionHelper
   include DdlHelper
 
@@ -142,6 +142,15 @@ class MysqlConnectionTest < ActiveRecord::TestCase
       ActiveRecord::Base.establish_connection(orig_connection.merge({:strict => false}))
       result = ActiveRecord::Base.connection.exec_query "SELECT @@SESSION.sql_mode"
       assert_equal [['']], result.rows
+    end
+  end
+
+  def test_mysql_strict_mode_specified_default
+    run_without_connection do |orig_connection|
+      ActiveRecord::Base.establish_connection(orig_connection.merge({strict: :default}))
+      global_sql_mode = ActiveRecord::Base.connection.exec_query "SELECT @@GLOBAL.sql_mode"
+      session_sql_mode = ActiveRecord::Base.connection.exec_query "SELECT @@SESSION.sql_mode"
+      assert_equal global_sql_mode.rows, session_sql_mode.rows
     end
   end
 

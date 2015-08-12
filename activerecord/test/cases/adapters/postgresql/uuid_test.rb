@@ -1,4 +1,3 @@
-# encoding: utf-8
 require "cases/helper"
 require 'support/schema_dumping_helper'
 
@@ -8,11 +7,11 @@ module PostgresqlUUIDHelper
   end
 
   def drop_table(name)
-    connection.execute "drop table if exists #{name}"
+    connection.drop_table name, if_exists: true
   end
 end
 
-class PostgresqlUUIDTest < ActiveRecord::TestCase
+class PostgresqlUUIDTest < ActiveRecord::PostgreSQLTestCase
   include PostgresqlUUIDHelper
   include SchemaDumpingHelper
 
@@ -52,7 +51,6 @@ class PostgresqlUUIDTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = UUIDType.type_for_attribute("guid")
-    assert_not type.number?
     assert_not type.binary?
   end
 
@@ -137,27 +135,7 @@ class PostgresqlUUIDTest < ActiveRecord::TestCase
   end
 end
 
-class PostgresqlLargeKeysTest < ActiveRecord::TestCase
-  include PostgresqlUUIDHelper
-  include SchemaDumpingHelper
-
-  def setup
-    connection.create_table('big_serials', id: :bigserial) do |t|
-      t.string 'name'
-    end
-  end
-
-  def test_omg
-    schema = dump_table_schema "big_serials"
-    assert_match "create_table \"big_serials\", id: :bigserial", schema
-  end
-
-  def teardown
-    drop_table "big_serials"
-  end
-end
-
-class PostgresqlUUIDGenerationTest < ActiveRecord::TestCase
+class PostgresqlUUIDGenerationTest < ActiveRecord::PostgreSQLTestCase
   include PostgresqlUUIDHelper
   include SchemaDumpingHelper
 
@@ -232,7 +210,7 @@ class PostgresqlUUIDGenerationTest < ActiveRecord::TestCase
   end
 end
 
-class PostgresqlUUIDTestNilDefault < ActiveRecord::TestCase
+class PostgresqlUUIDTestNilDefault < ActiveRecord::PostgreSQLTestCase
   include PostgresqlUUIDHelper
   include SchemaDumpingHelper
 
@@ -266,7 +244,7 @@ class PostgresqlUUIDTestNilDefault < ActiveRecord::TestCase
   end
 end
 
-class PostgresqlUUIDTestInverseOf < ActiveRecord::TestCase
+class PostgresqlUUIDTestInverseOf < ActiveRecord::PostgreSQLTestCase
   include PostgresqlUUIDHelper
 
   class UuidPost < ActiveRecord::Base

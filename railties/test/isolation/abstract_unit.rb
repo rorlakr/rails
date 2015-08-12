@@ -11,6 +11,7 @@ require 'fileutils'
 require 'bundler/setup' unless defined?(Bundler)
 require 'active_support'
 require 'active_support/testing/autorun'
+require 'active_support/testing/stream'
 require 'active_support/test_case'
 
 RAILS_FRAMEWORK_ROOT = File.expand_path("#{File.dirname(__FILE__)}/../../..")
@@ -269,17 +270,11 @@ module TestHelpers
       File.open(file, "w+") { |f| f.puts contents }
     end
 
-    def app_file(path, contents)
+    def app_file(path, contents, mode = 'w')
       FileUtils.mkdir_p File.dirname("#{app_path}/#{path}")
-      File.open("#{app_path}/#{path}", 'w') do |f|
+      File.open("#{app_path}/#{path}", mode) do |f|
         f.puts contents
       end
-    end
-
-    def gsub_app_file(path, regexp, *args, &block)
-      path = "#{app_path}/#{path}"
-      content = File.read(path).gsub(regexp, *args, &block)
-      File.open(path, 'wb') { |f| f.write(content) }
     end
 
     def remove_file(path)
@@ -310,45 +305,10 @@ class ActiveSupport::TestCase
   include TestHelpers::Paths
   include TestHelpers::Rack
   include TestHelpers::Generation
+  include ActiveSupport::Testing::Stream
 
   self.test_order = :sorted
 
-  private
-
-  def capture(stream)
-    stream = stream.to_s
-    captured_stream = Tempfile.new(stream)
-    stream_io = eval("$#{stream}")
-    origin_stream = stream_io.dup
-    stream_io.reopen(captured_stream)
-
-    yield
-
-    stream_io.rewind
-    return captured_stream.read
-  ensure
-    captured_stream.close
-    captured_stream.unlink
-    stream_io.reopen(origin_stream)
-  end
-
-  def quietly
-    silence_stream(STDOUT) do
-      silence_stream(STDERR) do
-        yield
-      end
-    end
-  end
-
-  def silence_stream(stream)
-    old_stream = stream.dup
-    stream.reopen(IO::NULL)
-    stream.sync = true
-    yield
-  ensure
-    stream.reopen(old_stream)
-    old_stream.close
-  end
 end
 
 # Create a scope and build a fixture rails app
@@ -362,7 +322,7 @@ Module.new do
   environment = File.expand_path('../../../../load_paths', __FILE__)
   require_environment = "-r #{environment}"
 
-  `#{Gem.ruby} #{require_environment} #{RAILS_FRAMEWORK_ROOT}/railties/bin/rails new #{app_template_path} --skip-gemfile --no-rc`
+  `#{Gem.ruby} #{require_environment} #{RAILS_FRAMEWORK_ROOT}/railties/exe/rails new #{app_template_path} --skip-gemfile --no-rc`
   File.open("#{app_template_path}/config/boot.rb", 'w') do |f|
     f.puts "require '#{environment}'"
     f.puts "require 'rails/all'"

@@ -1,8 +1,7 @@
-# encoding: utf-8
 require "cases/helper"
 require 'support/schema_dumping_helper'
 
-class PostgresqlLtreeTest < ActiveRecord::TestCase
+class PostgresqlLtreeTest < ActiveRecord::PostgreSQLTestCase
   include SchemaDumpingHelper
   class Ltree < ActiveRecord::Base
     self.table_name = 'ltrees'
@@ -23,7 +22,7 @@ class PostgresqlLtreeTest < ActiveRecord::TestCase
   end
 
   teardown do
-    @connection.execute 'drop table if exists ltrees'
+    @connection.drop_table 'ltrees', if_exists: true
   end
 
   def test_column
@@ -33,7 +32,6 @@ class PostgresqlLtreeTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = Ltree.type_for_attribute('path')
-    assert_not type.number?
     assert_not type.binary?
   end
 

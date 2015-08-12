@@ -1,8 +1,7 @@
-# encoding: utf-8
 require "cases/helper"
 require 'support/schema_dumping_helper'
 
-class PostgresqlNetworkTest < ActiveRecord::TestCase
+class PostgresqlNetworkTest < ActiveRecord::PostgreSQLTestCase
   include SchemaDumpingHelper
   class PostgresqlNetworkAddress < ActiveRecord::Base; end
 
@@ -16,7 +15,7 @@ class PostgresqlNetworkTest < ActiveRecord::TestCase
   end
 
   teardown do
-    @connection.execute 'DROP TABLE IF EXISTS postgresql_network_addresses'
+    @connection.drop_table 'postgresql_network_addresses', if_exists: true
   end
 
   def test_cidr_column
@@ -26,7 +25,6 @@ class PostgresqlNetworkTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = PostgresqlNetworkAddress.type_for_attribute("cidr_address")
-    assert_not type.number?
     assert_not type.binary?
   end
 
@@ -37,7 +35,6 @@ class PostgresqlNetworkTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = PostgresqlNetworkAddress.type_for_attribute("inet_address")
-    assert_not type.number?
     assert_not type.binary?
   end
 
@@ -48,7 +45,6 @@ class PostgresqlNetworkTest < ActiveRecord::TestCase
     assert_not column.array?
 
     type = PostgresqlNetworkAddress.type_for_attribute("mac_address")
-    assert_not type.number?
     assert_not type.binary?
   end
 

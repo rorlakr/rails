@@ -241,7 +241,7 @@ generates
 ```ruby
 class AddUserRefToProducts < ActiveRecord::Migration
   def change
-    add_reference :products, :user, index: true
+    add_reference :products, :user, index: true, foreign_key: true
   end
 end
 ```
@@ -357,8 +357,8 @@ will append `ENGINE=BLACKHOLE` to the SQL statement used to create the table
 
 ### Creating a Join Table
 
-Migration method `create_join_table` creates a HABTM join table. A typical use
-would be:
+The migration method `create_join_table` creates an HABTM (has and belongs to
+many) join table. A typical use would be:
 
 ```ruby
 create_join_table :products, :categories
@@ -367,23 +367,21 @@ create_join_table :products, :categories
 which creates a `categories_products` table with two columns called
 `category_id` and `product_id`. These columns have the option `:null` set to
 `false` by default. This can be overridden by specifying the `:column_options`
-option.
+option:
 
 ```ruby
-create_join_table :products, :categories, column_options: {null: true}
+create_join_table :products, :categories, column_options: { null: true }
 ```
 
-will create the `product_id` and `category_id` with the `:null` option as
-`true`.
-
-You can pass the option `:table_name` when you want to customize the table
-name. For example:
+By default, the name of the join table comes from the union of the first two
+arguments provided to create_join_table, in alphabetical order.
+To customize the name of the table, provide a `:table_name` option:
 
 ```ruby
 create_join_table :products, :categories, table_name: :categorization
 ```
 
-will create a `categorization` table.
+creates a `categorization` table.
 
 `create_join_table` also accepts a block, which you can use to add indices
 (which are not created by default) or additional columns:
@@ -423,21 +421,23 @@ change_column :products, :part_number, :text
 ```
 
 This changes the column `part_number` on products table to be a `:text` field.
+Note that `change_column` command is irreversible.
 
 Besides `change_column`, the `change_column_null` and `change_column_default`
-methods are used specifically to change the null and default values of a
-column.
+methods are used specifically to change a not null constraint and default
+values of a column.
 
 ```ruby
 change_column_null :products, :name, false
-change_column_default :products, :approved, false
+change_column_default :products, :approved, from: true, to: false
 ```
 
 This sets `:name` field on products to a `NOT NULL` column and the default
-value of the `:approved` field to false.
+value of the `:approved` field from true to false.
 
-TIP: Unlike `change_column` (and `change_column_default`), `change_column_null`
-is reversible.
+Note: You could also write the above `change_column_default` migration as
+`change_column_default :products, :approved, false`, but unlike the previous
+example, this would make your migration irreversible.
 
 ### Column Modifiers
 
@@ -475,7 +475,8 @@ column names can not be derived from the table names, you can use the
 `:column` and `:primary_key` options.
 
 Rails will generate a name for every foreign key starting with
-`fk_rails_` followed by 10 random characters.
+`fk_rails_` followed by 10 characters which are deterministically
+generated from the `from_table` and `column`.
 There is a `:name` option to specify a different name if needed.
 
 NOTE: Active Record only supports single column foreign keys. `execute` and
@@ -501,7 +502,7 @@ If the helpers provided by Active Record aren't enough you can use the `execute`
 method to execute arbitrary SQL:
 
 ```ruby
-Product.connection.execute('UPDATE `products` SET `price`=`free` WHERE 1')
+Product.connection.execute("UPDATE products SET price = 'free' WHERE 1=1")
 ```
 
 For more details and examples of individual methods, check the API documentation.
@@ -539,6 +540,14 @@ definitions:
 `change_table` is also reversible, as long as the block does not call `change`,
 `change_default` or `remove`.
 
+`remove_column` is reversible if you supply the column type as the third
+argument. Provide the original column options too, otherwise Rails can't
+recreate the column exactly when rolling back:
+
+```ruby
+remove_column :posts, :slug, :string, null: false, default: '', index: true
+```
+
 If you're going to need to use any other methods, you should use `reversible`
 or write the `up` and `down` methods instead of using the `change` method.
 
@@ -546,7 +555,7 @@ or write the `up` and `down` methods instead of using the `change` method.
 
 Complex migrations may require processing that Active Record doesn't know how
 to reverse. You can use `reversible` to specify what to do when running a
-migration what else to do when reverting it. For example:
+migration and what else to do when reverting it. For example:
 
 ```ruby
 class ExampleMigration < ActiveRecord::Migration
@@ -598,7 +607,7 @@ schema, and the `down` method of your migration should revert the
 transformations done by the `up` method. In other words, the database schema
 should be unchanged if you do an `up` followed by a `down`. For example, if you
 create a table in the `up` method, you should drop it in the `down` method. It
-is wise to reverse the transformations in precisely the reverse order they were
+is wise to perform the transformations in precisely the reverse order they were
 made in the `up` method. The example in the `reversible` section is equivalent to:
 
 ```ruby
@@ -995,7 +1004,10 @@ such features, the `execute` method can be used to execute arbitrary SQL.
 Migrations and Seed Data
 ------------------------
 
-Some people use migrations to add data to the database:
+The main purpose of Rails' migration feature is to issue commands that modify the 
+schema using a consistent process. Migrations can also be used 
+to add or modify data. This is useful in an existing database that can't be destroyed 
+and recreated, such as a production database. 
 
 ```ruby
 class AddInitialProducts < ActiveRecord::Migration
@@ -1011,9 +1023,11 @@ class AddInitialProducts < ActiveRecord::Migration
 end
 ```
 
-However, Rails has a 'seeds' feature that should be used for seeding a database
-with initial data. It's a really simple feature: just fill up `db/seeds.rb`
-with some Ruby code, and run `rake db:seed`:
+To add initial data after a database is created, Rails has a built-in 
+'seeds' feature that makes the process quick and easy. This is especially 
+useful when reloading the database frequently in development and test environments. 
+It's easy to get started with this feature: just fill up `db/seeds.rb` with some 
+Ruby code, and run `rake db:seed`:
 
 ```ruby
 5.times do |i|

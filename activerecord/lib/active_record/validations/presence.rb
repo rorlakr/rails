@@ -1,18 +1,12 @@
 module ActiveRecord
   module Validations
     class PresenceValidator < ActiveModel::Validations::PresenceValidator # :nodoc:
-      def validate(record)
+      def validate_each(record, attribute, association_or_value)
         return unless should_validate?(record)
-        super
-        attributes.each do |attribute|
-          next unless record.class._reflect_on_association(attribute)
-          associated_records = Array.wrap(record.send(attribute))
-
-          # Superclass validates presence. Ensure present records aren't about to be destroyed.
-          if associated_records.present? && associated_records.all?(&:marked_for_destruction?)
-            record.errors.add(attribute, :blank, options)
-          end
+        if record.class._reflect_on_association(attribute)
+          association_or_value = Array.wrap(association_or_value).reject(&:marked_for_destruction?)
         end
+        super
       end
     end
 
@@ -42,6 +36,10 @@ module ActiveRecord
       # prevents the parent object from validating successfully and saving, which then
       # deletes the associated object, thus putting the parent object into an invalid
       # state.
+      #
+      # NOTE: This validation will not fail while using it with an association
+      # if the latter was assigned but not valid. If you want to ensure that
+      # it is both present and valid, you also need to use +validates_associated+.
       #
       # Configuration options:
       # * <tt>:message</tt> - A custom error message (default is: "can't be blank").

@@ -1,3 +1,4 @@
+require 'active_support/core_ext/class/subclasses'
 require 'active_support/core_ext/hash/keys'
 
 module ActiveJob
@@ -6,17 +7,28 @@ module ActiveJob
     extend ActiveSupport::Concern
 
     included do
-      def before_setup
-        @old_queue_adapter  = queue_adapter
-        ActiveJob::Base.queue_adapter = :test
+      def before_setup # :nodoc:
+        test_adapter = ActiveJob::QueueAdapters::TestAdapter.new
+
+        @old_queue_adapters = (ActiveJob::Base.subclasses << ActiveJob::Base).select do |klass|
+          # only override explicitly set adapters, a quirk of `class_attribute`
+          klass.singleton_class.public_instance_methods(false).include?(:_queue_adapter)
+        end.map do |klass|
+          [klass, klass.queue_adapter].tap do
+            klass.queue_adapter = test_adapter
+          end
+        end
+
         clear_enqueued_jobs
         clear_performed_jobs
         super
       end
 
-      def after_teardown
+      def after_teardown # :nodoc:
         super
-        ActiveJob::Base.queue_adapter = @old_queue_adapter
+        @old_queue_adapters.each do |(klass, adapter)|
+          klass.queue_adapter = adapter
+        end
       end
 
       # Asserts that the number of enqueued jobs matches the given number.
@@ -56,7 +68,7 @@ module ActiveJob
           original_count = enqueued_jobs_size(only: only)
           yield
           new_count = enqueued_jobs_size(only: only)
-          assert_equal original_count + number, new_count, "#{number} jobs expected, but #{new_count - original_count} were enqueued"
+          assert_equal number, new_count - original_count, "#{number} jobs expected, but #{new_count - original_count} were enqueued"
         else
           actual_count = enqueued_jobs_size(only: only)
           assert_equal number, actual_count, "#{number} jobs expected, but #{actual_count} were enqueued"
@@ -125,12 +137,34 @@ module ActiveJob
       #       HelloJob.perform_later('sean')
       #     end
       #   end
-      def assert_performed_jobs(number)
+      #
+      # The block form supports filtering. If the :only option is specified,
+      # then only the listed job(s) will be performed.
+      #
+      #     def test_hello_job
+      #       assert_performed_jobs 1, only: HelloJob do
+      #         HelloJob.perform_later('jeremy')
+      #         LoggingJob.perform_later
+      #       end
+      #     end
+      #
+      # An array may also be specified, to support testing multiple jobs.
+      #
+      #     def test_hello_and_logging_jobs
+      #       assert_nothing_raised do
+      #         assert_performed_jobs 2, only: [HelloJob, LoggingJob] do
+      #           HelloJob.perform_later('jeremy')
+      #           LoggingJob.perform_later('stewie')
+      #           RescueJob.perform_later('david')
+      #         end
+      #       end
+      #     end
+      def assert_performed_jobs(number, only: nil)
         if block_given?
           original_count = performed_jobs.size
-          perform_enqueued_jobs { yield }
+          perform_enqueued_jobs(only: only) { yield }
           new_count = performed_jobs.size
-          assert_equal original_count + number, new_count,
+          assert_equal number, new_count - original_count,
                        "#{number} jobs expected, but #{new_count - original_count} were performed"
         else
           performed_jobs_size = performed_jobs.size
@@ -157,11 +191,33 @@ module ActiveJob
       #     end
       #   end
       #
+      # The block form supports filtering. If the :only option is specified,
+      # then only the listed job(s) will be performed.
+      #
+      #     def test_hello_job
+      #       assert_performed_jobs 1, only: HelloJob do
+      #         HelloJob.perform_later('jeremy')
+      #         LoggingJob.perform_later
+      #       end
+      #     end
+      #
+      # An array may also be specified, to support testing multiple jobs.
+      #
+      #     def test_hello_and_logging_jobs
+      #       assert_nothing_raised do
+      #         assert_performed_jobs 2, only: [HelloJob, LoggingJob] do
+      #           HelloJob.perform_later('jeremy')
+      #           LoggingJob.perform_later('stewie')
+      #           RescueJob.perform_later('david')
+      #         end
+      #       end
+      #     end
+      #
       # Note: This assertion is simply a shortcut for:
       #
       #   assert_performed_jobs 0, &block
-      def assert_no_performed_jobs(&block)
-        assert_performed_jobs 0, &block
+      def assert_no_performed_jobs(only: nil, &block)
+        assert_performed_jobs 0, only: only, &block
       end
 
       # Asserts that the job passed in the block has been enqueued with the given arguments.
@@ -177,10 +233,11 @@ module ActiveJob
         args.assert_valid_keys(:job, :args, :at, :queue)
         serialized_args = serialize_args_for_assertion(args)
         yield
-        matching_job = enqueued_jobs.any? do |job|
+        matching_job = enqueued_jobs.find do |job|
           serialized_args.all? { |key, value| value == job[key] }
         end
         assert matching_job, "No enqueued job found with #{args}"
+        instanciate_job(matching_job)
       ensure
         queue_adapter.enqueued_jobs = original_enqueued_jobs + enqueued_jobs
       end
@@ -198,23 +255,30 @@ module ActiveJob
         args.assert_valid_keys(:job, :args, :at, :queue)
         serialized_args = serialize_args_for_assertion(args)
         perform_enqueued_jobs { yield }
-        matching_job = performed_jobs.any? do |job|
+        matching_job = performed_jobs.find do |job|
           serialized_args.all? { |key, value| value == job[key] }
         end
         assert matching_job, "No performed job found with #{args}"
+        instanciate_job(matching_job)
       ensure
         queue_adapter.performed_jobs = original_performed_jobs + performed_jobs
       end
 
-      def perform_enqueued_jobs
-        @old_perform_enqueued_jobs = queue_adapter.perform_enqueued_jobs
-        @old_perform_enqueued_at_jobs = queue_adapter.perform_enqueued_at_jobs
-        queue_adapter.perform_enqueued_jobs = true
-        queue_adapter.perform_enqueued_at_jobs = true
-        yield
-      ensure
-        queue_adapter.perform_enqueued_jobs = @old_perform_enqueued_jobs
-        queue_adapter.perform_enqueued_at_jobs = @old_perform_enqueued_at_jobs
+      def perform_enqueued_jobs(only: nil)
+        old_perform_enqueued_jobs = queue_adapter.perform_enqueued_jobs
+        old_perform_enqueued_at_jobs = queue_adapter.perform_enqueued_at_jobs
+        old_filter = queue_adapter.filter
+
+        begin
+          queue_adapter.perform_enqueued_jobs = true
+          queue_adapter.perform_enqueued_at_jobs = true
+          queue_adapter.filter = only
+          yield
+        ensure
+          queue_adapter.perform_enqueued_jobs = old_perform_enqueued_jobs
+          queue_adapter.perform_enqueued_at_jobs = old_perform_enqueued_at_jobs
+          queue_adapter.filter = old_filter
+        end
       end
 
       def queue_adapter
@@ -236,7 +300,7 @@ module ActiveJob
 
         def enqueued_jobs_size(only: nil)
           if only
-            enqueued_jobs.select { |job| job[:job] == only }.size
+            enqueued_jobs.select { |job| job.fetch(:job) == only }.size
           else
             enqueued_jobs.size
           end
@@ -248,6 +312,13 @@ module ActiveJob
             serialized_args[:args] = ActiveJob::Arguments.serialize(job_args)
           end
           serialized_args
+        end
+
+        def instanciate_job(payload)
+          job = payload[:job].new(*payload[:args])
+          job.scheduled_at = Time.at(payload[:at]) if payload.key?(:at)
+          job.queue_name = payload[:queue]
+          job
         end
     end
   end

@@ -658,6 +658,16 @@ module NestedAttributesOnACollectionAssociationTests
     assert_equal "Couldn't find #{@child_1.class.name} with ID=1234567890 for Pirate with ID=#{@pirate.id}", exception.message
   end
 
+  def test_should_raise_RecordNotFound_if_an_id_belonging_to_a_different_record_is_given
+    other_pirate = Pirate.create! catchphrase: 'Ahoy!'
+    other_child = other_pirate.send(@association_name).create! name: 'Buccaneers Servant'
+
+    exception = assert_raise ActiveRecord::RecordNotFound do
+      @pirate.attributes = { association_getter => [{ id: other_child.id }] }
+    end
+    assert_equal "Couldn't find #{@child_1.class.name} with ID=#{other_child.id} for Pirate with ID=#{@pirate.id}", exception.message
+  end
+
   def test_should_automatically_build_new_associated_models_for_each_entry_in_a_hash_where_the_id_is_missing
     @pirate.send(@association_name).destroy_all
     @pirate.reload.attributes = {
@@ -672,7 +682,7 @@ module NestedAttributesOnACollectionAssociationTests
   end
 
   def test_should_not_assign_destroy_key_to_a_record
-    assert_nothing_raised ActiveModel::AttributeAssignment::UnknownAttributeError do
+    assert_nothing_raised ActiveRecord::UnknownAttributeError do
       @pirate.send(association_setter, { 'foo' => { '_destroy' => '0' }})
     end
   end
@@ -943,7 +953,7 @@ class TestNestedAttributesWithNonStandardPrimaryKeys < ActiveRecord::TestCase
 end
 
 class TestHasOneAutosaveAssociationWhichItselfHasAutosaveAssociations < ActiveRecord::TestCase
-  self.use_transactional_fixtures = false unless supports_savepoints?
+  self.use_transactional_tests = false unless supports_savepoints?
 
   def setup
     @pirate = Pirate.create!(:catchphrase => "My baby takes tha mornin' train!")
@@ -983,7 +993,7 @@ class TestHasOneAutosaveAssociationWhichItselfHasAutosaveAssociations < ActiveRe
 end
 
 class TestHasManyAutosaveAssociationWhichItselfHasAutosaveAssociations < ActiveRecord::TestCase
-  self.use_transactional_fixtures = false unless supports_savepoints?
+  self.use_transactional_tests = false unless supports_savepoints?
 
   def setup
     @ship = Ship.create!(:name => "The good ship Dollypop")
@@ -1053,5 +1063,40 @@ class TestHasManyAutosaveAssociationWhichItselfHasAutosaveAssociations < ActiveR
 
     assert_not part.valid?
     assert_equal ["Ship name can't be blank"], part.errors.full_messages
+  end
+
+  class ProtectedParameters
+    def initialize(hash)
+      @hash = hash
+    end
+
+    def permitted?
+      true
+    end
+
+    def [](key)
+      @hash[key]
+    end
+
+    def to_h
+      @hash
+    end
+  end
+
+  test "strong params style objects can be assigned for singular associations" do
+    params = { name: "Stern", ship_attributes:
+               ProtectedParameters.new(name: "The Black Rock") }
+    part = ShipPart.new(params)
+
+    assert_equal "Stern", part.name
+    assert_equal "The Black Rock", part.ship.name
+  end
+
+  test "strong params style objects can be assigned for collection associations" do
+    params = { trinkets_attributes: ProtectedParameters.new("0" => ProtectedParameters.new(name: "Necklace"), "1" => ProtectedParameters.new(name: "Spoon")) }
+    part = ShipPart.new(params)
+
+    assert_equal "Necklace", part.trinkets[0].name
+    assert_equal "Spoon", part.trinkets[1].name
   end
 end

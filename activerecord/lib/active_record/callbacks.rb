@@ -194,7 +194,7 @@ module ActiveRecord
   #
   # If the +before_validation+ callback throws +:abort+, the process will be
   # aborted and <tt>Base#save</tt> will return +false+. If Base#save! is called it will raise a
-  # ActiveRecord::RecordInvalid exception. Nothing will be appended to the errors object.
+  # <tt>ActiveRecord::RecordInvalid</tt> exception. Nothing will be appended to the errors object.
   #
   # == Canceling callbacks
   #
@@ -290,6 +290,9 @@ module ActiveRecord
 
     def destroy #:nodoc:
       _run_destroy_callbacks { super }
+    rescue RecordNotDestroyed => e
+      @_association_destroy_exception = e
+      false
     end
 
     def touch(*) #:nodoc:

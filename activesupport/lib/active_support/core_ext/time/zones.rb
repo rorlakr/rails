@@ -26,7 +26,7 @@ class Time
     # <tt>current_user.time_zone</tt> just needs to return a string identifying the user's preferred time zone:
     #
     #   class ApplicationController < ActionController::Base
-    #     around_filter :set_time_zone
+    #     around_action :set_time_zone
     #
     #     def set_time_zone
     #       if logged_in?
@@ -65,7 +65,8 @@ class Time
       if !time_zone || time_zone.is_a?(ActiveSupport::TimeZone)
         time_zone
       else
-        # lookup timezone based on identifier (unless we've been passed a TZInfo::Timezone)
+        # Look up the timezone based on the identifier (unless we've been
+        # passed a TZInfo::Timezone)
         unless time_zone.respond_to?(:period_for_local)
           time_zone = ActiveSupport::TimeZone[time_zone] || TZInfo::Timezone.get(time_zone)
         end

@@ -30,18 +30,13 @@ module ActiveRecord
         end
 
         def default_scoped # :nodoc:
-          relation.merge(build_default_scope)
-        end
+          scope = build_default_scope
 
-        # Collects attributes from scopes that should be applied when creating
-        # an AR instance for the particular class this is called on.
-        def scope_attributes # :nodoc:
-          all.scope_for_create
-        end
-
-        # Are there default attributes associated with this scope?
-        def scope_attributes? # :nodoc:
-          current_scope || default_scopes.any?
+          if scope
+            relation.spawn.merge!(scope)
+          else
+            relation
+          end
         end
 
         # Adds a class method for retrieving and querying objects. A \scope
@@ -151,11 +146,20 @@ module ActiveRecord
 
           extension = Module.new(&block) if block
 
-          singleton_class.send(:define_method, name) do |*args|
-            scope = all.scoping { body.call(*args) }
-            scope = scope.extending(extension) if extension
+          if body.respond_to?(:to_proc)
+            singleton_class.send(:define_method, name) do |*args|
+              scope = all.scoping { instance_exec(*args, &body) }
+              scope = scope.extending(extension) if extension
 
-            scope || all
+              scope || all
+            end
+          else
+            singleton_class.send(:define_method, name) do |*args|
+              scope = all.scoping { body.call(*args) }
+              scope = scope.extending(extension) if extension
+
+              scope || all
+            end
           end
         end
       end

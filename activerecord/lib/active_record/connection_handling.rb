@@ -5,7 +5,7 @@ module ActiveRecord
 
     # Establishes the connection to the database. Accepts a hash as input where
     # the <tt>:adapter</tt> key must be specified with the name of a database adapter (in lower-case)
-    # example for regular databases (MySQL, Postgresql, etc):
+    # example for regular databases (MySQL, PostgreSQL, etc):
     #
     #   ActiveRecord::Base.establish_connection(
     #     adapter:  "mysql",
@@ -88,7 +88,7 @@ module ActiveRecord
     end
 
     def connection_id
-      ActiveRecord::RuntimeRegistry.connection_id
+      ActiveRecord::RuntimeRegistry.connection_id ||= Thread.current.object_id
     end
 
     def connection_id=(connection_id)

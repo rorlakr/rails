@@ -40,6 +40,9 @@ class FormHelperTest < ActionView::TestCase
           },
           tag: {
             value: "Tag"
+          },
+          post_delegate: {
+            title: 'Delegate model_name title'
           }
         }
       }
@@ -81,6 +84,9 @@ class FormHelperTest < ActionView::TestCase
               body: "Write body here"
             }
           },
+          post_delegate: {
+            title: 'Delegate model_name title'
+          },
           tag: {
             value: "Tag"
           }
@@ -116,6 +122,10 @@ class FormHelperTest < ActionView::TestCase
 
     @post.tags = []
     @post.tags << Tag.new
+
+    @post_delegator = PostDelegator.new
+
+    @post_delegator.title = 'Hello World'
 
     @car = Car.new("#000FFF")
   end
@@ -249,6 +259,18 @@ class FormHelperTest < ActionView::TestCase
     end
   end
 
+  def test_label_with_non_active_record_object
+    form_for(OpenStruct.new(name:'ok'), as: 'person', url: 'an_url', html: { id: 'create-person' }) do |f|
+      f.label(:name)
+    end
+
+    expected = whole_form("an_url", "create-person", "new_person", method: "post") do
+      '<label for="person_name">Name</label>'
+    end
+
+    assert_dom_equal expected, output_buffer
+  end
+
   def test_label_with_for_attribute_as_symbol
     assert_dom_equal('<label for="my_for">Title</label>', label(:post, :title, nil, for: "my_for"))
   end
@@ -337,6 +359,22 @@ class FormHelperTest < ActionView::TestCase
     )
   end
 
+  def test_label_with_to_model
+    assert_dom_equal(
+      %{<label for="post_delegator_title">Delegate Title</label>},
+      label(:post_delegator, :title)
+    )
+  end
+
+  def test_label_with_to_model_and_overriden_model_name
+    with_locale :label do
+      assert_dom_equal(
+        %{<label for="post_delegator_title">Delegate model_name title</label>},
+        label(:post_delegator, :title)
+      )
+    end
+  end
+
   def test_text_field_placeholder_without_locales
     with_locale :placeholder do
       assert_dom_equal('<input id="post_body" name="post[body]" placeholder="Body" type="text" value="Back to the hill and over it again!" />', text_field(:post, :body, placeholder: true))
@@ -349,10 +387,26 @@ class FormHelperTest < ActionView::TestCase
     end
   end
 
+  def test_text_field_placeholder_with_locales_and_to_model
+    with_locale :placeholder do
+      assert_dom_equal(
+        '<input id="post_delegator_title" name="post_delegator[title]" placeholder="Delegate model_name title" type="text" value="Hello World" />',
+        text_field(:post_delegator, :title, placeholder: true)
+      )
+    end
+  end
+
   def test_text_field_placeholder_with_human_attribute_name
     with_locale :placeholder do
       assert_dom_equal('<input id="post_cost" name="post[cost]" placeholder="Total cost" type="text" />', text_field(:post, :cost, placeholder: true))
     end
+  end
+
+  def test_text_field_placeholder_with_human_attribute_name_and_to_model
+    assert_dom_equal(
+      '<input id="post_delegator_title" name="post_delegator[title]" placeholder="Delegate Title" type="text" value="Hello World" />',
+      text_field(:post_delegator, :title, placeholder: true)
+    )
   end
 
   def test_text_field_placeholder_with_string_value
@@ -2824,6 +2878,23 @@ class FormHelperTest < ActionView::TestCase
     assert_dom_equal expected, output_buffer
   end
 
+  def test_nested_fields_for_with_child_index_as_lambda_option_override_on_a_nested_attributes_collection_association
+    @post.comments = []
+
+    form_for(@post) do |f|
+      concat f.fields_for(:comments, Comment.new(321), child_index: -> { 'abc' } ) { |cf|
+        concat cf.text_field(:name)
+      }
+    end
+
+    expected = whole_form('/posts/123', 'edit_post_123', 'edit_post', method: 'patch') do
+      '<input id="post_comments_attributes_abc_name" name="post[comments_attributes][abc][name]" type="text" value="comment #321" />' +
+      '<input id="post_comments_attributes_abc_id" name="post[comments_attributes][abc][id]" type="hidden" value="321" />'
+    end
+
+    assert_dom_equal expected, output_buffer
+  end
+
   class FakeAssociationProxy
     def to_ary
       [1, 2, 3]
@@ -3196,6 +3267,30 @@ class FormHelperTest < ActionView::TestCase
     assert_dom_equal expected, output_buffer
   ensure
     ActionView::Base.default_form_builder = old_default_form_builder
+  end
+
+  def test_form_builder_override
+    self.default_form_builder = LabelledFormBuilder
+
+    output_buffer = fields_for(:post, @post) do |f|
+      concat f.text_field(:title)
+    end
+
+    expected = "<label for='title'>Title:</label> <input name='post[title]' type='text' id='post_title' value='Hello World' /><br/>"
+
+    assert_dom_equal expected, output_buffer
+  end
+
+  def test_lazy_loading_form_builder_override
+    self.default_form_builder = "FormHelperTest::LabelledFormBuilder"
+
+    output_buffer = fields_for(:post, @post) do |f|
+      concat f.text_field(:title)
+    end
+
+    expected = "<label for='title'>Title:</label> <input name='post[title]' type='text' id='post_title' value='Hello World' /><br/>"
+
+    assert_dom_equal expected, output_buffer
   end
 
   def test_fields_for_with_labelled_builder

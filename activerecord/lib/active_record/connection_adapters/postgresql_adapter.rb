@@ -1,20 +1,18 @@
-require 'active_record/connection_adapters/abstract_adapter'
-require 'active_record/connection_adapters/statement_pool'
-
-require 'active_record/connection_adapters/postgresql/utils'
-require 'active_record/connection_adapters/postgresql/column'
-require 'active_record/connection_adapters/postgresql/oid'
-require 'active_record/connection_adapters/postgresql/quoting'
-require 'active_record/connection_adapters/postgresql/referential_integrity'
-require 'active_record/connection_adapters/postgresql/schema_definitions'
-require 'active_record/connection_adapters/postgresql/schema_statements'
-require 'active_record/connection_adapters/postgresql/database_statements'
-
-require 'arel/visitors/bind_visitor'
-
-# Make sure we're using pg high enough for PGResult#values
-gem 'pg', '~> 0.15'
+# Make sure we're using pg high enough for type casts and Ruby 2.2+ compatibility
+gem 'pg', '~> 0.18'
 require 'pg'
+
+require "active_record/connection_adapters/abstract_adapter"
+require "active_record/connection_adapters/postgresql/column"
+require "active_record/connection_adapters/postgresql/database_statements"
+require "active_record/connection_adapters/postgresql/oid"
+require "active_record/connection_adapters/postgresql/quoting"
+require "active_record/connection_adapters/postgresql/referential_integrity"
+require "active_record/connection_adapters/postgresql/schema_definitions"
+require "active_record/connection_adapters/postgresql/schema_statements"
+require "active_record/connection_adapters/postgresql/type_metadata"
+require "active_record/connection_adapters/postgresql/utils"
+require "active_record/connection_adapters/statement_pool"
 
 require 'ipaddr'
 
@@ -68,11 +66,11 @@ module ActiveRecord
     #   defaults to true.
     #
     # Any further options are used as connection parameters to libpq. See
-    # http://www.postgresql.org/docs/9.1/static/libpq-connect.html for the
+    # http://www.postgresql.org/docs/current/static/libpq-connect.html for the
     # list of parameters.
     #
     # In addition, default connection parameters of libpq can be set per environment variables.
-    # See http://www.postgresql.org/docs/9.1/static/libpq-envars.html .
+    # See http://www.postgresql.org/docs/current/static/libpq-envars.html .
     class PostgreSQLAdapter < AbstractAdapter
       ADAPTER_NAME = 'PostgreSQL'.freeze
 
@@ -128,7 +126,7 @@ module ActiveRecord
       def column_spec_for_primary_key(column)
         spec = {}
         if column.serial?
-          return unless column.sql_type == 'bigint'
+          return unless column.bigint?
           spec[:id] = ':bigserial'
         elsif column.type == :uuid
           spec[:id] = ':uuid'
@@ -145,7 +143,6 @@ module ActiveRecord
       def prepare_column_options(column) # :nodoc:
         spec = super
         spec[:array] = 'true' if column.array?
-        spec[:default] = "\"#{column.default_function}\"" if column.default_function
         spec
       end
 
@@ -153,6 +150,26 @@ module ActiveRecord
       def migration_keys
         super + [:array]
       end
+
+      def schema_type(column)
+        return super unless column.serial?
+
+        if column.bigint?
+          'bigserial'
+        else
+          'serial'
+        end
+      end
+      private :schema_type
+
+      def schema_default(column)
+        if column.default_function
+          column.default_function.inspect unless column.serial?
+        else
+          super
+        end
+      end
+      private :schema_default
 
       # Returns +true+, since this connection adapter supports prepared statement
       # caching.
@@ -180,6 +197,10 @@ module ActiveRecord
         true
       end
 
+      def supports_datetime_with_precision?
+        true
+      end
+
       def index_algorithms
         { concurrently: 'CONCURRENTLY' }
       end
@@ -188,43 +209,17 @@ module ActiveRecord
         def initialize(connection, max)
           super
           @counter = 0
-          @cache   = Hash.new { |h,pid| h[pid] = {} }
         end
-
-        def each(&block); cache.each(&block); end
-        def key?(key);    cache.key?(key); end
-        def [](key);      cache[key]; end
-        def length;       cache.length; end
 
         def next_key
           "a#{@counter + 1}"
         end
 
         def []=(sql, key)
-          while @max <= cache.size
-            dealloc(cache.shift.last)
-          end
-          @counter += 1
-          cache[sql] = key
-        end
-
-        def clear
-          cache.each_value do |stmt_key|
-            dealloc stmt_key
-          end
-          cache.clear
-        end
-
-        def delete(sql_key)
-          dealloc cache[sql_key]
-          cache.delete sql_key
+          super.tap { @counter += 1 }
         end
 
         private
-
-          def cache
-            @cache[Process.pid]
-          end
 
           def dealloc(key)
             @connection.query "DEALLOCATE #{key}" if connection_active?
@@ -255,12 +250,15 @@ module ActiveRecord
         @table_alias_length = nil
 
         connect
+        add_pg_encoders
         @statements = StatementPool.new @connection,
                                         self.class.type_cast_config_to_integer(config.fetch(:statement_limit) { 1000 })
 
         if postgresql_version < 80200
           raise "Your version of PostgreSQL (#{postgresql_version}) is too old, please upgrade!"
         end
+
+        add_pg_decoders
 
         @type_map = Type::HashLookupTypeMap.new
         initialize_type_map(type_map)
@@ -426,7 +424,7 @@ module ActiveRecord
           @connection.server_version
         end
 
-        # See http://www.postgresql.org/docs/9.1/static/errcodes-appendix.html
+        # See http://www.postgresql.org/docs/current/static/errcodes-appendix.html
         FOREIGN_KEY_VIOLATION = "23503"
         UNIQUE_VIOLATION      = "23505"
 
@@ -459,11 +457,11 @@ module ActiveRecord
         end
 
         def initialize_type_map(m) # :nodoc:
-          register_class_with_limit m, 'int2', OID::Integer
-          register_class_with_limit m, 'int4', OID::Integer
-          register_class_with_limit m, 'int8', OID::Integer
+          register_class_with_limit m, 'int2', Type::Integer
+          register_class_with_limit m, 'int4', Type::Integer
+          register_class_with_limit m, 'int8', Type::Integer
           m.alias_type 'oid', 'int2'
-          m.register_type 'float4', OID::Float.new
+          m.register_type 'float4', Type::Float.new
           m.alias_type 'float8', 'float4'
           m.register_type 'text', Type::Text.new
           register_class_with_limit m, 'varchar', Type::String
@@ -474,8 +472,7 @@ module ActiveRecord
           register_class_with_limit m, 'bit', OID::Bit
           register_class_with_limit m, 'varbit', OID::BitVarying
           m.alias_type 'timestamptz', 'timestamp'
-          m.register_type 'date', OID::Date.new
-          m.register_type 'time', OID::Time.new
+          m.register_type 'date', Type::Date.new
 
           m.register_type 'money', OID::Money.new
           m.register_type 'bytea', OID::Bytea.new
@@ -501,10 +498,8 @@ module ActiveRecord
           m.alias_type 'lseg', 'varchar'
           m.alias_type 'box', 'varchar'
 
-          m.register_type 'timestamp' do |_, _, sql_type|
-            precision = extract_precision(sql_type)
-            OID::DateTime.new(precision: precision)
-          end
+          register_class_with_precision m, 'time', Type::Time
+          register_class_with_precision m, 'timestamp', OID::DateTime
 
           m.register_type 'numeric' do |_, fmod, sql_type|
             precision = extract_precision(sql_type)
@@ -541,13 +536,13 @@ module ActiveRecord
         end
 
         # Extracts the value from a PostgreSQL column default definition.
-        def extract_value_from_default(oid, default) # :nodoc:
+        def extract_value_from_default(default) # :nodoc:
           case default
             # Quoted types
             when /\A[\(B]?'(.*)'::/m
-              $1.gsub(/''/, "'")
+              $1.gsub("''".freeze, "'".freeze)
             # Boolean types
-            when 'true', 'false'
+            when 'true'.freeze, 'false'.freeze
               default
             # Numeric types
             when /\A\(?(-?\d+(\.\d*)?)\)?(::bigint)?\z/
@@ -571,6 +566,8 @@ module ActiveRecord
         end
 
         def load_additional_types(type_map, oids = nil) # :nodoc:
+          initializer = OID::TypeMapInitializer.new(type_map)
+
           if supports_ranges?
             query = <<-SQL
               SELECT t.oid, t.typname, t.typelem, t.typdelim, t.typinput, r.rngsubtype, t.typtype, t.typbasetype
@@ -586,11 +583,13 @@ module ActiveRecord
 
           if oids
             query += "WHERE t.oid::integer IN (%s)" % oids.join(", ")
+          else
+            query += initializer.query_conditions_for_initial_load(type_map)
           end
 
-          initializer = OID::TypeMapInitializer.new(type_map)
-          records = execute(query, 'SCHEMA')
-          initializer.run(records)
+          execute_and_clear(query, 'SCHEMA', []) do |records|
+            initializer.run(records)
+          end
         end
 
         FEATURE_NOT_SUPPORTED = "0A000" #:nodoc:
@@ -699,7 +698,7 @@ module ActiveRecord
           end
 
           # SET statements from :variables config hash
-          # http://www.postgresql.org/docs/8.3/static/sql-set.html
+          # http://www.postgresql.org/docs/current/static/sql-set.html
           variables = @config[:variables] || {}
           variables.map do |k, v|
             if v == ':default' || v == :default
@@ -743,9 +742,11 @@ module ActiveRecord
         #  - format_type includes the column size constraint, e.g. varchar(50)
         #  - ::regclass is a function that gives the id for a table name
         def column_definitions(table_name) # :nodoc:
-          exec_query(<<-end_sql, 'SCHEMA').rows
+          query(<<-end_sql, 'SCHEMA')
               SELECT a.attname, format_type(a.atttypid, a.atttypmod),
-                     pg_get_expr(d.adbin, d.adrelid), a.attnotnull, a.atttypid, a.atttypmod
+                     pg_get_expr(d.adbin, d.adrelid), a.attnotnull, a.atttypid, a.atttypmod,
+             (SELECT c.collname FROM pg_collation c, pg_type t
+               WHERE c.oid = a.attcollation AND t.oid = a.atttypid AND a.attcollation <> t.typcollation)
                 FROM pg_attribute a LEFT JOIN pg_attrdef d
                   ON a.attrelid = d.adrelid AND a.attnum = d.adnum
                WHERE a.attrelid = '#{quote_table_name(table_name)}'::regclass
@@ -762,6 +763,86 @@ module ActiveRecord
         def create_table_definition(name, temporary = false, options = nil, as = nil) # :nodoc:
           PostgreSQL::TableDefinition.new native_database_types, name, temporary, options, as
         end
+
+        def can_perform_case_insensitive_comparison_for?(column)
+          @case_insensitive_cache ||= {}
+          @case_insensitive_cache[column.sql_type] ||= begin
+            sql = <<-end_sql
+              SELECT exists(
+                SELECT * FROM pg_proc
+                INNER JOIN pg_cast
+                  ON casttarget::text::oidvector = proargtypes
+                WHERE proname = 'lower'
+                  AND castsource = '#{column.sql_type}'::regtype::oid
+              )
+            end_sql
+            execute_and_clear(sql, "SCHEMA", []) do |result|
+              result.getvalue(0, 0)
+            end
+          end
+        end
+
+        def add_pg_encoders
+          map = PG::TypeMapByClass.new
+          map[Integer] = PG::TextEncoder::Integer.new
+          map[TrueClass] = PG::TextEncoder::Boolean.new
+          map[FalseClass] = PG::TextEncoder::Boolean.new
+          map[Float] = PG::TextEncoder::Float.new
+          @connection.type_map_for_queries = map
+        end
+
+        def add_pg_decoders
+          coders_by_name = {
+            'int2' => PG::TextDecoder::Integer,
+            'int4' => PG::TextDecoder::Integer,
+            'int8' => PG::TextDecoder::Integer,
+            'oid' => PG::TextDecoder::Integer,
+            'float4' => PG::TextDecoder::Float,
+            'float8' => PG::TextDecoder::Float,
+            'bool' => PG::TextDecoder::Boolean,
+          }
+          known_coder_types = coders_by_name.keys.map { |n| quote(n) }
+          query = <<-SQL % known_coder_types.join(", ")
+            SELECT t.oid, t.typname
+            FROM pg_type as t
+            WHERE t.typname IN (%s)
+          SQL
+          coders = execute_and_clear(query, "SCHEMA", []) do |result|
+            result
+              .map { |row| construct_coder(row, coders_by_name[row['typname']]) }
+              .compact
+          end
+
+          map = PG::TypeMapByOid.new
+          coders.each { |coder| map.add_coder(coder) }
+          @connection.type_map_for_results = map
+        end
+
+        def construct_coder(row, coder_class)
+          return unless coder_class
+          coder_class.new(oid: row['oid'].to_i, name: row['typname'])
+        end
+
+        ActiveRecord::Type.add_modifier({ array: true }, OID::Array, adapter: :postgresql)
+        ActiveRecord::Type.add_modifier({ range: true }, OID::Range, adapter: :postgresql)
+        ActiveRecord::Type.register(:bit, OID::Bit, adapter: :postgresql)
+        ActiveRecord::Type.register(:bit_varying, OID::BitVarying, adapter: :postgresql)
+        ActiveRecord::Type.register(:binary, OID::Bytea, adapter: :postgresql)
+        ActiveRecord::Type.register(:cidr, OID::Cidr, adapter: :postgresql)
+        ActiveRecord::Type.register(:date_time, OID::DateTime, adapter: :postgresql)
+        ActiveRecord::Type.register(:decimal, OID::Decimal, adapter: :postgresql)
+        ActiveRecord::Type.register(:enum, OID::Enum, adapter: :postgresql)
+        ActiveRecord::Type.register(:hstore, OID::Hstore, adapter: :postgresql)
+        ActiveRecord::Type.register(:inet, OID::Inet, adapter: :postgresql)
+        ActiveRecord::Type.register(:json, OID::Json, adapter: :postgresql)
+        ActiveRecord::Type.register(:jsonb, OID::Jsonb, adapter: :postgresql)
+        ActiveRecord::Type.register(:money, OID::Money, adapter: :postgresql)
+        ActiveRecord::Type.register(:point, OID::Point, adapter: :postgresql)
+        ActiveRecord::Type.register(:legacy_point, OID::Point, adapter: :postgresql)
+        ActiveRecord::Type.register(:rails_5_1_point, OID::Rails51Point, adapter: :postgresql)
+        ActiveRecord::Type.register(:uuid, OID::Uuid, adapter: :postgresql)
+        ActiveRecord::Type.register(:vector, OID::Vector, adapter: :postgresql)
+        ActiveRecord::Type.register(:xml, OID::Xml, adapter: :postgresql)
     end
   end
 end

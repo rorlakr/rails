@@ -68,12 +68,12 @@ module ActiveSupport
     def camelize(term, uppercase_first_letter = true)
       string = term.to_s
       if uppercase_first_letter
-        string = string.sub(/^[a-z\d]*/) { inflections.acronyms[$&] || $&.capitalize }
+        string = string.sub(/^[a-z\d]*/) { |match| inflections.acronyms[match] || match.capitalize }
       else
-        string = string.sub(/^(?:#{inflections.acronym_regex}(?=\b|[A-Z_])|\w)/) { $&.downcase }
+        string = string.sub(/^(?:#{inflections.acronym_regex}(?=\b|[A-Z_])|\w)/) { |match| match.downcase }
       end
       string.gsub!(/(?:_|(\/))([a-z\d]*)/i) { "#{$1}#{inflections.acronyms[$2] || $2.capitalize}" }
-      string.gsub!(/\//, '::')
+      string.gsub!('/'.freeze, '::'.freeze)
       string
     end
 
@@ -90,11 +90,11 @@ module ActiveSupport
     #   camelize(underscore('SSLError'))  # => "SslError"
     def underscore(camel_cased_word)
       return camel_cased_word unless camel_cased_word =~ /[A-Z-]|::/
-      word = camel_cased_word.to_s.gsub(/::/, '/')
-      word.gsub!(/(?:(?<=([A-Za-z\d]))|\b)(#{inflections.acronym_regex})(?=\b|[^a-z])/) { "#{$1 && '_'}#{$2.downcase}" }
-      word.gsub!(/([A-Z\d]+)([A-Z][a-z])/,'\1_\2')
-      word.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
-      word.tr!("-", "_")
+      word = camel_cased_word.to_s.gsub('::'.freeze, '/'.freeze)
+      word.gsub!(/(?:(?<=([A-Za-z\d]))|\b)(#{inflections.acronym_regex})(?=\b|[^a-z])/) { "#{$1 && '_'.freeze }#{$2.downcase}" }
+      word.gsub!(/([A-Z\d]+)([A-Z][a-z])/, '\1_\2'.freeze)
+      word.gsub!(/([a-z\d])([A-Z])/, '\1_\2'.freeze)
+      word.tr!("-".freeze, "_".freeze)
       word.downcase!
       word
     end
@@ -127,9 +127,9 @@ module ActiveSupport
 
       inflections.humans.each { |(rule, replacement)| break if result.sub!(rule, replacement) }
 
-      result.sub!(/\A_+/, '')
-      result.sub!(/_id\z/, '')
-      result.tr!('_', ' ')
+      result.sub!(/\A_+/, ''.freeze)
+      result.sub!(/_id\z/, ''.freeze)
+      result.tr!('_'.freeze, ' '.freeze)
 
       result.gsub!(/([a-z\d]*)/i) do |match|
         "#{inflections.acronyms[match] || match.downcase}"
@@ -153,7 +153,7 @@ module ActiveSupport
     #   titleize('TheManWithoutAPast')       # => "The Man Without A Past"
     #   titleize('raiders_of_the_lost_ark')  # => "Raiders Of The Lost Ark"
     def titleize(word)
-      humanize(underscore(word)).gsub(/\b(?<!['’`])[a-z]/) { $&.capitalize }
+      humanize(underscore(word)).gsub(/\b(?<!['’`])[a-z]/) { |match| match.capitalize }
     end
 
     # Creates the name of a table like Rails does for models to table names.
@@ -178,14 +178,14 @@ module ActiveSupport
     #   classify('calculus')     # => "Calculu"
     def classify(table_name)
       # strip out any leading schema name
-      camelize(singularize(table_name.to_s.sub(/.*\./, '')))
+      camelize(singularize(table_name.to_s.sub(/.*\./, ''.freeze)))
     end
 
     # Replaces underscores with dashes in the string.
     #
     #   dasherize('puni_puni') # => "puni-puni"
     def dasherize(underscored_word)
-      underscored_word.tr('_', '-')
+      underscored_word.tr('_'.freeze, '-'.freeze)
     end
 
     # Removes the module part from the expression in the string.
@@ -231,8 +231,8 @@ module ActiveSupport
 
     # Tries to find a constant with the name specified in the argument string.
     #
-    #   'Module'.constantize     # => Module
-    #   'Test::Unit'.constantize # => Test::Unit
+    #   'Module'.constantize   # => Module
+    #   'Foo::Bar'.constantize # => Foo::Bar
     #
     # The name is assumed to be the one of a top-level constant, no matter
     # whether it starts with "::" or not. No lexical context is taken into
@@ -248,7 +248,7 @@ module ActiveSupport
     # NameError is raised when the name is not in CamelCase or the constant is
     # unknown.
     def constantize(camel_cased_word)
-      names = camel_cased_word.split('::')
+      names = camel_cased_word.split('::'.freeze)
 
       # Trigger a built-in NameError exception including the ill-formed constant in the message.
       Object.const_get(camel_cased_word) if names.empty?
@@ -280,8 +280,8 @@ module ActiveSupport
 
     # Tries to find a constant with the name specified in the argument string.
     #
-    #   safe_constantize('Module')     # => Module
-    #   safe_constantize('Test::Unit') # => Test::Unit
+    #   safe_constantize('Module')   # => Module
+    #   safe_constantize('Foo::Bar') # => Foo::Bar
     #
     # The name is assumed to be the one of a top-level constant, no matter
     # whether it starts with "::" or not. No lexical context is taken into
@@ -354,7 +354,7 @@ module ActiveSupport
     #   const_regexp("Foo::Bar::Baz") # => "Foo(::Bar(::Baz)?)?"
     #   const_regexp("::")            # => "::"
     def const_regexp(camel_cased_word) #:nodoc:
-      parts = camel_cased_word.split("::")
+      parts = camel_cased_word.split("::".freeze)
 
       return Regexp.escape(camel_cased_word) if parts.blank?
 
@@ -372,7 +372,7 @@ module ActiveSupport
     def apply_inflections(word, rules)
       result = word.to_s.dup
 
-      if word.empty? || inflections.uncountables.include?(result.downcase[/\b\w+\Z/])
+      if word.empty? || inflections.uncountables.uncountable?(result)
         result
       else
         rules.each { |(rule, replacement)| break if result.sub!(rule, replacement) }

@@ -130,7 +130,7 @@ class DateHelperTest < ActionView::TestCase
 
   def test_distance_in_words_with_mathn_required
     # test we avoid Integer#/ (redefined by mathn)
-    require 'mathn'
+    silence_warnings { require "mathn" }
     from = Time.utc(2004, 6, 6, 21, 45, 0)
     assert_distance_of_time_in_words(from)
   end
@@ -3217,12 +3217,4 @@ class DateHelperTest < ActionView::TestCase
     expected = '<time datetime="2013-02-20T00:00:00+00:00">20 Feb 00:00</time>'
     assert_equal expected, time_tag(time, :format => :short)
   end
-
-  protected
-    def with_env_tz(new_tz = 'US/Eastern')
-      old_tz, ENV['TZ'] = ENV['TZ'], new_tz
-      yield
-    ensure
-      old_tz ? ENV['TZ'] = old_tz : ENV.delete('TZ')
-    end
 end

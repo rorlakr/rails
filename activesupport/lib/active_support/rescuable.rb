@@ -68,7 +68,7 @@ module ActiveSupport
             raise ArgumentError, "#{klass} is neither an Exception nor a String"
           end
 
-          # put the new handler at the end because the list is read in reverse
+          # Put the new handler at the end because the list is read in reverse.
           self.rescue_handlers += [[key, options[:with]]]
         end
       end
@@ -100,7 +100,7 @@ module ActiveSupport
         # a string, otherwise a NameError will be raised by the interpreter
         # itself when rescue_from CONSTANT is executed.
         klass = self.class.const_get(klass_name) rescue nil
-        klass ||= klass_name.constantize rescue nil
+        klass ||= (klass_name.constantize rescue nil)
         klass === exception if klass
       end
 
