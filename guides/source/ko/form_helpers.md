@@ -1,33 +1,28 @@
-[Form Helpers] 폼 헬퍼
+
+Action View 폼 헬퍼
 ============
 
-웹 어플리케이션에서 폼은 사용자의 입력을 위한 필수 인터페이스입니다. 하지만 폼 마크업을 작성하고 수정하는것은 폼 컨트롤의 이름짓기와 많은 속성들로인해 금방 지루해집니다. 레일스는 이러한 복잡한작업을 위해 폼 마크업을 생성하는 뷰헬퍼를 제공합니다. 하지만 다양한 유즈케이스가 있기에 사용하기전에는 헬퍼 메소드의 다른점과 유사점을 알아야할 필요가 있습니다. [[[Forms in web applications are an essential interface for user input. However, form markup can quickly become tedious to write and maintain because of form control naming and their numerous attributes. Rails does away with these complexities by providing view helpers for generating form markup. However, since they have different use-cases, developers are required to know all the differences between similar helper methods before putting them to use.]]]
+웹 애플리케이션에서의 폼(Form)은 유저 입력을 받기 위해서는 필수인 인터페이스입니다. 하지만 폼의 각 요소들의 명명법과 수많은 속성들 탓에 폼의 마크업은 쉽게 복잡해지고, 관리하기 어려워집니다. 그래서 Rails에서는 폼 마크업을 생성하기 위한 뷰 헬퍼를 제공하고, 이런 번잡한 작업을 할 필요를 없앴습니다. 하지만 현실에서의 사용 예제는 무척 다양하기 때문에, 개발자는 이것들을 실제로 사용하기 전에 헬퍼 메서드 간에 어떤 차이가 있는지 파악해야할 필요가 있습니다.
 
-본 가이드를 읽고나면 다음의 내용들을 이해할 수 있습니다: [[[After reading this guide, you will know:]]]
+이 가이드의 내용:
 
-* 검색폼과 모델에 특정되지 않는 유사한 일반적인 폼의 생성 방법 [[[How to create search forms and similar kind of generic forms not representing any specific model in your application.]]]
-
-* 특정 데이터베이스 레코드를 생성하거나 수정하는 모델중심의 폼 생성 방법. [[[How to make model-centric forms for creation and editing of specific database records.]]]
-
-* 여러종류의 데이터를 표현하는 select 박스 생성 방법. [[[How to generate select boxes from multiple types of data.]]]
-
-* 레일스가 제공하는 날짜, 시간 헬퍼. [[[The date and time helpers Rails provides.]]]
-
-* 파일 업로드 폼을 다르게하는 것. [[[What makes a file upload form different.]]]
-
-* 외부 리소스와 연결하는 폼 생성 방법 [[[Some cases of building forms to external resources.]]]
-
-* 복잡한 폼 생성 방법. [[[How to build complex forms.]]]
+* 검색 폼, 그리고 특정 모델을 사용하지 않는 일반적인 폼의 작성법
+* 특정 데이터베이스 레코드의 생성/편집을 하는 모델 중심의 폼 작성법
+* 여러 종류의 데이터로부터 선택 상자를 만드는 방법
+* Rails가 제공하는 날짜 관련 헬퍼
+* 파일 업로드용 폼이 어떻게 다른가
+* 외부로 전송하는 폼을 작성하는 방법
+* 복잡한 폼을 작성하는 방법
 
 --------------------------------------------------------------------------------
 
-NOTE: 본 가이드는 폼 헬퍼와 인수에대한 완전한 문서를 목표로 하지 않습니다. 완전한 문서를 참고하려면 [the Rails API documentation](http://api.rubyonrails.org/) 링크를 방문하세요. [[[This guide is not intended to be a complete documentation of available form helpers and their arguments. Please visit [the Rails API documentation](http://api.rubyonrails.org/) for a complete reference.]]]
+NOTE: 이 가이드에서는 폼 헬퍼와 그 인수에 대한 모든 것을 설명하지 않습니다. 완전한 레퍼런스는 [Rails API 문서](http://api.rubyonrails.org/)를 참조해주세요.
 
 
-[Dealing with Basic Forms] 기본폼 다루기
+기본적인 폼 작성하기
 ------------------------
 
-가장 일반적인 폼 헬퍼는 `form_tag` 입니다. [[[The most basic form helper is `form_tag`.]]]
+가장 간단한 폼 헬퍼는 `form_tag`입니다.
 
 ```erb
 <%= form_tag do %>
@@ -35,7 +30,7 @@ NOTE: 본 가이드는 폼 헬퍼와 인수에대한 완전한 문서를 목표�
 <% end %>
 ```
 
-인수없이 위와 같이 호출하는경우, `<form>` 태그를 생성하고 전송하는경우 현재 페이지에 POST 요청을 합니다. 예를들어, 현재 페이지가 `/home/index` 인경우 생성되는 HTML은 다음과 같습니다.(가독성을 위해 개행문자가 일부 추가되었습니다.) [[[When called without arguments like this, it creates a `<form>` tag which, when submitted, will POST to the current page. For instance, assuming the current page is `/home/index`, the generated HTML will look like this (some line breaks added for readability):]]]
+이 코드처럼 인수 없이 호출하게 되면 `<form>` 태그를 생성합니다. 이 폼의 목적지는 현재 페이지로, HTTP POST가 사용됩니다. 예를 들어, 현재 페이지가 `/home/index`인 경우 아래와 같은 HTML이 생성됩니다(읽기 쉽게끔 개행을 추가 했습니다).
 
 ```html
 <form accept-charset="UTF-8" action="/home/index" method="post">
@@ -47,75 +42,71 @@ NOTE: 본 가이드는 폼 헬퍼와 인수에대한 완전한 문서를 목표�
 </form>
 ```
 
-HTML이 몇개의 추가 요소를 가지고 있는것을 확인할 수 있습니다: 2개의 숨겨진 input 요소를 포함한 `div`. 추가된 div 는 중요한데, 이것 없이는 폼이 받아들여지지 않기 때문입니다. 첫번째 input 요소는 `utf8`이라는 이름을 가지고 있으며 폼이 "GET"이나 "POST" 요청을 할때 브라우저가 문자열 인코딩을 제대로 다루도록 합니다. 두번째 input 요소는 `authenticity_token`이라는 이름을 가지고 있으며 레일스에서 **cross-site request forgery protection**라고 부르는 보안기능으로 폼 헬퍼는 GET 요청을 제외한 모든 폼에 생성합니다(이 보안기능이 활성화 되어 있을때 제공). 자세한 내용은 [레일스 어플리케이션 보안](./security.html#cross-site-request-forgery-csrf)을 확인합니다. [[[Now, you'll notice that the HTML contains something extra: a `div` element with two hidden input elements inside. This div is important, because the form cannot be successfully submitted without it. The first input element with name `utf8` enforces browsers to properly respect your form's character encoding and is generated for all forms whether their actions are "GET" or "POST". The second input element with name `authenticity_token` is a security feature of Rails called **cross-site request forgery protection**, and form helpers generate it for every non-GET form (provided that this security feature is enabled). You can read more about this in the [Security Guide](./security.html#cross-site-request-forgery-csrf).]]]
+이 폼을 잘 보면 이상한 부분이 있다는 것을 눈치채셨나요? `div` 태그 내부에 2개의 hidden input이 있습니다. 이 div는 생략할 수 없습니다. 이것이 없으면 폼이 정상적으로 전송할 수 없습니다. 처음의 `utf8` hidden input은 브라우저에게 폼에서 해당하는 문자 인코딩을 사용할 것을 강제합니다. 이것은 액션이 "GET"과 "POST"의 어느쪽이라도 모두 생성됩니다. 두번째의 hidden input인 `authenticity_token`는 **cross-site fequest forgery protection**를 위한 보안기능입니다. 이 요소는 GET을 사용하지 않는 모든 폼에서 생성됩니다(보안 기능이 활성화 되어있는 경우). 자세한 설명은 [보안 가이드](security.html#Cross_Site_Request_Forgery_csrf)를 참조해주세요.
 
-NOTE: 본가이드의 샘플코드에서 `div`의 숨겨진 input 요소는 간결성을 위해 제외됩니다. [[[Throughout this guide, the `div` with the hidden input elements will be excluded from code samples for brevity.]]]
 
-### [A Generic Search Form] 검색 폼
+### 일반적인 검색 폼
 
-웹에서 가장 기본적인 폼중 하나는 검색 폼입니다. 이 폼은 다음을 포함합니다: [[[One of the most basic forms you see on the web is a search form. This form contains:]]]
+웹에서는 검색 폼이 자주 사용됩니다. 이 폼은 아래와 같은 부분을 포함하고 있습니다.
 
-* "GET" 메소드를 가진 폼, [[[a form element with "GET" method,]]]
+* "GET" 메소드를 대상으로 하는 폼 요소
+* 입력할 대상을 알려주는 텍스트
+* 텍스트 입력 폼
+* [송신] 버튼
 
-* input을 위한 라벨, [[[a label for the input,]]]
-
-* text input 요소, [[[a text input element, and]]]
-
-* submit 요소. [[[a submit element.]]]
-
-이 폼을 만들기 위해 `form_tag`, `label_tag`, `text_field_tag`, `submit_tag`를 사용해야 할것입니다. 다음과 같은: [[[To create this form you will use `form_tag`, `label_tag`, `text_field_tag`, and `submit_tag`, respectively. Like this:]]]
+이 폼을 만들기 위해서는 `form_tag`, `label_tag`, `text_field_tag`, `submit_tag`이 필요합니다. 아래의 예시를 보세요.
 
 ```erb
 <%= form_tag("/search", method: "get") do %>
   <%= label_tag(:q, "Search for:") %>
   <%= text_field_tag(:q) %>
-  <%= submit_tag("Search") %>
+  <%= submit_tag("Search") %
 <% end %>
 ```
 
-다음과 같은 HTML을 생성합니다: [[[This will generate the following HTML:]]]
+이 코드로부터 아래의 HTML이 생성됩니다.
 
 ```html
-<form accept-charset="UTF-8" action="/search" method="get">
+<form accept-charset="UTF-8" action="/search" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
   <label for="q">Search for:</label>
   <input id="q" name="q" type="text" />
   <input name="commit" type="submit" value="Search" />
 </form>
 ```
 
-TIP: 모든 폼의 input에 ID 속성값은 name 속성값으로 생성됩니다(예제의 경우 "q"). 이러한 ID들은 CSS 스타일링이나 자바스크립트를 이용한 폼 처리에 매우 유용합니다. [[[For every form input, an ID attribute is generated from its name ("q" in the example). These IDs can be very useful for CSS styling or manipulation of form controls with JavaScript.]]]
+TIP: 어떤 input 태그를 사용하더라도 id 속성은 그 이름으로부터 생성됩니다(이 예시에서는 'q'). 이것들의 id는 css를 추가하거나 JavaScript를 이용하여 폼을 제어할 때에 유용합니다.
 
-`text_field_tag`, `submit_tag` 외에도 HTML의 _모든_ 폼 컨트롤에 대하여 비슷한 헬퍼가 있습니다. [[[Besides `text_field_tag` and `submit_tag`, there is a similar helper for _every_ form control in HTML.]]]
+HTML의 __모든__ 폼 태그에 대해서 `text_field_tag`나 `submit_tag`와 같은 편리한 헬퍼를 사용할 수 있습니다.
 
-IMPORTANT: 검색 폼에 대해서는 항상 "GET"을 사용합니다. 이렇게 하면 사용자가 특정 검색어를 즐겨찾기해서 다시 찾아올수 있게 합니다. 일반적으로 레일스는 액션에 알맞는 HTTP verb를 사용하도록 권장합니다. [[[Always use "GET" as the method for search forms. This allows users to bookmark a specific search and get back to it. More generally Rails encourages you to use the right HTTP verb for an action.]]]
+IMPORTANT: 검색을 위해서 폼을 사용하는 경우에는 반드시 "GET" 메소드를 사요해주세요. 이를 통해서 검색 쿼리가 URL의 일부가 되기 때문에, 사용자가 검색 결과를 북마크하고, 나중에 같은 검색 결과를 북마크를 통해 볼 수 있게 됩니다. Rails에서는 기본적으로 액션에 대응하는 적절한 HTTP 어휘를 선택해주세요.
 
-### [Multiple Hashes in Form Helper Calls] 폼 헬퍼를 호출시 다양한 인수
+### 폼 헬퍼를 호출 시에 여러 개의 해시를 사용하기
 
-`form_tag` 헬퍼는 2개의 인수를 받습니다: 액션의 경로와 옵션 해쉬. 이 해쉬는 폼의 속성이나 HTML class와 같은 옵션에 해당합니다. [[[The `form_tag` helper accepts 2 arguments: the path for the action and an options hash. This hash specifies the method of form submission and HTML options such as the form element's class.]]]
+`form_tag` 헬퍼는 2개의 인수를 사용합니다. 하나는 액션에 대한 경로이고, 또 하나는 옵션을 가지는 해시입니다. 이 해시에는 폼을 전송할때의 메소드 형식과 HTML 옵션(폼 태그의 클래스 등)이 포함될 수 있습니다.
 
-`link_to` 헬퍼는 경로 인수는 문자열이 아니어도 됩니다; 레일스 라우팅 매커니즘이 이해하고 알맞은 URL로 변환되는 해쉬도 가능합니다. 하지만 `form_tag`의 경우 경로를 설정할때 두개의 인수를 지정하는경우 문제를 발생시킬수 있습니다. 예를 들어 다음과 같이 적는다면: [[[As with the `link_to` helper, the path argument doesn't have to be a string; it can be a hash of URL parameters recognizable by Rails' routing mechanism, which will turn the hash into a valid URL. However, since both arguments to `form_tag` are hashes, you can easily run into a problem if you would like to specify both. For instance, let's say you write this:]]]
+`link_to` 헬퍼와 마찬가지로 문자열 이외의 인수도 받을 수 있습니다. 예를 들어서 Rails의 라우팅에서 인식 가능한 URL 파라미터의 해시를 받아서 그것을 올바른 URL로 변환할 수도 있습니다. 단, `form_tag`의 두 인수를 모두 해시로 하게 되면 문제가 생길 수 있습니다. 예를 들어 다음과 같은 코드를 작성했다고 합시다.
 
 ```ruby
 form_tag(controller: "people", action: "search", method: "get", class: "nifty_form")
 # => '<form accept-charset="UTF-8" action="/people/search?method=get&class=nifty_form" method="post">'
 ```
 
-`method`와 `class`는 URL의 쿼리문자열에 추가된것을 볼수 있습니다. 2개의 해쉬를 의미하는것이 었다면 하나를 명시해야합니다. 루비에게 첫번째 해쉬인지를(혹은 둘다) 중괄호로 분리해서 알려주어야 합니다. 이는 당신이 예상한 HTML을 만들것입니다: [[[Here, `method` and `class` are appended to the query string of the generated URL because even though you mean to write two hashes, you really only specified one. So you need to tell Ruby which is which by delimiting the first hash (or both) with curly brackets. This will generate the HTML you expect:]]]
+이 코드에서는 생성된 URL에 `method`와 `class`가 추가되고 맙니다. 2개의 해시를 넘겨줄 요량이었지만, 실제로는 그것들이 하나의 해시인 것처럼 다루어집니다. 따라서 중괄호 { } 를 사용해서 첫번째 해시를 (또는 어느 쪽이든) 구별해 줄 필요가 있습니다. 이번에는 기대한 대로의 HTML이 생성됩니다.
 
 ```ruby
 form_tag({controller: "people", action: "search"}, method: "get", class: "nifty_form")
 # => '<form accept-charset="UTF-8" action="/people/search" method="get" class="nifty_form">'
 ```
 
-### [Helpers for Generating Form Elements] 폼 요소를 생성하는 헬퍼
+### 폼 태그 생성에 사용하는 헬퍼
 
-레일스는 체크박스, 텍스트 필드, 라디오버튼과 같은 폼 요소를 생성하는 일련의 헬퍼를 제공합니다. 이러한 기본 헬퍼는 "_tag"라는 이름으로 끝나고(`text_field_tag`나 `check_box_tag`와 같이), 하나의 `<input>` 요소를 생성합니다. 첫번째 변수는 항상 input의 name입니다. 폼이 전송될때 name은 폼 데이터와 함께 전송되며 사용자의 입력값이 컨트롤러의 `params` 해쉬를 생성합니다. 예를들어 폼에 `<%= text_field_tag(:query) %>`이 있다며 컨트롤러에서 이 필드의 값은 `params[:query]`를 이용해 가져옵니다. [[[Rails provides a series of helpers for generating form elements such as checkboxes, text fields, and radio buttons. These basic helpers, with names ending in "_tag" (such as `text_field_tag` and `check_box_tag`), generate just a single `<input>` element. The first parameter to these is always the name of the input. When the form is submitted, the name will be passed along with the form data, and will make its way to the `params` hash in the controller with the value entered by the user for that field. For example, if the form contains `<%= text_field_tag(:query) %>`, then you would be able to get the value of this field in the controller with `params[:query]`.]]]
+Rails에는 체크 박스/텍스트 필드/라디오 버튼같은 폼 태그를 생성하기 위한 헬퍼도 준비되어 있습니다. 이 태그들을 생성하는 기본 헬퍼의 이름은 "_tag"로 끝나며(`text_field_tag`나 `check_box_tag`처럼) 각각 1개의 `<input>` 태그를 생성합니다. 이 헬퍼들의 첫번째 파라미터는 input의 이름을 받게 됩니다. 폼이 전송되었을때, 이 이름이 폼 데이터에 포함되어서 전달되며, 사용자가 입력한 값과 함께 컨트롤러 내부에서 `params` 해시로 변환됩니다. 예를 들어, 폼에 `<%= text_field_tag(:query) %>`라는 태그를 생성한다면, 컨트롤러에서는 `params[:query]`를 통해서 해당하는 값에 접근할 수 있습니다.
 
-input 이름을 지을때 array, hash와 같은 non-scalar 값들을 `params`에서 사용하기위해 레일스는 약간의 관례를 사용합니다. 이에 대한 자세한 것은 [본 가이드의 챕터 7](#understanding-parameter-naming-conventions)를 읽어봅니다. 헬퍼의 정확한 사용방법을 자세히 알고 싶다면 [API documentation](http://api.rubyonrails.org/classes/ActionView/Helpers/FormTagHelper.html)를 참고합니다. [[[When naming inputs, Rails uses certain conventions that make it possible to submit parameters with non-scalar values such as arrays or hashes, which will also be accessible in `params`. You can read more about them in [chapter 7 of this guide](#understanding-parameter-naming-conventions). For details on the precise usage of these helpers, please refer to the [API documentation](http://api.rubyonrails.org/classes/ActionView/Helpers/FormTagHelper.html).]]]
+Rails는 input의 명명시에 일정한 규칙을 따릅니다. 이에 따라, 배열이나 해시같은 '비 스칼라 값'의 파라미터를 폼을 사용해 전송할 수 있게 되며, 그 결과 `params`로서 컨트롤러에 접근할 수 있게 됩니다. 자세한 설명은 [이 가이드의 뒷부분](#파라미터의_명명_규칙_이해하기)을 참조해주세요. 그리고 이 헬퍼들의 정확한 사용법에 대해서는 [API 문서](http://api.rubyonrails.org/classes/ActionView/Helpers/FormTagHelper.html)를 참조해주세요.
 
-#### [Checkboxes] 체크박스
+#### 체크 박스
 
-체크박스는 사용자가 여러개의 옵션을 활성화하거나 비활성화할 수 있도록 하는 폼 컨트롤입니다.: [[[Checkboxes are form controls that give the user a set of options they can enable or disable:]]]
+체크 박스는 폼에서 사용 가능한 태그의 한 종류로, 사용자가 옵션을 활성화, 또는 비활성화할 수 있도록 되어있습니다.
 
 ```erb
 <%= check_box_tag(:pet_dog) %>
@@ -124,7 +115,7 @@ input 이름을 지을때 array, hash와 같은 non-scalar 값들을 `params`에
 <%= label_tag(:pet_cat, "I own a cat") %>
 ```
 
-위의 코드는 다음과 같이 생성됩니다: [[[This generates the following:]]]
+이 코드로 다음과 같은 코드가 생성됩니다.
 
 ```html
 <input id="pet_dog" name="pet_dog" type="checkbox" value="1" />
@@ -133,11 +124,11 @@ input 이름을 지을때 array, hash와 같은 non-scalar 값들을 `params`에
 <label for="pet_cat">I own a cat</label>
 ```
 
-`check_box_tag`의 첫번째 변수는 당연히 input의 name입니다. 두번째 변수는 input의 값입니다. 이 값은 체크박스가 체크된경우 폼 데이터에 포함됩니다(그리고 `params`에 제공됩니다). [[[The first parameter to `check_box_tag`, of course, is the name of the input. The second parameter, naturally, is the value of the input. This value will be included in the form data (and be present in `params`) when the checkbox is checked.]]]
+`check_box_tag`의 첫번째 파라미터는 말할 필요도 없이 input 태그의 이름입니다. 두번째 파라미터는 input 태그의 value 속성이 됩니다. 체크 박스를 활성화하면 이 값이 전송되는 폼 데이터를 포함되며 최종적으로 `params`로 변환됩니다.
 
-#### [Radio Buttons] 라디오 버튼
+#### 라디오 버튼
 
-라디오 버튼은 체크박스와 비슷하게 여러개의 옵션을 베타적으로 선택할수 있게하는 폼 컨트롤입니다(예를들어 사용자는 한개만 선택가능): [[[Radio buttons, while similar to checkboxes, are controls that specify a set of options in which they are mutually exclusive (i.e., the user can only pick one):]]]
+라디오 버튼도 체크 박스와 마찬가지로 옵션을 사용자가 선택할 수 있습니다만, 한번에 하나만을 선택할 수 있다는 것이 특징입니다.
 
 ```erb
 <%= radio_button_tag(:age, "child") %>
@@ -146,7 +137,7 @@ input 이름을 지을때 array, hash와 같은 non-scalar 값들을 `params`에
 <%= label_tag(:age_adult, "I'm over 21") %>
 ```
 
-결과물: [[[Output:]]]
+랜더링 결과는 다음과 같습니다.
 
 ```html
 <input id="age_child" name="age" type="radio" value="child" />
@@ -155,13 +146,13 @@ input 이름을 지을때 array, hash와 같은 non-scalar 값들을 `params`에
 <label for="age_adult">I'm over 21</label>
 ```
 
-`check_box_tag`와 같이 `radio_button_tag`의 두번째 변수는 input의 값입니다. 라디오 버튼은 같은 이름(age)을 공유하고 있기 때문에 사용자는 하나만 선택할 수 있고, `params[:age]`는 "child", "adult"중 하나의 값만 가지게 됩니다. [[[As with `check_box_tag`, the second parameter to `radio_button_tag` is the value of the input. Because these two radio buttons share the same name (age) the user will only be able to select one, and `params[:age]` will contain either "child" or "adult".]]]
+`check_box_tag` 헬퍼와 마찬가지로 `radio_button_tag`의 두번째 파라미터는 input 태그의 value 속성값입니다. 두번째 라디오 버튼은 같은 이름('age')를 사용하기 때문에 유저는 한가지의 값만 선택할 수 있습니다. 그리고 `params[:age]`의 값은 "child"나 "adult" 중 하나가 됩니다.
 
-NOTE: 체크박스와 라디오버튼에는 항상 라벨을 사용합니다. 특정 옵션과 연결된 텍스트는 클릭가능 영역을 늘려주고 사용자가 input을 쉽게 클릭할 수 있도록 합니다. [[[Always use labels for checkbox and radio buttons. They associate text with a specific option and, by expanding the clickable region, make it easier for users to click the inputs.]]]
+NOTE: 체크 박스와 라디오 버튼에는 반드시 label 태그를 함께 사용해주세요. label을 사용하는 것으로 그 옵션과 라벨이 연결되는 것 뿐만 아니라, label 부분까지 클릭 가능하게 되어 사용자가 클릭하기 편하게 됩니다.
 
-### [Other Helpers of Interest] 흥미로운 다른 헬퍼들
+### 그 이외의 헬퍼
 
-textarea, 비밀번호 필드, 숨김 필드, 검색 필드, 전화번호 필드, 날짜 필드, 시간 필드, 색상 필드, datetime-local 필드, month 필드, week 필드, URL 필드, 이메일 필드는 언급할 만한 가치가 있는 폼 컨트롤입니다. [[[Other form controls worth mentioning are textareas, password fields, hidden fields, search fields, telephone fields, date fields, time fields, color fields, datetime fields, datetime-local fields, month fields, week fields, URL fields and email fields:]]]
+지금까지 소개한 것 이외에도 다음과 같은 항목이 있습니다: 텍스트 영역(textarea), 패스워드, 숨김 필드, 검색 필드, 전화번호 필드, 날짜 필드, 시각 필드, 색상 필드, 날짜/시간 필드, 지역 날짜/시간 필드, 월 필드, 주 필드, URL 필드, 메일 주소 필드, 숫자 값 필드, 범위 필드.
 
 ```erb
 <%= text_area_tag(:message, "Hi, nice site", size: "24x6") %>
@@ -178,9 +169,11 @@ textarea, 비밀번호 필드, 숨김 필드, 검색 필드, 전화번호 필드
 <%= email_field(:user, :address) %>
 <%= color_field(:user, :favorite_color) %>
 <%= time_field(:task, :started_at) %>
+<%= number_field(:product, :price, in: 1.0..20.0, step: 0.5) %>
+<%= range_field(:product, :discount, in: 1..100) %>
 ```
 
-Output:
+결과는 다음과 같이 됩니다.
 
 ```html
 <textarea id="message" name="message" cols="24" rows="6">Hi, nice site</textarea>
@@ -197,44 +190,46 @@ Output:
 <input id="user_address" name="user[address]" type="email" />
 <input id="user_favorite_color" name="user[favorite_color]" type="color" value="#000000" />
 <input id="task_started_at" name="task[started_at]" type="time" />
+<input id="product_price" max="20.0" min="1.0" name="product[price]" step="0.5" type="number" />
+<input id="product_discount" max="100" min="1" name="product[discount]" type="range" />
 ```
 
-숨김 필드는 사용자에게 보이지 않지만 다른 문자열 input 필드처럼 데이터를 가지고 있습니다. 이 값은 자바스크립트에 의해 변경될 수 있습니다. [[[Hidden inputs are not shown to the user but instead hold data like any textual input. Values inside them can be changed with JavaScript.]]]
+숨김 필드는 사용자에게는 보이지 않으며, 사전에 주어진 값을 종류에 관계없이 저장합니다. 숨김 필드에 포함되있는 값은 JavaScript를 사용해서 변경할 수 있습니다.
 
-IMPORTANT: 검색, 전화번호, 날짜, 시간, 색상, datetime, datetime-local, month, week, URL, 이메일 input은 HTML5 컨트롤입니다. 만약 당신의 앱이 오래된 브라우저를 지원해야 한다면 HTML5 polyfill(CSS 또는 자바스크립트에 의해 제공되는)이 필요할것입니다. 현재 인기 있는 툴 [Modernizr](http://www.modernizr.com/)과 [yepnope](http://yepnopejs.com/)은 감지된 HTML5 기능의 존재 여부에 따라 기능을 추가 할 수있는 간단한 방법을 제공하지만 이것은 확실히 [부족함이 없는 해결 방법](https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills)입니다. [[[The search, telephone, date, time, color, datetime, datetime-local, month, week, URL, and email inputs are HTML5 controls. If you require your app to have a consistent experience in older browsers, you will need an HTML5 polyfill (provided by CSS and/or JavaScript). There is definitely [no shortage of solutions for this](https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills), although a couple of popular tools at the moment are [Modernizr](http://www.modernizr.com/) and [yepnope](http://yepnopejs.com/), which provide a simple way to add functionality based on the presence of detected HTML5 features.]]]
+IMPORTANT: '검색, 전화번호, 날짜, 시각, 색, 날짜/시각, 지역 날짜/시각, 월, 주, URL, 메일 주소, 숫자, 범위' 필드는 HTML5부터 사용가능해진 것들입니다. 이런 필드를 구형 브라우저에서도 같은 방식으로 다루고 싶다면 CSS나 JavaScript를 사용해서 HTML5 폴리필을 사용해야합니다. 구형 브라우저에서 HTML5를 사용하기 위한 방법은 [산더미처럼](https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-Browser-Polyfills) 있습니다만, 현 시점에서 대표적인 것으로는 [Modernizr](http://www.modernizr.com/)가 있습니다. 이것들은 HTML5의 신기능이 사용될 경우, 이를 추가하기 위한 간단한 방법을 제공합니다.
 
-TIP: 비밀번호 input 필드를 사용한다면(어떠한 목적이던지), 이 변수가 로그에 남지 않도록 어플리케이션 설정을 해야합니다. 자세한 내용은 [Security Guide](security.html#logging)에서 배울수 있습니다. [[[If you're using password input fields (for any purpose), you might want to configure your application to prevent those parameters from being logged. You can learn about this in the [레일스 어플리케이션 보안](security.html#logging).]]]
+TIP: 비밀번호 입력 필드를 사용하고 있다면, 입력된 비밀번호를 Rails의 로그에 남기고 싶지 않을 것입니다. 그 방법에 대해서는 [보안 가이드](security.html#로그출력)를 참조해주세요.
 
-[Dealing with Model Objects] 모델객체와 연결된 폼 다루기
+모델 객체 다루기
 --------------------------
 
-### [Model Object Helpers] 모델객체 헬퍼
+### 모델 객체 헬퍼
 
-폼의 일반적인 작업은 모델객체를 수정하거나 생성하는것입니다. `*_tag` 헬퍼들은 다소 장황하지만 각 태그들에 알맞은 변수명을 강제하고 적절한 input 기본값을 설정해 이러한 작업에 사용할 수 있습니다. 레일스는 이러한 작업에 맞추어진 헬퍼를 제공합니다. 이러한 헬퍼들은 `text_field`, `text_area` 처럼 _tag 접미사가 제외됩니다. [[[A particularly common task for a form is editing or creating a model object. While the `*_tag` helpers can certainly be used for this task they are somewhat verbose as for each tag you would have to ensure the correct parameter name is used and set the default value of the input appropriately. Rails provides helpers tailored to this task. These helpers lack the _tag suffix, for example `text_field`, `text_area`. ]]]
+폼의 주요한 기능이라고 한다면, 모델 객체를 생성하거나 변경하는 것이겠죠. `*_tag` 헬퍼를 모델 객체의 생성/변경시에 사용할 수도 있습니다만, 하나 하나의 태그에 대해서 올바른 파라미터가 사용되고 있는지, 입력의 기본값은 알맞게 설정되어 있는지를 일일히 확인하며 코딩하는 것은 무척 귀찮습니다. Rails에는 바로 이러한 작업을 줄이기 위한 헬퍼가 있습니다. 또한, 이 헬퍼들에는 _tag가 붙어있지 않습니다(`text_field`, `text_area` 등).
 
-이 헬퍼들의 첫번째 인수는 인스턴스 변수의 이름이고 두번째 인수는 객체의 메소드 이름(대개는 속성)입니다. 레일스는 객체 메소드의 반환값을 input의 값으로 하고 알맞은 input 이름을 설정합니다. 만약 컨트롤러에 `@person` 변수가 정의되어 있고 사람의 이름이 Henry인 경우 폼은 다음과 같습니다: [[[For these helpers the first argument is the name of an instance variable and the second is the name of a method (usually an attribute) to call on that object. Rails will set the value of the input control to the return value of that method for the object and set an appropriate input name. If your controller has defined `@person` and that person's name is Henry then a form containing:]]]
+이 헬퍼들의 첫번째 인수로는 인스턴스 변수명, 두번째 인수로는 객체를 호출하기 위한 메소드명(일반적으로 속성명을 사용합니다)을 넘겨줍니다. Rails는 객체의 해당 메소드로부터 값을 받아서 설정하며, 더불어 적절한 input 이름을 지정해줍니다. 예를 들어, 컨트롤러에서 `@person`이 정의되어 있고, 그 인물의 이름이 Henry라고 해봅시다.
 
 ```erb
 <%= text_field(:person, :name) %>
 ```
 
-다음과 같은 결과를 생성합니다 [[[will produce output similar to]]]
+이 때, 아래와 같은 결과를 얻을 수 있습니다.
 
 ```erb
 <input id="person_name" name="person[name]" type="text" value="Henry"/>
 ```
 
-폼 전송시 사용자가 입력한 값은 `params[:person][:name]`에 저장됩니다. `params[:person]` 해쉬는 `Person.new`의 인수 또는 `@person`이 Person 인스턴스인경우 `@person.update`의 인수로 전달하기 알맞습니다. 헬퍼의 두번째 인수로 속성의 이름이 사용되는것이 강제적인것은 아닙니다. 위의 경우 person 객체가 `name` 혹은 `name=` 메소드를 가지고 있다면 레일스의 헬퍼는 동작합니다. [[[Upon form submission the value entered by the user will be stored in `params[:person][:name]`. The `params[:person]` hash is suitable for passing to `Person.new` or, if `@person` is an instance of Person, `@person.update`. While the name of an attribute is the most common second parameter to these helpers this is not compulsory. In the example above, as long as person objects have a `name` and a `name=` method Rails will be happy.]]]
+이 폼을 전송하면, 사용자가 입력한 값은 `params[:person][:name]`에 저장됩니다. `params[:person]` 해시는 `Person.new`에 넘기기 쉽게 되어있습니다. `@person`이 Person 모델의 인스턴스라면 `@person.update`에도 간편하게 넘길 수 있습니다. 폼 헬퍼는 2번째 파라미터로서 속성명을 넘기는 경우가 대부분입니다만 이 헬퍼들은 그렇지 않아도 됩니다. 위의 예제라면, person 객체에 `name` 메소드와 `name=` 메소드가 있는 한 Rails는 추가 작업을 하지 않아도 됩니다.
 
-WARNING: `person` 또는 `"person"` 처럼 인스턴스 변수의 이름을 전달해야지 모델 인스턴스를 전달하는것이 아닙니다. [[[You must pass the name of an instance variable, i.e. `:person` or `"person"`, not an actual instance of your model object.]]]
+WARNING: 헬퍼에 넘기는 것은 모델 객체의 인스턴스 자체를 넘기는 것이 아닌, 인스턴스 변수의 '이름'입니다(심볼 `:person`이나 문자열 `"person"` 등).
 
-레일스는 모델 객체와 연동된 검증 오류를 표시하는 헬퍼를 제공합니다. 이것들은 [Active Record Validations](./active_record_validations.html#displaying-validation-errors-in-views)가이드에 자세히 설명되어 있습니다. [[[Rails provides helpers for displaying the validation errors associated with a model object. These are covered in detail by the [Active Record Validations](./active_record_validations.html#displaying-validation-errors-in-views) guide.]]]
+Rails 헬퍼에는 모델 객체와 관련된 검증(Validation) 에러를 자동적으로 표시하는 기능도 포함되어있습니다. 자세한 설명은 이 가이드의 [Active Record Validation](active_record_validations.html#검증_에러를_뷰에서_출력하기)을 참조하세요.
 
-### [Binding a Form to an Object] 객체에 폼 바인딩
+### 폼과 객체를 연결하기
 
-이것은 완벽함과 멀어지면서 편리함을 증가시킵니다. 만약 Person의 많은 속성을 수정하는 경우 변경하려는 객체의 이름을 반복해서 적어야 합니다. 우리가 원하는것은 폼을 모델객체에 바인딩 하는것인데 `form_for`가 정확히 그런 동작을 합니다. [[[While this is an increase in comfort it is far from perfect. If Person has many attributes to edit then we would be repeating the name of the edited object many times. What we want to do is somehow bind a form to a model object, which is exactly what `form_for` does.]]]
+이 방법으로 코딩이 그럭저럭 편해졌습니다만, 개선의 여지는 아직 있습니다. Person 모델에서 여러 속성을 변경해야 한다면 객체의 이름을 몇번이고 반복해서 변경하지 않으면 안됩니다. 좀 더 편하게 폼과 모델 객체를 연결해서 간단하게 만들 수 없을까. 이 고민의 결과물이 `form_for`입니다.
 
-articles을 다루는 컨트롤러 `app/controllers/articles_controller.rb`를 가정했을때: [[[Assume we have a controller for dealing with articles `app/controllers/articles_controller.rb`:]]]
+글을 다루는 Articles 컨트롤러 `app/controllers/articles_controller.rb`가 있다고 합시다.
 
 ```ruby
 def new
@@ -242,7 +237,7 @@ def new
 end
 ```
 
-`form_for`를 사용하는 뷰 `app/views/articles/new.html.erb`는 다음과 같습니다: [[[The corresponding view `app/views/articles/new.html.erb` using `form_for` looks like this:]]]
+이 컨트롤러에 대응하는 뷰 `app/views/articles/new.html.erb`에서 `form_for`를 사용하면, 아래와 같은 느낌이 됩니다.
 
 ```erb
 <%= form_for @article, url: {action: "create"}, html: {class: "nifty_form"} do |f| %>
@@ -252,18 +247,14 @@ end
 <% end %>
 ```
 
-여기 주의할 몇가지 사항이 있습니다: [[[There are a few things to note here:]]]
+아래의 것들에 주목해주세요.
 
+* `@article`은 실제로 변경되는 객체 그 자체입니다(이름이 아닙니다).
+* 1개의 옵션에 1개의 해시가 사용됩니다. 라우팅 옵션은 `:url`에 해시로 넘겨지며, HTML 옵션은 `:html` 해시에 넘겨집니다. `:namespace` 옵션을 사용해서 각 input 태그들의 id속성의 유일성을 보장할 수도 있습니다. 이 `:namespace` 속성의 값은 생성된 HTML의 id 속성의 접두어 형태로 언더스코어와 함께 추가됩니다.
+* `form_for` 메소드로부터 **폼 빌더** 객체(여기에서는 `f`)가 생성됩니다.
+* 폼에서 input 태그를 생성하는 메소드는 **폼 빌더 객체 `f`를 사용해** 호출합니다.
 
-* `@article`은 수정하려는 실제 객체이다. [[[`@article` is the actual object being edited.]]]
-
-* 옵션은 단일 해쉬이다. 라우팅 옵션은 `:url` 해쉬, HTML 옵션은 `:html` 해쉬에 전달된다. 또한 `:namespace` 옵션을 제공해 폼이 유일한 id 값을 가지게할 수 있다. namespace 속성값은 밑줄문자를 추가후 생성된 HTML id 값에 접두사로 사용된다. [[[There is a single hash of options. Routing options are passed in the `:url` hash, HTML options are passed in the `:html` hash. Also you can provide a `:namespace` option for your form to ensure uniqueness of id attributes on form elements. The namespace attribute will be prefixed with underscore on the generated HTML id.]]]
-
-* `form_for` 메소드는 **폼 빌더** 객체를 yields 한다(`f` 변수). [[[The `form_for` method yields a **form builder** object (the `f` variable).]]]
-
-* 폼 컨트롤을 생성하는 메소드는 폼 빌더 오브젝트 `f`의 **on** 메소드를 호출한다. [[[Methods to create form controls are called **on** the form builder object `f`]]]
-
-HTML 결과는 다음과 같다: [[[The resulting HTML is:]]]
+여기에서는 아래와 같은 HTML이 생성됩니다.
 
 ```html
 <form accept-charset="UTF-8" action="/articles/create" method="post" class="nifty_form">
@@ -273,11 +264,11 @@ HTML 결과는 다음과 같다: [[[The resulting HTML is:]]]
 </form>
 ```
 
-`form_for` 컨트롤에 전달된 name은 `params`의 키로 폼의 값에 접근할 수 있다. `article`의 모든 input은 `article[속성이름]`과 같은 name을 가진다. `create` 액션에서 `params[:article]` 해쉬는 `:title`, `:body` 키를 가진다. parameter_names 섹션에서 보다 자세한 input name에 대한 내용을 알 수 있다. [[[The name passed to `form_for` controls the key used in `params` to access the form's values. Here the name is `article` and so all the inputs have names of the form `article[attribute_name]`. Accordingly, in the `create` action `params[:article]` will be a hash with keys `:title` and `:body`. You can read more about the significance of input names in the parameter_names section.]]]
+`form_for`에 넘기는 이름은 `params`를 사용해서 넘어온 폼의 정보값이 들어있는 키 이름에 영향을 줍니다. 예를 들어, 이 이름이 `article`이라면 모든 input 태그는 `article[속성명]`이라는 폼 name 속성을 가지게 됩니다. 따라서 `create` 액션에서는 `:title` 키와 `:body` 키를 가지는 하나의 해시가 `params[:article]`에 포함됩니다. input의 name 속성의 중요성에 대해서는 [파라미터의 명명 규칙 이해하기](#파라미터의 명명 규칙 이해하기)를 참조해주세요.
 
-폼 빌더에 의해 호출된 헬퍼 메소드는 이미 폼 빌더에 의해 관리되어 어떤 객체가 수정되는지 필요하지 않을때를 제외하고는 모델 객체의 헬퍼와 동일하다. [[[The helper methods called on the form builder are identical to the model object helpers except that it is not necessary to specify which object is being edited since this is already managed by the form builder.]]]
+폼 빌더 변수에 대해서 호출되는 헬퍼 메소드는 모델 객체의 헬퍼 메소드와 같습니다. 단, 폼의 경우는 대상이 되는 객체가 이미 폼 빌더에 의해서 관리되고 있기 때문에, 어떤 객체에 대해서 생성할지 지정할 필요가 없다는 점이 다릅니다.
 
-`fields_for` 헬퍼를 이용해 실제 `<form>` 태그를 생성하는 대신 바인딩을 생성할 수 있다. 이는 같은 폼 안에서 또 다른 모델객체를 수정할 때 유용하다. 예를들어 만약 Pserson 모델과 연관된 ContactDetail 모델을 가지고 있을때 다음과 같이 둘다 포함하는 폼을 생성할 수 있다: [[[You can create a similar binding without actually creating `<form>` tags with the `fields_for` helper. This is useful for editing additional model objects with the same form. For example if you had a Person model with an associated ContactDetail model you could create a form for creating both like so:]]]
+`fields_for` 메소드를 사용하면 `<form>` 태그를 실제로 작성하지 않고 같은 연결을 선언할 수 있습니다. 이것은 동일한 폼 내에서 다른 모델 객체를 다루기 위한 경우 등에 편리합니다. 예를 들어 Person 모델에 관계되어있는 ContactDetail 모델이 있다고 가정한다면, 아래와 같이 폼을 작성하면 됩니다.
 
 ```erb
 <%= form_for @person, url: {action: "create"} do |person_form| %>
@@ -288,7 +279,7 @@ HTML 결과는 다음과 같다: [[[The resulting HTML is:]]]
 <% end %>
 ```
 
-다음과 같은 결과를 생성한다: [[[which produces the following output:]]]
+다음과 같은 결과를 얻을 수 있습니다.
 
 ```html
 <form accept-charset="UTF-8" action="/people/create" class="new_person" id="new_person" method="post">
@@ -297,68 +288,68 @@ HTML 결과는 다음과 같다: [[[The resulting HTML is:]]]
 </form>
 ```
 
-`fields_for`에 의해 yield된 객체는 `form_for`에 yield된 폼 빌더와 비슷하다(사실 `form_for` 내부에서는 `fields_for`를 호출). [[[The object yielded by `fields_for` is a form builder like the one yielded by `form_for` (in fact `form_for` calls `fields_for` internally).]]]
+`fields_for`에 의해서 생성되는 객체는 폼 빌더이며, `form_for`에서 생성되는 것과 비슷합니다(사실 `form_for`의 내부에서는 `fields_for`를 호출합니다).
 
-### [Relying on Record Identification] 레코드 식별에 의지하기
+### 레코드 식별에 의존하기
 
-사용자 어플리케이션에서 Article 모델을 사용 하려면 **리소스**에 선언 해야한다. [[[The Article model is directly available to users of the application, so — following the best practices for developing with Rails — you should declare it **a resource**:]]]
+이제 Article 모델을 사용자가 직접 변경할 수 있게 되었습니다. 다음으로 해야하는 것은 이것을 **리소스**로 선언하는 것입니다.
 
 ```ruby
 resources :articles
 ```
 
-리소스를 선언하는것은 몇가지 사이드 이팩트가 있다. [Rails Routing From the Outside In](routing.html#resource-routing-the-rails-default)에서 리소스 설정과 사용에 대해 보다 자세한 정보를 얻을수 있다. [[[TIP: Declaring a resource has a number of side-affects. See [Rails Routing From the Outside In](routing.html#resource-routing-the-rails-default) for more information on setting up and using resources.]]]
+TIP: 리소스를 선언하면 자동적으로 다른 몇가지 설정이 추가됩니다. 자세한 리소스 설정 방법에 대해서는 [Rails 라우팅 가이드](routing.html#리소스 기반 라우팅-rails의 기본)을 참조해주세요.
 
-RESTful 리소스를 다룰때, **레코드 식별**에 의지해 `form_for`를 사용하면 상당히 쉬워진다. 모델 인스턴스를 전달하는 것으로 레일스는 모델이름과 rest를 알아낸다. [[[When dealing with RESTful resources, calls to `form_for` can get significantly easier if you rely on **record identification**. In short, you can just pass the model instance and have Rails figure out model name and the rest:]]]
+RESTful한 리소스를 다루고 있는 경우, 레코드 식별(record identification)을 사용하면 `form_for`를 호출하는 작업이 무척 간단해집니다. 모델의 인스턴스를 넘기기만 하면, Rails가 나중에 그 인스턴스로부터 모델명 등의 필요한 정보를 꺼내서 처리해줍니다.
 
 ```ruby
-## Creating a new article
-# long-style:
+## 새 글 작성하기
+# 긴 방법
 form_for(@article, url: articles_path)
-# same thing, short-style (record identification gets used):
+# 짧은 방법(레코드 식별을 사용)
 form_for(@article)
 
-## Editing an existing article
-# long-style:
+## 기존의 글 수정하기
+# 긴 방법
 form_for(@article, url: article_path(@article), html: {method: "patch"})
-# short-style:
+# 짧은 방법
 form_for(@article)
 ```
 
-`form_for`의 간략버전은 레코드가 신규인지 기존에 존재하던것인지와 무관하게 동일한 것을 편리하게 한다. 레코드 식별은 `record.new_record?` 메소드를 통해 신규 레코드인지 알아낸다. 또한 정확한 경로에 폼을 전송하고 객체의 클래스에 기반에 이름을 정한다. [[[Notice how the short-style `form_for` invocation is conveniently the same, regardless of the record being new or existing. Record identification is smart enough to figure out if the record is new by asking `record.new_record?`. It also selects the correct path to submit to and the name based on the class of the object.]]]
+이 짧은 `form_for` 호출은 레코드를 작성, 편집하는 모든 경우에 있어서 같은 방식으로 사용할 수 있습니다. 이것이 얼마나 편리한 지는 이해하실 거라고 생각합니다. 레코드 식별은 새 레코드일 경우 `record.new_record?`가 필요하다, 같은 적절한 추측을 해줍니다. 나아가서 전송 시에 사용해야 하는 적절한 경로를 선택하며, 객체의 클래스에 기반해서 사용할 이름도 선택해줍니다.
 
-레일스는 또한 알맞은 `class`, `id`를 자동으로 설정한다: article을 생성하는 폼은 `id`, `class`에 `new_article`를 가진다. 만약 id 23번 article를 수정한다면 `class`는 `edit_article`, `id`는 `edit_article_23`가 된다. 이 속성은 가이드의 간결성을 위해 생략한다. [[[Rails will also automatically set the `class` and `id` of the form appropriately: a form creating an article would have `id` and `class` `new_article`. If you were editing the article with id 23, the `class` would be set to `edit_article` and the id to `edit_article_23`. These attributes will be omitted for brevity in the rest of this guide.]]]
+Rails는 폼의 `class`와 `id`를 자동적으로 설정합니다. 이 경우, 글을 생성하는 폼에는 `id`와 `new_article`이라는 `class`가 주어집니다. 만약 id가 23인 글을 편집하는 경우, `class`는 `edit_article`로 설정되며, id는 `edit_article_23`이 됩니다. 그리고, 이 속성들은 가독성을 위해서 가이드의 뒷부분에서는 생략합니다.
 
-WARNING: STI(단일 테이블 상속)을 모델과 함께 사용한다면, 상위 리소스만 선언된경우 서브클래스는 레코드 식별에 의지할수 없다. 이경우 모델 이름, `:url`, `:method`를 명시해야한다. [[[When you're using STI (single-table inheritance) with your models, you can't rely on record identification on a subclass if only their parent class is declared a resource. You will have to specify the model name, `:url`, and `:method` explicitly.]]]
+WARNING: 모델에서 단일 케이블 상속(STI: single-table inheritance)를 사용하고 있는 경우, 부모 클래스에서 리소스가 선언되더라도 자식 클래스에서 레코드를 식별할 수 없습니다. 그 경우에는 모델명, `:url`, `:method`를 명시적으로 지정해야 합니다.
 
-#### [Dealing with Namespaces] 네임스페이스 다루기
+#### 이름 공간 다루기
 
-네임스페이스 라우트를 생성하면 `form_for`는 9개의 약칭을 가집니다. 만약 당신의 어플리케이션이 admin 네임스페이스를 가진다면 [[[If you have created namespaced routes, `form_for` has a nifty shorthand for that too. If your application has an admin namespace then]]]
+이름 공간(Namespace)을 사용하는 라우팅을 작성한 경우, `form_for`에서도 이를 이용하여 간결하게 작성할 수 있습니다. 애플리케이션의 라우팅에서 admin이라는 이름 공간이 선언되어 있다고 합시다.
 
 ```ruby
 form_for [:admin, @article]
 ```
 
-admin 네임스페이스안의 articles 컨트롤러로 전송하는 폼을 만들게 됩니다(업데이트의 경우 `admin_article_path(@article)`에 전송). 만약 몇개의 네임스페이스 레벨을 가지는 구문은 비슷합니다: [[[will create a form that submits to the articles controller inside the admin namespace (submitting to `admin_article_path(@article)` in the case of an update). If you have several levels of namespacing then the syntax is similar:]]]
+이 코드는 admin 이름 공간에 있는 `ArticlesController`에 전송할 폼을 생성합니다(예를 들어 수정하는 경우에는 `admin_article_path(@article)`로 전송됩니다). 이름 공간을 중첩해서 사용하고 있는 경우에도 같은 문법을 사용하면 됩니다.
 
 ```ruby
 form_for [:admin, :management, @article]
 ```
 
-레일스 라우팅 시스템과 관련규칙에 관한 더 자세한 정보는 [routing guide](routing.html)를 참고합니다. [[[For more information on Rails' routing system and the associated conventions, please see the [routing guide](routing.html).]]]
+Rails의 라우팅 시스템의 자세한 설명과 관련된 규칙에 대해서는 [Rails 라우팅](routing.html)을 참조해주세요.
 
 
-### [How do forms with PATCH, PUT, or DELETE methods work?] 폼의 PATCH, PUT, DELETE 메소드는 어떻게 동작하는가?
+### 폼에서의 PATCH, PUT, DELETE 메소드 동작
 
-레일스 프레임워크는 RESTful 디자인을 장려합니다. 이는 많은 "PATCH", "DELETE" 요청("GET", "POST"외에)을 사용하는것을 의미합니다. 하지만 대부분의 브라우저는 폼을 전송할때 "GET", "POST" 메소드 이외에는 _지원하지 않습니다_. [[[The Rails framework encourages RESTful design of your applications, which means you'll be making a lot of "PATCH" and "DELETE" requests (besides "GET" and "POST"). However, most browsers _don't support_ methods other than "GET" and "POST" when it comes to submitting forms.]]]
+Rails 프레임워크는 개발자가 애플리케이션을 RESTful하게 구축하도록 만듭니다. 다시 말해서, 개발자는 GET이나 POST뿐만 아니라, PATCH나 DELETE 요청을 작성하도록 합니다. 그러나 많은 브라우저에서는 폼을 송신할 때에 GET, POST 이외의 방식을 _지원하지 않고 있습니다_.
 
-레일스는 이 이슈를 POST의 숨겨진 input `"_method"` 이름으로 다른 메소드를 에뮬레이팅하여 원하는 메소드를 반영하도록합니다. [[[Rails works around this issue by emulating other methods over POST with a hidden input named `"_method"`, which is set to reflect the desired method:]]]
+그래서 Rails에서는 POST 메소드 위에서 다른 메소드들을 에뮬레이트하는 것으로 이 문제를 해결하고 있습니다. 구체적으로는 `"_method"`라는 이름의 숨겨진 필드를 준비하고, 이를 이용해 사용할 메소드를 지정합니다.
 
 ```ruby
 form_tag(search_path, method: "patch")
 ```
 
-결과: [[[output:]]]
+이를 통해서 다음과 같은 코드를 얻을 수 있습니다.
 
 ```html
 <form accept-charset="UTF-8" action="/search" method="post">
@@ -370,14 +361,14 @@ form_tag(search_path, method: "patch")
   ...
 ```
 
-POST 데이터를 파싱할때, 레일스는 HTTP 메소드가 내부의 지정된 하나인 경우(예제는 "PATCH") `_method` 특수 파라미터를 고려해 동작하도록 합니다. [[[When parsing POSTed data, Rails will take into account the special `_method` parameter and acts as if the HTTP method was the one specified inside it ("PATCH" in this example).]]]
+Rails는 POST로 전송된 데이터를 해석하기 위해서 이 `_method` 파라미터를 확인하고, 여기서 지정된 메소드(이 경우에는 PATCH)로 전송된 것처럼 행동합니다.
 
-[Making Select Boxes with Ease] Select 박스 쉽게 만들기
+간단하게 선택 상자를 만들기
 -----------------------------
 
-HTML에서의 Select 박스는 많은 마크업(각각의 선택 항목마다 한개의 `OPTION`)을 필요로 하기 때문에 동적으로 생성하는것이 의미가 있습니다. [[[Select boxes in HTML require a significant amount of markup (one `OPTION` element for each option to choose from), therefore it makes the most sense for them to be dynamically generated.]]]
+HTML에서 선택 상자를 생성하기 위해서는 대량의 마크업을 작성해야합니다. 따라서 이러한 마크업을 자동으로 생성하고 싶다고 생각하는 것이 자연스러울 것입니다.
 
-다음과 같은 마크업이 있습니다: [[[Here is what the markup might look like:]]]
+일반적으로 HTML 마크업은 다음과 같이 작성됩니다.
 
 ```html
 <select name="city_id" id="city_id">
@@ -388,69 +379,69 @@ HTML에서의 Select 박스는 많은 마크업(각각의 선택 항목마다 �
 </select>
 ```
 
-여기 유저에게 보여질 도시 이름 목록이 있습니다. 어플리케이션 내부적으로는 옵션의 value 속성에 있는 ID 값만을 사용합니다. 레일스에서 이부분을 어떻게 쉽게 해주는지 살펴 보겠습니다. [[[Here you have a list of cities whose names are presented to the user. Internally the application only wants to handle their IDs so they are used as the options' value attribute. Let's see how Rails can help out here.]]]
+여기에서는 도시의 이름 목록이 표시됩니다. 애플리케이션 내부에서는 이 항목들의 id를 사용하면 됩니다. 이에 따라서 각각의 id를 옵션의 값으로 사용하면 됩니다. Rails의 내부에서 어떠한 처리가 이루어지는지를 봅시다.
 
-### [The Select and Option Tags] Select, Option 태그
+### Select 태그와 Option 태그
 
-가장 일반적인 헬퍼는 `select_tag` 이며, 옵션의 문자열을 감싸는 `SELECT` 태그를 생성합니다. [[[The most generic helper is `select_tag`, which — as the name implies — simply generates the `SELECT` tag that encapsulates an options string:]]]
+가장 일반적인 헬퍼는 `select_tag`일겁니다. 이것은 이름 그대로 옵션의 문자열을 포함하는 `SELECT` 태그를 생성하는 메소드입니다.
 
 ```erb
 <%= select_tag(:city_id, '<option value="1">Lisbon</option>...') %>
 ```
 
-이것은 시작에 불과하며 option 태그를 동적으로 생성하지는 않습니다. `options_for_select` 헬퍼를 이용해 option 태그를 생성할 수 있습니다: [[[This is a start, but it doesn't dynamically create the option tags. You can generate option tags with the `options_for_select` helper:]]]
+우선 위의 코드를 작성합니다만, 이것만으로는 옵션 태그를 동적으로 생성할 수 없습니다. 옵션 태그를 생성하기 위해서는 `options_for_select` 헬퍼를 사용합니다.
 
 ```html+erb
 <%= options_for_select([['Lisbon', 1], ['Madrid', 2], ...]) %>
 
-결과: [[[output:]]]
+이 코드로부터 다음과 같은 결과를 얻을 수 있습니다.
 
 <option value="1">Lisbon</option>
 <option value="2">Madrid</option>
 ...
 ```
 
-`options_for_select`의 첫번째 인수는 각 항목마다 두개의 항목을 가진 중첩된 배열 입니다: 각 항목은 option 문자열(도시 이름)과 option 값(도시 id)로 이루어졌습니다. option 값은 컨트롤러에 전달됩니다. 이값은 데이터베이스 객체의 id에 상응하는 경우가 보통이지만 상황에따라 아닐수있습니다. [[[The first argument to `options_for_select` is a nested array where each element has two elements: option text (city name) and option value (city id). The option value is what will be submitted to your controller. Often this will be the id of a corresponding database object but this does not have to be the case.]]]
+`options_for_select`의 첫번째 인수는 중첩된 배열이며, 배열의 각 요소는 '옵션 텍스트(city name)'과 '옵션 값(city id)'의 배열이 됩니다. 옵션의 값이 컨트롤러에게 전송되며, 전송된 id는 대응하는 데이터베이스 객체의 id인 경우가 일반적입니다만, 그렇지 않은 경우도 있습니다.
 
-이것을 알면 `select_tag`, `options_for_select`을 이용해 원하는 마크업을 만들수 있습니다: [[[Knowing this, you can combine `select_tag` and `options_for_select` to achieve the desired, complete markup:]]]
+이것을 이해하면, `select_tag`와 `options_for_select`을 조합해서 원하는 마크업을 생성할 수 있습니다.
 
 ```erb
 <%= select_tag(:city_id, options_for_select(...)) %>
 ```
 
-`options_for_select`에 옵션값을 전달해 사전에 선택될 옵션을 지정할 수 있습니다. [[[`options_for_select` allows you to pre-select an option by passing its value.]]]
+`options_for_select`에는 기본값으로 사용하고 싶은 옵션 값을 넘겨줄 수 있습니다.
 
 ```html+erb
 <%= options_for_select([['Lisbon', 1], ['Madrid', 2], ...], 2) %>
 
-output:
+이 코드로부터 다음과 같은 결과를 얻을 수 있습니다.
 
 <option value="1">Lisbon</option>
 <option value="2" selected="selected">Madrid</option>
 ...
 ```
 
-레일스는 option의 값을 확인해 전달된 값과 일치하면 `selected` 속성을 옵션에 추가합니다. [[[Whenever Rails sees that the internal value of an option being generated matches this value, it will add the `selected` attribute to that option.]]]
+생성된 옵션의 값과 넘겨진 값과 일치하면 Rails는 `selected` 속성을 자동적으로 추가합니다.
 
-TIP: `options_for_select`의 두번째 인수는 내부에서 사용하는 값과 동일해야합니다. 값은 숫자 2인데 인수로 문자열 "2"를 `options_for_select`에 전달할 수 없으며 숫자 2를 전달해야합니다. `params` 해쉬로부터 추출된 값은 모두 문자열이라는것을 유의해야합니다. [[[The second argument to `options_for_select` must be exactly equal to the desired internal value. In particular if the value is the integer 2 you cannot pass "2" to `options_for_select` — you must pass 2. Be aware of values extracted from the `params` hash as they are all strings.]]]
+TIP: `options_for_select`의 두번째 인수는 내부에서 사용하는 값과 정확하게 일치해야합니다. 예를 들어 값이 정수 2인 경우, 문자열 "2"를 `options_for_select`에 넘겨주어서는 안됩니다. 어디까지나 정수 2를 넘겨줘야합니다. `params` 해시에서 값을 꺼냈을 때에는 모두 문자열이 되므로, 주의해야 할 필요가 있습니다.
 
-WARNING: `:include_blank` 또는 `:prompt`가 제공되지 않는다면, select의 `required` 속성이 true 인경우 `:include_blank`는 true로 설정되며, `size`는 한개가 되고, `multiple`는 true가 아니게 됩니다. [[[when `:include_blank` or `:prompt` are not present, `:include_blank` is forced true if the select attribute `required` is true, display `size` is one and `multiple` is not true.]]]
+WARNING: `:include_blank`나 `:prompt`가 지정되어 있지 않을 때, 선택 속성 `required`가 `true`가 되면 `:include_blank`가 강제적으로 true로 설정되고, `size`는 `1`, `multiple`은 `true`가 아니게 됩니다.
 
-해쉬를 이용해 option에 임의의 속성을 추가할 수 있습니다: [[[You can add arbitrary attributes to the options using hashes:]]]
+해시를 사용하여 임의의 값을 추가할 수도 있습니다.
 
 ```html+erb
 <%= options_for_select([['Lisbon', 1, {'data-size' => '2.8 million'}], ['Madrid', 2, {'data-size' => '3.2 million'}]], 2) %>
 
-결과: [[[output:]]]
+이 코드로부터는 아래와 같은 결과를 얻을 수 있습니다.
 
 <option value="1" data-size="2.8 million">Lisbon</option>
 <option value="2" selected="selected" data-size="3.2 million">Madrid</option>
 ...
 ```
 
-### [Select Boxes for Dealing with Models] 모델과 연동되는 Select 박스
+### 모델을 사용하는 선택 상자
 
-대부분의 경우 폼 컨트롤은 특정 데이터베이스 모델에 연동되고 레일스는 그 목적을 위한 헬퍼를 제공합니다. 다른 폼 헬퍼와 동일하게 모델과 연동하는경우 `select_tag`에서 `_tag` 접미사를 제거합니다. [[[In most cases form controls will be tied to a specific database model and as you might expect Rails provides helpers tailored for that purpose. Consistent with other form helpers, when dealing with models you drop the `_tag` suffix from `select_tag`:]]]
+대부분의 경우, 폼은 특정 모델과 연결되어 있으며, Rails에 이를 위한 헬퍼가 있을 거라고 기대하는 것은 당연할 것입니다. 모델을 다루는 경우, 다른 폼 헬퍼와 같은 요령으로 `select_tag`에서 `_tag`라는 접미어를 제거하고 사용할 수 있습니다.
 
 ```ruby
 # controller:
@@ -462,74 +453,83 @@ WARNING: `:include_blank` 또는 `:prompt`가 제공되지 않는다면, select�
 <%= select(:person, :city_id, [['Lisbon', 1], ['Madrid', 2], ...]) %>
 ```
 
-세번째 변수(options의 배열)는 `options_for_select`에 전달하는 인수와 동일합니다. 한가지 이점은 사전에 선택될 도시이름에 대해 신경쓰지 않아도 유저가 이미 가지고 있는 도시를 선택합니다 - 레일스는 `@person.city_id` 값으로부터 이를 수행합니다. [[[Notice that the third parameter, the options array, is the same kind of argument you pass to `options_for_select`. One advantage here is that you don't have to worry about pre-selecting the correct city if the user already has one — Rails will do this for you by reading from the `@person.city_id` attribute.]]]
+세번째 파라미터로 넘겨진 옵션 베열은 `options_for_select`에 넘겨주던 인수와 같은 것입니다. 이 헬퍼의 이점중 하나는 사용자가 이미 도시를 선택하고 있는 경우, 올바른 도시가 기본값으로 설정되었는지에 대해서 신경쓸 필요가 없다는 점입니다. Rails는 `@person.city_id` 속성을 읽어서 이 작업을 자동으로 처리합니다.
 
-`@person` 영역을 가지는 폼 빌더헬퍼에서 `select` 헬퍼를 사용하고자 한다면 다음과 같습니다: [[[As with other helpers, if you were to use the `select` helper on a form builder scoped to the `@person` object, the syntax would be:]]]
+다른 헬퍼와 마찬가지로 `@person` 객체를 대상으로 하는 폼 빌더에서 `select`를 사용한다면 다음과 같이 작성합니다.
 
 ```erb
-# select on a form builder
+# 폼빌더에서 선택 상자를 생성한다
 <%= f.select(:city_id, ...) %>
 ```
 
-WARNING: `belongs_to` association을 설정하기위해 `select`(또는 비슷한 헬퍼인 `collection_select`, `select_tag`)를 사용할때는 assosiation 이름이 아니라 외부키의 이름을 전달해야 합니다.(위의 예제에서는 `city_id`) `city_id`가 아니라 `city`를 사용하면 `params` 해쉬를 `Person.new`나 `update`에 전달할때 Active Record는 ` ActiveRecord::AssociationTypeMismatch: City(#17815740) expected, got String(#1138750) ` 에러를 발생시킵니다. 이를 살펴볼수 있는 또다른 방법은 폼 헬퍼의 속성만을 수정하는것입니다. 사용자가 외부키를 직접 변경하는 잠재적인 보안 문제에 대해 알아야합니다. [[[If you are using `select` (or similar helpers such as `collection_select`, `select_tag`) to set a `belongs_to` association you must pass the name of the foreign key (in the example above `city_id`), not the name of association itself. If you specify `city` instead of `city_id` Active Record will raise an error along the lines of ` ActiveRecord::AssociationTypeMismatch: City(#17815740) expected, got String(#1138750) ` when you pass the `params` hash to `Person.new` or `update`. Another way of looking at this is that form helpers only edit attributes. You should also be aware of the potential security ramifications of allowing users to edit foreign keys directly.]]]
+`select` 헬퍼에 블록을 넘길 수도 있습니다.
 
-### [Option Tags from a Collection of Arbitrary Objects] 임의의 객체 모음을 위한 option 태그
+```erb
+<%= f.select(:city_id) do %>
+  <% [['Lisbon', 1], ['Madrid', 2]].each do |c| -%>
+    <%= content_tag(:option, c.first, value: c.last) %>
+  <% end %>
+<% end %>
+```
 
-`options_for_select`를 이용한 option 태그 생성은 각 option의 문자열과 값으로 이루어진 배열을 필요로 합니다. 하지만 City 모델(아마도 Active Record)을 가지고 있고 이들 객체 모음으로부터 option 태그를 생성하고 싶다면 어떻게 해야할까요? 여기에 중첩배열을 만들어내는 한가지 해결방법이 있습니다: [[[Generating options tags with `options_for_select` requires that you create an array containing the text and value for each option. But what if you had a City model (perhaps an Active Record one) and you wanted to generate option tags from a collection of those objects? One solution would be to make a nested array by iterating over them:]]]
+WARNING: `select` 헬퍼(또는 유사한 `collection_select`, `select_tag` 등)을 사용해서 `belongs_to`를 설정하는 경우에는 관계를 그 자체의 이름이 아닌 외부키의 이름(위 예제라면 `city_id`)를 넘겨주어야 합니다. `city_id`가 아닌 `city`를 넘겨주면 `Person.new` 또는 `Person.update`에 `params` 해시를 넘겼을 경우에 Active Record에서 `ActiveRecord::AssociationTypeMismatch: City(#17815740) expected, got String(#1138750)` 에러가 발생합니다. 나아가 속성의 편집을 하는 경우에도 주의해야할 필요가 있습니다. 사용자가 외부키를 직접 변경하는 경우 보안 상의 문제가 발생할 가능성이 있으므로, 충분히 주의해주세요.
+
+### 임의의 객체 컬렉션에 대해 옵션 태그를 사용하기
+
+`options_for_select`를 사용해서 옵션 태그를 생성할 때, 각 옵션의 텍스트와 값을 포함하는 배열이 생성되어 있어야 합니다. 여기에서는 City 모델이 존재한다고 가정하고, 그 객체의 컬렉션으로부터 옵션 태그를 생성하려면 어떻게 하면 좋을까요? 한가지 방법으로는 컬렉션을 탐색하면서 배열을 생성할 수 있을 겁니다.
 
 ```erb
 <% cities_array = City.all.map { |city| [city.name, city.id] } %>
 <%= options_for_select(cities_array) %>
 ```
 
-이것은 완벽히 유효한 해결방법이지만 레일스는 간결한 대안인 `options_from_collection_for_select`를 제공합니다. 이 헬퍼는 임의의 객체 모음이 2개의 인수(option의 **value**, **text** 에 접근하는 메서드 이름)를 가지고 있다고 가정합니다: [[[This is a perfectly valid solution, but Rails provides a less verbose alternative: `options_from_collection_for_select`. This helper expects a collection of arbitrary objects and two additional arguments: the names of the methods to read the option **value** and **text** from, respectively:]]]
+이것은 이것대로 정상적인 방법입니다만, Rails에는 좀 더 간결한 `options_from_collection_for_select` 헬퍼가 존재합니다. 이 헬퍼는 임의의 객체의 컬렉션을 다른 2개의 인수 (**value** 옵션과 **text** 옵션을 각각 읽기 위한 메소드명)을 받습니다.
 
 ```erb
 <%= options_from_collection_for_select(City.all, :id, :name) %>
 ```
 
-이름에서 알 수 있듯이, 이것은 option 태그만을 생성합니다. select 박스와 함께 사용하려면 `options_for_select`처럼 `select_tag`와 같이 사용합니다. 모델 객체와 사용하는경우, `select`가 `select_tag`, `options_for_select` 하나로 합친것처럼, `collection_select`는 `select_tag`, `options_from_collection_for_select` 하나로 합친것처럼 동작합니다. [[[As the name implies, this only generates option tags. To generate a working select box you would need to use it in conjunction with `select_tag`, just as you would with `options_for_select`. When working with model objects, just as `select` combines `select_tag` and `options_for_select`, `collection_select` combines `select_tag` with `options_from_collection_for_select`.]]]
+이름이 가리키듯, 이 헬퍼가 생성하는 것은 옵션 태그 뿐입니다. 실제로 동작하는 선택 상자를 만들기 위해서는 이 메소드를 `options_for_select`와 마찬가지로 `select_tag`와 함께 사용해야합니다. 모델 객체를 사용하는 경우 `select`를 `select_tag`와 `options_for_select`를 함께 사용해야하는 것처럼 `collection_select`를 `select_tag`와 `options_from_collection_for_select`와 함께 사용합니다.
 
 ```erb
 <%= collection_select(:person, :city_id, City.all, :id, :name) %>
 ```
 
-정리해보면, `options_for_select`가 `select`로 되는것처럼 `options_from_collection_for_select`는 `collection_select`으로 됩니다. [[[To recap, `options_from_collection_for_select` is to `collection_select` what `options_for_select` is to `select`.]]]
+정리하자면, `options_from_collection_for_select` 헬퍼는 '`options_for_select`가 `select`하는 것'처럼 '`collection_select`한다'가 됩니다.
 
-NOTE: `options_for_select`에 전달되는 배열의 쌍은 첫번째는 문자열 두번째는 값입니다. 하지만 `options_from_collection_for_select`는 첫번째 인수는 값 메소드, 두번째는 문자열 메소드입니다. [[[Pairs passed to `options_for_select` should have the name first and the id second, however with `options_from_collection_for_select` the first argument is the value method and the second the text method.]]]
+NOTE: `options_for_select`에 넘기는 배열에서는 이름의 첫번째, 값이 두번째였습니다만, `options_from_collection_for_select`에서는 첫번째가 값을 얻어오기 위한 메소드이고, 두번째가 이름을 가져오기 위한 메소드입니다.
 
-### [Time Zone and Country Select] 시간대와 국가 선택
+### 타임존과 나라 선택하기
 
-레일스에서 시간대 지원을 사용하려면 사용자에게 어떤 시간대에 있는지 질의해야합니다. 이를 위해 미리 지정되어 있는 TimeZone 객체들을 `collection_select`를 이용해 select option을 생성해야 합니다. 하지만 `time_zone_select` 헬퍼를 이용해 쉽게 사용할 수 있습니다. [[[To leverage time zone support in Rails, you have to ask your users what time zone they are in. Doing so would require generating select options from a list of pre-defined TimeZone objects using `collection_select`, but you can simply use the `time_zone_select` helper that already wraps this:]]]
+Rails에서는 타임존을 지원하기 위해서 사용자가 지금 어떤 타임존에 있는지를 어떤 형태로든 사용자에게 물어야합니다. 이를 위해서는 `collection_select` 헬퍼를 사용해서 이미 정의되어있는 TimeZone 객체의 목록으로부터 선택 상자를 생성해야 합니다만 사실 이 기능을 구현해둔 `time_zone_select`이라는 전용의 헬퍼라 이미 준비되어 있습니다.
 
 ```erb
 <%= time_zone_select(:person, :time_zone) %>
 ```
 
-또한 좀더 자세한 설정을 위해 `time_zone_options_for_select` 헬퍼가 있습니다. 이 두가지 메소드의 인수에 대한 자세한 내용은 API 문서를 읽어보기 바랍니다. [[[There is also `time_zone_options_for_select` helper for a more manual (therefore more customizable) way of doing this. Read the API documentation to learn about the possible arguments for these two methods.]]]
+`time_zone_options_for_select`라는 비슷한 헬퍼도 존재하고 있으며, 여기에서는 좀 더 상세할 설정을 사용할 수 있습니다. 이 2가지의 메소드에서 사용하는 인수에 대해서는 API문서를 참조해주세요.
 
-레일스는 국가를 선택하기위해 `country_select` 헬퍼를 _사용_합니다. 하지만 이것은 [country_select plugin](https://github.com/stefanpenner/country_select)으로 분리되어 있습니다. 이것을 사용할때 특정이름을 목록에 포함하거나 제외하는것은 논란의 여지가 있다는것을 인식해야합니다.(이것은 레일스로부터 분리된 이유이기도 합니다) [[[Rails _used_ to have a `country_select` helper for choosing countries, but this has been extracted to the [country_select plugin](https://github.com/stefanpenner/country_select). When using this, be aware that the exclusion or inclusion of certain names from the list can be somewhat controversial (and was the reason this functionality was extracted from Rails).]]]
+이전 Rails에서는 `country_select` 헬퍼를 사용해서 나라를 _선택했었습니다_만, 이 기능은 [country_select 플러그인](https://github.com/stefanpenner/country_select)으로 분리되었습니다. 이 기능을 사용하는 경우, 어떤 나라를 목록에 포함하고, 어떤 나라를 포함하지 않을 지에 결정할 때에 정치적인 이슈를 고려해야 한다는 점을 유의해주세요(이 기능이 플러그인으로 분리된 이유이기도 합니다).
 
-[Using Date and Time Form Helpers] 날짜와 시간 폼 헬퍼 사용하기
+날짜/시각 폼 헬퍼 사용하기
 --------------------------------
 
-HTML5에서 제공하는 날짜와 시간 입력 필드를 생성하는 폼헬퍼를 사용하지 않고 다른 헬퍼를 선택할 수 있습니다. 이러한 날짜와 시간 헬퍼는 다른 폼 헬퍼와 다른 두가지가 있습니다. [[[You can choose not to use the form helpers generating HTML5 date and time input fields and use the alternative date and time helpers. These date and time helpers differ from all the other form helpers in two important respects:]]]
+HTML5 표준 날짜/시각 입력 필드를 생성하는 헬퍼 대신에 별도의 날짜/시각 헬퍼를 사용할 수도 있습니다. 어느 쪽이든 날짜/시각 헬퍼는 아래의 두가지 부분에 있어서 다른 헬퍼들과 다릅니다.
 
-* 날짜와 시간은 하나의 입력 항목으로 표현되지 않습니다. 대신 각 항목의 컴포넌트(년, 월, 일 등...)를 가지며 `params` 해쉬에 하나의 값으로 날짜와 시간이 전달 되지 않습니다. [[[Dates and times are not representable by a single input element. Instead you have several, one for each component (year, month, day etc.) and so there is no single value in your `params` hash with your date or time.]]]
+* 날짜와 시각을 한번에 표시할 수 있는 것은 없습니다. 이 때문에 년, 월, 일 등의 각각의 요소들을 조합해서 사용해야하며, 따라서 `params` 해시 내에서도 날짜/시각 정보는 한 개의 값으로 나타나지 않습니다.
+* 다른 헬퍼에서는 그 헬퍼가 최소한의 기본 기능을 가지는지, 또는 모델 객체를 다루는지를 `_tag` 접미어의 유무로 표현합니다. 날짜/시각 헬퍼의 경우 `select_date`, `select_time`, `select_datetime`가 기본 헬퍼이고, `date_select`, `time_select`, `datetime_select`가 모델 객체를 사용하는 헬퍼입니다.
 
-* 다른 헬퍼는 `_tag` 접미사를 가지는 것으로 기본 헬퍼인지 아니면 모델객체와 연결된 객체인지 판단합니다. 하지만 날짜와 시간 헬퍼의 경우 `select_date`, `select_time`, `select_datetime`은 기본 헬퍼, `date_select`, `time_select`, `datetime_select`는 모델객체 헬퍼입니다. [[[Other helpers use the `_tag` suffix to indicate whether a helper is a barebones helper or one that operates on model objects. With dates and times, `select_date`, `select_time` and `select_datetime` are the barebones helpers, `date_select`, `time_select` and `datetime_select` are the equivalent model object helpers.]]]
+어느 쪽의 헬퍼를 사용하더라도, 년, 월, 일 등의 요소들의 선택 상자를 작성할 수 있습니다.
 
-헬퍼는 여러개의 select 박스로 이루어진 각기 다른 컴포넌트(년도, 월, 일 등)를 생성합니다. [[[Both of these families of helpers will create a series of select boxes for the different components (year, month, day etc.).]]]
+### 기본 헬퍼
 
-### [Barebones Helpers] 기본 헬퍼
-
-`select_*`와 비슷한 헬퍼는 첫번째 인수로 Date, Time, DateTime 인스턴스를 받아서 현재 선택된 값을 결정하는데 사용합니다. 해당 값을 전달하지 않는경우 현재 날짜값이 사용됩니다. 예를들어 [[[The `select_*` family of helpers take as their first argument an instance of Date, Time or DateTime that is used as the currently selected value. You may omit this parameter, in which case the current date is used. For example]]]
+`select_*`로 시작되는 날짜/시각 헬퍼에서는 Date, Time, DateTime 중 어느 한 인스턴스를 첫 번째 인수로 받고, 현재 선택중인 값으로 사용합니다. 현재 날짜가 사용되는 경우에는 이 파라미터를 생략할 수 있습니다. 예를 들어,
 
 ```erb
 <%= select_date Date.today, prefix: :start_date %>
 ```
 
-결과(실제 옵션 값은 간결함을 위해 생략) [[[outputs (with actual option values omitted for brevity)]]]
+이 코드로부터 아래와 같은 결과를 얻을 수 있습니다(번잡함을 피하기 위해서 실제 옵션 값은 생략했습니다).
 
 ```html
 <select id="start_date_year" name="start_date[year]"> ... </select>
@@ -537,23 +537,23 @@ HTML5에서 제공하는 날짜와 시간 입력 필드를 생성하는 폼헬�
 <select id="start_date_day" name="start_date[day]"> ... </select>
 ```
 
-위의 input은 `params[:start_date]` 해쉬에 `:year`, `:month`, `:day` 키를 가지도록 합니다. 실제 Time, Date 객체를 얻기 위해서는 추출된 값을 알맞은 생성자에 전달해야 합니다. 예를들어 [[[The above inputs would result in `params[:start_date]` being a hash with keys `:year`, `:month`, `:day`. To get an actual Time or Date object you would have to extract these values and pass them to the appropriate constructor, for example]]]
+위의 입력 결과는 `params[:start_date]`에 반영되며, 키는 `:year`, `:month`, `:day`가 됩니다. 이 값들로부터 실제의 Time 객체나 Date 객체를 얻기 위해서는 값을 꺼내서 적절한 생성자에 넘겨주어야합니다.
 
 ```ruby
 Date.civil(params[:start_date][:year].to_i, params[:start_date][:month].to_i, params[:start_date][:day].to_i)
 ```
 
-`:prefix` 옵션은 `params` 해쉬에서 날짜 컴포넌트 키로 사용합니다. 여기서는 `start_date`로 설정되어 있고 생략하는경우 기본값은 `date`입니다. [[[The `:prefix` option is the key used to retrieve the hash of date components from the `params` hash. Here it was set to `start_date`, if omitted it will default to `date`.]]]
+`:prefix` 옵션은 `params` 해시로부터 날짜 정보를 가져올때에 사용되는 키입니다. 여기에서는 `start_date`로 사용했습니다. 생략하면 `date`로 설정됩니다.
 
-### [Model Object Helpers] 모델 객체 헬퍼
+### 모델 객체 헬퍼
 
-`select_date`는 `params` 해쉬에 Active Record가 예상하는 적합한 하나의 값으로 제공되지 않기 때문에 Active Record 객체에 수정하거나 생성하는데 알맞지 않습니다. [[[`select_date` does not work well with forms that update or create Active Record objects as Active Record expects each element of the `params` hash to correspond to one attribute.]]]
-날짜와 시간을 위한 모델 객체 헬퍼는 특별한 이름을 가진 변수를 전송합니다; Active Record가 보기에 생성자에 적합한 컬럼 타입이 주어지는 형태를 가집니다. 예를들어: [[[The model object helpers for dates and times submit parameters with special names; when Active Record sees parameters with such names it knows they must be combined with the other parameters and given to a constructor appropriate to the column type. For example:]]]
+`select_date` 헬퍼는 Active Record 객체를 변경/생성하는 폼에서는 사용하기 어렵게 되어있습니다. Active Record는 `param` 해시에 포함되는 요소가 각각 1개의 속성에 대응될 것을 전제로 하고 있기 때문입니다. 날짜/시각용의 모델 객체 헬퍼는 특별한 이름을 사용해서 값을 전송합니다. Active Record는 이 특별한 이름을 발견하면 다른 파라미터를 위한 값이라고 추측하고, 컬럼의 종류에 맞는 생성자가 있을 것이라고 생각합니다. 예를 들어,
 
 ```erb
 <%= date_select :person, :birth_date %>
 ```
-결과 (실제 옵션 값은 간결함을 위해 생략) [[[outputs (with actual option values omitted for brevity)]]]
+
+이 코드로부터 아래와 같은 결과를 얻을 수 있습니다.
 
 ```html
 <select id="person_birth_date_1i" name="person[birth_date(1i)]"> ... </select>
@@ -561,41 +561,41 @@ Date.civil(params[:start_date][:year].to_i, params[:start_date][:month].to_i, pa
 <select id="person_birth_date_3i" name="person[birth_date(3i)]"> ... </select>
 ```
 
-`params` 해쉬의 결과는 다음과 같습니다 [[[which results in a `params` hash like]]]
+이 폼에서 다음과 같은 `params` 해시를 얻을 수 있습니다.
 
 ```ruby
-{:person => {'birth_date(1i)' => '2008', 'birth_date(2i)' => '11', 'birth_date(3i)' => '22'}}
+{'person' => {'birth_date(1i)' => '2008', 'birth_date(2i)' => '11', 'birth_date(3i)' => '22'}}
 ```
 
-`Person.new` (또는 `update`)에 변수가 전달되면 Active Record는 `birth_date` 속성을 생성하는데 `Date.civil`이 동작하는것처럼 알맞은 값이 전달됩니다. [[[When this is passed to `Person.new` (or `update`), Active Record spots that these parameters should all be used to construct the `birth_date` attribute and uses the suffixed information to determine in which order it should pass these parameters to functions such as `Date.civil`.]]]
+이 값이 `Person.new`(나 `Person.update`)에 넘겨지면 Active Record는 이 값들로 부터 `birth_date` 속성을 구성하기 위해서 사용해야한다는 것을 이해하고, 어미로 붙어 있는 정보를 통해서 어떤 생성자를 호출해야 할지(예를 들면, `Date.civil` 같은)를 판단합니다.
 
-### [Common Options] 공통 옵션
+### 공통 옵션
 
-두 헬퍼는 각각의 select 태그를 생성하는데 동일한 핵심 함수를 사용하고 많은 비슷한 옵션을 가집니다. 레일스는 현재 년도의 앞뒤 5년에 해당하는 년도 옵션을 생성합니다. 만약 이게 적절한 범위가 아니라면 `:start_year`, `:end_year` 옵션을 이용해 변경할 수 있습니다. 사용가능한 옵션의 완전한 목록은 [API 문서](http://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html)를 참고하시기 바랍니다. [[[Both families of helpers use the same core set of functions to generate the individual select tags and so both accept largely the same options. In particular, by default Rails will generate year options 5 years either side of the current year. If this is not an appropriate range, the `:start_year` and `:end_year` options override this. For an exhaustive list of the available options, refer to the [API documentation](http://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html).]]]
+어느 날짜/시간 헬퍼라도 각각의 선택 태그를 생성하기 위한 핵심 기능은 공통적이므로 대부분의 옵션을 같은 방식으로 사용할 수 있습니다. 특히 Rails에서는 연도를 사용할 때 기본으로 현재 년도를 기준으로 전후 5년을 사용합니다. 이 범위가 적절하지 않은 경우 `:start_year` 옵션과 `:end_year` 옵션을 사용해서 덮어쓸 수 있습니다. 사용 가능한 모든 옵션은 [API 문서](http://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html)를 참조해주세요.
 
-경험으로 볼때 모델 객체와 연동할때는 `date_select`를 사용하고 그렇지 않고 검색 제한과 같은 다른경우에는 `select_date`를 사용하는것이 좋습니다. [[[As a rule of thumb you should be using `date_select` when working with model objects and `select_date` in other cases, such as a search form which filters results by date.]]]
+경험적으로 조언하자면, 모델 객체를 다루는 경우에는 `date_select`가 편리하며, 그 이외의 경우, 예를 들어 날짜로 필터링하기 위한 검색 폼을 만드는 경우 등에는 `select_date`를 사용하는 것이 좋습니다.
 
-NOTE: 많은 경우 브라우저 자체 날짜 선택창은 어설프고 날짜와 한주의 시작일이 연동되는것이 고려되지 않습니다. [[[In many cases the built-in date pickers are clumsy as they do not aid the user in working out the relationship between the date and the day of the week.]]]
+NOTE: 내장된 날짜 선택(date picker) 헬퍼는 날짜와 요일이 연동되지 않는 등의 문제가 많습니다.
 
-### [Individual Components] 개별 컴포넌트
+### 각각 별도로 사용하기
 
-가끔 년도나 월처럼 하나의 날짜 컴포넌트만 표시할 필요가 있습니다. 레일스는 이를 위해 `select_year`, `select_month`, `select_day`, `select_hour`, `select_minute`, `select_second` 헬퍼를 제공합니다. 이 헬퍼들은 쉽게 사용할 수 있습니다. 기본값으로 컴포넌트의 이름으로 input 이름을 설정 하고(예를들어 `select_year`는 "year", `select_month`는 "month") 이는 `:field_name` 옵션으로 변경 가능 합니다. `:prefix` 옵션은 `select_date`, `select_time`에서와 기본값, 동작박식이 동일합니다. [[[Occasionally you need to display just a single date component such as a year or a month. Rails provides a series of helpers for this, one for each component `select_year`, `select_month`, `select_day`, `select_hour`, `select_minute`, `select_second`. These helpers are fairly straightforward. By default they will generate an input field named after the time component (for example "year" for `select_year`, "month" for `select_month` etc.) although this can be overridden with the  `:field_name` option. The `:prefix` option works in the same way that it does for `select_date` and `select_time` and has the same default value.]]]
+때때로, 연도만, 또는 월만 사용하고 싶은 경우가 있습니다. Rails에서는 날짜/시각을 표현하는 각각의 요소들을 다루기 위한 `select_year`, `select_month`, `select_day`, `select_hour`, `select_minute`, `select_second` 헬퍼를 지원합니다. 이 각각의 헬퍼들은 비교적 단순한 구조로 되어있습니다. 이 헬퍼들에서는 각각 날짜/시각 요소들을 속성명 그대로 입력 필드의 이름으로 사용합니다. 예를 들어, `select_year` 헬퍼를 사용하면 "year" 필드가 생성되며, `select_month`를 사용하면 "month"이 생성되는 식입니다. `:field_name` 옵션을 사용해서 이 이름을 변경할 수 있습니다. `:prefix` 옵션은 `select_date`나 `select_time`에서처럼 동작하며 기본값도 동일합니다.
 
-첫번째 변수는 선택될 날짜로 Date, Time, DateTime 인스턴스이거나 컴포넌트에 적절한 값이거나 숫자입니다. 예를들어 [[[The first parameter specifies which value should be selected and can either be an instance of a Date, Time or DateTime, in which case the relevant component will be extracted, or a numerical value. For example]]]
+첫번째 파라미터로는 선택되어야 하는 파라미터를 지정합니다. 선택할 수 있는 것은 Date, Time, DateTime 중 하나의 인스턴스이며, 인스턴스의 형식에 알맞는 요소, 또는 수치를 추출합니다. 예를 들어,
 
 ```erb
 <%= select_year(2009) %>
 <%= select_year(Time.now) %>
 ```
 
-현재 년도가 2009년이라면 동일한 결과를 생성하고 유저가 선택한 값은 `params[:date][:year]`에서 찾을수 있습니다. [[[will produce the same output if the current year is 2009 and the value chosen by the user can be retrieved by `params[:date][:year]`.]]]
+현재의 연도가 2009년이라면 위의 코드는 같은 결과를 생성하며, 값은 `params[:date][:year]`으로 전송됩니다.
 
-[Uploading Files] 파일 업로드 
+파일 업로드
 ---------------
 
-사람의 사진이나 작업할 내용을 포함한 CSV 파일과 같은 것이든 파일을 업로드 하는것은 일반적인 작업입니다. 파일을 업로드 하는데 기억해야할 가장 중요한것은 form 인코딩이 **반드시** "multipart/form-data" 이어야 한다는것입니다. `form_for`를 사용하는경우 이는 자동으로 적용됩니다. `form_tag`를 사용하는경우 다음 예제와 같이 직접 설정해야합니다. [[[A common task is uploading some sort of file, whether it's a picture of a person or a CSV file containing data to process. The most important thing to remember with file uploads is that the rendered form's encoding **MUST** be set to "multipart/form-data". If you use `form_for`, this is done automatically. If you use `form_tag`, you must set it yourself, as per the following example.]]]
+파일 업로드는 애플리케이션에서 자주 일어나는 작업 중 하나입니다(프로필 사진의 업로드나, 처리하고 싶은 CSV 파일 업로드 등). 파일 업로드에서 주의해야하는 것 중 하나는 폼 전송시의 인코딩이 **반드시** "multipart/form-data"이어야 한다는 점입니다. `form_for` 를 사용하면 이 부분은 자동적으로 처리됩니다. `form_tag`를 사용해서 파일 업로드를 하는 경우에는 아래의 예시처럼 인코딩을 명시적으로 지정해야 합니다.
 
-다음 2개의 form은 파일을 업로드 합니다. [[[The following two forms both upload a file.]]]
+아래 2개의 예제는 모두 정상적으로 파일 업로드를 할 수 있습니다.
 
 ```erb
 <%= form_tag({action: :upload}, multipart: true) do %>
@@ -607,33 +607,35 @@ NOTE: 많은 경우 브라우저 자체 날짜 선택창은 어설프고 날짜�
 <% end %>
 ```
 
-레일스는 두개의 헬퍼를 제공합니다: 기본헬퍼인 `file_field_tag`, 모델과 연동된 `file_field` 헬퍼. 다른 헬퍼들과 다르게 기본값을 설정할 수 없다는것이 유일하게 다른점입니다. 첫번째 예제의 업로드 파일은 `params[:picture]`에 두번째 예제는 `params[:person][:picture]`에 전달될것을 예상할 수 있습니다. [[[Rails provides the usual pair of helpers: the barebones `file_field_tag` and the model oriented `file_field`. The only difference with other helpers is that you cannot set a default value for file inputs as this would have no meaning. As you would expect in the first case the uploaded file is in `params[:picture]` and in the second case in `params[:person][:picture]`.]]]
+Rails에서는 다른 것들과 마찬가지로, 기본 헬퍼 `file_field_tag`와 모델 헬퍼 `file_field`가 제공됩니다. 다른 헬퍼와 유일하게 다른 점은 기본값을 줄 수 없다는 부분입니다(실제로 아무런 의미가 없습니다). 그리고 예상하시는 것처럼 업로드된 파일은 `params[:picture]`에 저장되며, 모델 헬퍼에서는 `params[:person][:picture]`로 저장됩니다.
 
-### [What Gets Uploaded] 업로드된것은 어떻게 가져오는가
+### 업로드 가능한 파일
 
-`params` 해쉬에 저장된 업로드된 객체는 IO의 서브클래스 인스턴스입니다. 업로드되는 파일 사이즈에 따라서 StringIO 혹은 임시 저장된 파일의 File 인스턴스가 됩니다. 두 경우 모두 `original_filename` 속성에 사용자 컴퓨터의 파일이름을 가지고 `content_type` 속성에 업로드된 파일의 MIME 종류가 설정됩니다. 다음의 코드는 업로드된 객체를 `#{Rails.root}/public/uploads`에 원본파일과 동일한 이름으로 저장합니다.(form은 이전 예제라고 가정합니다) [[[The object in the `params` hash is an instance of a subclass of IO. Depending on the size of the uploaded file it may in fact be a StringIO or an instance of File backed by a temporary file. In both cases the object will have an `original_filename` attribute containing the name the file had on the user's computer and a `content_type` attribute containing the MIME type of the uploaded file. The following snippet saves the uploaded content in `#{Rails.root}/public/uploads` under the same name as the original file (assuming the form was the one in the previous example).]]]
+`params` 해시에 포함된 객체는 IO 클래스의 서브 클래스의 인스턴스입니다. 이 객체는 업로드된 파일의 사이즈에 알맞는 StringIO이거나, File 클래스의 인스턴스(이 경우, 임시 파일로 저장되어 있습니다)가 됩니다. 어느 쪽의 헬퍼를 사용하든 객체에는 `original_filename`과 `content_type` 속성이 포함됩니다. `original_filename`가 포함하는 이름은 사용자의 컴퓨터에 있었던 원래의 파일명입니다. `content_type`에는 업로드가 완료된 파일의 MIME 타입이 저장됩니다. 아래의 코드에서는 `#{Rails.root}/public/uploads`에 저장된 파일을 업로드된 파일명 그대로 저장합니다(폼은 위의 예제와 같은 것을 사용했다고 합시다).
+
 
 ```ruby
 def upload
   uploaded_io = params[:person][:picture]
-  File.open(Rails.root.join('public', 'uploads', uploaded_io.original_filename), 'w') do |file|
+  File.open(Rails.root.join('public', 'uploads', uploaded_io.original_filename), 'wb') do |file|
     file.write(uploaded_io.read)
   end
 end
 ```
 
-파일이 업로드되면 이미지 리사이징, 썸네일 생성을 위한 파일의 저장위치(디스크, 아마존 S3 등)와 모델객체의 연결과 같은 여러가지의 잠재적 작업이 있습니다. 이러한 작업은 본 가이드의 범위를 벗어나지만 이러한 작업을 위한 라이브러리들이 있습니다. [CarrierWave](https://github.com/jnicklas/carrierwave)와 [Paperclip](http://www.thoughtbot.com/projects/paperclip)이 가장 잘 알려진것들입니다. [[[Once a file has been uploaded, there are a multitude of potential tasks, ranging from where to store the files (on disk, Amazon S3, etc) and associating them with models to resizing image files and generating thumbnails. The intricacies of this are beyond the scope of this guide, but there are several libraries designed to assist with these. Two of the better known ones are [CarrierWave](https://github.com/jnicklas/carrierwave) and [Paperclip](http://www.thoughtbot.com/projects/paperclip).]]]
+파일이 업로드된 이후에도 해야할 일이 잔뜩 있습니다. 파일을 어디에 저장(웹서버, Amazon S3 등)할지,
+모델과의 관계 설정, 이미지라면 크기 변경이나 섬네일 생성 작업 등이 필요합니다. 이러한 처리들은 이 가이드의 설명 범위를 벗어나므로 다루지 않습니다만, 이러한 처리를 도와주기 위한 라이브러리가 있다는 정도는 알아두면 좋을 겁니다. 그 중에서도 [CarrierWave](https://github.com/jnicklas/carrierwave)와 [Paperclip](http://www.thoughtbot.com/projects/paperclip)이 유명합니다.
 
-NOTE: 사용자가 파일을 선택하지 않으면 이에 상응하는 파라미터에는 빈 문자열이 설정됩니다. [[[If the user has not selected a file the corresponding parameter will be an empty string.]]]
+NOTE: 사용자가 파일을 선택하지 않고 업로드를 하게 되면 빈 문자열이 파라미터로 넘어오게 됩니다.
 
-### [Dealing with Ajax] Ajax로 다루기
+### Ajax 사용하기
 
-다른 form들과 다르게 비동기적인 파일 업로드는 `form_for`에서 제공하는 `remote: true`로 간단히 되지 않습니다. Ajax form 직렬화는 브라우저안의 자바스크립트에 의해서 실행되는데 자바스크립트는 하드 드라이브에 있는 파일을 읽을수 없기 때문에 업로드 할 수 없습니다. 가장 일반적인 해결책은 보이지 않는 iframe를 이용해 form을 전송하는것입니다. [[[Unlike other forms making an asynchronous file upload form is not as simple as providing `form_for` with `remote: true`. With an Ajax form the serialization is done by JavaScript running inside the browser and since JavaScript cannot read files from your hard drive the file cannot be uploaded. The most common workaround is to use an invisible iframe that serves as the target for the form submission.]]]
+비동기 파일 업로드 폼을 생성하는 것은 다른 일반적인 폼에서 하듯 `form_for`에 `remote: true`를 추가하는 것처럼 간단하지 않습니다. Ajax 폼의 직렬화는 브라우저 내에서 실행되는 JavaScript에 의해 이루어집니다. 그리고 브라우저의 JavaScript는 (위험을 피하기 위해) 컴퓨터에 저장되어 있는 파일에 직접 접근할 수 없도록 되어있기 때문에, JavaScript에서 업로드할 파일을 읽어올 수 없습니다. 이것을 회피하는 가장 일반적인 방법은 표시되지 않는 iframe을 폼의 전송 대상으로 사용하는 것입니다.
 
-[Customizing Form Builders] Customizing Form Builders
+폼 빌더를 개조하기
 -------------------------
 
-이전에 언급한것처럼 `form_for`, `fields_for`의 yield된 객체는 FormBuilder의 인스턴스(혹은 상속받은 클래스의 인스턴스) 입니다. form 빌더는 한개의 객체를 위한 form 요소의 출력을 캡슐화한것입니다. 당신의 form을 위해 헬퍼를 만들수도 있고, FormBuilder를 상속받고 헬퍼를 추가할 수 있습니다. [[[As mentioned previously the object yielded by `form_for` and `fields_for` is an instance of FormBuilder (or a subclass thereof). Form builders encapsulate the notion of displaying form elements for a single object. While you can of course write helpers for your forms in the usual way, you can also subclass FormBuilder and add the helpers there. For example]]]
+지금까지 설명한 것처럼 `form_for`, `fields_for`로 생성된 객체는 FormBuilder(또는 그 서브클래스)의 인스턴스입니다. 폼 빌더는 어떤 한 객체의 폼 요소를 생성하기 위해서 필요한 것들을 캡슐화합니다. 독자적인 폼 헬퍼를 만들 수도 있으며, FormBuilder의 서브클래스를 만들고 거기에 헬퍼를 추가할 수도 있습니다. 예를 들어,
 
 ```erb
 <%= form_for @person do |f| %>
@@ -641,7 +643,7 @@ NOTE: 사용자가 파일을 선택하지 않으면 이에 상응하는 파라�
 <% end %>
 ```
 
-다음과 같이 대체 가능 [[[can be replaced with]]]
+이 코드는 아래처럼 작성할 수 있습니다.
 
 ```erb
 <%= form_for @person, builder: LabellingFormBuilder do |f| %>
@@ -649,7 +651,7 @@ NOTE: 사용자가 파일을 선택하지 않으면 이에 상응하는 파라�
 <% end %>
 ```
 
-LabellingFormBuilder 클래스는 다음과 같은 형태로 정의 [[[by defining a LabellingFormBuilder class similar to the following:]]]
+이 코드를 위해서 아래와 같은 LabellingFormBuilder 클래스를 정의합니다.
 
 ```ruby
 class LabellingFormBuilder < ActionView::Helpers::FormBuilder
@@ -659,59 +661,59 @@ class LabellingFormBuilder < ActionView::Helpers::FormBuilder
 end
 ```
 
-만약 이를 자주 재사용하게 된다면 `labeled_form_for` 헬퍼를 만들어 자동으로 `builder: LabellingFormBuilder` 옵션이 적용되게 할 수 있습니다. [[[If you reuse this frequently you could define a `labeled_form_for` helper that automatically applies the `builder: LabellingFormBuilder` option.]]]
+이 클래스를 자주 사용한다면 `labeled_form_for` 헬퍼를 정의하고 `builder: LabellingFormBuilder` 옵션을 포함하도록 해두면 편할 겁니다.
 
-form 빌더는 다음과 같은 상황에서도 어떤일은 할지 결정하는데 사용됩니다. [[[The form builder used also determines what happens when you do]]]
+여기서 사용되는 폼 빌더는 아래의 코드가 실행된 순간의 동작도 결정합니다.
 
 ```erb
 <%= render partial: f %>
 ```
 
-만약 `f`가 FormBuilder 인스턴스라면 `form` partial을 사용하고 partial의 object 변수에 form 빌더를 설정합니다. form 빌더가 LabellingFormBuilder의 인스턴스인경우 `labelling_form` partial을 사용합니다. [[[If `f` is an instance of FormBuilder then this will render the `form` partial, setting the partial's object to the form builder. If the form builder is of class LabellingFormBuilder then the `labelling_form` partial would be rendered instead.]]]
+이 코드는 `f`가 FormBuilder의 인스턴스인 경우 `form` 파셜 템플릿을 랜더링하고, 파셜 객체를 폼 빌더로 설정합니다. 이 폼 빌더의 클래스가 LabellingFormBuilder인 경우, `labelling_form` 파셜을 랜더링합니다.
 
-[Understanding Parameter Naming Conventions] 파라미터 이름 규칙에 대한 이해
+파라미터의 명명 규칙 이해하기
 ------------------------------------------
 
-이전 섹션에서 살펴 본것처럼 form으로부터 전송받은 값들은 `params` 해쉬 혹은 그 하위에 중첩 해쉬형태로 저장됩니다. 예를들어 Person 모델의 `create` 액션은 `params[:person]`에 person 인스턴스를 생성하기 위한 모든 속성값이 저장되어 있습니다. `params` 해쉬는 배열, 해쉬들의 배열등도 가질수 있습니다. [[[As you've seen in the previous sections, values from forms can be at the top level of the `params` hash or nested in another hash. For example in a standard `create` action for a Person model, `params[:person]` would usually be a hash of all the attributes for the person to create. The `params` hash can also contain arrays, arrays of hashes and so on.]]]
+지금까지 설명했듯 폼에서 전송받은 값들은 `params` 해시에 바로 저장되든가, 다른 해시의 내부에 저장됩니다. 예를 들어 Person 모델의 표준적인 `create` 액션은 `params[:person]`에 전송받은 모든 값들을 해시의 형태로 저장합니다. `params` 해시에 배열이나 해시의 배열을 포함할 수도 있습니다.
 
-기본적으로 HTML form은 구조화된 데이터에 대해 알지 못하고 단순한 문자열인경우 모두 이름-값 형태로 생성됩니다. 어플리케이션에서 배열과 해쉬를 사용하기위해서는 레일스의 이름 규칙에 따른 결과입니다. [[[Fundamentally HTML forms don't know about any sort of structured data, all they generate is name–value pairs, where pairs are just plain strings. The arrays and hashes you see in your application are the result of some parameter naming conventions that Rails uses.]]]
+원칙적으로 HTML 폼은 어떤 형태의 구조화라도 상관하지 않습니다. 폼이 생성하는 것은 모두 이름과 이에 맞는 값의 쌍이며, 이것들은 단순한 문자열입니다. 이 데이터들을 애플리케이션 쪽에서 참조할 때에 배열이나 해시의 형태인 것은 Rails에서 사용하고 있는 파라미터 명명 규칙 덕분입니다.
 
-TIP: 다음의 예제들은 Racks 파라미터 파서를 이용해 콘솔에서 빠르게 확인할 수있습니다. 예를들어, [[[You may find you can try out examples in this section faster by using the console to directly invoke Racks' parameter parser. For example,]]]
+TIP: Rack의 파라미터 파서를 콘솔에서 직접 호출해서 이 절의 예제를 좀 더 쉽게 해볼 수 있습니다. 예를 들어, 다음처럼 쓸 수 있습니다.
 
 ```ruby
 Rack::Utils.parse_query "name=fred&phone=0123456789"
 # => {"name"=>"fred", "phone"=>"0123456789"}
 ```
 
-### [Basic Structures] 기본 자료구조
+### 기본 구조
 
-두개의 기본 자료구조는 배열과 해쉬입니다. 해쉬는 `params` 값에 접근하는 방법과 동일한 규칙을 가집니다. 예를들어 form이 다음과 같다면 [[[The two basic structures are arrays and hashes. Hashes mirror the syntax used for accessing the value in `params`. For example if a form contains]]]
+배열과 해시는 기본이 되는 2대 구조입니다. 해시는 `params`의 값에 접근할 때 사용되는 문법에서 사용됩니다. 예를 들어 폼에 다음과 같은 것들이 포함되어있다고 해봅시다.
 
 ```html
 <input id="person_name" name="person[name]" type="text" value="Henry"/>
 ```
 
-`params` 해쉬는 다음과 같습니다 [[[the `params` hash will contain]]]
+이때 `params` 해시의 내부는 아래와 같습니다.
 
 ```erb
 {'person' => {'name' => 'Henry'}}
 ```
 
-그리고 컨트롤러에서는 `params[:person][:name]`와 같이 전송된 값을 조회할 수 있습니다. [[[and `params[:person][:name]` will retrieve the submitted value in the controller.]]]
+따라서 컨트롤러에서 `params[:person][:name]`에 접근하면 전송된 값을 꺼내올 수 있습니다.
 
-해쉬는 원하는만큼 중첩될수 있습니다. 예를들어 [[[Hashes can be nested as many levels as required, for example]]]
+해시는 아래와 같이 얼마든 원하는 만큼 중첩시킬 수 있습니다.
 
 ```html
 <input id="person_address_city" name="person[address][city]" type="text" value="New York"/>
 ```
 
-`params` 해쉬는 다음과 같습니다 [[[will result in the `params` hash being]]]
+이 코드에서 얻을 수 있는 `params` 해시는 다음과 같습니다.
 
 ```ruby
 {'person' => {'address' => {'city' => 'New York'}}}
 ```
 
-일반적으로 레일스에서는 중복되는 파라미터 이름은 무시합니다. 만약 파라미터 이름이 빈 대괄호[]로 이루어진경우 배열로 저장됩니다. 만약 people에 여러개의 phone_number가 존재하는 경우, form에서 다음과 같이할 수 있습니다. [[[Normally Rails ignores duplicate parameter names. If the parameter name contains an empty set of square brackets [] then they will be accumulated in an array. If you wanted people to be able to input multiple phone numbers, you could place this in the form:]]]
+파라미터명이 중복되는 경우는 Rails에 의해서 무시됩니다. 파라미터명에 비어있는 []가 포함되어 있는 경우, 파라미터는 배열에 포함됩니다. 예를 들어 전화번호를 입력할 경우에 복수의 전화번호를 입력할 수 있도록 하고 싶은 경우, 다음과 같이 폼을 만들 수 있습니다.
 
 ```html
 <input name="person[phone_number][]" type="text"/>
@@ -719,11 +721,11 @@ Rack::Utils.parse_query "name=fred&phone=0123456789"
 <input name="person[phone_number][]" type="text"/>
 ```
 
-이에 대한 결과는 `params[:person][:phone_number]`에 배열로 저장됩니다. [[[This would result in `params[:person][:phone_number]` being an array.]]]
+이에 의해서 `params[:person][:phone_number]`는 전화번호의 배열이 됩니다.
 
-### [Combining Them] 조합해서 사용
+### 조합해서 사용하기
 
-우리는 두개의 컨셉을 적절히 섞어서 사용할 수 있습니다. 이전의 예제에서 한개의 해쉬 항목이 배열이 될수도 있고, 해쉬의 배열이 될수도 있습니다. 예를들어 여러개의 주소를 가지는 form조각이 반복되는 form을 만들수 있습니다. [[[We can mix and match these two concepts. For example, one element of a hash might be an array as in the previous example, or you can have an array of hashes. For example a form might let you create any number of addresses by repeating the following form fragment]]]
+이 두가지 개념을 조합해서 사용할 수도 있습니다. 예를 들어 좀 전에 보여드린 예제처럼 해시의 요소 중 하나를 배열로 받거나, 해시의 배열을 사용할 수도 있습니다. 이외에도 아래처럼 폼의 일부를 반복하는 것으로 주소를 얼마든지 추가로 받을 수 있는 폼도 생각해 볼 수 있습니다.
 
 ```html
 <input name="addresses[][line1]" type="text"/>
@@ -731,30 +733,30 @@ Rack::Utils.parse_query "name=fred&phone=0123456789"
 <input name="addresses[][city]" type="text"/>
 ```
 
-이에대한 결과로 `params[:addresses]`는 배열이 되고 배열의 항목은 `line1`, `line2`, `city` 키를 가진 해쉬로 이루어집니다. 레일스는 이미 존재하는 해쉬와 동일한 이름이 입력되면 새로운 해쉬를 생성합니다. [[[This would result in `params[:addresses]` being an array of hashes with keys `line1`, `line2` and `city`. Rails decides to start accumulating values in a new hash whenever it encounters an input name that already exists in the current hash.]]]
+이 폼에 의해서 `params[:addresses]` 해시가 생성되며 `line1`, `line2`, `city`를 키로 가지게 됩니다. 입력된 이름이 현재 해시에 이미 존재하는 경우에는 새로운 해시에 값을 추가하게 됩니다.
 
-하지만 해쉬의 중첩에는 한개 레벨의 배열만 가질수 있다는 제약이 있습니다. 배열은 대개 해쉬로 대체가능합니다. 예를들어 모델 객체의 배열대신 모델객체의 id, 배열의 인덱스, 다른 파라미터를 키로하는  하나의 해쉬로 대체 가능합니다. [[[There's a restriction, however, while hashes can be nested arbitrarily, only one level of "arrayness" is allowed. Arrays can be usually replaced by hashes, for example instead of having an array of model objects one can have a hash of model objects keyed by their id, an array index or some other parameter.]]]
+단 여기에는 한가지 제약사항이 있습니다. 해시는 얼마든지 중첩시킬 수 있습니다만, 배열은 중첩해서 사용할 수 없습니다. 다만 대부분의 경우, 배열은 해시로 변환하여 사용할 수 있습니다. 예를 들어 모델 객체의 배열 대신에 모델 객체의 해시를 사용할 수 있습니다. 이 경우 키로는 id, 배열 인덱스 등의 값을 사용할 수 있을 겁니다.
 
-WARNING: 배열 파라미터는 `check_box` 헬퍼에 대해서 잘 동작하지 않습니다. HTML 스펙정의에 보면 체크되지 않은 checkbox는 값을 전송하지 않습니다. 하지만 보통 편의를 위해 checkbox의 값을 항상 전송합니다. `check_box` 헬퍼는 이를위해 동일한 이름을 가지는 hidden input을 만들어 처리합니다. checkbox가 체크되지 않은경우 hidden input의 값만 전송되고 체크된경우는 두개 모두 전송되지만 checkbox의 값을 우선사용합니다. 배열 파라미터를 이와같이 중복되게 전송하는경우 레일스는 언제 새로운 배열을 만들어야될지 결정하는데 혼란이옵니다. `check_box_tag`를 사용하거나 배열대신 해쉬를 사용하는것이 더 좋습니다. [[[Array parameters do not play well with the `check_box` helper. According to the HTML specification unchecked checkboxes submit no value. However it is often convenient for a checkbox to always submit a value. The `check_box` helper fakes this by creating an auxiliary hidden input with the same name. If the checkbox is unchecked only the hidden input is submitted and if it is checked then both are submitted but the value submitted by the checkbox takes precedence. When working with array parameters this duplicate submission will confuse Rails since duplicate input names are how it decides when to start a new array element. It is preferable to either use `check_box_tag` or to use hashes instead of arrays.]]]
+WARNING: 배열 파라미터는 `check_box` 헬퍼와 상성이 좋지 않습니다. HTML에서는 ON이 아닌 체크 상자로부터는 값이 전송되지 않습니다. 그러나 체크 상자로부터는 언제나 값이 전송되는 것이 여러가지로 편리합니다. 그 때문에 `check_box` 헬퍼는 같은 이름으로 숨겨진 입력을 추가하는 것으로 본래 전송되지 않을 체크 상자의 값을 전송하도록 하고 있습니다. 체크 상자가 OFF일 때에는 숨겨진 값만이 전송되고, 체크 상자가 ON일 경우에는 본래의 체크 상자의 값과 숨겨진 값이 함께 전송됩니다만, 이 경우에는 본래의 체크 상자의 값이 우선됩니다. 따라서 이러한 중복된 값 전송에 대해서 배열 파라미터를 사용하게 되면 Rails가 혼란에 빠질 수 있습니다. 왜냐하면 입력값의 이름이 중복되어있는 경우, 거기에서 새로운 배열 요소를 생성하기 때문입니다. 이를 회피하기 위해서는 `check_box_tag`를 사용하거나 배열 대신 해시를 사용하여 주세요.
 
-### [Using Form Helpers] Form 헬퍼 사용
+### 폼 헬퍼 사용하기
 
-이전 섹션에서는 레일스 form 헬퍼 전부를 사용하지 않았습니다. input name을 직접 만들어 `text_field_tag`와 같이 헬퍼에 직접전달할때 레일스는 보다 높은 수준의 도움을 제공합니다. 당신의 name 파라미터를 처리를 위해 `form_for`, `fields_for` 두개의 헬퍼의 `:index` 옵션을 이용합니다. [[[The previous sections did not use the Rails form helpers at all. While you can craft the input names yourself and pass them directly to helpers such as `text_field_tag` Rails also provides higher level support. The two tools at your disposal here are the name parameter to `form_for` and `fields_for` and the `:index` option that helpers take.]]]
+앞에서는 Rails의 폼 헬퍼를 전혀 사용하지 않았습니다. 물론 위와 같은 방식으로 직접 이름을 정해서 `text_field_tag` 등의 일반 헬퍼에 넘겨주어도 됩니다만, Rails는 좀 더 편한 방법을 지원해줍니다. `form_for`와 `fields_for`의 이름 파라미터, 그리고 헬퍼가 인수로 받는 `:index` 옵션이 바로 그것입니다.
 
-당신은 각 사람마다 여러개의 주소를 가지는 form을 렌더링할수 있습니다. 예를들어: [[[You might want to render a form with a set of edit fields for each of a person's addresses. For example:]]]
+여러개의 주소를 편집할 수 있는 필드를 가지는 폼을 생성할 수도 있습니다. 예:
 
 ```erb
 <%= form_for @person do |person_form| %>
   <%= person_form.text_field :name %>
   <% @person.addresses.each do |address| %>
-    <%= person_form.fields_for address, index: address do |address_form|%>
+    <%= person_form.fields_for address, index: address.id do |address_form|%>
       <%= address_form.text_field :city %>
     <% end %>
   <% end %>
 <% end %>
 ```
 
-한 사람이 2개의 주소를 가진다고 가정하고, id는 23, 45라면 출력은 다음과 같을것입니다: [[[Assuming the person had two addresses, with ids 23 and 45 this would create output similar to this:]]]
+여기에서는 한 명의 인물이 2개의 주소(id는 23, 45)를 가질 수 있다고 합시다. 이를 통해서 생성된 코드는 다음과 같습니다.
 
 ```html
 <form accept-charset="UTF-8" action="/people/1" class="edit_person" id="edit_person_1" method="post">
@@ -764,15 +766,15 @@ WARNING: 배열 파라미터는 `check_box` 헬퍼에 대해서 잘 동작하지
 </form>
 ```
 
-`params` 해쉬의 결과는 다음과 같습니다 [[[This will result in a `params` hash that looks like]]]
+이로부터 얻을 수 있는 `params` 해시는 아래와 같습니다.
 
 ```ruby
 {'person' => {'name' => 'Bob', 'address' => {'23' => {'city' => 'Paris'}, '45' => {'city' => 'London'}}}}
 ```
 
-레일스는 form 빌더로부터 `fields_for`가 호출되었기 때문에 이러한 input들이 person 해쉬의 일부라는것을 알고 있습니다. `:index` 옵션은 레일스에게 `person[address][city]` 대신 배열을 의미하는 []로 address와 city 사이를 감싸라고 알립니다. 만약 Active Record 객체를 전달한다면 레일스는 `to_param`을 호출하고 기본값으로 데이터베이스의 id를 리턴합니다. 이는 수정해야할 Address를 알아내는데 유용합니다. 중요한 숫자나 문자열, `nil`을 전달할 수 있습니다(배열 파라미터 결과에 나타낼 값). [[[Rails knows that all these inputs should be part of the person hash because you called `fields_for` on the first form builder. By specifying an `:index` option you're telling Rails that instead of naming the inputs `person[address][city]` it should insert that index surrounded by [] between the address and the city. If you pass an Active Record object as we did then Rails will call `to_param` on it, which by default returns the database id. This is often useful as it is then easy to locate which Address record should be modified. You can pass numbers with some other significance, strings or even `nil` (which will result in an array parameter being created).]]]
+Rails는 이 입력이 person 해시의 일부여야 한다는 점을 이해하고 있습니다. 이것이 가능한 이유는 최초의 폼 빌더에서 `fields_for`를 호출했기 때문입니다. 거기에서 `:index` 옵션을 지정하면 `person[address][city]`와 같은 이름 대신에 주소와 도시명의 사이에 []로 인덱스를 삽입합니다. 이렇게 해두면 수정해야하는 Address 객체를 간단하게 지정할 수 있기 때문에 여러가지로 편리합니다. 다른 의미를 가지는 숫자를 넘기거나, 문자열이나 `nil`을 넘길 수도 있습니다. 이것들은 작성되는 배열 파라미터에 포함됩니다.
 
-보다 복잡한 중첩을 생성하기 위해 input name의 첫번째 부분(이전 예제의 `person[address]`)을 명시할 수 있습니다. 예를들어 [[[To create more intricate nestings, you can specify the first part of the input name (`person[address]` in the previous example) explicitly, for example]]]
+입력명의 앞 부분(위의 예시에서라면 `person[address]`)를 명시적으로 표현하는 것으로 보다 복잡한 폼을 작성할 수도 있습니다.
 
 ```erb
 <%= fields_for 'person[address][primary]', address, index: address do |address_form| %>
@@ -780,15 +782,15 @@ WARNING: 배열 파라미터는 `check_box` 헬퍼에 대해서 잘 동작하지
 <% end %>
 ```
 
-다음과 같은 결과를 생성합니다 [[[will create inputs like]]]
+이 코드로부터 다음과 같은 폼 요소를 생성할 수 있습니다.
 
 ```html
 <input id="person_address_primary_1_city" name="person[address][primary][1][city]" type="text" value="bologna" />
 ```
 
-일반적인 규칙으로 결과의 input name은 `fields_for`/`form_for`에 주어진 name, index 값, input의 name이 추가된 형태입니다. `:index` 옵션을 `text_field`와 같은 헬퍼에 직접 전달할수도 있지만 개별 input에 지정하기보다는 일반적으로 반복적인 작업을 줄이기위해 form 빌더 레벨에 지정합니다. [[[As a general rule the final input name is the concatenation of the name given to `fields_for`/`form_for`, the index value and the name of the attribute. You can also pass an `:index` option directly to helpers such as `text_field`, but it is usually less repetitive to specify this at the form builder level rather than on individual input controls.]]]
+Rails의 일반적인 규칙 중에는 최종적인 입력값은 `fields_for`나 `form_for`에 주어진 이름, 인덱스값, 그리고 속성명을 연결한 결과물이 됩니다. `text_field` 등의 헬퍼에 `:index` 옵션을 직접 넘겨줄 수도 있습니다만, 이것들을 하나하나 지정하는 것 보다는, 폼 빌더에서 한번 지정해 주는 것이 대부분의 경우 좀 더 간단하게 코드를 작성할 수 있습니다.
 
-손쉬운 방법으로 name에 []를 추가해 `:index` 옵션을 제거할 수 있습니다. 이는 `index: address` 옵션과 동일합니다 [[[As a shortcut you can append [] to the name and omit the `:index` option. This is the same as specifying `index: address` so]]]
+이름에 []를 추가하고 `:index`옵션을 생략하는 방법도 있습니다. 다음은 `index: address`를 지정한 것과 같은 결과를 생성합니다. 
 
 ```erb
 <%= fields_for 'person[address][primary][]', address do |address_form| %>
@@ -796,12 +798,10 @@ WARNING: 배열 파라미터는 `check_box` 헬퍼에 대해서 잘 동작하지
 <% end %>
 ```
 
-생성된 결과는 이전의 예제와 동일합니다. [[[produces exactly the same output as the previous example.]]]
-
-[Forms to external resources] 외부 리소스 Form
+외부 리소스용 폼
 ---------------------------
 
-외부 리소스에 데이터를 전송해야할 필요가 있는 경우에도 레일스 폼 헬퍼를 사용하는것이 좋습니다. 하지만 가끔 `authenticity_token` 값을 설정할 필요가 있습니다. `form_tag` 옵션에 `authenticity_token: '외부리소스 토큰'` 파라미터를 전달해 이를 설정합니다: [[[If you need to post some data to an external resource it is still great to build your form using rails form helpers. But sometimes you need to set an `authenticity_token` for this resource. You can do it by passing an `authenticity_token: 'your_external_token'` parameter to the `form_tag` options:]]]
+외부 리소스로 임의의 데이터를 전송하고 싶은 경우에도 Rails의 폼 헬퍼를 사용해서 폼을 생성하는 것이 편리합니다. 다만 이 때, 외부 리소스에 대해서 `authenticity_token`를 지정해야하는 경우에는 어떻게 해야할까요? 이것은 `form_tag`에 `authenticity_token: 'your_external_token'`를 주는 것으로 간단하게 설정할 수 있습니다.
 
 ```erb
 <%= form_tag 'http://farfar.away/form', authenticity_token: 'external_token') do %>
@@ -809,7 +809,7 @@ WARNING: 배열 파라미터는 `check_box` 헬퍼에 대해서 잘 동작하지
 <% end %>
 ```
 
-외부 결제 게이트웨이와 같이 외부 리소스에 데이터를 전송하는데 있어서 때때로 외부 API에 의해 사용할 수 있는 필드가 제한되기도 합니다. 따라서 `authenticity_token` 히든 필드를 생성할 필요가 없을수도 있습니다. 이를 위해 `:authenticity_token` 옵션에 `false`를 전달합니다: [[[Sometimes when you submit data to an external resource, like payment gateway, fields you can use in your form are limited by an external API. So you may want not to generate an `authenticity_token` hidden field at all. For doing this just pass `false` to the `:authenticity_token` option:]]]
+결제 게이트웨이 등의 외부 리소스로 데이터를 전송해야하는 경우, 폼에서 사용가능한 필드는 외부 API에 따라 제한을 받습니다. 그런 경우처럼 `authenticity_token`를 위한 숨김 필드를 생성하지 않으려면 `:authenticity_token`을 `false`로 지정하면 됩니다.
 
 ```erb
 <%= form_tag 'http://farfar.away/form', authenticity_token: false) do %>
@@ -817,7 +817,7 @@ WARNING: 배열 파라미터는 `check_box` 헬퍼에 대해서 잘 동작하지
 <% end %>
 ```
 
-`form_for`에 대해서도 동일: [[[The same technique is also available for `form_for`:]]]
+`form_for`에서도 같은 방법을 사용할 수 있습니다.
 
 ```erb
 <%= form_for @invoice, url: external_url, authenticity_token: 'external_token' do |f| %>
@@ -825,7 +825,7 @@ WARNING: 배열 파라미터는 `check_box` 헬퍼에 대해서 잘 동작하지
 <% end %>
 ```
 
-마찬가지로 `authenticity_token` 필드를 생성하고 싶지 않을때: [[[Or if you don't want to render an `authenticity_token` field:]]]
+또는 `authenticity_token` 를 비활성화 할 수도 있습니다.
 
 ```erb
 <%= form_for @invoice, url: external_url, authenticity_token: false do |f| %>
@@ -833,14 +833,14 @@ WARNING: 배열 파라미터는 `check_box` 헬퍼에 대해서 잘 동작하지
 <% end %>
 ```
 
-[Building Complex Forms] 복잡한 폼 만들기
+복잡한 폼을 생성하기
 ----------------------
 
-많은 앱들이 간단한 폼에서 하나의 객체를 수정하는것을 넘어서 커집니다. 예를들어 Person 객체를 만들때 사용자가 동일한 폼에서 여러개의 주소(집, 직장 등)를 추가하거나 나중에 person을 수정할때 사용자가 필요에 따라 주소를 추가, 삭제, 수정 할 수 있게 합니다. [[[Many apps grow beyond simple forms editing a single object. For example when creating a Person you might want to allow the user to (on the same form) create multiple address records (home, work, etc.). When later editing that person the user should be able to add, remove or amend addresses as necessary.]]]
+처음에는 하나의 객체를 수정하기 위한 간단한 폼도 점점 커져서 복잡해지기 마련입니다. 예를 들어 Person에 한 명의 정보를 추가하는 코드라면, 같은 폼 내에서 여러개의 주소(자택, 직장 등)을 등록할 수 있도록 해주고, Person을 편집할 경우에 필요에 따라서 주소의 추가, 삭제, 변경을 할 수 있게끔 해주어야 합니다.
 
-### [Configuring the Model] 모델 설정
+### 모델을 구성하기
 
-Active Record는 모델 레벨에서 `accepts_nested_attributes_for` 메소드를 제공합니다: [[[Active Record provides model level support  via the `accepts_nested_attributes_for` method:]]]
+Active Record는 `accepts_nested_attributes_for` 메소드를 통해서 모델을 중첩해 사용할 수 있도록 해줍니다.
 
 ```ruby
 class Person < ActiveRecord::Base
@@ -853,11 +853,11 @@ class Address < ActiveRecord::Base
 end
 ```
 
-이는 `Person` 모델에 `addresses_attributes=` 메소드를 생성하고 addresses를 추가, 수정, 삭제할 수 있게 합니다. [[[This creates an `addresses_attributes=` method on `Person` that allows you to create, update and (optionally) destroy addresses.]]]
+이 코드에 의해서 `addresses_attributes=` 메소드가 `Person` 모델에 추가되고, 이를 사용해서 주소를 생성, 갱신, 필요하다면 삭제까지 할 수 있습니다.
 
-### [Building the Form] 폼 만들기
+### 중첩된 폼
 
-다음의 폼은 사용자가 `Person`을 생성하고 addresses와 관계를 가지도록 합니다. [[[The following form allows a user to create a `Person` and its associated addresses.]]]
+사용자는 아래의 폼을 통해 `Person`과 이에 관련된 복수의 주소를 생성할 수 있습니다.
 
 ```html+erb
 <%= form_for @person do |f| %>
@@ -877,42 +877,42 @@ end
 <% end %>
 ```
 
-중복 속성을 허용한 경우 `fields_for`는 관계에 해당하는 각 항목에 대해 블록이 한번씩 렌더링합니다. person이 addresses를 하나도 가지지 않는경우 아무것도 렌더링되지 않습니다. 일반적으로 컨트롤러에서 한개 이상의 비어있는 자식객체를 만들어서 적어도 한개의 필드세트가 사용자에게 보여지게 합니다. 아래의 예제는 person 폼을 렌더링할때 3개의 주소 필드 세트가 추가됩니다. [[[When an association accepts nested attributes `fields_for` renders its block once for every element of the association. In particular, if a person has no addresses it renders nothing. A common pattern is for the controller to build one or more empty children so that at least one set of fields is shown to the user. The example below would result in 3 sets of address fields being rendered on the new person form.]]]
+폼에서 중첩된 속성이 사용되면, `fields_for` 헬퍼는 그 관계로 연결된 모든 요소를 하나씩 출력합니다. 특히 Person에 주소가 등록되어 있지 않은 경우에는 아무것도 출력하지 않습니다. 필드의 세트가 적어도 하나 출력되도록 컨트롤러에서 1개 이상의 공백 문자를 사용하는 것은 자주 사용되는 패턴입니다. 아래의 예제에서는 Person 폼을 새로 생성할 경우에 2개의 주소 필드가 표시되도록 합니다.
 
 ```ruby
 def new
   @person = Person.new
-  3.times { @person.addresses.build}
+  2.times { @person.addresses.build}
 end
 ```
 
-`fields_for`는 폼빌더를 만들때 파라미터 이름을 `accepts_nested_attributes_for`에 의해 얻게됩니다. 예를들어 2개의 주소를 가진 객체를 생성하면 전송된 파라미터는 다음과 같습니다. [[[`fields_for` yields a form builder that names parameters in the format expected the accessor generated by `accepts_nested_attributes_for`. For example when creating a user with 2 addresses, the submitted parameters would look like]]]
+`fields_for` 헬퍼는 폼의 필드를 하나 생성합니다. `accepts_nested_attributes_for` 헬퍼가 받는 것은 이러한 파라미터의 이름입니다. 예를 들어 2개의 주소를 가지는 사용자를 한 명 생성할 경우, 전송된 파라미터는 아래처럼 구성됩니다.
 
 ```ruby
 {
-    :person => {
-        :name => 'John Doe',
-        :addresses_attributes => {
-            '0' => {
-                :kind  => 'Home',
-                :street => '221b Baker Street',
-            },
-            '1' => {
-                :kind => 'Office',
-                :street => '31 Spooner Street'
-            }
-        }
+  'person' => {
+    'name' => 'John Doe',
+    'addresses_attributes' => {
+      '0' => {
+        'kind' => 'Home',
+        'street' => '221b Baker Street'
+      },
+      '1' => {
+        'kind' => 'Office',
+        'street' => '31 Spooner Street'
+      }
     }
+  }
 }
 ```
 
-`:addresses_attributes` 해쉬의 키는 그저 다른 주소를 얻는데 필요할 뿐 중요하지 않습니다. [[[The keys of the `:addresses_attributes` hash are unimportant, they need merely be different for each address.]]]
+여기에서 `:addresses_attributes` 해시의 키는 중복되지만 않으면 되므로 중요하지 않습니다.
 
-만약 associated 객체가 이미 저장된 상태라면 `fields_for`는 자동으로 저장된 객체의 `id`를 숨겨진 input으로 생성합니다. 이를 비활성화 시키려면 `fields_for`의 옵션에 `include_id: false`를 설정합니다. 자동생성된 input의 위치가 유효하지 않은 HTML이 되거나 사용하는 ORM이 id를 가지지 않을때 필요할 것입니다. [[[If the associated object is already saved, `fields_for` autogenerates a hidden input with the `id` of the saved record. You can disable this by passing `include_id: false` to `fields_for`. You may wish to do this if the autogenerated input is placed in a location where an input tag is not valid HTML or when using an ORM where children do not have an id.]]]
+관계가 정의된 객체가 이미 저장되어있는 경우, `fields_for` 메소드는 저장되어 있는 레코드의 `id`를 가지는 숨김 필드를 자동적으로 생성합니다. `fields_for`에 `include_id: false`를 넘기면 이 자동생성을 막을 수 있습니다. HTML이 유효하지 않은 곳에서는 input 태그를 자동으로 생성하고 싶지 않거나, 자식이 `id`를 가지지 않는 ORM(Object Releational Mapping)을 사용하는 경우 등, 이러한 때에 자동 생성을 끌 수 있습니다.
 
-### [The Controller] 컨트롤러
+### 컨트롤러
 
-모델에 데이터를 전달하기전에 컨트롤러의 [파라미터 화이트리스트](action_controller_overview.html#strong-parameters)에 추가해야합니다. [[[As usual you need to [whitelist the parameters](action_controller_overview.html#strong-parameters) in the controller before you pass them to the model:]]]
+컨트롤러에서 파라미터를 모델에 넘기기 전에 [파라미터의 화이트리스트 체크](action_controller_overview.html#strong-parameters)를 사용합시다.
 
 ```ruby
 def create
@@ -921,14 +921,14 @@ def create
 end
 
 private
-def person_params
-  params.require(:person).permit(:name, addresses_attributes: [:id, :kind, :street])
-end
+  def person_params
+    params.require(:person).permit(:name, addresses_attributes: [:id, :kind, :street])
+  end
 ```
 
-### [Removing Objects] 객체 삭제
+### 객체를 삭제하기
 
-사용자가 associated 객체를 삭제 하도록 하기 위해서는 `accepts_nested_attributes_for` 옵션에 `allow_destroy: true`를 추가합니다. [[[You can allow users to delete associated objects by passing `allow_destroy: true` to `accepts_nested_attributes_for`]]]
+`accepts_nested_attributes_for`에 `allow_destroy: true`를 넘기는 것으로 관계가 설정된 객체를 사용자가 삭제할 수 있도록 허가할 수 있습니다.
 
 ```ruby
 class Person < ActiveRecord::Base
@@ -937,7 +937,7 @@ class Person < ActiveRecord::Base
 end
 ```
 
-객체의 해쉬가 `_destroy` 키에 '1' 혹은 'true' 값인경우 객체는 삭제됩니다. 다음의 폼은 사용자가 주소를 삭제할 수 있게 합니다. [[[If the hash of attributes for an object contains the key `_destroy` with a value of '1' or 'true' then the object will be destroyed. This form allows users to remove addresses:]]]
+어떤 객체의 속성값 해시에 키가 `_destroy`에 값이 `1` 또는 `true`가 들어있는 경우, 그 객체를 삭제합니다. 아래의 폼에서는 사용자가 주소를 삭제할 수 있습니다.
 
 ```erb
 <%= form_for @person do |f| %>
@@ -945,7 +945,7 @@ end
   <ul>
     <%= f.fields_for :addresses do |addresses_form| %>
       <li>
-        <%= check_box :_destroy%>
+        <%= addresses_form.check_box :_destroy%>
         <%= addresses_form.label :kind %>
         <%= addresses_form.text_field :kind %>
         ...
@@ -955,7 +955,7 @@ end
 <% end %>
 ```
 
-컨트롤러의 params 화이트리스트에 `_destroy` 필드를 추가하는것을 잊지 말아야합니다: [[[Don't forget to update the whitelisted params in your controller to also include the `_destroy` field:]]]
+컨트롤러의 화이트리스트 목록에 `_destroy` 필드를 추가해서 체크를 통과할 수 있도록 해야한다는 점을 잊지 말아주세요.
 
 ```ruby
 def person_params
@@ -964,9 +964,9 @@ def person_params
 end
 ```
 
-### [Preventing Empty Records] 빈 데이터 방지
+### 필드의 공백을 무시하기
 
-보통 사용자가 채우지 않은 필드들을 무시하는것은 유용합니다. `accepts_nested_attributes_for` 에 `:reject_if` proc를 전달해서 동작 방식을 변경할 수 있습니다. proc는 폼에의해 전송된 해쉬마다 호출됩니다. 만약 proc가 `false`를 반환하면 Active Record는 해당 해쉬에 대해 associated 객체를 생성하지 않습니다. 아래의 예제는 address의 `kind` 속성이 설정된 경우만 생성합니다. [[[It is often useful to ignore sets of fields that the user has not filled in. You can control this by passing a `:reject_if` proc to `accepts_nested_attributes_for`. This proc will be called with each hash of attributes submitted by the form. If the proc returns `false` then Active Record will not build an associated object for that hash. The example below only tries to build an address if the `kind` attribute is set.]]]
+사용자가 아무것도 입력하지 않은 필드를 무시하는 것이 편리한 경우가 많습니다. 이는 `:reject_if` Proc을 `accepts_nested_attributes_for`에 넘겨두는 것을 통해서 구현할 수 있습니다. 이 Proc은 폼에서 전송된 속성값 해시 하나 하나에 대해서 호출됩니다. 이 Proc이 `false`를 반환하는 경우 Active Record는 그 해시에 관계가 설정된 객체를 작성하지 않습니다. 아래의 예제에서는 `kind` 속성에 값이 넘어왔을 경우에만 주소 객체를 생성합니다.
 
 ```ruby
 class Person < ActiveRecord::Base
@@ -975,8 +975,10 @@ class Person < ActiveRecord::Base
 end
 ```
 
-편의를 위해 `:all_blank` 심볼을 전달하는것으로 대체되는데 이는 `_destroy` 속성을 제외한 모든 속성이 비어있는경우 해당 해쉬가 거부되는 proc를 생성합니다. [[[As a convenience you can instead pass the symbol `:all_blank` which will create a proc that will reject records where all the attributes are blank excluding any value for `_destroy`.]]]
+또는 `:all_blank`를 넘겨도 됩니다. 이 심볼을 넘기는 경우, 모든 값이 공백인 레코드를 받지 않는 Proc이 생성됩니다. 단 `_destroy`의 경우, 어떤 값이더라도 체크를 통과합니다.
 
-### [Adding Fields on the Fly] 동적 필드 추가 
+### 동적으로 필드 추가하기
 
-여러개의 필드 세트를 미리 렌더링하는것이 아니라 사용자가 'Add new child' 버튼을 클릭했을때 추가하는것을 원할 수 있습니다. 하지만 레일스는 이에 대한 지원을 하지 않습니다. 필드 세트를 생성할때 associated 해쉬의 키가 유일하도록 해야합니다. - 자바스크립트의 현재시간이(epoch이후 경과한 밀리세컨드) 일반적인 선택 [[[Rather than rendering multiple sets of fields ahead of time you may wish to add them only when a user clicks on an 'Add new child' button. Rails does not provide any builtin support for this. When generating new sets of fields you must ensure the the key of the associated array is unique - the current javascript date (milliseconds after the epoch) is a common choice.]]]
+필드들을 미리 생성하지 않고 [새로운 주소를 추가] 버튼을 눌렀을 경우에만 이 필드를 생성할 수 있도록 하고 싶을 때가 있습니다. 안타깝게도 Rails에서는 이를 위한 방법이 지원되지 않습니다. 필드를 직접 생성하는 경우에는, 관련된 배열의 키가 중복되지 않도록 해야한다는 점을 주의해주세요. JavaScript에서 현재 시각을 사용해 유일한 식별자를 생성하는 것이 자주 사용되는 방법입니다.
+
+TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.
