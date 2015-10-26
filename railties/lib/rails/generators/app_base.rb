@@ -205,18 +205,21 @@ module Rails
       end
 
       def rails_gemfile_entry
+        dev_edge_common = [
+            GemfileEntry.github('sprockets-rails', 'rails/sprockets-rails'),
+            GemfileEntry.github('sprockets', 'rails/sprockets'),
+            GemfileEntry.github('sass-rails', 'rails/sass-rails'),
+            GemfileEntry.github('arel', 'rails/arel'),
+            GemfileEntry.github('rack', 'rack/rack')
+          ]
         if options.dev?
           [
-            GemfileEntry.path('rails', Rails::Generators::RAILS_DEV_PATH),
-            GemfileEntry.github('sprockets-rails', 'rails/sprockets-rails'),
-            GemfileEntry.github('arel', 'rails/arel')
-          ]
+            GemfileEntry.path('rails', Rails::Generators::RAILS_DEV_PATH)
+          ] + dev_edge_common
         elsif options.edge?
           [
-            GemfileEntry.github('rails', 'rails/rails'),
-            GemfileEntry.github('sprockets-rails', 'rails/sprockets-rails'),
-            GemfileEntry.github('arel', 'rails/arel')
-          ]
+            GemfileEntry.github('rails', 'rails/rails')
+          ] + dev_edge_common
         else
           [GemfileEntry.version('rails',
                             Rails::VERSION::STRING,
@@ -255,8 +258,6 @@ module Rails
         return [] if options[:skip_sprockets]
 
         gems = []
-        gems << GemfileEntry.version('sass-rails', '~> 5.0',
-                                     'Use SCSS for stylesheets')
 
         gems << GemfileEntry.version('uglifier',
                                    '>= 1.3.0',

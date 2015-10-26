@@ -931,11 +931,23 @@ class RelationTest < ActiveRecord::TestCase
     assert davids.loaded?
   end
 
+  def test_destroy_all_with_conditions_is_deprecated
+    assert_deprecated do
+      assert_difference('Author.count', -1) { Author.destroy_all(name: 'David') }
+    end
+  end
+
   def test_delete_all
     davids = Author.where(:name => 'David')
 
     assert_difference('Author.count', -1) { davids.delete_all }
     assert ! davids.loaded?
+  end
+
+  def test_delete_all_with_conditions_is_deprecated
+    assert_deprecated do
+      assert_difference('Author.count', -1) { Author.delete_all(name: 'David') }
+    end
   end
 
   def test_delete_all_loaded
@@ -1527,6 +1539,13 @@ class RelationTest < ActiveRecord::TestCase
     # Testing that the before_update callbacks have run
     assert_equal 'David', topic1.reload.author_name
     assert_equal 'David', topic2.reload.author_name
+  end
+
+  def test_update_on_relation_passing_active_record_object_is_deprecated
+    topic = Topic.create!(title: 'Foo', author_name: nil)
+    assert_deprecated(/update/) do
+      Topic.where(id: topic.id).update(topic, title: 'Bar')
+    end
   end
 
   def test_distinct

@@ -354,15 +354,15 @@ module ActionDispatch
           if xhr
             headers ||= {}
             headers['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
-            headers['HTTP_ACCEPT'] ||= [Mime::JS, Mime::HTML, Mime::XML, 'text/xml', Mime::ALL].join(', ')
+            headers['HTTP_ACCEPT'] ||= [Mime[:js], Mime[:html], Mime[:xml], 'text/xml', '*/*'].join(', ')
           end
 
           # this modifies the passed request_env directly
           if headers.present?
-            Http::Headers.new(request_env).merge!(headers)
+            Http::Headers.from_hash(request_env).merge!(headers)
           end
           if env.present?
-            Http::Headers.new(request_env).merge!(env)
+            Http::Headers.from_hash(request_env).merge!(env)
           end
 
           session = Rack::Test::Session.new(_mock_session)

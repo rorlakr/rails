@@ -1,5 +1,3 @@
-require "active_support/deprecation"
-
 module ActiveRecord
   module Associations
     # = Active Record Association Collection
@@ -442,12 +440,7 @@ module ActiveRecord
 
       private
       def get_records
-        if reflection.scope_chain.any?(&:any?) ||
-          scope.eager_loading? ||
-          klass.scope_attributes?
-
-          return scope.to_a
-        end
+        return scope.to_a if skip_statement_cache?
 
         conn = klass.connection
         sc = reflection.association_scope_cache(conn, owner) do

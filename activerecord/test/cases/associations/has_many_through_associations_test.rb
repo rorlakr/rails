@@ -744,8 +744,9 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
 
   def test_get_ids_for_has_many_through_with_conditions_should_not_preload
     Tagging.create!(:taggable_type => 'Post', :taggable_id => posts(:welcome).id, :tag => tags(:misc))
-    ActiveRecord::Associations::Preloader.expects(:new).never
-    posts(:welcome).misc_tag_ids
+    assert_not_called(ActiveRecord::Associations::Preloader, :new) do
+      posts(:welcome).misc_tag_ids
+    end
   end
 
   def test_get_ids_for_loaded_associations
@@ -765,9 +766,10 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
   end
 
   def test_association_proxy_transaction_method_starts_transaction_in_association_class
-    Tag.expects(:transaction)
-    Post.first.tags.transaction do
-      # nothing
+    assert_called(Tag, :transaction) do
+      Post.first.tags.transaction do
+        # nothing
+      end
     end
   end
 
@@ -1170,5 +1172,33 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     post = Post.find(1)
 
     assert_deprecated { post.people(true) }
+  end
+
+  def test_has_many_through_do_not_cache_association_reader_if_the_though_method_has_default_scopes
+    member = Member.create!
+    club = Club.create!
+    TenantMembership.create!(
+      member: member,
+      club: club
+    )
+
+    TenantMembership.current_member = member
+
+    tenant_clubs = member.tenant_clubs
+    assert_equal [club], tenant_clubs
+
+    TenantMembership.current_member = nil
+
+    other_member = Member.create!
+    other_club = Club.create!
+    TenantMembership.create!(
+      member: other_member,
+      club: other_club
+    )
+
+    tenant_clubs = other_member.tenant_clubs
+    assert_equal [other_club], tenant_clubs
+  ensure
+    TenantMembership.current_member = nil
   end
 end
