@@ -1,5 +1,3 @@
-require "active_support/deprecation"
-
 module ActiveRecord
   module Associations
     class SingularAssociation < Association #:nodoc:
@@ -47,12 +45,7 @@ module ActiveRecord
         end
 
         def get_records
-          if reflection.scope_chain.any?(&:any?) ||
-              scope.eager_loading? ||
-              klass.scope_attributes?
-
-            return scope.limit(1).to_a
-          end
+          return scope.limit(1).to_a if skip_statement_cache?
 
           conn = klass.connection
           sc = reflection.association_scope_cache(conn, owner) do

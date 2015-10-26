@@ -490,6 +490,34 @@ module CacheStoreBehavior
     assert_equal({key => "bar"}, @cache.read_multi(key))
     assert @cache.delete(key)
   end
+
+  def test_cache_hit_instrumentation
+    key = "test_key"
+    subscribe_executed = false
+    ActiveSupport::Notifications.subscribe "cache_read.active_support" do |name, start, finish, id, payload|
+      subscribe_executed = true
+      assert_equal :fetch, payload[:super_operation]
+      assert payload[:hit]
+    end
+    assert @cache.write(key, "1", :raw => true)
+    assert @cache.fetch(key) {}
+    assert subscribe_executed
+  ensure
+    ActiveSupport::Notifications.unsubscribe "cache_read.active_support"
+  end
+
+  def test_cache_miss_instrumentation
+    subscribe_executed = false
+    ActiveSupport::Notifications.subscribe "cache_read.active_support" do |name, start, finish, id, payload|
+      subscribe_executed = true
+      assert_equal :fetch, payload[:super_operation]
+      assert_not payload[:hit]
+    end
+    assert_not @cache.fetch("bad_key") {}
+    assert subscribe_executed
+  ensure
+    ActiveSupport::Notifications.unsubscribe "cache_read.active_support"
+  end
 end
 
 # https://rails.lighthouseapp.com/projects/8994/tickets/6225-memcachestore-cant-deal-with-umlauts-and-special-characters
@@ -732,6 +760,11 @@ class FileStoreTest < ActiveSupport::TestCase
   def test_long_keys
     @cache.write("a"*10000, 1)
     assert_equal 1, @cache.read("a"*10000)
+  end
+
+  def test_long_uri_encoded_keys
+    @cache.write("%"*870, 1)
+    assert_equal 1, @cache.read("%"*870)
   end
 
   def test_key_transformation

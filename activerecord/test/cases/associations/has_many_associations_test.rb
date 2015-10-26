@@ -31,6 +31,8 @@ require 'models/student'
 require 'models/pirate'
 require 'models/ship'
 require 'models/ship_part'
+require 'models/treasure'
+require 'models/parrot'
 require 'models/tyre'
 require 'models/subscriber'
 require 'models/subscription'
@@ -168,7 +170,9 @@ class HasManyAssociationsTest < ActiveRecord::TestCase
     part = ShipPart.create(name: 'cockpit')
     updated_at = part.updated_at
 
-    ship.parts << part
+    travel(1.second) do
+      ship.parts << part
+    end
 
     assert_equal part.ship, ship
     assert_not_equal part.updated_at, updated_at
@@ -932,6 +936,25 @@ class HasManyAssociationsTest < ActiveRecord::TestCase
     assert_equal 0, new_firm.clients_of_firm.size
   end
 
+  def test_has_many_without_counter_cache_option
+    # Ship has a conventionally named `treasures_count` column, but the counter_cache
+    # option is not given on the association.
+    ship = Ship.create(name: 'Countless', treasures_count: 10)
+
+    assert_not Ship.reflect_on_association(:treasures).has_cached_counter?
+
+    # Count should come from sql count() of treasures rather than treasures_count attribute
+    assert_equal ship.treasures.size, 0
+
+    assert_no_difference lambda { ship.reload.treasures_count }, "treasures_count should not be changed" do
+      ship.treasures.create(name: 'Gold')
+    end
+
+    assert_no_difference lambda { ship.reload.treasures_count }, "treasures_count should not be changed" do
+      ship.treasures.destroy_all
+    end
+  end
+
   def test_deleting_updates_counter_cache
     topic = Topic.order("id ASC").first
     assert_equal topic.replies.to_a.size, topic.replies_count
@@ -1459,6 +1482,25 @@ class HasManyAssociationsTest < ActiveRecord::TestCase
     assert_equal "Cannot delete record because dependent companies exist", firm.errors[:base].first
     assert RestrictedWithErrorFirm.exists?(:name => 'restrict')
     assert firm.companies.exists?(:name => 'child')
+  end
+
+  def test_restrict_with_error_with_locale
+    I18n.backend = I18n::Backend::Simple.new
+    I18n.backend.store_translations 'en', activerecord: {attributes: {restricted_with_error_firm: {companies: 'client companies'}}}
+    firm = RestrictedWithErrorFirm.create!(name: 'restrict')
+    firm.companies.create(name: 'child')
+
+    assert !firm.companies.empty?
+
+    firm.destroy
+
+    assert !firm.errors.empty?
+
+    assert_equal "Cannot delete record because dependent client companies exist", firm.errors[:base].first
+    assert RestrictedWithErrorFirm.exists?(name: 'restrict')
+    assert firm.companies.exists?(name: 'child')
+  ensure
+    I18n.backend.reload!
   end
 
   def test_included_in_collection
@@ -2137,6 +2179,26 @@ class HasManyAssociationsTest < ActiveRecord::TestCase
 
     assert_equal [bulb1], car.bulbs
     assert_equal [bulb1, bulb2], car.all_bulbs.sort_by(&:id)
+  end
+
+  test "can unscope and where the default scope of the associated model" do
+    Car.has_many :other_bulbs, -> { unscope(where: [:name]).where(name: 'other') }, class_name: "Bulb"
+    car = Car.create!
+    bulb1 = Bulb.create! name: "defaulty", car: car
+    bulb2 = Bulb.create! name: "other",    car: car
+
+    assert_equal [bulb1], car.bulbs
+    assert_equal [bulb2], car.other_bulbs
+  end
+
+  test "can rewhere the default scope of the associated model" do
+    Car.has_many :old_bulbs, -> { rewhere(name: 'old') }, class_name: "Bulb"
+    car = Car.create!
+    bulb1 = Bulb.create! name: "defaulty", car: car
+    bulb2 = Bulb.create! name: "old",      car: car
+
+    assert_equal [bulb1], car.bulbs
+    assert_equal [bulb2], car.old_bulbs
   end
 
   test 'unscopes the default scope of associated model when used with include' do

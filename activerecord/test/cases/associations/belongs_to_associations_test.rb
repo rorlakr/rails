@@ -1,6 +1,5 @@
 require 'cases/helper'
 require 'models/developer'
-require 'models/computer'
 require 'models/project'
 require 'models/company'
 require 'models/topic'
@@ -21,6 +20,9 @@ require 'models/column'
 require 'models/record'
 require 'models/admin'
 require 'models/admin/user'
+require 'models/ship'
+require 'models/treasure'
+require 'models/parrot'
 
 class BelongsToAssociationsTest < ActiveRecord::TestCase
   fixtures :accounts, :companies, :developers, :projects, :topics,
@@ -91,7 +93,7 @@ class BelongsToAssociationsTest < ActiveRecord::TestCase
     end
 
     account = model.new
-    refute account.valid?
+    assert_not account.valid?
     assert_equal [{error: :blank}], account.errors.details[:company]
   ensure
     ActiveRecord::Base.belongs_to_required_by_default = original_value
@@ -108,7 +110,7 @@ class BelongsToAssociationsTest < ActiveRecord::TestCase
     end
 
     account = model.new
-    refute account.valid?
+    assert_not account.valid?
     assert_equal [{error: :blank}], account.errors.details[:company]
   ensure
     ActiveRecord::Base.belongs_to_required_by_default = original_value
@@ -347,6 +349,22 @@ class BelongsToAssociationsTest < ActiveRecord::TestCase
     assert_equal 1, Company.all.merge!(:includes => :firm_with_select ).find(2).firm_with_select.attributes.size
   end
 
+  def test_belongs_to_without_counter_cache_option
+    # Ship has a conventionally named `treasures_count` column, but the counter_cache
+    # option is not given on the association.
+    ship = Ship.create(name: 'Countless')
+
+    assert_no_difference lambda { ship.reload.treasures_count }, "treasures_count should not be changed unless counter_cache is given on the relation" do
+      treasure = Treasure.new(name: 'Gold', ship: ship)
+      treasure.save
+    end
+
+    assert_no_difference lambda { ship.reload.treasures_count }, "treasures_count should not be changed unless counter_cache is given on the relation" do
+      treasure = ship.treasures.first
+      treasure.destroy
+    end
+  end
+
   def test_belongs_to_counter
     debate = Topic.create("title" => "debate")
     assert_equal 0, debate.read_attribute("replies_count"), "No replies yet"
@@ -482,7 +500,9 @@ class BelongsToAssociationsTest < ActiveRecord::TestCase
     line_item = LineItem.create!
     invoice = Invoice.create!(line_items: [line_item])
     initial = invoice.updated_at
-    line_item.touch
+    travel(1.second) do
+      line_item.touch
+    end
 
     assert_not_equal initial, invoice.reload.updated_at
   end

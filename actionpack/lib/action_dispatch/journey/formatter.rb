@@ -33,7 +33,7 @@ module ActionDispatch
           defaults       = route.defaults
           required_parts = route.required_parts
           parameterized_parts.keep_if do |key, value|
-            defaults[key].nil? || value.to_s != defaults[key].to_s || required_parts.include?(key)
+            (defaults[key].nil? && value.present?) || value.to_s != defaults[key].to_s || required_parts.include?(key)
           end
 
           return [route.format(parameterized_parts), params]
@@ -155,7 +155,7 @@ module ActionDispatch
 
         def build_cache
           root = { ___routes: [] }
-          routes.each_with_index do |route, i|
+          routes.routes.each_with_index do |route, i|
             leaf = route.required_defaults.inject(root) do |h, tuple|
               h[tuple] ||= {}
             end

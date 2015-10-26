@@ -70,11 +70,13 @@ Here's what a job looks like:
 class GuestsCleanupJob < ActiveJob::Base
   queue_as :default
 
-  def perform(*args)
+  def perform(*guests)
     # Do something later
   end
 end
 ```
+
+Note that you can define `perform` with as many arguments as you want.
 
 ### Enqueue the Job
 
@@ -83,21 +85,26 @@ Enqueue a job like so:
 ```ruby
 # Enqueue a job to be performed as soon the queuing system is
 # free.
-MyJob.perform_later record
+GuestsCleanupJob.perform_later guest
 ```
 
 ```ruby
 # Enqueue a job to be performed tomorrow at noon.
-MyJob.set(wait_until: Date.tomorrow.noon).perform_later(record)
+GuestsCleanupJob.set(wait_until: Date.tomorrow.noon).perform_later(guest)
 ```
 
 ```ruby
 # Enqueue a job to be performed 1 week from now.
-MyJob.set(wait: 1.week).perform_later(record)
+GuestsCleanupJob.set(wait: 1.week).perform_later(guest)
+```
+
+```ruby
+# `perform_now` and `perform_later` will call `perform` under the hood so
+# you can pass as many arguments as defined in the latter.
+GuestsCleanupJob.perform_later(guest1, guest2, filter: 'some_filter')
 ```
 
 That's it!
-
 
 Job Execution
 -------------
@@ -129,10 +136,19 @@ module YourApp
 end
 ```
 
-NOTE: Since jobs run in parallel to your Rails application, most queuing libraries
+### Starting the Backend
+
+Since jobs run in parallel to your Rails application, most queuing libraries
 require that you start a library-specific queuing service (in addition to
-starting your Rails app) for the job processing to work. For information on
-how to do that refer to the documentation of your respective library.
+starting your Rails app) for the job processing to work. Refer to library
+documentation for instructions on starting your queue backend.
+
+Here is a noncomprehensive list of documentation:
+
+- [Sidekiq](https://github.com/mperham/sidekiq/wiki/Active-Job)
+- [Resque](https://github.com/resque/resque/wiki/ActiveJob)
+- [Sucker Punch](https://github.com/brandonhilkert/sucker_punch#active-job)
+- [Queue Classic](https://github.com/QueueClassic/queue_classic#active-job)
 
 Queues
 ------
@@ -289,7 +305,7 @@ emails asynchronously:
 ```ruby
 I18n.locale = :eo
 
-UserMailer.welcome(@user).deliver_later # Email will be localized to Esparanto.
+UserMailer.welcome(@user).deliver_later # Email will be localized to Esperanto.
 ```
 
 

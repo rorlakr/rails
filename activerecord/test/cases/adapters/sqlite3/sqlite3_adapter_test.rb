@@ -294,7 +294,7 @@ module ActiveRecord
       def test_tables_logs_name
         sql = <<-SQL
           SELECT name FROM sqlite_master
-          WHERE (type = 'table' OR type = 'view') AND NOT name = 'sqlite_sequence'
+          WHERE type IN ('table','view') AND name <> 'sqlite_sequence'
         SQL
         assert_logged [[sql.squish, 'SCHEMA', []]] do
           @conn.tables('hello')
@@ -313,8 +313,7 @@ module ActiveRecord
         with_example_table do
           sql = <<-SQL
             SELECT name FROM sqlite_master
-            WHERE (type = 'table' OR type = 'view')
-            AND NOT name = 'sqlite_sequence' AND name = \"ex\"
+            WHERE type IN ('table','view') AND name <> 'sqlite_sequence' AND name = 'ex'
           SQL
           assert_logged [[sql.squish, 'SCHEMA', []]] do
             assert @conn.table_exists?('ex')
@@ -425,13 +424,16 @@ module ActiveRecord
                                    configurations['arunit']['database'])
         statement = ::SQLite3::Statement.new(db,
                                            'CREATE TABLE statement_test (number integer not null)')
-        statement.stubs(:step).raises(::SQLite3::BusyException, 'busy')
-        statement.stubs(:columns).once.returns([])
-        statement.expects(:close).once
-        ::SQLite3::Statement.stubs(:new).returns(statement)
-
-        assert_raises ActiveRecord::StatementInvalid do
-          @conn.exec_query 'select * from statement_test'
+        statement.stub(:step, ->{ raise ::SQLite3::BusyException.new('busy') }) do
+          assert_called(statement, :columns, returns: []) do
+            assert_called(statement, :close) do
+              ::SQLite3::Statement.stub(:new, statement) do
+                assert_raises ActiveRecord::StatementInvalid do
+                  @conn.exec_query 'select * from statement_test'
+                end
+              end
+            end
+          end
         end
       end
 

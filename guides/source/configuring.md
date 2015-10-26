@@ -214,7 +214,6 @@ Every Rails application comes with a standard set of middleware which it uses in
 * `ActionDispatch::Cookies` sets cookies for the request.
 * `ActionDispatch::Session::CookieStore` is responsible for storing the session in cookies. An alternate middleware can be used for this by changing the `config.action_controller.session_store` to an alternate value. Additionally, options passed to this can be configured by using `config.action_controller.session_options`.
 * `ActionDispatch::Flash` sets up the `flash` keys. Only available if `config.action_controller.session_store` is set to a value.
-* `ActionDispatch::ParamsParser` parses out parameters from the request into `params`.
 * `Rack::MethodOverride` allows the method to be overridden if `params[:_method]` is set. This is the middleware which supports the PATCH, PUT, and DELETE HTTP method types.
 * `Rack::Head` converts HEAD requests to GET requests and serves them as so.
 
@@ -245,7 +244,7 @@ config.middleware.swap ActionController::Failsafe, Lifo::Failsafe
 They can also be removed from the stack completely:
 
 ```ruby
-config.middleware.delete "Rack::MethodOverride"
+config.middleware.delete Rack::MethodOverride
 ```
 
 ### Configuring i18n
@@ -267,8 +266,8 @@ All these configuration options are delegated to the `I18n` library.
 * `config.active_record.logger` accepts a logger conforming to the interface of Log4r or the default Ruby Logger class, which is then passed on to any new database connections made. You can retrieve this logger by calling `logger` on either an Active Record model class or an Active Record model instance. Set to `nil` to disable logging.
 
 * `config.active_record.primary_key_prefix_type` lets you adjust the naming for primary key columns. By default, Rails assumes that primary key columns are named `id` (and this configuration option doesn't need to be set.) There are two other choices:
-** `:table_name` would make the primary key for the Customer class `customerid`
-** `:table_name_with_underscore` would make the primary key for the Customer class `customer_id`
+    * `:table_name` would make the primary key for the Customer class `customerid`
+    * `:table_name_with_underscore` would make the primary key for the Customer class `customer_id`
 
 * `config.active_record.table_name_prefix` lets you set a global string to be prepended to table names. If you set this to `northwest_`, then the Customer class will look for `northwest_customers` as its table. The default is an empty string.
 
@@ -305,7 +304,9 @@ All these configuration options are delegated to the `I18n` library.
   `:all` which always dumps all schemas regardless of the schema_search_path,
   or a string of comma separated schemas.
 
-* `config.active_record.belongs_to_required_by_default` is a boolean value and controls whether `belongs_to` association is required by default.
+* `config.active_record.belongs_to_required_by_default` is a boolean value and
+  controls whether a record fails validation if `belongs_to` association is not
+  present.
 
 * `config.active_record.warn_on_records_fetched_greater_than` allows setting a
   warning threshold for query result size. If the number of records returned
@@ -451,6 +452,9 @@ encrypted cookies salt value. Defaults to `'signed encrypted cookie'`.
 * `config.action_view.raise_on_missing_translations` determines whether an
   error should be raised for missing translations.
 
+* `config.action_view.automatically_disable_submit_tag` determines whether
+  submit_tag should automatically disable on click, this defaults to true.
+
 ### Configuring Action Mailer
 
 There are a number of settings available on `config.action_mailer`:
@@ -533,7 +537,7 @@ There are a few configuration options available in Active Support:
 
 * `config.active_support.time_precision` sets the precision of JSON encoded time values. Defaults to `3`.
 
-* `config.active_support.halt_callback_chains_on_return_false` specifies whether ActiveRecord, ActiveModel and ActiveModel::Validations callback chains can be halted by returning `false` in a 'before' callback. Defaults to `true`.
+* `ActiveSupport.halt_callback_chains_on_return_false` specifies whether Active Record and Active Model callback chains can be halted by returning `false` in a 'before' callback. Defaults to `true`.
 
 * `ActiveSupport::Logger.silencer` is set to `false` to disable the ability to silence logging in a block. The default is `true`.
 
@@ -639,7 +643,7 @@ TIP: You don't have to update the database configurations manually. If you look 
 
 ### Connection Preference
 
-Since there are two ways to set your connection, via environment variable it is important to understand how the two can interact.
+Since there are two ways to configure your connection (using `config/database.yml` or using an environment variable) it is important to understand how they can interact.
 
 If you have an empty `config/database.yml` file but your `ENV['DATABASE_URL']` is present, then Rails will connect to the database via your environment variable:
 
@@ -1093,7 +1097,7 @@ you and wait for a connection from the pool. If it cannot get a connection, a
 timeout error similar to that given below will be thrown.
 
 ```ruby
-ActiveRecord::ConnectionTimeoutError - could not obtain a database connection within 5 seconds. The max pool size is currently 5; consider increasing it:
+ActiveRecord::ConnectionTimeoutError - could not obtain a database connection within 5.000 seconds (waited 5.000 seconds)
 ```
 
 If you get the above error, you might want to increase the size of the
@@ -1105,7 +1109,7 @@ NOTE. If you are running in a multi-threaded environment, there could be a chanc
 Custom configuration
 --------------------
 
-You can configure your own code through the Rails configuration object with custom configuration. It works like this:
+You can configure your own code through the Rails configuration object with custom configuration under the `config.x` property. It works like this:
 
   ```ruby
   config.x.payment_processing.schedule = :daily

@@ -79,7 +79,7 @@ module ActiveRecord
     initializer "active_record.migration_error" do
       if config.active_record.delete(:migration_error) == :page_load
         config.app_middleware.insert_after ::ActionDispatch::Callbacks,
-          "ActiveRecord::Migration::CheckPending"
+          ActiveRecord::Migration::CheckPending
       end
     end
 
@@ -121,7 +121,7 @@ module ActiveRecord
 
     # This sets the database configuration from Configuration#database_configuration
     # and then establishes the connection.
-    initializer "active_record.initialize_database" do |app|
+    initializer "active_record.initialize_database" do
       ActiveSupport.on_load(:active_record) do
         self.configurations = Rails.application.config.database_configuration
 
