@@ -1102,3 +1102,5 @@ end
 ```
 
 `force_ssl`을 여러 컨트롤러에서 사용하고 싶다면, 애플리케이션 전체에서 HTTPS 접속을 요구하는 편이 좋습니다. 이를 위해서는 환경 파일에서 `config.force_ssl`을 설정하세요.
+
+TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.
