@@ -1029,7 +1029,7 @@ class CreateComments < ActiveRecord::Migration
       t.string :commenter
       t.text :body
 
-      # 以下の行によって`article_id`という整数カラムが追加される
+      # 아래의 행으로 인해 'article_id'라는 int 컬럼이 추가된다.
       t.references :article, index: true
 
       t.timestamps
@@ -1412,7 +1412,7 @@ def index
     @articles = Article.all
   end
 
-  # (以下省略)
+  # (이하생략)
 ```
 
 덧글의 삭제도 인증한 사용자만 가능하게 하고 싶으므로 `CommentsController`(`app/controllers/comments_controller.rb`)에도 다음을 추가합시다.
@@ -1427,7 +1427,7 @@ class CommentsController < ApplicationController
     ...
   end
 
-  # (以下省略)
+  # (이하생략)
 ```
 
 이제 새 글을 작성하려고 하면, 아래와 같은 BASIC http인증 창이 나타납니다.
