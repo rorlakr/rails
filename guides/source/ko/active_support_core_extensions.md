@@ -1,115 +1,116 @@
-[Active Support Core Extensions] 액티브서포트 코어확장
+Active Support 코어 확장 기능
 ==============================
 
-액티브서포트는 루비온레일스의 구성요소로서 루비언어에 대한 확장, 유틸리티 그리고 기타 다양한 것들을 제공해 줍니다. [[[Active Support is the Ruby on Rails component responsible for providing Ruby language extensions, utilities, and other transversal stuff.]]]
+Active Support는 Ruby on Rails의 구성 요소중 하나로, Ruby의 확장 기능, 유틸리티, 그 외의 작업 등을 담당하고 있습니다.
 
-또한, 레일스 어플리케이션을 개발할 경우와 루비온레일스 프레임워크 자체를 개발하는 경우를 대상으로 루비언어 수준에서 핵심적인 것들을 보다 풍부하게 제공해 줍니다. [[[It offers a richer bottom-line at the language level, targeted both at the development of Rails applications, and at the development of Ruby on Rails itself.]]]
+Active Support는 언어 레벨에서 다양한 기능을 추가해주며, Rails 애플리케이션의 개발과 Ruby on Rails 자체의 개발을 지원하기 위한 목적으로 만들어졌습니다.
 
-본 가이드를 읽고나면 아래 사항을 알게 될 것입니다. [[[After reading this guide, you will know:]]]
+이 가이드의 내용:
 
-* 코어확장이 무엇이지 [[[What Core Extensions are.]]]
-
-* 모든 확장을 로드하는 방법 [[[How to load all extensions.]]]
-
-* 원하는 확장만을 선별하는 방법 [[[How to cherry-pick just the extensions you want.]]]
-
-* 액티브서포트가 제공하는 확장기능들 [[[What extensions Active Support provides.]]]
+* 코어의 확장 기능에 대해서
+* 모든 확장 기능을 불러오는 방법
+* 필요한 확장 기능만을 사용하는 방법
+* Active Support가 제공하는 확장 기능 목록
 
 --------------------------------------------------------------------------------
 
-[How to Load Core Extensions] 코어확장 로드하는 방법
+코어 확장 기능을 불러오는 방법
 ---------------------------
 
-### [Stand-Alone Active Support] 액티브서포트를 단독으로 사용하기
+### 독립적인 Active Support
 
-액티브서포트는 아무런 기능확장을 하지 않도록, 디폴트 상태에서는 아무것도 로드하지 않습니다. 여러 개의 모듈로 분리되어 있어서 필요한 것만 로드할 수 있도록 되어 있습니다. 또한 한번에 관련 확장모듈만을, 심지어 모든 것을 로드할 수 있도록 진입점을 제공해 주어 편리하게 구성되어 있습니다. [[[In order to have a near-zero default footprint, Active Support does not load anything by default. It is broken in small pieces so that you can load just what you need, and also has some convenience entry points to load related extensions in one shot, even everything.]]]
+흔적을 최대한 남기지 않기 위해서, Active Support는 기본적으로 아무것도 읽어들이지 않습니다. Active Support는 자잘하게 분할되어 필요한 확장 기능만 불러올 수 있도록 되어 있습니다. 또한 연관되어 있는 확장기능(상황에 따라서는 모든 확장 기능)도 동시에 불러올 때에 사용할 수 있는 엔트리 포인트도 포함하고 있습니다.
 
-따라서, 아래와 같이 간단하게 require할 경우, [[[Thus, after a simple require like:]]]
+따라서 아래와 같은 require문을 실행하더라도,
 
 ```ruby
 require 'active_support'
 ```
 
-객체들은 `blank` 메소드에 대해서 반응을 하지 않게 됩니다. 이제 해당 정의를 로드하는 방법을 알아보겠습니다. [[[objects do not even respond to `blank?`. Let's see how to load its definition.]]]
+객체는 `blank?`에 응답하지 않습니다(역주: `black?`는 Active Support가 추가해주는 메소드 중 하나임). 이 정의가 어떤 식으로 로드되는지 확인해봅시다.
 
-#### [Cherry-picking a Definition] 특정 정의만 선별하기
+#### 필요한 정의만을 선택
 
-`blank`를 사용하기 위한 가장 손쉬운 방법은 이에 대한 정의를 포함하는 파일만을 선별하는 것입니다. [[[The most lightweight way to get `blank?` is to cherry-pick the file that defines it.]]]
+`blank?` 메소드를 사용하는 가장 '가벼운' 방법은 그 메소드가 정의되어있는 파일만을 선택해서 불러오는 것입니다.
 
-본 가이드에는 코어확장으로 정의된 모든 메소드 각각에 대해서 해당 메소드가 어디에 정의되어 있는지를 노트로 표시해 줍니다. `blank?` 메소드의 경우, 해당 노트는 아래와 같습니다. [[[For every single method defined as a core extension this guide has a note that says where such a method is defined. In the case of `blank?` the note reads:]]]
+이 가이드에서는 코어 확장 기능으로 정의되어있는 모든 메소드에 대해서 그 정의 파일이 어디에 위치해 있는지를 적어두었습니다. 예를 들어 `blank?`의 경우, 아래와 같은 메모가 되어 있습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/object/blank.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/blank.rb`.]]]
+NOTE: `active_support/core_ext/object/blank.rb`에 정의되어 있습니다.
 
-이것은 한번만 호출하면 된다는 것을 의미합니다. [[[That means that this single call is enough:]]]
+다시 말해 아래와 같이 핀포인트로 require를 실행할 수도 있습니다.
 
 ```ruby
+require 'active_support'
 require 'active_support/core_ext/object/blank'
 ```
 
-액티브서포트는 세심하게 수정되어서 하나의 파일만을 선별할 경우 해당 의존성 파일들(존재할 경우)만을 로드하게 됩니다. [[[Active Support has been carefully revised so that cherry-picking a file loads only strictly needed dependencies, if any.]]]
+Active Support는 무척 조심스러워서, 어떤 파일을 선택했을 경우 정말로 필요한 파일들만을 동시에 불러옵니다(의존 관계가 있는 경우).
 
-#### [Loading Grouped Core Extensions] 코어확장을 그룹으로 로딩하기
+#### 코어 확장 기능을 그룹화하여 불러오기
 
-다음 단계는 `Object`내의 모든 기능확장을 간단하게 로드하는 것입니다. 대개는, `SomeClass`내의 기능을 확장하기 위해서는 `active_support/core_ext/some_class`를 로딩하므로써 단번에 사용할 수 있게 됩니다. [[[The next level is to simply load all extensions to `Object`. As a rule of thumb, extensions to `SomeClass` are available in one shot by loading `active_support/core_ext/some_class`.]]]
+다음 단계로 `Object`에 대한 모든 확장 기능을 불러와봅시다. 경험적으로 `SomeClass`라는 클래스가 있다면 `active_support/core_ext/some_class`라는 경로를 지정하면 한번에 읽어올 수 있습니다.
 
-따라서, (`blank?` 메소드를 포함하는) `Object`내의 모든 기능을 확장하기 위해서는 아래와 같이 하면 됩니다. [[[Thus, to load all extensions to `Object` (including `blank?`):]]]
+따라서, (`blank?`를 포함하여)`Object`에 대한 모든 확장기능을 불러오기 위해서는 다음과 같이 작성하면 됩니다.
 
 ```ruby
+require 'active_support'
 require 'active_support/core_ext/object'
 ```
 
-#### [Loading All Core Extensions] 모든 코어확장 로드하기
+#### 모든 확장 기능을 불러오기
 
-모든 코어확장을 로드하고자 할 경우에는 아래와 같이 하나의 파일을 불러 들이면 됩니다. [[[You may prefer just to load all core extensions, there is a file for that:]]]
+모든 코어 확장 기능을 불러오고 싶다면 아래와 같이 require하면 됩니다.
 
 ```ruby
+require 'active_support'
 require 'active_support/core_ext'
 ```
 
-#### [Loading All Active Support] 모든 액티브서포트를 로드하기
+#### 모든 Active Support를 읽어오기
 
-그리고 마지막으로, 사용가능한 모든 액티브서포트를 불러들일 경우에는 아래와 같이 하면 됩니다. [[[And finally, if you want to have all Active Support available just issue:]]]
+마지막으로 사용가능한 Active Support를 모두 불러오고 싶다면 이렇게 할 수 있습니다.
 
 ```ruby
 require 'active_support/all'
 ```
 
-이렇게 할 경우에도, 모든 액티브서포트를 메모리상에 로드하지 않는데, 일부 모듈은 `autoload`상태로 설정되기 때문에, 필요할 경우에만 로드됩니다. [[[That does not even put the entire Active Support in memory upfront indeed, some stuff is configured via `autoload`, so it is only loaded if used.]]]
+단, 이 코드를 실행하더라도 Active Support 전체가 메모리 상에 로드되는 것은 아닙니다. 일부는 `autoload`로 설정되어서, 실제로 사용하기 전까지는 로드되지 않습니다.
 
-### [Active Support Within a Ruby on Rails Application] 루비온레일스 어플리케이션 내에서 액티브서포트 사용하기
+### Ruby on Rails 애플리케이션에서 Active Support를 사용하기
 
-루비온레일스 어플리케이션은 `config.active_support.bare`이 true로 설정되어 있지 않는 한, 모든 액티브서포트를 로드하게 됩니다. 이와 같이 true로 지정된 경우에는, 레일스 프레임워크가 필요로하는 것만을 선별해서 로드하게 되고, 이전에 설명한 바와 같이, 각 단계별로 선별해서 사용할 수도 있습니다. [[[A Ruby on Rails application loads all Active Support unless `config.active_support.bare` is true. In that case, the application will only load what the framework itself cherry-picks for its own needs, and can still cherry-pick itself at any granularity level, as explained in the previous section.]]]
+Ruby on Rails 애플리케이션에서는 기본적으로 모든 Active Support를 불러옵니다. `active_support.bare`를 true로 설정했을 때는 예외입니다. 이 옵션을 true로 설정하면 프레임워크 자체가 필요로 할 때까지 애플리케이션은 확장 기능을 불러오지 않습니다. 또한 불러올 확장 기능은 위에서 이야기했듯이 각 부분별로 그때그때 선택됩니다.
 
-[Extensions to All Objects] 객체에 대한 확장 메소드
+모든 객체에서 사용할 수 있는 확장 기능
 -------------------------
 
-### [`blank?` and `present?`] `blank?` 와 `present?`
+### `blank?`와 `present?`
 
-레일스 어플리케이션에서 다음과 같은 값들은 blank로 인식됩니다. [[[The following values are considered to be blank in a Rails application:]]]
+Rails 애플리케이션은 아래의 값을 공백(blank)라고 판단합니다.
 
-* `nil` 과 `false`, [[[`nil` and `false`,]]]
+* `nil`과 `false`
 
-* whitespace 만으로 구성된 문자열 (아래의 노트를 참고하세요.), [[[strings composed only of whitespace (see note below),]]]
+* 공백문자(whitespace)만으로 구성되어있는 문자열 (아래의 설명 참조)
 
-* 빈 배열과 해시 [[[empty arrays and hashes, and]]]
+* 비어있는 배열과 해시
 
-* `empty?` 메소드가 정의되어 있어서 empty를 반환하는 기타 다른 객체들 [[[any other object that responds to `empty?` and is empty.]]]
+* 그 외, `empty?` 메소드에 true를 돌려주는 모든 객체를 비어있다고 생각합니다.
 
-INFO: 문자열에 대한 서술부분은 유니코드를 인식하는 캐릭터 클래스 `[:space:]` 를 사용합니다. 그래서, 예를 들면, 문단구분자인 U+2029는 whitespace로 인식되는 것입니다. [[[The predicate for strings uses the Unicode-aware character class `[:space:]`, so for example U+2029 (paragraph separator) is considered to be whitespace.]]]
+INFO: 문자열을 판정하기위해, Unicode에 대응하는 문자 클래스인 `[:space:]`를 사용합니다. 그러므로 예를 들어 U+2029(단락 구분자)역시 공백 문자로 판정됩니다.
 
-WARNING: 주목할 것은 숫자에 대해서 언급하지 않았습니다. 특히, 0과 0.0은 blank가 **아닙니다**. [[[Note that numbers are not mentioned. In particular, 0 and 0.0 are **not** blank.]]]
+WARNING: 숫자에 대해서는 공백인지 아닌지 판단할 수 없습니다. 특히 0이나 0.0은 **공백이 아니므로** 주의해주세요.
 
-예를 들어, `ActionDispatch::Session::AbstractStore`에 있는 아래의 메소드는 세션키의 존재여부를 확인하기 위해 `blank?`를 사용합니다. [[[For example, this method from `ActionDispatch::Session::AbstractStore` uses `blank?` for checking whether a session key is present:]]]
+예를 들어 `ActionController::HttpAuthentication::Token::ControllerMethods`에 있는 아래의 메소드에서는 `blank?`를 사용해서 토큰이 존재하고 있는지를 확인합니다.
 
 ```ruby
-def ensure_session_key!
-  if @key.blank?
-    raise ArgumentError, 'A key is required...'
+def authenticate(controller, &login_procedure)
+  token, options = token_and_options(controller.request)
+  unless token.blank?
+    login_procedure.call(token, options)
   end
 end
 ```
 
-`present?` 메소드는 `!blank?`와 동일한 것입니다. 아래의 예는 `ActionDispatch::Http::Cache::Response`로부터 발췌한 것입니다. [[[The method `present?` is equivalent to `!blank?`. This example is taken from `ActionDispatch::Http::Cache::Response`:]]]
+`present?` 메소드는 `!blank?` 메소드와 동등합니다. 아래의 예시는 `ActionDispatch::Http::Cache::Response`에서 인용했습니다.
 
 ```ruby
 def set_conditional_cache_control!
@@ -118,58 +119,58 @@ def set_conditional_cache_control!
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/object/blank.rb`에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/blank.rb`.]]]
+NOTE: `active_support/core_ext/object/blank.rb`에 정의되어 있습니다.
 
 ### `presence`
 
-`presence` 메소드는 `present?` 결과 true 값을 반환할 경우 receiver 객체를, false 값을 반환할 경우 `nil` 객체를 반환하게 됩니다. 이것은 아래와 같은 경우 유용하게 습관적으로 사용할 수 있습니다. [[[The `presence` method returns its receiver if `present?`, and `nil` otherwise. It is useful for idioms like this:]]]
+`presence` 메소드는 `present?`가 true인 경우에는 자기 자신의 리시버를 반환하고, false인 경우에는 `nil`을 반환합니다. 이 메소드는 아래와 같은 경우에 편리합니다.
 
 ```ruby
 host = config[:host].presence || 'localhost'
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/object/blank.rb`에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/blank.rb`.]]]
+NOTE: `active_support/core_ext/object/blank.rb`에 정의되어 있습니다.
 
 ### `duplicable?`
 
-루비에서 몇가지 기본 객체들은 싱글레톤의 형태를 가집니다. 예를 들어, 하나의 프로그램 프로세스 동안에, 정수 1 은 항상 동일한 인스턴스를 참조합니다. [[[A few fundamental objects in Ruby are singletons. For example, in the whole life of a program the integer 1 refers always to the same instance:]]]
+Ruby에 존재하는 기본적인 객체들의 몇몇은 singleton 객체 입니다. 예를 들자면, 프로그램의 생애 주기 동안에 정수 1은 항상 같은 같은 인스턴스를 참조합니다.
 
 ```ruby
 1.object_id                 # => 3
 Math.cos(0).to_i.object_id  # => 3
 ```
 
-따라서, 이러한 객체들은 `dup`이나 `clone` 메소드를 이용하여 복제할 수 있는 방법이 없습니다. [[[Hence, there's no way these objects can be duplicated through `dup` or `clone`:]]]
+따라서, 이러한 객체는 `dup` 메소드나, `clone` 메소드로 복사할 수 없습니다.
 
 ```ruby
 true.dup  # => TypeError: can't dup TrueClass
 ```
 
-싱글레톤 형태를 취하지 않는 몇몇 숫자들도 복제할 수 없는데, 다음과 같습니다. [[[Some numbers which are not singletons are not duplicable either:]]]
+singleton이 아닌 숫자에도 복사가 불가능한 것들이 있습니다.
 
 ```ruby
 0.0.clone        # => allocator undefined for Float
 (2**1024).clone  # => allocator undefined for Bignum
 ```
 
-액티브서포트는 이와 같이 특정 객체가 복제가능한 가를 프로그램상에서 조회해 볼 수 있도록 `duplicable?`이라는 메소드를 제공해 줍니다. [[[Active Support provides `duplicable?` to programmatically query an object about this property:]]]
+Active Support에는 객체가 프로그램 상에서 복사 가능한지 아닌지 확인하기 위한 `duplicable?` 메소드가 존재합니다..
 
 ```ruby
 "foo".duplicable? # => true
-"".duplicable?     # => true
-0.0.duplicable?   # => false
-false.duplicable?  # => false
+"".duplicable?    # => true
+0.0.duplicable?  # => false
+false.duplicable? # => false
 ```
 
-정의상, `nil`, `false`, `true`, 심볼, 숫자, 클래스, 모듈 객체들을 제외한 모든 객체는 `duplicable?` 메소드에 대해 true 값을 반환합니다. [[[By definition all objects are `duplicable?` except `nil`, `false`, `true`, symbols, numbers, class, and module objects.]]]
+기본으로 `nil`, `false`, `true`, 심볼, 숫자, 클래스, 모듈, 메소드 객체를 제외한 모든 객체가 `duplicable?` #=> true입니다.
 
-WARNING: 모든 클래스는 `dup`과 `clone` 메소드를 제거하거나 메소드 내에 예외를 발생시켜서 복제를 못하게 할 수 있습니다. 이렇게 하면 `rescue` 만이 유일하게 특정 객체가 복제가능한지를 알려 줄 수 있게 됩니다. `duplicable?` 메소드는 위에서와 같이 코딩에 따라 좌우되지만, `rescue` 보다는 훨씬 빠르게 결과를 알려 줍니다. 따라서 특정 상황에서 하드코딩된 목록으로도 충분한 경우에만 사용하기 바랍니다. [[[Any class can disallow duplication by removing `dup` and `clone` or raising exceptions from them. Thus only `rescue` can tell whether a given arbitrary object is duplicable. `duplicable?` depends on the hard-coded list above, but it is much faster than `rescue`. Use it only if you know the hard-coded list is enough in your use case.]]]
+WARNING: 어떤 클래스라도 `dup` 메소드와 `clone` 메소드를 삭제하여 이 메소드들을 사용할 수 없게 만들 수 있습니다. 이때 이 메소드들을 실행하면 예외가 발생합니다. 이런 경우에는 어떤 객체에서든 그 객체가 복사 가능한지 아닌지를 확인하기 위해 `rescue`를 사용해야하는 상황이 생깁니다. `duplicable?` 메소드는 위처럼 고정된 목록에 의존합니다만, 그 대신 `rescue`보다 빠르게 동작합니다. 실제로 사용하는 경우에 저 목록으로 충분하다고 판단되는 경우에는 `duplicable?`를 사용해주세요.
 
-NOTE: 이 메소드는 `active_support/core_ext/object/duplicable.rb`에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/duplicable.rb`.]]]
+NOTE: `active_support/core_ext/object/duplicable.rb`에 정의되어 있습니다.
 
 ### `deep_dup`
 
-`deep_dup` 메소드는 특정 객체를 deep 복사해서 반환해 줍니다. 보통은, 다른 객체를 포함하는 특정 객체를 `dup` 할 때, 루비는 포함된 객체는 `dup` 하지 않게 됩니다. 따라서, 해당 객체를 shallow 복사를 하게 됩니다. 특정 문자열을 가지는 특정 배열을 예를 들면, 다음과 같습니다. [[[The `deep_dup` method returns deep copy of a given object. Normally, when you `dup` an object that contains other objects, ruby does not `dup` them, so it creates a shallow copy of the object. If you have an array with a string, for example, it will look like this:]]]
+`deep_dup` 메소드는 주어진 객체의 '깊은 복사'를 돌려줍니다. 루비는 일반적으로 다른 객체를 포함하는 객체를 `dup`하더라도 내부에 있는 다른 객체들을 복사하지 않습니다. 이러한 사본은 '앝은 복사(shallow copy)'라고 불립니다. 예를 들자면, 아래와 같은 문자열을 포함하는 배열이 있다고 가정합시다.
 
 ```ruby
 array     = ['string']
@@ -177,20 +178,20 @@ duplicate = array.dup
 
 duplicate.push 'another-string'
 
-# the object was duplicated, so the element was added only to the duplicate
-array     #=> ['string']
-duplicate #=> ['string', 'another-string']
+# 이 객체는 복사되었으므로, 복사 된쪽에만 객체가 추가됨
+array     # => ['string']
+duplicate # => ['string', 'another-string']
 
 duplicate.first.gsub!('string', 'foo')
 
-# first element was not duplicated, it will be changed in both arrays
-array     #=> ['foo']
-duplicate #=> ['foo', 'another-string']
+# 첫번째 요소는 복사되지 않았으므로 한쪽을 변경하면, 양쪽 배열에 모두 변경사항이 반영됨
+array     # => ['foo']
+duplicate # => ['foo', 'another-string']
 ```
 
-알 수 있듯이, `Array` 인스턴스를 복제하면, 또 다른 배열 객체를 가지게 됩니다. 그러므로 복제한 배열 객체를 변경하면 원래의 배열 객체는 변경되지 않은 채로 있게 될 것입니다. 그러나, 배열 요소에 대해서는 이러한 사항이 해당되지 않습니다. `dup` 메소드는 deep 복사를 하지 않기 때문에, 배열내의 문자열은 여전히 동일한 객체가 되는 것입니다. [[[As you can see, after duplicating the `Array` instance, we got another object, therefore we can modify it and the original object will stay unchanged. This is not true for array's elements, however. Since `dup` does not make deep copy, the string inside the array is still the same object.]]]
+위에서 보듯, `Array` 인스턴스를 복사하여 다른 객체가 생성되었으므로, 한쪽을 변경하더라도 다른쪽은 변경되지 않게 되었습니다. 단, 배열은 복사되었습니다만, 배열 내의 요소들은 그렇지 않습니다. `dup` 메소드는 깊은 복사를 해주지 않으므로, 배열의 내부에 있는 문자열은 복사 후에도 같은 객체입니다.
 
-특정 객체에 대해서 deep 복사를 해야할 경우에는, `deep_dup` 메소드를 사용해야 합니다. 다음에 그 예가 있습니다. [[[If you need a deep copy of an object, you should use `deep_dup`. Here is an example:]]]
+객체를 깊은 복사해야할 필요가 있는 경우에는 `deep_dup`를 사용해주세요.
 
 ```ruby
 array     = ['string']
@@ -198,11 +199,11 @@ duplicate = array.deep_dup
 
 duplicate.first.gsub!('string', 'foo')
 
-array     #=> ['string']
-duplicate #=> ['foo']
+array     # => ['string']
+duplicate # => ['foo']
 ```
 
-특정 객체가 복제가능하지 않을 경우에, `deep_dup` 메소드는 단지 해당 객체만을 반환해 줄 것입니다. [[[If the object is not duplicable, `deep_dup` will just return it:]]]
+객체가 복사 불가능한 경우, `deep_dup`는 그 객체를 그대로 돌려줍니다.
 
 ```ruby
 number = 1
@@ -210,25 +211,23 @@ duplicate = number.deep_dup
 number.object_id == duplicate.object_id   # => true
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/object/deep_dup.rb` 파일에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/deep_dup.rb`.]]]
+NOTE: `active_support/core_ext/object/deep_dup.rb`에 정의되어 있습니다.
 
 ### `try`
 
-특정 객체에 대해서 `nil`이 아닐 경우에만 메소드를 호출하고자 할 때, 가장 손쉬운 방법은 좀 너저분하게 생각되지만 조건절을 사용하는 것입니다. 다른 대안으로는 `try` 메소드를 사용하는 것입니다. `try`는 `nil` 값을 보내면 `nil`을 반환하는 것만 제외하고는 `Object#send`와 동일하게 동작합니다. [[[When you want to call a method on an object only if it is not `nil`, the simplest way to achieve it is with conditional statements, adding unnecessary clutter. The alternative is to use `try`. `try` is like `Object#send` except that it returns `nil` if sent to `nil`.]]]
-
-아래에 이에 대한 예가 있습니다. [[[Here is an example:]]]
+`nil`이 아닌 경우에만 객체의 메소드를 호출하고 싶은 경우, 가장 단순한 방법은 조건문을 추가하는 것입니다만, 아무래도 코드가 장황해지게 됩니다. 이러한 상황에서 `try`를 사용할 수 있습니다. `try`는 `Object#send`와 닮아있습니다만, `nil`에 호출되는 경우에는 `nil`을 돌려준다는 부분이 다릅니다.
 
 ```ruby
-# without try
+# try 메소드를 사용하지 않은 경우
 unless @number.nil?
   @number.next
 end
 
-# with try
+# try 메소드를 사용한 경우
 @number.try(:next)
 ```
 
-`ActiveRecord::ConnectionAdapters::AbstractAdapter`에서 다른 예를 볼 수 있는데, `@logger`가 `nil` 값을 가질 수 있습니다. 그래서 `try` 메소드를 이용해서 불필요한 체크를 하지 않도록 한 것을 알 수 있습니다. [[[Another example is this code from `ActiveRecord::ConnectionAdapters::AbstractAdapter` where `@logger` could be `nil`. You can see that the code uses `try` and avoids an unnecessary check.]]]
+`ActiveRecord::ConnectionAdapters::AbstractAdapter`에 있는 다른 예시를 소개합니다. 여기에서는 `@logger`가 `nil`일 경우가 있습니다. 이 코드에서는 `try`를 사용하는 것으로 불필요한 체크를 하는 수고를 덜 수 있습니다.
 
 ```ruby
 def log_info(sql, name, ms)
@@ -239,17 +238,17 @@ def log_info(sql, name, ms)
 end
 ```
 
-`try` 메소드는 인수 대신에 코드블록을 사용하여 호출할 수 있는데, 이 코드블록은 receiver 객체가 `nil`이 아닐 경우에만 실행될 것입니다. [[[`try` can also be called without arguments but a block, which will only be executed if the object is not nil:]]]
+`try` 메소드는 인수 대신 블록과 함께 호출할 수도 있습니다. 이 경우 객체가 `nil`이 아닌 경우에만 블록이 실행됩니다.
 
 ```ruby
 @person.try { |p| "#{p.first_name} #{p.last_name}" }
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/object/try.rb` 파일에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/try.rb`.]]]
+NOTE: `active_support/core_ext/object/try.rb`에 정의되어 있습니다.
 
 ### `class_eval(*args, &block)`
 
-`class_eval` 메소드를 이용하면, 모든 객체의 싱글레톤 클래스 내에서 코드가 실행되도록 할 수 있습니다. [[[You can evaluate code in the context of any object's singleton class using `class_eval`:]]]
+`class_eval` 메소드를 사용하여 다양한 객체의 singleton 클래스의 컨텍스트에서 코드를 실행(eval)할 수 있습니다.
 
 ```ruby
 class Proc
@@ -266,52 +265,52 @@ class Proc
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/kernel/singleton_class.rb` 파일 내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/kernel/singleton_class.rb`.]]]
+NOTE: `active_support/core_ext/kernel/singleton_class.rb`에 정의되어 있습니다.
 
 ### `acts_like?(duck)`
 
-`acts_like?` 메소드는, `String` 클래스가 정의하는 것과 동일한 인터페이스를 제공하는 임의의 클래스, 즉, 이와 같이 간단한 규칙에 근거하여, 어떤 클래스가 다른 어떤 클래스처럼 동작하는지를 체크하는 방법을 제공해 줍니다. [[[The method `acts_like?` provides a way to check whether some class acts like some other class based on a simple convention: a class that provides the same interface as `String` defines]]]
+`acts_like?` 메소드는, 일부 클래스가 다른 클래스와 같은 방식으로 동작하는지에 대해서 어떤 관례에 따라서 확인합니다. `String` 클래스와 동일한 인터페이스를 제공하는 클래스가 있고, 그 중에서 아래의 메소드를 정의했다고 가정해 봅시다.
 
 ```ruby
 def acts_like_string?
 end
 ```
 
-위의 코드는 단지 하나의 표식자에 불과하며, 메소드 내의 코드나 반환값은 별개의 문제입니다. 그러면 아래와 같이 duct-type-safeness를 조회해 볼 수 있게 됩니다. [[[which is only a marker, its body or return value are irrelevant. Then, client code can query for duck-type-safeness this way:]]]
+이 메소드는 단순한 지표이며, 메소드 자체가 돌려주는 값과 관련은 없습니다. 이에 의해서 클라이언트 코드에서는 이래와 같은 덕 타이핑(duck typing) 체크를 할 수 있게 됩니다.
 
 ```ruby
 some_klass.acts_like?(:string)
 ```
 
-레일스는 `Date` 또는 `Time`처럼 동작하며 이와 같은 규칙을 따르는 클래스들을 제공해 줍니다. [[[Rails has classes that act like `Date` or `Time` and follow this contract.]]]
+Rails에서는 `Date` 클래스나 `Time` 클래스와 비슷하게 행동하는 클래스가 존재하며, 이 방식을 사용하고 있습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/object/acts_like.rb` 파일 내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/acts_like.rb`.]]]
+NOTE: `active_support/core_ext/object/acts_like.rb`에 정의되어 있습니다.
 
 ### `to_param`
 
-레일스에서 모든 객체는 `to_param` 메소드에 반응하게 되며, 해당 객체를 쿼리문자열이나 URL 일부 값을 결과값으로 반환해 줍니다. [[[All objects in Rails respond to the method `to_param`, which is meant to return something that represents them as values in a query string, or as URL fragments.]]]
+Rails의 모든 객체들에 `to_param` 메소드를 사용할 수 있습니다. 이것은 객체를 값으로 표현한 것을 반환한다는 의미입니다. 반환된 값은 쿼리 문자열이나 URL의 일부로 사용할 수 있습니다.
 
-디폴트로 `to_param` 메소드는 단지 `to_s` 메소드를 호출하기만 합니다. [[[By default `to_param` just calls `to_s`:]]]
+기본으로 `to_param` 메소드는 `to_s` 메소드를 호출하게 됩니다.
 
 ```ruby
 7.to_param # => "7"
 ```
 
-`to_param` 메소드의 반환값은 이스케이핑되지 **안는다는 것입니다**. (역자주: 이스케이프 문자가 포함될 경우에도 그데로 문자로 반환된다는 의미로 해석) [[[The return value of `to_param` should **not** be escaped:]]]
+`to_param`에 의해서 반환된 값을 **이스케이프 해서는 안됩니다**. 취약점이 발생할 수 있습니다.
 
 ```ruby
 "Tom & Jerry".to_param # => "Tom & Jerry"
 ```
 
-레일스의 몇가지 클래스는 이 메소드를 재정의하여 사용합니다. [[[Several classes in Rails overwrite this method.]]]
+이 메소드는 Rails의 많은 클래스에서 재정의됩니다.
 
-예를 들어, `nil`, `true`, `false`는 자기자신을 반환합니다. `Array#to_param` 메소드는 배열 각요소에 대해서 `to_param` 메소드를 호출하여 결과를 `/`문자로 연결해서 반환해 줍니다. [[[For example `nil`, `true`, and `false` return themselves. `Array#to_param` calls `to_param` on the elements and joins the result with "/":]]]
+예를 들어 `nil`, `true`, `false`의 경우는 자기 자신을 반환합니다. `Array#to_param`를 실행하면 `to_param`이 배열 내의 각 요소에 대해서 실행되며, 결과가 "/"로 join됩니다.
 
 ```ruby
 [0, true, String].to_param # => "0/true/String"
 ```
 
-주목할 것은, 레일스 라우팅 시스템은 모델에 대해서 `to_param` 메소드를 호출하여 `:id` 값을 얻어냅니다. `ActiveRecord::Base#to_param`은 특정 모델의 `id` 값을 반환해주지만, 예를 들어, 아래와 같이, 모델 클래스에서 이 메소드를 재정의할 수도 있습니다. [[[Notably, the Rails routing system calls `to_param` on models to get a value for the `:id` placeholder. `ActiveRecord::Base#to_param` returns the `id` of a model, but you can redefine that method in your models. For example, given]]]
+특히 Rails의 라우팅 시스템은 모델에 대해서 `to_param` 메소드를 실행해서 `:id` 플레이스홀더의 값을 얻어옵니다. `ActiveRecord::Base#to_param`은 모델의 `id`를 반환합니다만 이 메소드를 모델 내에서 재정의할 수도 있습니다. 다음처럼,
 
 ```ruby
 class User
@@ -321,19 +320,19 @@ class User
 end
 ```
 
-이와 같이 재정의하면 아래와 같은 결과를 얻을 수 있습니다. [[[we get:]]]
+이래의 결과를 얻을 수 있습니다.
 
 ```ruby
 user_path(@user) # => "/users/357-john-smith"
 ```
 
-WARNING. 이와 같이 요청이 들어올 경우, `params[:id]`의 값이 "357-john-smith"가 되기 때문에 컨트롤러는 `to_param`이 재정의된 것을 알 필요가 있습니다. [[[Controllers need to be aware of any redefinition of `to_param` because when a request like that comes in "357-john-smith" is the value of `params[:id]`.]]]
+WARNING: 컨트롤러에서는 `to_param` 메소드가 모델쪽에서 재정의 되어있을 가능성을 항상 주의해야할 필요가 있습니다. 위와 같은 요청을 수신했을 경우, `params[:id]`의 값이 "357-john-smith"가 되기 때문입니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/object/to_param.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/to_param.rb`.]]]
+NOTE: `active_support/core_ext/object/to_param.rb`에 정의되어 있습니다.
 
 ### `to_query`
 
-해시를 제외하고, 이스케이프되지 않은 `key`가 주어진 상태에서 이 메소드는 해당 키를 `to_param`이 반환하는 값으로 매핑시켜 주는 쿼리문자열 일부를 생성해 줍니다. 예를 들어 아래와 같이 `to_param`이 재정의된 경우에, [[[Except for hashes, given an unescaped `key` this method constructs the part of a query string that would map such key to what `to_param` returns. For example, given]]]
+이 메소드는 이스케이프 되지 않은 `key`를 받으면, 그 키를 `to_param`이 돌려주는 값을 대응시키는 쿼리 문자열의 일부를 생성합니다. 단 해시는 예외입니다(뒤에서 설명). 예를 들자면 다음과 같은 경우,
 
 ```ruby
 class User
@@ -343,48 +342,48 @@ class User
 end
 ```
 
-아래와 같은 결과를 얻게 될 것입니다. [[[we get:]]]
+아래와 같은 결과를 얻을 수 있습니다.
 
 ```ruby
-current_user.to_query('user') # => user=357-john-smith
+current_user.to_query('user') # => "user=357-john-smith"
 ```
 
-이 메소드는 키와 값을 모두 이스케이프시키게 됩니다. [[[This method escapes whatever is needed, both for the key and the value:]]]
+이 메소드는 키와 값, 어느쪽이든 필요한 부분을 모두 이스케이프 합니다.
 
 ```ruby
 account.to_query('company[name]')
 # => "company%5Bname%5D=Johnson+%26+Johnson"
 ```
 
-따라서 위와 같은 결과물은 쿼리문자열로 사용할 수 있는 상태가 되는 것입니다. [[[so its output is ready to be used in a query string.]]]
+따라서 이 결과값은 그대로 쿼리 문자열로 사용할 수 있습니다.
 
-배열은 각요소에 대해서 `_key_[]`형태의 키로써 `to_query` 메소드를 적용하고 각각의 결과를 "&" 문자로 연결해서 결과물로 반환하게 됩니다.  [[[Arrays return the result of applying `to_query` to each element with `_key_[]` as key, and join the result with "&":]]]
+배열에 `to_query` 메소드를 사용한 경우 `to_query`를 배열의 각 요소에 호출하여 `_key_[]`를 키로 추가하고, 그 값들을 "&"로 연결한 결과를 반환합니다.
 
 ```ruby
 [3.4, -45.6].to_query('sample')
 # => "sample%5B%5D=3.4&sample%5B%5D=-45.6"
 ```
 
-해시도 `to_query` 메소드에 반응하지만, 다른 특징을 가지고 있습니다. 인수없이 호출하게 되면 일련의 키/값 할당문을 생성하고 각 값에 대해서 `to_query(key)`를 호출하게 됩니다. 그리고 그 결과들을 "&" 문자로 연결하여 반환합니다. [[[Hashes also respond to `to_query` but with a different signature. If no argument is passed a call generates a sorted series of key/value assignments calling `to_query(key)` on its values. Then it joins the result with "&":]]]
+해시도 `to_query`를 사용할 수 있습니다만, 다른 방식으로 호출됩니다. 메소드에 인수가 넘겨지지 않았을 경우, 메소드는 해시의 키/값 쌍을 정렬된 순서로 생성하고, 각각의 값에 대해서 `to_query(key)`를 호출합니다. 이어서 각 결과들을 "&"로 연결합니다.
 
 ```ruby
 {c: 3, b: 2, a: 1}.to_query # => "a=1&b=2&c=3"
 ```
 
-`Hash#to_query` 메소드는 키에 대한 네임스페이스를 옵션으로 지정할 수 있습니다. [[[The method `Hash#to_query` accepts an optional namespace for the keys:]]]
+`Hash#to_query` 메소드는 각 키에 대해서 네임스페이스를 옵션으로 줄 수도 있습니다.
 
 ```ruby
 {id: 89, name: "John Smith"}.to_query('user')
 # => "user%5Bid%5D=89&user%5Bname%5D=John+Smith"
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/object/to_query.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/to_query.rb`.]]]
+NOTE: `active_support/core_ext/object/to_query.rb`에 정의되어 있습니다.
 
 ### `with_options`
 
-`with_options` 메소드는 일련의 메소드 호출시 공통되는 옵션을 별도로 빼는 방법을 제공해 줍니다. [[[The method `with_options` provides a way to factor out common options in a series of method calls.]]]
+`with_options` 메소드는 순차적으로 사용되는 여러 메소드에 대해서 공통으로 주어지는 옵션을 바깥으로 꺼내기 위한 수단을 제공합니다.
 
-디폴트 옵션 해시를 넘겨 주면, `with_options` 메소드는 코드블록으로 대리 객체를 넘겨주게 됩니다. 그러면 블록내에서 대리객체에 대해서 호출된 메소드는 넘겨 받은 옵션들을 머지해서 receiver 객체로 전달됩니다. 예를 들면, 아래의 코드에서 중복된 옵션을 제거할 수 있습니다. [[[Given a default options hash, `with_options` yields a proxy object to a block. Within the block, methods called on the proxy are forwarded to the receiver with their options merged. For example, you get rid of the duplication in:]]]
+기본으로 옵션 해시가 주어지면, `with_options`은 블록에 대해서 프록시 객체를 생성합니다. 그 블록 내에서는 프록시에 대해서 호출된 메소드에 옵션을 추가한 뒤, 그 메소드를 리시버에게 보냅니다. 예를 들자면, 아래와 같은 옵션을 반복하지 않아도 됩니다.
 
 ```ruby
 class Account < ActiveRecord::Base
@@ -395,7 +394,7 @@ class Account < ActiveRecord::Base
 end
 ```
 
-이 메소드를 이용하면 아래와 같이 코딩할 수 있습니다. [[[this way:]]]
+이는 아래와 같이 재작성할 수 있습니다.
 
 ```ruby
 class Account < ActiveRecord::Base
@@ -408,7 +407,7 @@ class Account < ActiveRecord::Base
 end
 ```
 
-이와 같은 관용적인 용법은 독자들을 그룹화할 수 있게도 합니다. 예를 들면, 독자들이 등록해 놓은 언어에 맞는 뉴스레터를 발송하고자 할 때 아래와 같이 메일러 내에 로케일별로 그룹화할 수 있을 것입니다. [[[That idiom may convey _grouping_ to the reader as well. For example, say you want to send a newsletter whose language depends on the user. Somewhere in the mailer you could group locale-dependent bits like this:]]]
+예를 들어,  이 방법을 사용하면 뉴스레터의 독자를 언어별로 _그룹화_할 수 있습니다. 독자가 원하는 언어에 따라서 다른 뉴스레터를 보내고 싶다고 해봅시다. 메일 전송용 코드의 어딘가에 아래와 같은 언어에 의존하는 부분을 그룹화 할 수 있습니다.
 
 ```ruby
 I18n.with_options locale: user.locale, scope: "newsletter" do |i18n|
@@ -417,17 +416,23 @@ I18n.with_options locale: user.locale, scope: "newsletter" do |i18n|
 end
 ```
 
-TIP: `with_options` 메소드는 호출을 자신의 recevier 객체로 전달하기 때문에 얼마든지 중첩해서 호출할 수 있습니다. 각각의 중첩레벌은 자신 뿐만아니라 상속된 디폴트 설정을 머지하게 될 것입니다. [[[Since `with_options` forwards calls to its receiver they can be nested. Each nesting level will merge inherited defaults in addition to their own.]]]
+TIP: `with_options`은 메소드를 리시버에게 전송하므로 호출을 중첩할 수도 있습니다. 각 중첩 레벨에서는 자신의 호출에 대해서 물려받은 기본 호출값을 병합합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/object/with_options.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/with_options.rb`.]]]
+NOTE: `active_support/core_ext/object/with_options.rb`에 정의되어 있습니다.
 
-### Instance Variables
+### JSON support
 
-액티브서포트는 인스턴스 변수를 쉽게 접근할 수 있는 다양한 메소드를 제공해 줍니다. [[[Active Support provides several methods to ease access to instance variables.]]]
+Active Support가 제공하는 `to_json` 메소드의 구현은 일반적으로 `json` gem이 Ruby 객체에 제공하는 `to_json`보다도 뛰어납니다. 그 이유는 `Hash`나 `OrderedHash`, `Process::Status` 등의 클래스에서는 올바른 JSON 표현을 제공하기 위해서 특별한 처리가 필요하기 때문입니다.
+
+NOTE: `active_support/core_ext/object/json.rb`에 정의되어 있습니다.
+
+### 인스턴스 변수
+
+Active Support는 인스턴스 변수에 간단히 접근하기 위한 메소드를 제공합니다.
 
 #### `instance_values`
 
-`instance_values` 메소드는 인스턴스 변수 이름에서 `@` 문자를 제거한 상태로 해당 값을 매핑해 주는 해시를 반환해 줍니다. 키들은 문자열형태를 가집니다. [[[The method `instance_values` returns a hash that maps instance variable names without "@" to their corresponding values. Keys are strings:]]]
+`instance_values` 메소드는 해시를 반환합니다. 인스턴스 변수명으로부터 "@"를 제외한 부분이 해시의 키로, 인스턴스 변수의 값이 해시의 값으로 매핑됩니다. 키는 문자열입니다.
 
 ```ruby
 class C
@@ -439,17 +444,33 @@ end
 C.new(0, 1).instance_values # => {"x" => 0, "y" => 1}
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/object/instance_variables.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/instance_variables.rb`.]]]
+NOTE: `active_support/core_ext/object/instance_variables.rb`에 정의되어 있습니다.
 
-### [Silencing Warnings, Streams, and Exceptions] 경고, 스트림, 예외 표시 감추기
+#### `instance_variable_names`
 
-`silence_warnings`와 `enable_warnings` 메소드는 블록내의 코드가 실행되는 동안 `$VERBOSE` 값을 변경하여 경고표시 상태를 결정하게 되는데 블록내의 코드 실행이 종료되면 다시 이전 상태로 되돌려 주게 됩니다. [[[The methods `silence_warnings` and `enable_warnings` change the value of `$VERBOSE` accordingly for the duration of their block, and reset it afterwards:]]]
+`instance_variable_names` 메소드는 배열을 반환합니다. 배열의 인스턴스명에는 "@" 기호가 포함됩니다.
+
+```ruby
+class C
+  def initialize(x, y)
+    @x, @y = x, y
+  end
+end
+
+C.new(0, 1).instance_variable_names # => ["@x", "@y"]
+```
+
+NOTE: `active_support/core_ext/object/instance_variables.rb`에 정의되어 있습니다.
+
+### 경고, 스트림, 예외 무시하기
+
+`silence_warnings` 메소드와 `enable_warnings` 메소드는 블록이 살아있는 동안 `$VERBOSE`을 변경하고, 그 후 초기화합니다.
 
 ```ruby
 silence_warnings { Object.const_set "RAILS_DEFAULT_LOGGER", logger }
 ```
 
-`silence_stream` 메소드에 코드블록을 넘겨 주어 블록이 실행되는 동안 스트림으로 아무 것도 표시되지 않도록 할 수 있습니다. [[[You can silence any stream while a block runs with `silence_stream`:]]]
+마찬가지로 `silence_stream`을 통해서 특정 스트림에 대한 출력을 무시할 수도 있습니다.
 
 ```ruby
 silence_stream(STDOUT) do
@@ -457,58 +478,54 @@ silence_stream(STDOUT) do
 end
 ```
 
-`quietly` 메소드는 흔히 서브프로세스에서 조차도 STDOUT과 STDERR을 표시하지 않도록 할 때 사용할 수 있습니다. [[[The `quietly` method addresses the common use case where you want to silence STDOUT and STDERR, even in subprocesses:]]]
+`quietly` 메소드는 STDOUT과 STDERR에 대한 출력을 무시하길 원하는 경우에 사용할수 있는 일반적인 방법입니다. 이는 서브 프로세스에서도 유효합니다.
 
 ```ruby
 quietly { system 'bundle install' }
 ```
 
-예를 들면, railties 테스트 류들은 군데군데 이러한 메소드를 사용해서 명령 메시지가 진행상태 메시지와 혼재되어 표시되는 것을 방지해 줍니다.[[[For example, the railties test suite uses that one in a few places to prevent command messages from being echoed intermixed with the progress status.]]]
+예를 들어, railities 테스트 중 몇몇에서는 테스트 진행 상태를 알려주는 메시지를 방해하지 않도록 내부 출력을 무시합니다.
 
-예외를 표시하지 않기 위해서는 `suppress`라는 메소드를 사용할 수 있습니다. 이 메소드는 여러개의 예외 클래스를 취할 수 있는데, 코드블록이 실행될 때 발생하는 예외가 인수로 넘겨진 예외의 `kind_of?` 클래스이면 `suppress` 메소드가 그 예외를 인지해서 표시하지 않도록 해 줍니다. 넘겨진 예외 클래스와 일치하지 않는 경우에는 해당 예외를 다시 발생시키게 됩니다. [[[Silencing exceptions is also possible with `suppress`. This method receives an arbitrary number of exception classes. If an exception is raised during the execution of the block and is `kind_of?` any of the arguments, `suppress` captures it and returns silently. Otherwise the exception is reraised:]]]
+`suppress` 메소드를 사용하면 예외의 발생을 막을 수도 있습니다. 이 메소드는 예외 클래스를 가리키는 임의의 숫자를 받습니다. `suppress`는 블록을 실행할 때에 예외가 발생하고, 그 예외가 (`kind_of?`에 의한 판정을 통해) 넘겨받은 인수와 일치하는 경우, 그것을 잡아서 예외를 발생시키지 않고 돌려보냅니다. 일치하지 않는 경우에는 예외를 처리하지 않습니다.
 
 ```ruby
-# 해당 유저가 lock 상태일 때 increments 메소드는 값을 증가시키지 못하게 됩니다. 이것은 당연한 일이기도 합니다. 
+#  잠긴 사용자의 경우, 증분은 발생하지 않지만, 이 손실이 중요하지 않을 때
 suppress(ActiveRecord::StaleObjectError) do
   current_user.increment! :visits
 end
 ```
 
-코멘트 중 한역부분 [[[If the user is locked the increment is lost, no big deal.]]]
-
-NOTE: 이 메소드는 `active_support/core_ext/kernel/reporting.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/kernel/reporting.rb`.]]]
+NOTE: `active_support/core_ext/kernel/reporting.rb`에 정의되어 있습니다.
 
 ### `in?`
 
-`in?` 메소드는 특정 객체가 다른 객체나 객체 목록에 포함되는지를 테스트해 줍니다. 인수 하나만 넘겨지고 `include?` 메소드에 반응하지 않으면 `ArgumentError` 예외가 발생할 것입니다. [[[The predicate `in?` tests if an object is included in another object or a list of objects. An `ArgumentError` exception will be raised if a single argument is passed and it does not respond to `include?`.]]]
+메소드 `in?`는 어떤 객체가 다른 객체에 포함되어있는지를 테스트합니다. 넘겨받은 인수에 `include?`를 호출할 수 없는 경우에는 `ArgumentError` 예외를 발생시킵니다.
 
-`in?` 메소드의 예는 아래와 같습니다. [[[Examples of `in?`:]]]
+`in?`의 예시를 보시죠.
 
 ```ruby
-1.in?(1,2)          # => true
 1.in?([1,2])        # => true
 "lo".in?("hello")   # => true
 25.in?(30..50)      # => false
 1.in?(1)            # => ArgumentError
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/object/inclusion.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/object/inclusion.rb`.]]]
+NOTE: `active_support/core_ext/object/inclusion.rb`에 정의되어 있습니다.
 
-[Extensions to `Module`] 모듈에 대한 확장 메소드
+`Module` 확장
 ----------------------
 
 ### `alias_method_chain`
+확장되지 않은 순수한 Ruby를 사용하여 메소드를 다른 메소드로 감쌀 수 있습니다만, 이는 _alias chaining_이라고 불립니다.
 
-루비에서는 다른 메소드로 메소드를 감싸 줄 수 있습니다. 바로 이런 것을 _alias_chaining_ 이라고 합니다. [[[Using plain Ruby you can wrap methods with other methods, that's called _alias chaining_.]]]
-
-예를 들어, 기능테스트에서 실제적인 요청이 있을 때 문자열을 params로 사용하기를 원하지만, 정수와 다른 형의 값들로도 사용하기를 원한다고 가정해 봅시다. 이를 구현하기 위해서는 `test/test_helper.rb` 파일내에 있는 `ActionController::TestCase#process`를 이런식으로 감싸줄 수 있을 것입니다. [[[For example, let's say you'd like params to be strings in functional tests, as they are in real requests, but still want the convenience of assigning integers and other kind of values. To accomplish that you could wrap `ActionController::TestCase#process` this way in `test/test_helper.rb`:]]]
+예를 들자면, 기능 테스트를 할 때에 파라미터가(실제 요청과 마찬가지로) 문자열이길 기대한다고 합시다. 그러나 필요하다면 정수 등의 다른 타입의 값을 가질 수 있도록 하고 싶습니다. 이를 실현하기 위해서는 `ActionController::TestCase#process`를 아래와 같이 `test/test_helper.rb`에서 감쌉니다.
 
 ```ruby
 ActionController::TestCase.class_eval do
-  # save a reference to the original process method
+  # 본래의 프로세스 메소드의 참조를 저장
   alias_method :original_process, :process
 
-  # now redefine process and delegate to original_process
+  # 프로세스를 재정의 하여 original_process에 위임
   def process(action, params=nil, session=nil, flash=nil, http_method='GET')
     params = Hash[*params.map {|k, v| [k, v.to_s]}.flatten]
     original_process(action, params, session, flash, http_method)
@@ -516,9 +533,9 @@ ActionController::TestCase.class_eval do
 end
 ```
 
-`get`, `post`등과 같은 메소드가 그 일을 위임받아 처리하게 됩니다.(역자주: 번역이 불완전합니다) [[[That's the method `get`, `post`, etc., delegate the work to.]]]
+이는 `get`, `post` 메소드 등이 작업을 위임할 때에 사용되는 방식입니다.
 
-이러한 기법은 위험성이 있습니다. 예를 들어, `:original_process`를 취하게 될 때가 그런 경우입니다. 이 때 충돌을 피하기 위해서는 어떤 라벨을 선택하게 되는데, 바로 이것이 `alias chaining`이 어떤 특징이 있는지를 잘 설명해 줍니다. [[[That technique has a risk, it could be the case that `:original_process` was taken. To try to avoid collisions people choose some label that characterizes what the chaining is about:]]]
+이 방법에는 `:original_process`가 의도치 않은 방식으로 사용될 위험이 있습니다. alias chain을 사용할 때에 명명으로 인한 사용자들의 혼란을 피하기 위해서는 다음과 같이 사용할 수 있습니다.
 
 ```ruby
 ActionController::TestCase.class_eval do
@@ -531,7 +548,7 @@ ActionController::TestCase.class_eval do
 end
 ```
 
-`alias_method_chain`은 이러한 기법를 단순화 시켜 줍니다.[[[The method `alias_method_chain` provides a shortcut for that pattern:]]]
+`alias_method_chain` 메소드를 사용하면 이와 같은 패턴을 더 간단하게 사용할 수 있습니다.
 
 ```ruby
 ActionController::TestCase.class_eval do
@@ -543,51 +560,51 @@ ActionController::TestCase.class_eval do
 end
 ```
 
-레일스는 코드 전반에 결쳐서 `alias_chain_methods`를 사용합니다. 예를 들어, 유효성검증에 특화된 별도의 모듈에서 그런식으로 감싸줌으로써 `ActiveRecord::Base#save`에 유효성 검증 기능을 추가해 주었습니다. [[[Rails uses `alias_method_chain` all over the code base. For example validations are added to `ActiveRecord::Base#save` by wrapping the method that way in a separate module specialized in validations.]]]
 
-NOTE: 이 메소드는 `active_support/core_ext/module/aliasing.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/aliasing.rb`.]]]
 
-### Attributes
+NOTE: `active_support/core_ext/module/aliasing.rb`에 정의되어 있습니다.
+
+### 속성
 
 #### `alias_attribute`
 
-모델 속성들은 reader, writer, predicate(논리값을 반환하는 reader)를 가집니다. 하나의 모델 속성에 별칭을 부여해서 한번에 이 세가지 메소드가 정의되도록 할 수 있습니다. 다른 별칭부여 메소스와 같이, 새로운 이름이 첫번째 인수가 되고 이전 이름이 두번째 인수가 됩니다.(이것은 할당 문법을 생각하면 쉽게 기억할 수 있습니다.)[[[Model attributes have a reader, a writer, and a predicate. You can alias a model attribute having the corresponding three methods defined for you in one shot. As in other aliasing methods, the new name is the first argument, and the old name is the second (my mnemonic is they go in the same order as if you did an assignment):]]]
+모델의 속성에는 읽기 접근자(reader), 쓰기 접근자(writer), 술어(predicate)가 있습니다. 이에 대응하는 3개의 메소드를 가지는 모델의 속성의 별명(alias)를 한번에 작성할 수 있습니다. 다른 별명 생성용 메소드와 마찬가지로 첫번째 인수로 새 이름, 두번째로 원래의 이름을 지정합니다(변수에 대입할 때와 같은 순서라고 기억해두는 방법도 있습니다).
 
 ```ruby
 class User < ActiveRecord::Base
-  # let me refer to the email column as "login",
-  # possibly meaningful for authentication code
+  # email 컬럼을 "login"이라는 이름으로 참조하고 싶음
+  # 이것으로 인증 코드의 가독성을 올릴 수 있음
   alias_attribute :login, :email
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/module/aliasing.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/aliasing.rb`.]]]
+NOTE: `active_support/core_ext/module/aliasing.rb`에 정의되어 있습니다.
 
-#### Internal Attributes
+#### 내부 속성
 
-상속을 전제로 하여 클래스에서 하나의 속성을 정의할 때, 이름 충돌의 위험성이 있습니다. 이것은 라이브러리를 구축할 때 매우 심각한 일입니다. [[[When you are defining an attribute in a class that is meant to be subclassed, name collisions are a risk. That's remarkably important for libraries.]]]
+어떤 클래스에서 속성을 정의하면, 나중에 그 클래스의 서브 클래스를 선언할 때 이름이 충돌할 수 있는 위험성이 발생합니다. 이는 라이브러리에 있어서 가장 중요한 문제입니다.
 
-액티브서프트는 `attr_internal_reader`, `attr_internal_writer`, `attr_internal_accessor` 매크로를 정의하고 있습니다. 이것들은 루비의 `attr_*` 해당 매크로와 같이 동작을 하지만 인스턴스변수명 앞에 밑줄문자가 붙여 이름 충돌을 최소한으로 피하도록 했습니다. [[[Active Support defines the macros `attr_internal_reader`, `attr_internal_writer`, and `attr_internal_accessor`. They behave like their Ruby built-in `attr_*` counterparts, except they name the underlying instance variable in a way that makes collisions less likely.]]]
+Active Support에서는 `attr_internal_reader`, `attr_internal_writer`, `attr_internal_accessor`라는 매크로가 정의되어 있습니다. 이 매크로는 Ruby에 내장되어있는 `attr_*`와 동일한 동작을 수행합니다만, 내부의 인스턴스 변수의 이름이 충돌하기 어렵도록 고려되어 있다는 점이 다릅니다.
 
-`attr_internal` 매크로는 `attr_internal_accessor`와 같은 것입니다. [[[The macro `attr_internal` is a synonym for `attr_internal_accessor`:]]]
+`attr_internal` 매크로는 `attr_internal_accessor`와 동일합니다.
 
 ```ruby
-# library
+# 라이브러리
 class ThirdPartyLibrary::Crawler
   attr_internal :log_level
 end
 
-# client code
+# 클라이언트 코드
 class MyCrawler < ThirdPartyLibrary::Crawler
   attr_accessor :log_level
 end
 ```
 
-이전 예에서 `:log_level`은 라이브러리의 공개 인턴페이스로 제공되지 않고 단지 개발을 위해서 사용됩니다. 이러한 이름 충돌의 가능성을 알지 못하는 클라이언트 코드에서 이 클래스를 상속해서 자신만의 `:log_level`을 정의하지만 `attr_internal` 덕분에 충돌현상을 발생하지 않게 됩니다. [[[In the previous example it could be the case that `:log_level` does not belong to the public interface of the library and it is only used for development. The client code, unaware of the potential conflict, subclasses and defines its own `:log_level`. Thanks to `attr_internal` there's no collision.]]]
+이 예시에서는 `:log_level`은 라이브러리의 퍼블릭 인터페이스에 속해있지 않고 개발용으로만 사용됩니다. 클라이언트의 코드에서는 충돌의 가능성을 고려하지 않고 독자적인 `:log_level`을 자식 클래스에 정의하고 있습니다. 라이브러리에서 `attr_internal`을 사용하고 있는 덕분에 충돌이 발생하는 것을 회피할 수 있습니다.
 
-디폴트 상태에서는 내부 인스턴스 변수의 이름은 위의 예에서 볼 때 `@_log_level`과 같이 이름 앞에 밑줄문자가 붙게 됩니다. 그러나 이러한 명칭 포맷은 `Module.attr_internal_naming_format`을 수정하여 변경할 수 있는데, 변수명이 위치하는 곳에 `sprintf`에서 사용하는 포맷 문자열의 앞에 `@`을 붙이고 문자열 중간에 `%s`를 삽입하면 됩니다. 디폴트는 `"@_%s"`입니다. [[[By default the internal instance variable is named with a leading underscore, `@_log_level` in the example above. That's configurable via `Module.attr_internal_naming_format` though, you can pass any `sprintf`-like format string with a leading `@` and a `%s` somewhere, which is where the name will be placed. The default is `"@_%s"`.]]]
+이 때, 내부 인스턴스 변수의 이름에는 기본으로 언더스코어가 추가됩니다. 위의 예제에서라면 `@_log_level`이 됩니다. 이 동작은 `Module.attr_internal_naming_format`을 사용해서 변경할 수도 있습니다. `sprintf`와 마찬가지로 포맷 문자열을 넘기고, 첫부분에 `@`를 두고, 나머지 부분을 위치시킬 장소에 `%s`를 추가합니다. 기본 값은 `"@_%s"`입니다.
 
-레일스는 몇군데에서 이러한 내부 속성을 사용하는데, 뷰를 예를 들면, 다음과 같습니다. [[[Rails uses internal attributes in a few spots, for examples for views:]]]
+Rails에서는 이 내부 속성을 몇몇 코드에서 사용하고 있습니다. 예를 들자면 뷰에서는 다음처럼 사용합니다.
 
 ```ruby
 module ActionView
@@ -599,13 +616,14 @@ module ActionView
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/module/attr_internal.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/attr_internal.rb`.]]]
+NOTE: `active_support/core_ext/module/attr_internal.rb`에 정의되어 있습니다.
 
-#### Module Attributes
+#### 모듈 속성
 
-`mattr_reader`, `mattr_writer`, `mattr_accessor` 매크로는 클래스에서 정의되는 `cattr_*` 매크로에 해당하는 것입니다. [Class Attributes](#class-attributes)를 확인해 보기 바랍니다. [[[The macros `mattr_reader`, `mattr_writer`, and `mattr_accessor` are analogous to the `cattr_*` macros defined for class. Check [Class Attributes](#class-attributes).]]]
+`mattr_reader`, `mattr_writer`, `mattr_accessor`라는 3개의 매크로는 클래스 용으로 정의되어 있는 `cattr_*` 매크로돠 동일한 동작을 수행합니다. 실제로 `cattr_*` 매크로의 별칭으로 `mattr_*`를 사용하고 있을 뿐입니다. [클래스 속성](#class속성)을 참고해주세요.
 
-예를 들면, 의존성 메카니즘이 이것을 사용합니다. [[[For example, the dependencies mechanism uses them:]]]
+예를 들자면, 이 매크로는 아래의 Dependencies 모듈에서 사용하고 있습니다.
+たとえば、これらのマクロは以下のDependenciesモジュールで使用されています。
 
 ```ruby
 module ActiveSupport
@@ -626,13 +644,13 @@ module ActiveSupport
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/module/attribute_accessors.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/attribute_accessors.rb`.]]]
+NOTE: `active_support/core_ext/module/attribute_accessors.rb`에 정의되어 있습니다.
 
-### Parents
+### 부모
 
 #### `parent`
 
-명칭이 붙은 모듈이 중첩된 경우 `parent` 메소드는 해당 모듈 상수를 포함하는 모듈을 반환해 줍니다. [[[The `parent` method on a nested named module returns the module that contains its corresponding constant:]]]
+`parent` 메소드는 이름을 가지는 중첩된 모듈에 대해서 실행할 수 있으며, 대응하는 상수를 가지는 모듈을 반환합니다.
 
 ```ruby
 module X
@@ -647,15 +665,15 @@ X::Y::Z.parent # => X::Y
 M.parent       # => X::Y
 ```
 
-모듈에 명칭이 없거나 최상위에 속할 경우, `parent`는 `Object`를 반환해 줍니다. [[[If the module is anonymous or belongs to the top-level, `parent` returns `Object`.]]]
+모듈에 이름이 없거나, 최상위인 경우, `parent`는 `Object`를 반환합니다.
 
-WARNING: 이럴 경우에, `parent_name`은 `nil` 값을 반환해 준다는 것을 주목하기 바랍니다. [[[Note that in that case `parent_name` returns `nil`.]]]
+WARNING: `parent_name`는 그 경우 `nil`을 돌려줍니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/module/introspection.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/introspection.rb`.]]]
+NOTE: `active_support/core_ext/module/introspection.rb`에 정의되어 있습니다.
 
 #### `parent_name`
 
-모듈에 명칭이 있는 경우 중첩되어 사용될 때 `parent_name` 메소드는 해당 모듈 상수를 포함하는 모듈명을 전체 네임스페이스를 포함해서 문자열로 반환해 줍니다. [[[The `parent_name` method on a nested named module returns the fully-qualified name of the module that contains its corresponding constant:]]]
+`parent_name` 메소드는 이름을 가지는 모듈들이 중첩되어 있는 경우에 실행할 수 있으며, 대응하는 상수를 가지는 모듈의 이름을 반환합니다.
 
 ```ruby
 module X
@@ -670,15 +688,15 @@ X::Y::Z.parent_name # => "X::Y"
 M.parent_name       # => "X::Y"
 ```
 
-최상위 또는 명칭이 없는 모듈인 경우에 `parent_name`은 `nil` 값을 반환해 줍니다. [[[For top-level or anonymous modules `parent_name` returns `nil`.]]]
+모듈의 이름이 없거나, 최상위인 경우, `parent_name`은 `nil`을 반환합니다.
 
-WARNING: 이런 경우에 `parent`는 `Object`를 반환한다는 것을 주목하기 바랍니다. [[[Note that in that case `parent` returns `Object`.]]]
+WARNING: `parent`는 그 경우에 `Object`를 돌려줍니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/module/introspection.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/introspection.rb`.]]]
+NOTE: `active_support/core_ext/module/introspection.r에 정의되어 있습니다.
 
 #### `parents`
 
-`parents` 메소드는 receiver에 대해서 (상속계층구조에서) `Object`에 도달할 때까지 `parent` 메소드를 호출합니다. 결과 체인은 아래서부터 최상위 순서로 배열에 담겨 반환됩니다. [[[The method `parents` calls `parent` on the receiver and upwards until `Object` is reached. The chain is returned in an array, from bottom to top:]]]
+`parents` 메소드는 리시버에 대해서 `parent`를 호출하며, `Object`에 도달할때까지의 경로를 거슬로 올라갑니다. 연쇄적인 모듈은 하위부터 상위의 순서로 배열에 저장되어 반환됩니다.
 
 ```ruby
 module X
@@ -693,11 +711,11 @@ X::Y::Z.parents # => [X::Y, X, Object]
 M.parents       # => [X::Y, X, Object]
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/module/introspection.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/introspection.rb`.]]]
+NOTE: `active_support/core_ext/module/introspection.rb`에 정의되어 있습니다.
 
-### [Constants] 상수
+### 상수
 
-`local_constants` 메소드는 receiver 모듈에 정의되어 있는 상수들의 이름을 반환해 줍니다. [[[The method `local_constants` returns the names of the constants that have been defined in the receiver module:]]]
+`local_constants` 메소드는 리시버 모듈에 정의된 상수를 반환합니다.
 
 ```ruby
 module X
@@ -713,15 +731,15 @@ X.local_constants    # => [:X1, :X2, :Y]
 X::Y.local_constants # => [:Y1, :X1]
 ```
 
-이 때 상수명은 심볼로 반환됩니다. (이와 대조적으로, 이제는 더 이상 사용되지 않는 `local_constant_names` 메소드는 문자열을 반환합니다.) [[[The names are returned as symbols. (The deprecated method `local_constant_names` returns strings.)]]]
+상수명은 심볼로 돌아옵니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/module/introspection.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/introspection.rb`.]]]
+NOTE: `active_support/core_ext/module/introspection.rb`에 정의되어 있습니다.
 
-#### [Qualified Constant Names] 경로를 포함하는 상수명
+#### 정규 상수명
 
-표준 루비 메소드인 `const_defined?`, `const_get`, `const_set`은 상수명만 인수로 받습니다. 그러나 액티브서포트는 이 표준 API의 기능을 확장해서 상대경로를 포함하는 상수명을 넘겨 받을 수 있습니다. [[[The standard methods `const_defined?`, `const_get` , and `const_set` accept bare constant names. Active Support extends this API to be able to pass relative qualified constant names.]]]
+표준 메소드인 `const_defined?`, `const_get`, `const_set`에서는 순수한 상수명만을 사용할 수 있습니다. Active Support는 이 API를 확장하여 전체 경로에 가까운(qualified) 상수명을 넘길 수 있게 해줍니다.
 
-이렇게 기능이 확장된 새로운 메소드는 `qualified_const_defined?`, `qualified_const_get`, `qualified_const_set`이 있습니다. 인수는 receiver에 대한 상대경로명을 가지는 상수명이 지정됩니다. (역자주: `qualified_*`로 시작하는 메소드는 receiver로 부터의 상대경로 상의 인수를 받는다고 생각하면 될 것 같습니다.) [[[The new methods are `qualified_const_defined?`, `qualified_const_get`, and `qualified_const_set`. Their arguments are assumed to be qualified constant names relative to their receiver:]]]
+이 메소드들은 `qualified_const_defined?`, `qualified_const_get`, `qualified_const_set`입니다. 넘긴 인수는 리시버를 기준으로 경로를 포함한 상수 명일 것이라는 전제를 가집니다.
 
 ```ruby
 Object.qualified_const_defined?("Math::PI")       # => true
@@ -729,15 +747,15 @@ Object.qualified_const_get("Math::PI")            # => 3.141592653589793
 Object.qualified_const_set("Math::Phi", 1.618034) # => 1.618034
 ```
 
-인수를 상수 이름만으로 지정할 수 있습니다. [[[Arguments may be bare constant names:]]]
+경로를 포함하지 않는 순수한 정수명도 사용할 수 있습니다.
 
 ```ruby
 Math.qualified_const_get("E") # => 2.718281828459045
 ```
 
-이 메소드는 루비의 내장 코어의 카운터파트 메소드와 유사합니다. 특히, `qualified_constant_defined?` 메소드는 두번째 인수를 옵션으로 지정하여 상속계층구조상에서 조상모듈을 찾을 것인지를 선택할 수 있습니다. 이 옵션은 계층구조의 경로를 따라 갈 때 표현식에서 각각의 상수에 대해서 고려해야 합니다. [[[These methods are analogous to their builtin counterparts. In particular, `qualified_constant_defined?` accepts an optional second argument to be able to say whether you want the predicate to look in the ancestors. This flag is taken into account for each constant in the expression while walking down the path.]]]
+이러한 메소드들은 내장된 메소드와 무척 닮아있습니다. 특히 `qualified_constant_defined?` 메소드는 옵션으로 리시버의 부모에서도 해당하는 상수를 검색할 것인지를 지정하는 두번째 인수를 받을 수 있습니다. 이 플래그는 주어진 모든 상수에 대해서 메소드로 경로를 따라 내려가며 적용됩니다.
 
-예를 들어, 다음과 같은 모듈구조에서 [[[For example, given]]]
+아래의 예시를 확인해주세요.
 
 ```ruby
 module M
@@ -751,7 +769,7 @@ module N
 end
 ```
 
-`qualified_const_defined?` 메소드는 다음과 같이 동작을 하게 됩니다. [[[`qualified_const_defined?` behaves this way:]]]
+`qualified_const_defined?`는 다음과 같이 동작합니다.
 
 ```ruby
 N.qualified_const_defined?("C::X", false) # => false
@@ -759,17 +777,17 @@ N.qualified_const_defined?("C::X", true)  # => true
 N.qualified_const_defined?("C::X")        # => true
 ```
 
-위의 예에서와 같이, 두번째 인수의 디폴트값은, `const_defined?`에서와 같이, true 입니다. [[[As the last example implies, the second argument defaults to true, as in `const_defined?`.]]]
+마지막 예제에서 볼 수 있듯, `const_defined?` 메소드와 마찬가지로 두번째 인수는 기본으로 true로 설정되어 있습니다.
 
-내장 메소드에 대한 일관성을 유지하기 위해서, 상대경로만을 취하게 됩니다. `::Math::PI`와 같은 절대경로를 사용할 경우에는 `NamedError` 예외가 발생합니다. [[[For coherence with the builtin methods only relative paths are accepted. Absolute qualified constant names like `::Math::PI` raise `NameError`.]]]
+내장 메소드와 호환성을 위해 상대 경로 이외에는 사용할 수 없습니다. `::Math::PI`와 같은 절대 경로를 사용한 상수명을 사용하면 `NameError`가 발생합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/module/qualified_const.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/qualified_const.rb`.]]]
+NOTE: `active_support/core_ext/module/qualified_const.rb`에 정의되어 있습니다.
 
-### Reachable
+### 도달 가능
 
-이름이 붙은 모듈이 해당 상수로 저장이 된 경우 그 모듈은 `reachable` 하다라고 말합니다. 다시 말해서, 그 상수를 통해서 모듈 객체에 접근할 수 있다는 의미입니다. [[[A named module is reachable if it is stored in its corresponding constant. It means you can reach the module object via the constant.]]]
+이름을 가지는 모듈이 대응하는 상수에 저장되어 있는 경우에 도달 가능(reachable)이라고 표현합니다. 이것은 상수를 사용하여 모듈 객체에 접근할 수 있다는 의미입니다.
 
-이것은 일반적으로 일어나는 일인데, 하나의 모듈이 "M"으로 호출된다면 `M` 상수가 존재하게 되는 것이고 이 상수는 해당 모듈은 소유하게 되는 것입니다. [[[That is what ordinarily happens, if a module is called "M", the `M` constant exists and holds it:]]]
+"M"이라는 모듈이 있을 경우, `M`이라는 상수가 존재하고, 거기에 모듈이 저장됩니다.
 
 ```ruby
 module M
@@ -778,7 +796,7 @@ end
 M.reachable? # => true
 ```
 
-그러나 상수와 모듈이 일종의 분리상태로 된다면 모듈객체는 `unreachable`하게 됩니다. [[[But since constants and modules are indeed kind of decoupled, module objects can become unreachable:]]]
+그러나 상수와 모듈이 분리되면, 그 모듈 객체는 도달 불가능(unreachable)하게 됩니다.
 
 ```ruby
 module M
@@ -786,30 +804,26 @@ end
 
 orphan = Object.send(:remove_const, :M)
 
-#1 모듈 객체는 이제 상수와 모듈자체가 분리되었지만 여전히 모듈 이름을 가지고 있습니다. 
+# 이 모듈은 고립되어 있지만 이름을 가지고 있음
 orphan.name # => "M"
 
-#2 상수 M이 더 이상 존재하지 않기 때문에 상수 M을 통해서 접근할 수 없습니다.
+# 상수 M은 존재하지 않으므로 상수 M을 통하여 사용할 수 없음
 orphan.reachable? # => false
 
-#3 다시 "M"이라는 모듈을 정의해 봅시다.
+# "M"이라는 이름을 모듈에 재정의
 module M
 end
 
-#4 이제 다시 상수 M이 존재하게 되고 이 상수가 "M"이라고 하는 모듈객체를 저장하게 되자만, 이것은 새로운 인스턴스라서 이전 것과 동일한 것을 아닙니다. 
+# 상수 M은 다시 존재하므로 모듈 객체 "M"을 저장하고 있지만
+# 원래와는 다른 인스턴스임
 orphan.reachable? # => false
 ```
 
-위 코드내의 코멘트 1 [[[The module object is orphan now but it still has a name.]]]
-위 코드내의 코멘트 2 [[[You cannot reach it via the constant M because it does not even exist.]]]
-위 코드내의 코멘트 3 [[[Let's define a module called "M" again.]]]
-위 코드내의 코멘트 4 [[[The constant M exists now again, and it stores a module object called "M", but it is a new instance.]]]
+NOTE: `active_support/core_ext/module/reachable.rb`에 정의되어 있습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/module/reachable.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/reachable.rb`.]]]
+### 익명 모듈
 
-### [Anonymous] 익명 모듈
-
-하나의 모듈은 이름을 가질 수도 있고, 이름이 없을 수도 있습니다. [[[A module may or may not have a name:]]]
+모듈에 이름을 지정하지 않을 수도 있습니다.
 
 ```ruby
 module M
@@ -822,7 +836,7 @@ N.name # => "N"
 Module.new.name # => nil
 ```
 
-`anonymous?` 메소드를 이용하여 특정 모듈이 이름을 가지고 있는지를 알아볼 수 있습니다. [[[You can check whether a module has a name with the predicate `anonymous?`:]]]
+`anonymous?`를 사용해서 모듈에 이름이 있는지 없는지 확인할 수 있습니다.
 
 ```ruby
 module M
@@ -832,7 +846,7 @@ M.anonymous? # => false
 Module.new.anonymous? # => true
 ```
 
-따라서 주목할 것은 `unreachable`하다는 것이 반드시 `anonymous`하다는 것이 아니라는 것입니다.(역자주: 모듈을 접근하기 위한 상수명을 가지는 것과 모듈객체의 이름을 가지는 것과는 별개의 것입니다. 개념을 이해하기가 까다롭습니다.) [[[Note that being unreachable does not imply being anonymous:]]]
+도달 불가능(unreachable)하더라도 반드시 익명(anonymous)이라고 볼 수는 없습니다.
 
 ```ruby
 module M
@@ -844,15 +858,15 @@ m.reachable? # => false
 m.anonymous? # => false
 ```
 
-그러나 반대로, 정의상, 이름이 없는 모듈은 `unreachable` 하긴 합니다. [[[though an anonymous module is unreachable by definition.]]]
+반대로 익명 모듈은, 정의 구조상 반드시 도달 불가능합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/module/anonymous.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/anonymous.rb`.]]]
+NOTE: `active_support/core_ext/module/anonymous.rb`에 정의되어 있습니다.
 
-### [Method Delegation] 메소드의 위임
+### 메소드 위임
 
-`delegate` 매크로는 메소드를 전단하기 위한 손쉬운 방법을 제공해 줍니다. [[[The macro `delegate` offers an easy way to forward methods.]]]
+`delegate` 매크로를 사용하면 메소드를 간단하게 위임할 수 있습니다.
 
-어떤 어플리케이션에서 유저가 로그인 정보는 `User` 모델에 가지고 있지만, 이름과 기타 다른 데이터는 별도의 `Profile` 모델에 가지고 있다고 가정해 보겠습니다. [[[Let's imagine that users in some application have login information in the `User` model but name and other data in a separate `Profile` model:]]]
+어떤 애플리케이션의 `User` 모델에 로그인 정보가 있고, 거기에 연관된 이름 등의 정보가 `Profile` 모델에 있다고 가정해봅시다.
 
 ```ruby
 class User < ActiveRecord::Base
@@ -860,7 +874,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-이러한 설정에서 유저의 이름은 자신의 프로파일을 통해서(`user.profile.name`) 얻을 수 있지만, 유저 모델에서 직접 속성처럼 접근할 수 있다면 더 편리할 수 있습니다. [[[With that configuration you get a user's name via his profile, `user.profile.name`, but it could be handy to still be able to access such attribute directly:]]]
+이 구성에서는 `user.profile.name` 처럼 프로파일을 통해 사용자의 이름을 얻어올 수 있습니다. 이러한 속성에 직접 접근할 수 있다면 좀 더 편리할 것입니다.
 
 ```ruby
 class User < ActiveRecord::Base
@@ -872,7 +886,7 @@ class User < ActiveRecord::Base
 end
 ```
 
-바로 이것이 `delegate` 매크로가 하는 일입니다. [[[That is what `delegate` does for you:]]]
+`delegate`는 이를 가능하게 해줍니다.
 
 ```ruby
 class User < ActiveRecord::Base
@@ -882,89 +896,72 @@ class User < ActiveRecord::Base
 end
 ```
 
-`delegate` 매크로를 사용하면 코드가 보다 간단해지고, 프로그래머의 의도를 더 직관적으로 알 수 있게 됩니다. [[[It is shorter, and the intention more obvious.]]]
+이 방법을 사용하면 선언이 좀 더 짧아지고, 의미도 확실해집니다.
 
-메소드는 대상 클래스에서 public 접근자(역자주: `액션`)로 선언되어 있어야 합니다. [[[The method must be public in the target.]]]
+단, 사용할 메소드가 대상 클래스에서 공개되어있어야 합니다.
 
-`delegate` 매크로에 여러개의 메소드를 지정할 수 있습니다. [[[The `delegate` macro accepts several methods:]]]
+`delegate` 매크로에는 복수의 메소드를 지정할 수 있습니다.
 
 ```ruby
 delegate :name, :age, :address, :twitter, to: :profile
 ```
 
-문자열 중간에 삽입될 경우에는, `:to` 옵션은 표현식이 되어야 합니다. 그래서 이 표현식이 메소드가 전달되는 객체에 대해서 평가되어야 합니다. 이 옵션은 대개 문자열 또는 심볼을 취하게 됩니다. 이 표현식은 receiver의 입장에서 평가되어야 합니다. [[[When interpolated into a string, the `:to` option should become an expression that evaluates to the object the method is delegated to. Typically a string or symbol. Such an expression is evaluated in the context of the receiver:]]]
+`:to` 옵션에 문자열을 넘겨주게 되면, 메소드를 위임할 상대 객체를 평가하는 식이 됩니다. 일반적으로는 문자열 또는 심볼을 사용합니다. 그러한 식은 리시버의 컨텍스트에서 실행됩니다.
 
 ```ruby
-#1 레일스 상수로 위임 
+# Rails의 상수에 위임한다
 delegate :logger, to: :Rails
 
-#2 receiver의 클래스로 위임 
+# 리시버의 클래스에 위임한다.
 delegate :table_name, to: :class
 ```
 
-위 예의 코멘트 #1 [[[delegates to the Rails constant]]]
-위 예의 코멘트 #2 [[[delegates to the receiver's class]]]
+WARNING: `:prefix` 옵션이 `true`인 경우는 일반적이지 않습니다(아래에서 설명).
 
-
-WARNING: `:prefix` 옵션이 `true`인 경우는 일반적이지 않지만 아래를 참조하기 바랍니다. [[[If the `:prefix` option is `true` this is less generic, see below.]]]
-
-디폴트 상태에서, 메소드 위임이 `NoMethodError` 예외를 발생시키고 대상이 `nil`이면 예외가 전달됩니다. 이 때 `:allow_nil` 옵션을 사용하면 대신에 `nil` 값을 반환하도록 할 수 있습니다. [[[By default, if the delegation raises `NoMethodError` and the target is `nil` the exception is propagated. You can ask that `nil` is returned instead with the `:allow_nil` option:]]]
+위임할 때에 `NoMethodError`가 발생한 경우에 대상이 `nil`인 경우, 예외가 넘겨집니다. `:allow_nil` 옵션을 사용하면 예외 대신에 `nil`을 돌려받을 수 있습니다.
 
 ```ruby
 delegate :name, to: :profile, allow_nil: true
 ```
 
-즉, `:allow_nil` 옵션을 사용할 경우, 유저가 프로파일이 없는 경우에라도 `user.name`을 호출하면, 예외를 발생시키지 않고 `nil` 값을 반환하게 됩니다. [[[With `:allow_nil` the call `user.name` returns `nil` if the user has no profile.]]]
+`:allow_nil`을 사용하면 사용자의 프로파일이 없는 경우 `user.name`를 호출하면 `nil`을 돌려줍니다.
 
-`:prefix` 옵션은 위임된 메소드의 이름 앞에 전두어를 추가해 줍니다. 이것은 좀 더 좋은 이름을 사용하고자 할 때 편리할 수 있습니다. [[[The option `:prefix` adds a prefix to the name of the generated method. This may be handy for example to get a better name:]]]
+`:prefix` 옵션은 생성된 메소드의 이름에 접두어를 추가합니다. 이것은 가독성을 높이고 싶을 때에 편리합니다.
 
 ```ruby
 delegate :street, to: :address, prefix: true
 ```
 
-위의 예에서는 `street`가 아니고 `address_street`라는 메소드명을 만들어 줍니다. [[[The previous example generates `address_street` rather than `street`.]]]
+이 예제에서는 `street`가 아닌 `address_street`가 발생합니다.
 
-WARNING: 이런 경우에 위임 메소드명이 대상 객체와 대상 메소드명의 조합으로 만들어지기 때문에, `:to` 옵션은 메소드명이 되는 것입니다. [[[Since in this case the name of the generated method is composed of the target object and target method names, the `:to` option must be a method name.]]]
+WARNING: 이 경우, 생성된 메소드의 이름에서는 대상의 객체명과 메소드명이 사용됩니다. `:to` 옵션으로 넘기는 것은 메소드명이어야 합니다.
 
-또한 전두어를 변경할 수 있습니다. [[[A custom prefix may also be configured:]]]
+접두어를 변경할 수도 있습니다.
 
 ```ruby
 delegate :size, to: :attachment, prefix: :avatar
 ```
 
-위의 예에서, `delegate` 매크로는 `size`가 아니고 `avatar_size`라는 위임 메소드명을 생성하게 됩니다. [[[In the previous example the macro generates `avatar_size` rather than `size`.]]]
+여기에서는 매크로를 사용해 `size` 대신에 `avatar_size`가 생성됩니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/module/delegation.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/delegation.rb`]]]
+NOTE: `active_support/core_ext/module/delegation.rb`에 정의되어 있습니다.
 
-### [Redefining Methods] 메소드 재정의하기
+### 매소드 재정의
 
-`define_method`를 사용해서 하나의 메소드를 정의해야 할 경우가 있습니다. 그러나 미리 정의할 메소드명이 이미 존재하는 지를 알 수 없습니다. 만약 이미 정의된 메소드명을 지정하게 되면, 해당 메소드가 기능을 하게 될 때 경고메시지가 나타나게 됩니다. 당연한 것이지만, 그렇다고 깔끔하지는 못합니다. [[[There are cases where you need to define a method with `define_method`, but don't know whether a method with that name already exists. If it does, a warning is issued if they are enabled. No big deal, but not clean either.]]]
+`define_method`를 사용해서 메소드를 제정의할 필요가 있지만, 그 이름이 이미 사용되고 있는지 아닌지 알 수 없는 경우가 있습니다. 유효한 이름이 이미 존재한다면 경고를 보여줍니다. 동작에 큰 문제는 없지만 깔끔하지 못한 방식입니다.
 
-이러한 상황에서, `redefine_method` 메소드는 필요할 경우 기존의 메소드를 제거해서 그런 잠재된 경고를 방지해 줍니다. 레일스는 몇군데에서 이 메소드를 사용하는데, 예를 들면 모델 관계를 설정하는 API를 생성할 때 입니다. [[[The method `redefine_method` prevents such a potential warning, removing the existing method before if needed. Rails uses it in a few places, for instance when it generates an association's API:]]]
+`redefine_method` 메소드를 사용하면 필요에 따라서 기존의 메소드를 삭제하므로 이러한 경고 메시지를 제어할 수 있습니다.
 
-```ruby
-redefine_method("#{reflection.name}=") do |new_value|
-  association = association_instance_get(reflection.name)
+NOTE: `active_support/core_ext/module/remove_method.rb`에 정의되어 있습니다.
 
-  if association.nil? || association.target != new_value
-    association = association_proxy_class.new(self, reflection)
-  end
-
-  association.replace(new_value)
-  association_instance_set(reflection.name, new_value.nil? ? nil : association)
-end
-```
-
-NOTE: 이 메소드는 `active_support/core_ext/module/remove_method.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/module/remove_method.rb`]]]
-
-[Extensions to `Class`] `클래스`에 대한 확장 메소드
+`Class`의 확장
 ---------------------
 
-### [Class Attributes] 클래스 속성
+### Class 속성
 
 #### `class_attribute`
 
-`class_attribute` 메소드는 특정 클래스의 상속계층구조상 어느 레벨에서라도 재정의될 수 있는 상속가능한 클래스 속성을 하나 또는 그 이상을 선언해 줍니다. [[[The method `class_attribute` declares one or more inheritable class attributes that can be overridden at any level down the hierarchy.]]]
+`class_attribute` 메소드는 1개 이상의 상속 가능한 클래스의 속성을 선언합니다. 그 클래스 속성은 자식 클래스에서 재정의할 수 있습니다.
 
 ```ruby
 class A
@@ -988,7 +985,7 @@ A.x # => :a
 B.x # => :b
 ```
 
-예를 들어, `ActionMailer::Base`는 다음과 같이 정의합니다. [[[For example `ActionMailer::Base` defines:]]]
+예를 들자면, `ActionMailer::Base`에 아래의 정의가 있다고 해봅시다.
 
 ```ruby
 class_attribute :default_params
@@ -1000,7 +997,7 @@ self.default_params = {
 }.freeze
 ```
 
-이 클래스 속성들은 인스턴스 레벨에서도 접근할 수 있고 재정의할 수도 있습니다. [[[They can be also accessed and overridden at the instance level.]]]
+이 속성들은 인스턴스 레벨에서 접근 또는 재정의할 수 있습니다.
 
 ```ruby
 A.x = 1
@@ -1009,11 +1006,11 @@ a1 = A.new
 a2 = A.new
 a2.x = 2
 
-a1.x # => 1, comes from A
-a2.x # => 2, overridden in a2
+a1.x # => 1 (A의 값이 사용된다)
+a2.x # => 2 (a2에서 재정의된 값)
 ```
 
-이 때 `:instance_writer` 옵션을 `false` 값으로 지정하면 `writer` 인스턴스 메소드를 생성하지 못하게 할 수 있습니다. [[[The generation of the writer instance method can be prevented by setting the option `:instance_writer` to `false`.]]]
+`:instance_writer`를 `false`로 주면 writer 인스턴스 메소드가 생성되지 않습니다.
 
 ```ruby
 module ActiveRecord
@@ -1024,9 +1021,9 @@ module ActiveRecord
 end
 ```
 
-모델 입장에서는 이 옵션이 클래스 속성을 mass-assignment로 변경할 수 없도록 하는 유용한 방법이라고 생각할 수 있습니다. [[[A model may find that option useful as a way to prevent mass-assignment from setting the attribute.]]]
+위 옵션은 모델의 속성 설정시에 일괄 저장(Mass Assignment)을 막을 때 유용합니다.
 
-`:instance_reader` 옵션을 `false` 값으로 지정하여 `reader` 인스턴스 메소드를 생성하지 못하게 할 수 있습니다. [[[The generation of the reader instance method can be prevented by setting the option `:instance_reader` to `false`.]]]
+`:instance_reader`를 `false`로 주면 reader 인스턴스 메소드가 생성되지 않습니다.
 
 ```ruby
 class A
@@ -1036,27 +1033,27 @@ end
 A.new.x = 1 # NoMethodError
 ```
 
-편리함을 위해서, `class_attribute` 메소드는 인스턴스 `reader`가 반환하는 것에 대한 논리값을 반환하는 인스턴스 `predicate`를 정의해 줍니다. 위의 예에서는 `x?`을 호출합니다. [[[For convenience `class_attribute` also defines an instance predicate which is the double negation of what the instance reader returns. In the examples above it would be called `x?`.]]]
+편의를 위해서 `class_attribute`는 인스턴스의 reader가 돌려주는 값을 '이중부정'하는 인스턴스 존재 확인 메소드도 정의합니다. 위의 예제로 설명하자면, `x?`가 바로 그것입니다.
 
-`:instance_reader`에 `false`값이 지정되어 있는 상태에서 인스턴스 `predicate`를 호출하면 reader 메소드처럼 `NoMethodError`를 반환하게 됩니다. [[[When `:instance_reader` is `false`, the instance predicate returns a `NoMethodError` just like the reader method.]]]
+`:instance_reader`가 `false`인 경우, 이는 reader 메소드와 마찬가지로 `NoMethodError`를 돌려줍니다.
 
-인스턴스 `predicate`가 생성되기를 원치 않는다면, `instance_predicate: false`를 넘겨 주면 됩니다. [[[If you do not want the instance predicate,  pass `instance_predicate: false` and it will not be defined.]]]
+인스턴스 존재 확인 메소드가 필요 없는 경우, `instance_predicate: false`를 사용하면 됩니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/class/attribute.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/class/attribute.rb`]]]
+NOTE: `active_support/core_ext/class/attribute.rb`에 정의되어 있습니다.
 
-#### `cattr_reader`, `cattr_writer`, and `cattr_accessor`
+#### `cattr_reader`, `cattr_writer`, `cattr_accessor`
 
-`cattr_reader`, `cattr_writer`, `cattr_accessor` 매크로는 `attr_*` 카운터파트 매크로와 클래스라는 것만 제외하고 유사합니다. 이 매크로들은 클래스 변수가 이전에 존재하지 않는 것이라면 `nil` 값으로 초기화하고 그 클래스변수를 접근하기 위한 해당 클래스 메소드를 생성해 줍니다. [[[The macros `cattr_reader`, `cattr_writer`, and `cattr_accessor` are analogous to their `attr_*` counterparts but for classes. They initialize a class variable to `nil` unless it already exists, and generate the corresponding class methods to access it:]]]
+`cattr_reader`, `cattr_writer`, `cattr_accessor` 매크로는 `attr_*`와 유사합니다만 클래스용으로 사용한다는 점이 다릅니다. 이 메소드에서는 클래스 변수를 `nil`로 설정(클래스 변수가 이미 존재하는 경우를 제외)하고, 대응하는 클래스 메소드를 생성하여 사용할 수 있도록 만들어줍니다.
 
 ```ruby
 class MysqlAdapter < AbstractAdapter
-  # Generates class methods to access @@emulate_booleans.
+  # @@emulate_booleans에 접근 가능한 클래스 메소드를 생성함
   cattr_accessor :emulate_booleans
   self.emulate_booleans = true
 end
 ```
 
-편리를 도모하기 위해서 인스턴스 메소드가 만들어 지지만 단지 클래스 속성에 대한 대리자에 불과합니다. 그래서, 인스턴스 객체들이 클래스 속성을 변경할 수 있지만 위에서 언급되었던 `class_attribute` 처럼 재정의할 수는 없습니다. 예를 들어 다음과 같을 때, [[[Instance methods are created as well for convenience, they are just proxies to the class attribute. So, instances can change the class attribute, but cannot override it as it happens with `class_attribute` (see above). For example given]]]
+사용성을 위해서, 이 때 인스턴스 메소드도 생성됩니다만, 이것들은 실제로는 클래스 속성의 프록시입니다. 따라서 인스턴스로부터 클래스 속성을 변경할 수 있습니다만, `class_attribute`에서처럼 재정의할 수는 없습니다(위를 참조). 예를 들자면,
 
 ```ruby
 module ActionView
@@ -1067,32 +1064,41 @@ module ActionView
 end
 ```
 
-뷰에서 `field_error_proc` 클래스 속성을 접근할 수 있습니다. [[[we can access `field_error_proc` in views.]]]
+뷰에서 `field_error_proc`에 접근할 수 있습니다.
 
-`:instance_reader` 옵션을 `false`로 지정하여 `reader` 인스턴스 메소드의 생성을 못하게 할 수 있고, `:instance_writer` 옵션을 `false`로 지정하여 `writer` 인스턴스 메소드의 생성을 막을 수 있습니다. `:instance_accessor` 옵션을 `false`로 지정하여 이 두가지 인스턴스 메소드가 만들어지 못하도록 할 수 있습니다. 이 모든 경우에서, 값은 정확하게 `false`로 지정되어야 합니다. [[[The generation of the reader instance method can be prevented by setting `:instance_reader` to `false` and the generation of the writer instance method can be prevented by setting `:instance_writer` to `false`. Generation of both methods can be prevented by setting `:instance_accessor` to `false`. In all cases, the value must be exactly `false` and not any false value.]]]
+마찬가지로 `cattr_*`에 블록을 넘겨서 속성의 기본값을 줄 수도 있습니다.
+
+```ruby
+class MysqlAdapter < AbstractAdapter
+  # @@emulate_booleans의 기본값을 true로 만들고, 이에 접근하기 위한 클래스 메소드를 생성
+  cattr_accessor(:emulate_booleans) { true }
+end
+```
+
+`:instance_reader`를 `false`로 주면, reader 인스턴스 메소드가 생성되지 않습니다. 마찬가지로 `:instance_writer`를 `false`로 주면, writer 인스턴스 메소드가 생성되지 않습니다. `:instance_accessor`를 `false`로 주면 두 인스턴스 메소드가 모두 생성되지 않습니다. 어느 경우에도 사용 가능한 값은 `false` 뿐입니다. 'nil' 등의 다른 값을 사용할 수는 없습니다.
 
 ```ruby
 module A
   class B
-    # No first_name instance reader is generated.
+    # first_name 인스턴스 reader는 생성되지 않음
     cattr_accessor :first_name, instance_reader: false
-    # No last_name= instance writer is generated.
+    # last_name= 인스턴스 writer는 생성되지 않음
     cattr_accessor :last_name, instance_writer: false
-    # No surname instance reader or surname= writer is generated.
+    # surname 인스턴스 reader도 surname= 인스턴스 writer도 생성되지 않음
     cattr_accessor :surname, instance_accessor: false
   end
 end
 ```
 
-모델에서 `:instance_accessor`를 `false`로 지정하면, mass-assignment를 통해 해당 클래스 속성을 변경할 수 없게 하는 유용한 방법이 될 수 있습니다. [[[A model may find it useful to set `:instance_accessor` to `false` as a way to prevent mass-assignment from setting the attribute.]]]
+`:instance_accessor`를 `false`로 주면 모델의 속성 설정시에 일괄 저장(Mass Assignment) 를 막을 수 있어 유용합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/class/attribute_accessors.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/class/attribute_accessors.rb`.]]]
+NOTE: `active_support/core_ext/module/attribute_accessors.rb`에 정의되어 있습니다.
 
-### Subclasses & Descendants 
+### Subclasses & Descendants
 
 #### `subclasses`
 
-`subclasses` 메소드는 receiver 클래스의 하위클래스들을 반환합니다. [[[The `subclasses` method returns the subclasses of the receiver:]]]
+`subclasses` 메소드는 리시버의 자식 클래스를 돌려줍니다.
 
 ```ruby
 class C; end
@@ -1108,13 +1114,13 @@ class D < C; end
 C.subclasses # => [B, D]
 ```
 
-이 때 반환되는 클래스의 순서는 명시되지 않습니다. [[[The order in which these classes are returned is unspecified.]]]
+돌려받는 순서는 명시되지 않습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/class/subclasses.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/class/subclasses.rb`.]]]
+NOTE: `active_support/core_ext/class/subclasses.rb`에 정의되어 있습니다.
 
 #### `descendants`
 
-`descendants` 메소드는 receiver 클래스로부터 상속받은 모든 클래스를 반환합니다. [[[The `descendants` method returns all classes that are `<` than its receiver:]]]
+`descendants` 메소드는 그 리시버를 상속받은 모든 클래스를 돌려줍니다.
 
 ```ruby
 class C; end
@@ -1130,37 +1136,37 @@ class D < C; end
 C.descendants # => [B, A, D]
 ```
 
-이 때 반환되는 클래스의 순서는 명시되지 않습니다. [[[The order in which these classes are returned is unspecified.]]]
+돌려받는 순서는 명시되지 않습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/class/subclasses.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/class/subclasses.rb`.]]]
+NOTE: `active_support/core_ext/class/subclasses.rb`에 정의되어 있습니다.
 
-[Extensions to `String`] `String`형에 대한 확장 메소드
+`String`의 확장 메소드
 ----------------------
 
-### Output Safety
+### 안전한 출력
 
-#### Motivation
+#### 구현 동기
 
-데이터를 HTML템플릿에 삽입할 때는 주의를 기울려야 합니다. 예를 들면, `@review.title`을 HTML 페이지에도 그대로 삽입할 수 없습니다. 한가지는, review title이 "Flanagan & Matz rules!"와 같다면, 문자열에 포함된 "&" 문자가 "&amp;amp;"로 특수문자 처리가 되기 때문에 결과가 제대로 보이지 않게 됩니다. 더우기, 어플리케이션에 따라서는, 유저들이 review title에 악성 HTML코드를 삽입할 수 있기 때문에 심각한 보안상의 결함을 초래할 수 있습니다. 이러한 보안상의 위험에 대해서 자세한 내용을 알고자 한다면 [Security guide](security.html#cross-site-scripting-xss)에 있는 cross-site scripting에 대한 내용을 확인해 보기 바랍니다. [[[Inserting data into HTML templates needs extra care. For example, you can't just interpolate `@review.title` verbatim into an HTML page. For one thing, if the review title is "Flanagan & Matz rules!" the output won't be well-formed because an ampersand has to be escaped as "&amp;amp;". What's more, depending on the application, that may be a big security hole because users can inject malicious HTML setting a hand-crafted review title. Check out the section about cross-site scripting in the [Security guide](security.html#cross-site-scripting-xss) for further information about the risks.]]]
+HTML 템플릿에 데이터를 삽입하는 방법은 무척 신중하게 구현해야 합니다. 예를 들어, `@review.title`를 아무런 조치도 취하지 않고 그대로 HTML에 내보내서는 안됩니다. 만약 이 리뷰의 제목이 "Flanagan & Matz rules!"이었다면, 올바른 HTML이라고 할 수 없습니다. 이를 올바르게 만들려면 "&amp;amp;"처럼 이스케이프를 해야 합니다. 나아가 사용자가 리뷰의 타이틀에 악의있는 HTML을 포함시켜 저장하게 되면, 엄청난 보안문제를 야기할 수 있습니다. 이 위험성에 대해서는 [보안 가이드](security.html#크로스-사이트-스크립팅-xss)의 크로스 사이트 스크립팅을 참조해주세요.
 
-#### [Safe Strings] 보안상 안전한 문자열
+#### 안전한 문자열
 
-액티브서포트는 <i>(html) safe</i> 문자열에 관한 개념을 가지고 있습니다. 따라서 안전한 문자열이란 HTML 태그를 있는 그대로 삽입할 수 있는 상태를 말합니다. 이와 같이 안전문자열은 이스케이프 되던 안 되던간에 상관없이 신뢰성을 갖게 됩니다. [[[Active Support has the concept of <i>(html) safe</i> strings. A safe string is one that is marked as being insertable into HTML as is. It is trusted, no matter whether it has been escaped or not.]]]
+Active Support에는 '(html 기준으로)안전한 문자열'이라는 개념이 존재합니다. 안전한 문자열이란 HTML으로 그대로 출력하더라도 문제가 없다는 표시가 되어 있는 문자열을 말합니다. 이 표시가 되어 있다면, '실제로 이스케이프 되어있는지, 아닌지에 관계 없이' 그 문자열을 신뢰합니다.
 
-문자열은 디폴트로 <i>비안전(unsafe)</i>한 것으로 간주됩니다. [[[Strings are considered to be <i>unsafe</i> by default:]]]
+문자열은 기본으로 _unsafe_로 표시되어있습니다.
 
 ```ruby
 "".html_safe? # => false
 ```
 
-`html_safe` 메소드를 사용하면 안전문자열을 얻을 수 있습니다. [[[You can obtain a safe string from a given one with the `html_safe` method:]]]
+주어진 문자열에 `html_safe`메소드를 사용하면 안전한 문자열을 얻을 수 있습니다.
 
 ```ruby
 s = "".html_safe
 s.html_safe? # => true
 ```
 
-`html_safe`는 receiver 문자열이 무엇인던지 간에 상관없이 <i>특수문자를 무효화(no escaping)</i>시킨다는 것을 이해하는 것이 중요한데, 이것은 그저 하나의 주장에 불과할 뿐입니다. [[[It is important to understand that `html_safe` performs no escaping whatsoever, it is just an assertion:]]]
+여기서 주의해야하는 부분은 `html_safe` 메소드 자체는 어떤 이스케이프 작업도 수행하지 않는다는 점입니다. 그저 안전하다는 표시를 해줄 뿐입니다.
 
 ```ruby
 s = "<script>...</script>".html_safe
@@ -1168,39 +1174,39 @@ s.html_safe? # => true
 s            # => "<script>...</script>"
 ```
 
-특정 문자열에 대해서 `html_safe`을 호출하는 것은 전적으로 개발자의 몫입니다. [[[It is your responsibility to ensure calling `html_safe` on a particular string is fine.]]]
+따라서 특정 문자열에 대해서 `html_safe` 메소드를 호출할 때에는 그 문자열이 정말로 안전한지 확인할 의무가 있습니다.
 
-안전문자열 끝에 `concat`/`<<`, or with `+`를 이용하여 추가한다면 결과는 안전문자열이 됩니다. 비안전 인수에서는 특수문자가 고유의 기능을 하게 됩니다. [[[If you append onto a safe string, either in-place with `concat`/`<<`, or with `+`, the result is a safe string. Unsafe arguments are escaped:]]]
+안전하다고 판단된 문자열에 대해서 안전하지 않은 문자열을 `concat`/`<<` 또는 `+` 같은 파괴적인 메소드를 통해 추가를 하게 되면, 결과는 여전히 안전한 문자열입니다. 안전하지 않은 인수는 추가될 때에 이스케이프 처리됩니다.
 
 ```ruby
 "".html_safe + "<" # => "&lt;"
 ```
 
-안전 인수들은 직접 추가됩니다. [[[Safe arguments are directly appended:]]]
+안전한 인수라면 이스케이프 작업 없이 직접 추가됩니다.
 
 ```ruby
 "".html_safe + "<".html_safe # => "<"
 ```
 
-이 메소드는 평상적인 뷰에서 사용해서는 안됩니다. 비안전 값에 대해서는 자동으로 특수문자가 고유의 기능을 하게 됩니다. [[[These methods should not be used in ordinary views. Unsafe values are automatically escaped:]]]
+기본적으로 이 메소드는 일반적인 뷰에서는 사용하지 말아주세요. 현재 Rails의 뷰에서는 안전하지 않은 값은 자동적으로 이스케이프되기 때문입니다.
 
 ```erb
-<%= @review.title %> <%# fine, escaped if needed %>
+<%= @review.title %> <%# 필요에 따라 이스케이프되므로 문제 없음 %>
 ```
 
-따라서 뷰에서는 `html_safe`을 호출하기 보다는 `raw` 헬퍼를 사용하여 있는 그대로 보이게 합니다. [[[To insert something verbatim use the `raw` helper rather than calling `html_safe`:]]]
+특별한 이유가 있어서, 이스케이프되지 않은 문자열을 사용하고 싶은 경우에는 `html_safe` 대신 `raw` 헬퍼를 사용해주세요.
 
 ```erb
-<%= raw @cms.current_template %> <%# inserts @cms.current_template as is %>
+<%= raw @cms.current_template %> <%# @cms.current_template를 그대로 사용 %>
 ```
 
-또는 `<%==`와 같이 사용해도 동일한 결과를 보여 줍니다. [[[or, equivalently, use `<%==`:]]]
+또는 `raw`와 동일한 동작을 하는 `<%==`를 사용하세요.
 
 ```erb
-<%== @cms.current_template %> <%# inserts @cms.current_template as is %>
+<%== @cms.current_template %> <%# @cms.current_template를 그대로 사용 %>
 ```
 
-`raw` 헬퍼는 `html_safe`를 호출합니다. [[[The `raw` helper calls `html_safe` for you:]]]
+`raw` 헬퍼는 내부에서 `html_safe`를 호출합니다.
 
 ```ruby
 def raw(stringish)
@@ -1208,57 +1214,69 @@ def raw(stringish)
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/output_safety.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/output_safety.rb`.]]]
+NOTE: `active_support/core_ext/string/output_safety.rb`에 정의되어 있습니다.
 
-#### [Transformation] 문자열 변형
+#### 각종 변환
 
-대개, 위에서 설명한 바와 같이 문자열을 연결하는 것을 제외하고, 문자열을 변경하는 메소드는 비안전 문자열을 반환합니다. 이러한 메소드는 `downcase`, `gsub`, `strip`, `chomp`, `underscore` 등이 있습니다. [[[As a rule of thumb, except perhaps for concatenation as explained above, any method that may change a string gives you an unsafe string. These are `downcase`, `gsub`, `strip`, `chomp`, `underscore`, etc.]]]
+보통 위에서 설명한 문자열 연결(concatenation) 작업을 제외하고 어떤 메소드라도 잠재적으로 문자열을 안전하지 않은 것으로 변환할 가능성이 있다는 점을 주의해야 합니다. `downcase`, `gsub`, `strip`, `chomp`, `underscore` 등이 그렇습니다.
 
-`gsub!`와 같이 receiver 문자열을 변경하는 경우에, receiver 문자열은 비안전 상태로 됩니다. [[[In the case of in-place transformations like `gsub!` the receiver itself becomes unsafe.]]]
+`gsub!` 같은 파괴적인 변환을 하는 메소드를 사용하면 리시버 자체가 안전하지 않게 됩니다.
 
-INFO: 문자열 변형이 실제로 변경하는 것과는 무관하게 안전 상태값은 항상 사라지게 됩니다. [[[The safety bit is lost always, no matter whether the transformation actually changed something.]]]
+INFO: 이런 메소드를 사용하면, 실제로 변환이 발생했는가, 아닌가에 관계없이 안전함을 알려주던 표시가 무효화됩니다.
 
-#### [Conversion and Coercion] 강제 변환
+#### 변환과 강제
 
-안전 문자열에 대해서 `to_s`를 호출하면 안전 문자열을 반환하지만 `to_str` 메소드로 강제로 변환하면 비안전 문자열을 반환하게 됩니다. [[[Calling `to_s` on a safe string returns a safe string, but coercion with `to_str` returns an unsafe string.]]]
+안전한 문자열에 대해서 `to_s`를 실행한 경우에는 안전한 문자열이 반환됩니다. 그러나 `to_str`에 의한 강제적인 변환을 실행한 경우에는 안전하지 않은 문자열이 반환됩니다.
 
-#### [Copying] 복사하기
+#### 복사
 
-안전문자열에 대해서 `dup` 또는 `clone`을 호출하면 안전문자열을 만들어 줍니다. [[[Calling `dup` or `clone` on safe strings yields safe strings.]]]
+안전한 문자열에 대해서 `dup` 또는 `clone`를 실행한 경우에는 안전한 문자열이 생성됩니다.
+
+### `remove`
+
+`remove` 메소드를 실행하면, 해당하는 모든 패턴이 삭제됩니다.
+
+```ruby
+"Hello World".remove(/Hello /) # => "World"
+```
+
+이 메소드에는 파괴적인 버전(`String#remove!`)이 존재합니다.
+
+NOTE: `active_support/core_ext/string/filters.rb`에 정의되어 있습니다.
 
 ### `squish`
 
-`squish` 메소드는 문자열 앞뒤에 있는 whitespace를 제거해 주고 중간에 whitespace가 중복되어 나타날 때는 각각에 대해서 하나의 스페이스로 대체해 줍니다. [[[The method `squish` strips leading and trailing whitespace, and substitutes runs of whitespace with a single space each:]]]
+`squish` 메소드는 어두와 어미의 공백 문자를 제거하고, 연속된 공백을 하나로 줄여줍니다.
 
 ```ruby
 " \n  foo\n\r \t bar \n".squish # => "foo bar"
 ```
 
-또한 !(bang) 버전도 사용할 수 있습니다. [[[There's also the destructive version `String#squish!`.]]]
+이 메소드도 파괴적인 버전(`String#squish!`)이 존재합니다.
 
-이 메소드는 몽고어 모음 구분자(U+180E)와 같은 ASCII와 유니코드 whitespace도 처리해 줍니다. [[[Note that it handles both ASCII and Unicode whitespace like mongolian vowel separator (U+180E).]]]
+이 메소드는 ASCII와 Unicode의 공백문자를 처리합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/filters.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/filters.rb`.]]]
+NOTE: `active_support/core_ext/string/filters.rb`에 정의되어 있습니다.
 
 ### `truncate`
 
-`truncate` 메소드는 receiver 문자열을 주어진 길이만큼 잘라서 반환해 줍니다. [[[The method `truncate` returns a copy of its receiver truncated after a given `length`:]]]
+`truncate` 메소드는 문자열 처음부터 지정된 `length`만큼 복사하여 반환합니다.
 
 ```ruby
 "Oh dear! Oh dear! I shall be late!".truncate(20)
 # => "Oh dear! Oh dear!..."
 ```
 
-생략부호는 `:omission` 옵션으로 변경할 수 있습니다. [[[Ellipsis can be customized with the `:omission` option:]]]
+`:omission`를 통해 생략문자열(...)를 변경할 수 있습니다.
 
 ```ruby
 "Oh dear! Oh dear! I shall be late!".truncate(20, omission: '&hellip;')
 # => "Oh dear! Oh &hellip;"
 ```
 
-특히 주목할 것은, 주어진 길이 만큼 문자열을 짜를 때 생략문자열의 길이를 감안한다는 것입니다. [[[Note in particular that truncation takes into account the length of the omission string.]]]
+문자열을 자를 때에는 생략문자열의 길이도 포함된다는 점에 주의해주세요.
 
-`:separator` 옵션을 사용하면 단어의 중간이 아니라 단어의 전후에서 짤리도록 할 수 있습니다. [[[Pass a `:separator` to truncate the string at a natural break:]]]
+`:separator`를 사용하면 자연스럽게 보이는 위치에서 문자열을 자를 수 있습니다.
 
 ```ruby
 "Oh dear! Oh dear! I shall be late!".truncate(18)
@@ -1267,42 +1285,74 @@ NOTE: 이 메소드는 `active_support/core_ext/string/filters.rb` 파일내에 
 # => "Oh dear! Oh..."
 ```
 
-또한 `:separator` 옵션은 정규표현식으로 지정할 수도 있습니다. [[[The option `:separator` can be a regexp:]]]
+`:separator`에는 정규표현을 사용할 수도 있습니다.
 
 ```ruby
 "Oh dear! Oh dear! I shall be late!".truncate(18, separator: /\s/)
 # => "Oh dear! Oh..."
 ```
 
-위의 예에서, "dear" 단어의 중간에서 짤려야 하지만 `:separator` 옵션을 사용하였기 때문에 그 단어 앞에서 짤리는 결과를 보입니다. [[[In above examples "dear" gets cut first, but then `:separator` prevents it.]]]
+이 예제에서는 `:separator`를 통해 "dear"라는 단어가 잘리지 않도록 하고 있습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/filters.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/filters.rb`.]]]
+NOTE: `active_support/core_ext/string/filters.rb`에 정의되어 있습니다.
+
+### `truncate_words`
+
+`truncate_words` 메소드는 지정된 단어 수 뒤에 나오는 문자열을 잘라낸 사본을 반환합니다.
+
+```ruby
+"Oh dear! Oh dear! I shall be late!".truncate_words(4)
+# => "Oh dear! Oh dear!..."
+```
+
+`:omission`를 통해 생략문자열(...)를 변경할 수 있습니다.
+
+```ruby
+"Oh dear! Oh dear! I shall be late!".truncate_words(4, omission: '&hellip;')
+# => "Oh dear! Oh dear!&hellip;"
+```
+
+`:separator`를 사용하면 자연스럽게 보이는 위치에서 문자열을 자를 수 있습니다.
+
+```ruby
+"Oh dear! Oh dear! I shall be late!".truncate_words(3, separator: '!')
+# => "Oh dear! Oh dear! I shall be late..."
+```
+
+`:separator`에는 정규표현을 사용할 수도 있습니다.
+
+```ruby
+"Oh dear! Oh dear! I shall be late!".truncate_words(4, separator: /\s/)
+# => "Oh dear! Oh dear!..."
+```
+
+NOTE: `active_support/core_ext/string/filters.rb`에 정의되어 있습니다.
 
 ### `inquiry`
 
-`inguiry` 메소드는 문자열을 `StringInquirer` 객채로 변환해서 일치함을 좀 더 멋지게 확인할 수 있도록 해 줍니다. [[[The `inquiry` method converts a string into a `StringInquirer` object making equality checks prettier.]]]
+`inquiry`는 문자열을 `StringInquirer` 객체로 변환합니다. 이 객체를 사용하면 동일 여부를 좀 더 보기 좋게 비교할 수 있습니다.
 
 ```ruby
 "production".inquiry.production? # => true
 "active".inquiry.inactive?       # => false
 ```
 
-### `starts_with?` and `ends_with?`
+### `starts_with?`와 `ends_with?`
 
-액티브서포트는 `String#start_with?`와 `String#end_with?` 메소드도 지원해 줍니다. [[[Active Support defines 3rd person aliases of `String#start_with?` and `String#end_with?`:]]]
+Active Support에서는 `String#start_with?`와 `String#end_with?`를 영어 기준으로 3인칭일때 사용하는 형태(starts、ends)로 만든 별칭 메소드를 정의해두고 있습니다.
 
 ```ruby
 "foo".starts_with?("f") # => true
 "foo".ends_with?("o")   # => true
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/starts_ends_with.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/starts_ends_with.rb`.]]]
+NOTE: `active_support/core_ext/string/starts_ends_with.rb`에 정의되어 있습니다.
 
 ### `strip_heredoc`
 
-`strip_heredoc` 메소드는 heredoc 내에서 들여쓰기 여백을 제거해 줍니다. [[[The method `strip_heredoc` strips indentation in heredocs.]]]
+`strip_heredoc` 메소드는 히어독(Heredoc)의 들여쓰기를 제거합니다.
 
-For example in
+다음은 예시입니다.
 
 ```ruby
 if options[:usage]
@@ -1316,15 +1366,15 @@ if options[:usage]
 end
 ```
 
-이와 같이 하면 사용자는 사용법 메시지를 왼쪽 마진에 정돈되어 보게 됩니다. [[[the user would see the usage message aligned against the left margin.]]]
+이 USAGE 메시지는 좌측에 정렬되어 표시됩니다.
 
-기술적으로는, 가장 들여쓰기가 작은 라인을 찾아서 그만큼 전체 들여쓰기를 제거해 줍니다. [[[Technically, it looks for the least indented line in the whole string, and removes that amount of leading whitespace.]]]
+기술적으로는 들여쓰기가 가장 적게 되어있는 행을 찾아, 그만큼만 전체 행의 앞 부분에서 제거합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/strip.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/strip.rb`.]]]
+NOTE: `active_support/core_ext/string/strip.rb`에 정의되어 있습니다.
 
 ### `indent`
 
-`indent` 메소드는 receiver의 코드라인을 들여쓰기 합니다. [[[Indents the lines in the receiver:]]]
+이 메소드는 리시버의 각 행에 들여쓰기를 추가합니다.
 
 ```ruby
 <<EOS.indent(2)
@@ -1338,7 +1388,7 @@ EOS
   end
 ```
 
-두번째 인수인 `indent_string`은 들여쓰기 문자로 어떤 것을 사용할 것인지를 지정할 수 있게 해 줍니다. 디폴트는 `nil`이며, 이것은 메소드로 하여금 receiver내에서 제일 처음 들여쓰기된 라인을 찾아보고 학습(들여쓰기 문자로 어떤 것이 쓰였는지를 알도록)을 하도록 하여, 들여쓰기 문자가 없다면 대신 스페이스문자로 들여쓰기를 하게 됩니다. [[[The second argument, `indent_string`, specifies which indent string to use. The default is `nil`, which tells the method to make an educated guess peeking at the first indented line, and fallback to a space if there is none.]]]
+두번째 인수 `indent_string`는 들여쓰기에 사용될 문자열을 넘겨받습니다. 기본은 `nil`이며 이 경우에는 첫번째 들여쓰기가 발생한 행을 찾아서 그 때 사용된 문자를 참조하여 사용할 문자를 결정합니다. 들여쓰기가 전혀 없는 경우에는 띄어쓰기 1개를 사용합니다.
 
 ```ruby
 "  foo".indent(2)        # => "    foo"
@@ -1346,22 +1396,24 @@ EOS
 "foo".indent(2, "\t")    # => "\t\tfoo"
 ```
 
-보통은 `indent_string`으로 스페이스나 탭문자를 사용하지만 다른 어떤 문자도 가능합니다. [[[While `indent_string` is typically one space or tab, it may be any string.]]]
+`indent_string`에는 1문자의 띄어쓰기 또는 탭문자를 사용하는 것이 일반적입니다만, 다른 문자도 사용할 수 있습니다.
 
-세번째 인수인 `indent_empty_lines`는 빈 라인도 들여쓰기를 할지를 결정하는 표시로 디폴값은 false입니다. [[[The third argument, `indent_empty_lines`, is a flag that says whether empty lines should be indented. Default is false.]]]
+3번째 인수인 `indent_empty_lines`는 빈 줄도 들여쓰기를 할지 말지를 결정하는 플래그입니다. 기본은 false입니다.
 
 ```ruby
 "foo\n\nbar".indent(2)            # => "  foo\n\n  bar"
 "foo\n\nbar".indent(2, nil, true) # => "  foo\n  \n  bar"
 ```
 
-!(bang)버전인 `indent!` 메소드는 receiver 문자열에 직접 들여쓰기를 합니다. [[[The `indent!` method performs indentation in-place.]]]
+`indent!` 메소드는 들여쓰기를 파괴적으로 수행합니다.
 
-### [Access] 접근 메소드
+NOTE: `active_support/core_ext/string/indent.rb`에 정의되어 있습니다.
+
+### Access
 
 #### `at(position)`
 
-이 메소드는 문자열내 특정 `position`에 위치하는 문자를 반환해 줍니다. [[[Returns the character of the string at position `position`:]]]
+대상이 되는 문자열에서 `position`으로 넘겨받은 위치에 있는 문자를 반환합니다.
 
 ```ruby
 "hello".at(0)  # => "h"
@@ -1370,24 +1422,24 @@ EOS
 "hello".at(10) # => nil
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
+NOTE: `active_support/core_ext/string/access.rb`에 정의되어 있습니다.
 
 #### `from(position)`
 
-이 메소드는 문자열내 특정 `position`부터 끝까지의 문자열 일부를 반환합니다. [[[Returns the substring of the string starting at position `position`:]]]
+문자열에서 `position`으로 넘겨받은 위치로부터 시작되는 부분 문자열을 반환합니다.
 
 ```ruby
 "hello".from(0)  # => "hello"
 "hello".from(2)  # => "llo"
 "hello".from(-2) # => "lo"
-"hello".from(10) # => "" if < 1.9, nil in 1.9
+"hello".from(10) # => nil
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
+NOTE: `active_support/core_ext/string/access.rb`에 정의되어 있습니다.
 
 #### `to(position)`
 
-이 메소드는 문자열내 특정 `position`까지의 문자열 일부를 반환합니다. [[[Returns the substring of the string up to position `position`:]]]
+문자열에서 `position`으로 넘겨받은 위치를 마지막으로 하는 부분 문자열을 반환합니다.
 
 ```ruby
 "hello".to(0)  # => "h"
@@ -1396,25 +1448,25 @@ NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 �
 "hello".to(10) # => "hello"
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
+NOTE: `active_support/core_ext/string/access.rb`에 정의되어 있습니다.
 
 #### `first(limit = 1)`
 
-`str.first(n)`은 `n`이 0 보다 클 경우, `str.to(n-1)`와 같은 결과를 반환해 주며, 0인 경우에는 빈 문자열을 반환해 줍니다. [[[The call `str.first(n)` is equivalent to `str.to(n-1)` if `n` > 0, and returns an empty string for `n` == 0.]]]
+`str.first(n)`은 `n` > 0일 때 `str.to(n-1)`와 동등합니다. `n` == 0인 경우에는 빈 문자열을 반환합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
+NOTE: `active_support/core_ext/string/access.rb`에 정의되어 있습니다.
 
 #### `last(limit = 1)`
 
-`str.last(n)`은 `n`이 0보다 클 경우, `str.from(n-1)`와 같은 결과를 반환해 주며, 0인 경우에는 빈 문자열을 반환해 줍니다. [[[The call `str.last(n)` is equivalent to `str.from(-n)` if `n` > 0, and returns an empty string for `n` == 0.]]]
+`str.last(n)`은 `n` > 0일때 `str.from(-n)`와 동등합니다. `n` == 0인 경우에는 빈 문자열을 반환합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/access.rb`.]]]
+NOTE: `active_support/core_ext/string/access.rb`에 정의되어 있습니다.
 
-### [Inflections] 어미/어형의 변경 메소드
+### 활용형
 
 #### `pluralize`
 
-`pluralize`는 receiver 문자열의 복수형을 반환합니다. [[[The method `pluralize` returns the plural of its receiver:]]]
+`pluralize` 메소드는 리시버의 복수형을 반환합니다.
 
 ```ruby
 "table".pluralize     # => "tables"
@@ -1422,9 +1474,9 @@ NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 �
 "equipment".pluralize # => "equipment"
 ```
 
-이전 예에서 알 수 있듯이, 액티브서포트는 불규칙 복수형과 불가산 명사들을 인식합니다. 내장된 변환규칙은 `config/initializers/inflections.rb`에서 확장할 수 있습니다. 이 파일은 `rails` 명령으로 생성되는데, 코멘트에 그 사용법이 소개되어 있습니다. [[[As the previous example shows, Active Support knows some irregular plurals and uncountable nouns. Built-in rules can be extended in `config/initializers/inflections.rb`. That file is generated by the `rails` command and has instructions in comments.]]]
+이 예제에서도 볼 수 있듯, Active Support는 불규칙 복수형이나 불가산명사에 대해서도 어느 정도 이해하고 있습니다. `config/initializers/inflections.rb`에 존재하는 내장 규칙을 확장할 수 있습니다. 이 파일은 `rails` 명령으로 확장 가능하며, 방법은 주석에서 확인할 수 있습니다.
 
-`pluralize` 메소드는 또한 `count` 옵션을 가질 수 있는데, `count == 1`이면 단수형이 반환될 것입니다. 1 이외의 다른 값에 대해서는 복수형이 반환될 것입니다. [[[`pluralize` can also take an optional `count` parameter.  If `count == 1` the singular form will be returned.  For any other value of `count` the plural form will be returned:]]]
+`pluralize` 메소드에서는 `count` 파라미터를 사용할 수 있습니다. 만약 `count == 1`이라면 단수형이 반환됩니다. `count`가 그 이외의 값일 경우에는 복수형을 반환합니다(역주: 영어에서는 갯수가 0이거나 소수인 경우도 복수형을 사용합니다).
 
 ```ruby
 "dude".pluralize(0) # => "dudes"
@@ -1432,7 +1484,7 @@ NOTE: 이 메소드는 `active_support/core_ext/string/access.rb` 파일내에 �
 "dude".pluralize(2) # => "dudes"
 ```
 
-액티브서포트는 이 메소드를 이용해서 특정 모델과 연결되는 디폴트 테이블명을 산출해 냅니다. [[[Active Record uses this method to compute the default table name that corresponds to a model:]]]
+Active Record에서는 모델 이름과 대응하는 테이블의 이름을 추측할 때 이 메소드를 사용합니다.
 
 ```ruby
 # active_record/model_schema.rb
@@ -1442,11 +1494,11 @@ def undecorated_table_name(class_name = base_class.name)
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `singularize`
 
-`pluralize` 메소드의 반대기능을 하는 메소드입니다. [[[The inverse of `pluralize`:]]]
+`pluralize`와 반대의 동작을 합니다.
 
 ```ruby
 "tables".singularize    # => "table"
@@ -1454,7 +1506,7 @@ NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내
 "equipment".singularize # => "equipment"
 ```
 
-모델간의 관계를 설정할 때 바로 이 메소드를 이용하여 해당 디폴트 클래스명을 산출하게 됩니다. [[[Associations compute the name of the corresponding default associated class using this method:]]]
+Rails의 Association에서 관계가 정의된 클래스에 대응하는 이름을 구할 때 이 메소드를 사용합니다.
 
 ```ruby
 # active_record/reflection.rb
@@ -1465,24 +1517,24 @@ def derive_class_name
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `camelize`
 
-이 메소드는 receiver를 카멜형으로 반환해 줍니다. [[[The method `camelize` returns its receiver in camel case:]]]
+`camelize` 메소드는 리시버의 낙타 표기법(각 단어 첫번째 글자를 대문자로 만들고 띄어쓰기를 제거하는 것)으로 변환해줍니다.
 
 ```ruby
 "product".camelize    # => "Product"
 "admin_user".camelize # => "AdminUser"
 ```
 
-대개는 슬래시 문자를 네임스페이로 사용하는 경로를 루비클래스나 모듈명으로 변형하고자 할 때 이 메소드를 고려해 볼 수 있습니다. [[[As a rule of thumb you can think of this method as the one that transforms paths into Ruby class or module names, where slashes separate namespaces:]]]
+이 메소드는 경로를 Ruby의 클래스로 변환할 때 자주 사용됩니다. '/'로 구분되어있는 경로는 '::'로 구분됩니다.
 
 ```ruby
 "backoffice/session".camelize # => "Backoffice::Session"
 ```
 
-예를 들어, 액션팩은 이 메소드를 이용하여, 임의의 세션저장소를 제공하는 클래스를 로드합니다. [[[For example, Action Pack uses this method to load the class that provides a certain session store:]]]
+예를 들어, Action Pack은 특정 세션 스토어를 제공하는 클래스를 읽어올 때에 이 메소드를 사용하고 있습니다.
 
 ```ruby
 # action_controller/metal/session_management.rb
@@ -1493,52 +1545,52 @@ def session_store=(store)
 end
 ```
 
-`camelize` 메소드는 하나의 옵션을 취할 수 있는데 `:upper`(디폴트) 또는 `:lower` 입니다. `:lower` 옵션을 사용하면 첫번째 문자가 소문자가 됩니다. [[[`camelize` accepts an optional argument, it can be `:upper` (default), or `:lower`. With the latter the first letter becomes lowercase:]]]
+`camelize` 메소드는 옵션으로 하나의 값을 받습니다. 사용 가능한 것은 `:upper`(기본값)나, `:lower`입니다. 후자를 사용하면 문자열의 첫번째 글자를 소문자로 처리합니다.
 
 ```ruby
 "visual_effect".camelize(:lower) # => "visualEffect"
 ```
 
-이 메소드는 예를 들어 자바스크립트와 같이 이러한 규칙을 따르는 언어에서 메소드명을 산출하는데 사용하면 편리합니다. [[[That may be handy to compute method names in a language that follows that convention, for example JavaScript.]]]
+이 메소드는 그러한 작명법(카멜 표기법)을 따르는 언어(JavaScript 등)에서 사용하는 이름을 얻어올 때 유용합니다.
 
-INFO: 대개는 `underscore`와 반대기능으로 `camelize` 메소드를 생각할 수 있습니다. 그러나 특수한 경우도 있습니다. 즉, `"SSLError".underscore.camelize`는 `"SslError"`값을 되돌려 주는데, 이러한 경우를 감안하여, 액티브서포트는 `config/initializers/inflections.rb` 파일내에 이러한 첨두어(Acronym)를 명시할 수 있게 해 줍니다. [[[As a rule of thumb you can think of `camelize` as the inverse of `underscore`, though there are cases where that does not hold: `"SSLError".underscore.camelize` gives back `"SslError"`. To support cases such as this, Active Support allows you to specify acronyms in `config/initializers/inflections.rb`:]]]
+INFO: `camerize` 메소드의 동작은 `underscore` 메소드와 반대의 동작을 한다고 생각하면 알기 쉽습니다. 단 완전히 반대의 동작을 하는 것은 아닙니다. 예를 들어 `"SSLError".underscore.camelize`를 실행한 결과는 `"SslError"`이 되어 원래대로 되돌릴 수 없습니다. 이러한 경우를 위해서 Active Support는 `config/initializers/inflections.rb`에서 접두어를 지정할 수 있게 해줍니다.
 
 ```ruby
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'SSL'
 end
 
-"SSLError".underscore.camelize #=> "SSLError"
+"SSLError".underscore.camelize # => "SSLError"
 ```
 
-`camelize`는 `camelcase`라는 이름으로도 사용할 수 있습니다. [[[`camelize` is aliased to `camelcase`.]]]
+`camelize`는 `camelcase`의 다른 이름입니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `underscore`
 
-`underscore` 메소드는 카멜형으로 경로명을 산출할 때 사용하면 됩니다. [[[The method `underscore` goes the other way around, from camel case to paths:]]]
+`underscore` 메소드는 위와 반대로 카멜 표기법을 경로로 변환합니다.
 
 ```ruby
 "Product".underscore   # => "product"
 "AdminUser".underscore # => "admin_user"
 ```
 
-이 때 네이스페이스 구분자인 "::"는 "/" 로 변환됩니다. [[[Also converts "::" back to "/":]]]
+"::"도 "/"로 역변환됩니다.
 
 ```ruby
 "Backoffice::Session".underscore # => "backoffice/session"
 ```
 
-그리고 소문자로 시작하는 문자열을 인식하기도 합니다. [[[and understands strings that start with lowercase:]]]
+소문자로 시작하는 문자열도 변환 가능합니다.
 
 ```ruby
 "visualEffect".underscore # => "visual_effect"
 ```
 
-그러나 `underscore` 메소드는 인수를 취할 수 없습니다. [[[`underscore` accepts no argument though.]]]
+단, `underscore`는 인수를 받지 않습니다.
 
-레일스 클래스와 모듈을 자동으로 로딩할 때 바로 이 메소드를 이용하는데, missing constant를 정의하는 모듈 파일의 확장자 없이 상대경로를 유추하게 됩니다. [[[Rails class and module autoloading uses `underscore` to infer the relative path without extension of a file that would define a given missing constant:]]]
+Rails에서 자동적으로 읽어들이는 클래스와 모듈은 `underscore` 메소드를 사용하여 파일의 확장자를 제외한 상대 경로를 추측하고, 해당하는 경로에 존재하지 않는 경우에 새로 정의합니다.
 
 ```ruby
 # active_support/dependencies.rb
@@ -1550,33 +1602,33 @@ def load_missing_constant(from_mod, const_name)
 end
 ```
 
-INFO: 대개는, `underscore`를 `camelize`의 반대기능으로 생각할 수 있습니다. 그러나, 이러한 규칙의 예외적인 상황이 있는데, 예를 들면, `"SSLError".underscore.camelize`는 `"SslError"` 값을 반환하게 됩니다. [[[As a rule of thumb you can think of `underscore` as the inverse of `camelize`, though there are cases where that does not hold. For example, `"SSLError".underscore.camelize` gives back `"SslError"`.]]]
+INFO: `underscore` 메소드의 동작은 `camelize` 메소드와 반대의 동작을 한다고 생각하면 이해하기 쉽습니다. 단 완전히 반대의 동작을 수행하는 것은 아닙니다. 예를 들어 `"SSLError".underscore.camelize`를 실행한 결과는 `"SslError"`가 됩니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `titleize`
 
-`titleize` 메소드는 receiver 단어들의 첫문자를 대문자로 만들어 줍니다. [[[The method `titleize` capitalizes the words in the receiver:]]]
+`titleize` 메소드는 리시버에 존재하는 단어들의 첫번째 글자를 대문자로 만듭니다.
 
 ```ruby
 "alice in wonderland".titleize # => "Alice In Wonderland"
 "fermat's enigma".titleize     # => "Fermat's Enigma"
 ```
 
-`titleize`는 `titlecase`라는 이름으로도 사용할 수 있습니다. [[[`titleize` is aliased to `titlecase`.]]]
+`titleize` 메소드는 `titlecase`의 다른 이름입니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `dasherize`
 
-`dasherize` 메소드는 receiver 문자열내의 밑줄문자를 대시문자로 바꿔주는 기능을 합니다. [[[The method `dasherize` replaces the underscores in the receiver with dashes:]]]
+`dasherize` 메소드는 리시버의 언더스코어 문자를 '-'로 변환합니다(역주: 여기서 말하는 '-'는 유니코드로 'U+002D'입니다).
 
 ```ruby
 "name".dasherize         # => "name"
 "contact_data".dasherize # => "contact-data"
 ```
 
-모델에 대한 XML 시리얼라이저는 이 메소드를 이용하여 노드명을 변경하게 됩니다. [[[The XML serializer of models uses this method to dasherize node names:]]]
+모델의 XML 시리얼라이저에서는 이 메소드를 사용하여 노드명을 변환합니다.
 
 ```ruby
 # active_model/serializers/xml.rb
@@ -1586,19 +1638,22 @@ def reformat_name(name)
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `demodulize`
 
-네임스페이스가 포함되어 있는 문자열에 `demodulize` 메소드를 사용하면, 가장 우측에 있는 상수명만 반환해 줍니다. [[[Given a string with a qualified constant name, `demodulize` returns the very constant name, that is, the rightmost part of it:]]]
+`demodulize` 메소드는 전체 경로명을 받아 경로 부분을 제외하고 마지막 실제 상수 이름만을 남겨줍니다.
 
 ```ruby
 "Product".demodulize                        # => "Product"
 "Backoffice::UsersController".demodulize    # => "UsersController"
 "Admin::Hotel::ReservationUtils".demodulize # => "ReservationUtils"
+"::Inflections".demodulize                  # => "Inflections"
+"".demodulize                               # => ""
+
 ```
 
-예를 들어, 액티브레코드는 이 메소드를 이용하여 카운터 캐시로 사용하는 컬럼명을 산출해 냅니다. [[[Active Record for example uses this method to compute the name of a counter cache column:]]]
+다음 Active Record의 예제에서는 이 메소드를 사용해서 counter_cache용 컬럼의 이름을 가져옵니다.
 
 ```ruby
 # active_record/reflection.rb
@@ -1611,11 +1666,11 @@ def counter_cache_column
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `deconstantize`
 
-네임스페이스가 포함된 상수 참조 표현식을 가지는 문자열에 `deconstantize` 메소드를 사용하면 가장 오른쪽 세그먼트를 제거한 상태의 네임스페이스만 남게 됩니다. [[[Given a string with a qualified constant reference expression, `deconstantize` removes the rightmost segment, generally leaving the name of the constant's container:]]]
+`deconstantize` 메소드는 전체 경로명을 받아, 실제 상수의 이름을 제거합니다.
 
 ```ruby
 "Product".deconstantize                        # => ""
@@ -1623,7 +1678,7 @@ NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내
 "Admin::Hotel::ReservationUtils".deconstantize # => "Admin::Hotel"
 ```
 
-예를 들어 액티브서포트는 `Module#qualified_const_set`에서 이 메소드를 이용합니다. [[[Active Support for example uses this method in `Module#qualified_const_set`:]]]
+다음의 Active Record 예시에서는 `Module#qualified_const_set`에서 이 메소드를 사용하고 있습니다.
 
 ```ruby
 def qualified_const_set(path, value)
@@ -1636,24 +1691,24 @@ def qualified_const_set(path, value)
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `parameterize`
 
-`parameterize` 메소드는 receiver 문자열을 URL에서 사용할 수 있도록 만들어 줍니다. [[[The method `parameterize` normalizes its receiver in a way that can be used in pretty URLs.]]]
+`parameterize` 메소드는 리시버를 URL에서 사용가능한 형태로 정규화합니다.
 
 ```ruby
 "John Smith".parameterize # => "john-smith"
 "Kurt Gödel".parameterize # => "kurt-godel"
 ```
 
-사실, 결과로 만들어지는 문자열은 `ActiveSupport::Multibyte::Chars` 클래스의 인스턴스 형태를 띠게 됩니다. [[[In fact, the result string is wrapped in an instance of `ActiveSupport::Multibyte::Chars`.]]]
+실제로 얻는 문자열은 `ActiveSupport::Multibyte::Chars`의 인스턴스로 래핑되어있습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `tableize`
 
-`tableize` 메소드는 `underscore` 다음에 `pluralize` 메소드를 적용한 결과를 반환합니다. [[[The method `tableize` is `underscore` followed by `pluralize`.]]]
+`tableize`메소드는 `underscore`를 실행한 뒤, `pluralize`를 실행한 것과 동일합니다.
 
 ```ruby
 "Person".tableize      # => "people"
@@ -1661,13 +1716,13 @@ NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내
 "InvoiceLine".tableize # => "invoice_lines"
 ```
 
-대개 `tableize` 메소드는 간단한 경우, 특정 모델로 연결되는 테이블명을 반환합니다. 그러나 액티브레코드에서는 직접 `tableize` 메소드를 구현하지 않는데, 클래스명에 `demodulize` 메소드를 적용한 후 몇가지 옵션을 처리하여 그에 따른 테이블명을 적절하게 만들어 주기 때문입니다. [[[As a rule of thumb, `tableize` returns the table name that corresponds to a given model for simple cases. The actual implementation in Active Record is not straight `tableize` indeed, because it also demodulizes the class name and checks a few options that may affect the returned string.]]]
+보통은 모델명에 `tableize`를 사용하면 그 모델을 위한 테이블 이름을 얻을 수 있습니다. 실제 Active Record는 클래스 이름에 `demodulize`를 호출하고, 변환된 문자열에 영향을 줄 수 있는 가능성이 있는 옵션을 몇가지 더 확인하기 때문에, 실제로는 `tableize`를 호출하는 것 뿐만 아니라 그 이외의 작업들도 처리합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `classify`
 
-`classify` 메소드는 `tableize` 메소드의 반대기능을 합니다. 이것은 테이블명에 해당하는 클래스명을 반환해 줍니다. [[[The method `classify` is the inverse of `tableize`. It gives you the class name corresponding to a table name:]]]
+`classify` 메소드는 `tableize`와 반대의 동작을 합니다. 주어진 테이블 이름에 대응하는 클래스 이름을 반환합니다.
 
 ```ruby
 "people".classify        # => "Person"
@@ -1675,19 +1730,19 @@ NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내
 "invoice_lines".classify # => "InvoiceLine"
 ```
 
-또한 이 메소드는 컨텍스트가 적용된 테이블명을 인식합니다. [[[The method understands qualified table names:]]]
+이 메소드는 컨텍스트가 적용된 테이블 이름도 처리 가능합니다.
 
 ```ruby
 "highrise_production.companies".classify # => "Company"
 ```
 
-주목할 것은 `classify` 메소드가 클래스명을 문자열로 반환해 준다는 것입니다. 따라서 실제 클래스 객체는 다음에 설명할 `constantize` 메소드를 적용해서 얻을 수 있습니다. [[[Note that `classify` returns a class name as a string. You can get the actual class object invoking `constantize` on it, explained next.]]]
+`classify`가 돌려주는 클래스 이름은 문자열입니다. 얻은 문자열에 대해서 `constantize`를 호출하는 것으로 실제 클래스 객체를 얻을 수 있습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `constantize`
 
-`constantize` 메소드는 receiver의 상수를 참조하는 표현식을 실체화해 줍니다. [[[The method `constantize` resolves the constant reference expression in its receiver:]]]
+`constantize` 메소드는 리시버의 값을 참조하여 실제 객체를 반환합니다.
 
 ```ruby
 "Fixnum".constantize # => Fixnum
@@ -1698,9 +1753,9 @@ end
 "M::X".constantize # => 1
 ```
 
-receiver 문자열의 평가결과, 실존하는 상수가 아니거나 유효한 상수명이 아닌 경우 `NameError` 예외를 발생시킵니다. [[[If the string evaluates to no known constant, or its content is not even a valid constant name, `constantize` raises `NameError`.]]]
+주어진 문자열을 `constantize` 메소드로 평가하더라도 기존의 상수와 매치되지 않는, 또는 지정된 상수명이 올바르지 않은 경우에는 `NameError`가 발생합니다.
 
-`constantize` 메소드에 의한 상수명의 실체화는 앞에 "::" 구분자가 없는 경우에도 항상 최상위 `Object`로부터 시작합니다. [[[Constant name resolution by `constantize` starts always at the top-level `Object` even if there is no leading "::".]]]
+`constantize` 메소드에 의한 상수 이름 평가는 항상 최상위의 `Object`로부터 시작됩니다. 이것은 상수 이름이 절대경로("::"로 시작)가 아닐 경우에도 동일합니다.
 
 ```ruby
 X = :in_Object
@@ -1713,9 +1768,9 @@ module M
 end
 ```
 
-그렇기 때문에, 일반적으로는 동일한 시점에 루비가 작업하여 실제 상수가 평가가 되기 때문에 그 결과가 같지 않게 됩니다. [[[So, it is in general not equivalent to what Ruby would do in the same spot, had a real constant be evaluated.]]]
+따라서 이 메소드는 같은 위치에서 Ruby가 상수를 평가할 때의 값과 항상 동일하다고 말할 수 없습니다.
 
-메일러에 대한 테스트 케이스는 메일러가 `constantize` 메소드를 이용하여 테스트 클래스로부터 검증되도록 합니다. [[[Mailer test cases obtain the mailer being tested from the name of the test class using `constantize`:]]]
+메일러(mailer)의 테스트 케이스에서는 테스트할 클래스의 이름으로부터 태스트 대상 메일러를 얻어오기 위해서 `constantize` 메소드를 사용합니다.
 
 ```ruby
 # action_mailer/test_case.rb
@@ -1726,40 +1781,57 @@ rescue NameError => e
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `humanize`
 
-`humanize` 메소드는 모델 속성명으로부터 가독성있는 이름을 반환해 줍니다. 따라서 속성명내의 밑줄문자는 스페이스로 대체되고 속성명 끝의 "_id"는 제거되며 첫번째 단어는 첫문자가 대문자로 변환됩니다. [[[The method `humanize` gives you a sensible name for display out of an attribute name. To do so it replaces underscores with spaces, removes any "_id" suffix, and capitalizes the first word:]]]
+`humanize` 메소드는 속성명을 (영어 기준으로) 읽기 쉽게 변환해줍니다.
+
+구체적으로는 다음과 같은 작업을 수행합니다.
+
+  * 인수에 (영어의) 활용 규칙을 적용합니다(inflection).
+  * 말머리에 언더스코어가 있는 경우 제거합니다.
+  * 어미에 "_id"가 있는 경우에 제거합니다.
+  * 그 이외의 언더스코어는 띄어쓰기로 치환합니다.
+  * 약어를 제외하고 모든 단어를 소문자로 변환합니다(downcase).
+  * 첫 단어만 첫글자를 대문자로 변환합니다(capitalize).
+
+`capitalize` 옵션을 false로 지정하면 첫단어의 첫글자를 대문자로 변환하지 않습니다(기본값은 true).
 
 ```ruby
-"name".humanize           # => "Name"
-"author_id".humanize      # => "Author"
-"comments_count".humanize # => "Comments count"
+"name".humanize                         # => "Name"
+"author_id".humanize                    # => "Author"
+"author_id".humanize(capitalize: false) # => "author"
+"comments_count".humanize               # => "Comments count"
+"_id".humanize                          # => "Id"
 ```
 
-`full_messages` 헬퍼메소드는 속성명을 포함하기 위한 방법으로 `humanize` 메소드를 이용합니다. [[[The helper method `full_messages` uses `humanize` as a fallback to include attribute names:]]]
+"SSL"이 접두어로 정의되어 있는 경우에는 아래와 같이 변환됩니다.
+
+```ruby
+'ssl_error'.humanize # => "SSL error"
+```
+
+헬퍼 메소드 `full_messages`에서는 속성명을 메시지에 포함할 때 `humanize`를 사용합니다.
 
 ```ruby
 def full_messages
-  full_messages = []
+  map { |attribute, message| full_message(attribute, message) }
+end
 
-  each do |attribute, messages|
-    ...
-    attr_name = attribute.to_s.gsub('.', '_').humanize
-    attr_name = @base.class.human_attribute_name(attribute, default: attr_name)
-    ...
-  end
-
-  full_messages
+def full_message
+  ...
+  attr_name = attribute.to_s.tr('.', '_').humanize
+  attr_name = @base.class.human_attribute_name(attribute, default: attr_name)
+  ...
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `foreign_key`
 
-`foreign_key` 메소드는 특정 클래스명으로부터 외부키 컬럼명을 만들어 줍니다. 따라서 receiver에 대해서 `demodulize`, `underscore` 메소드를 적용한 결과문자열 끝에 "_id"를 붙여 줍니다. [[[The method `foreign_key` gives a foreign key column name from a class name. To do so it demodulizes, underscores, and adds "_id":]]]
+`foreign_key` 메소드는 클래스의 이름으로부터 외래키의 이름을 구할 때 사용합니다. 구체적으로는 `demodulize`, `underscore`를 실행하고 어미에 "_id"를 추가합니다.
 
 ```ruby
 "User".foreign_key           # => "user_id"
@@ -1767,26 +1839,26 @@ NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내
 "Admin::Session".foreign_key # => "session_id"
 ```
 
-"_id" 에서 민줄문자를 제거하여 붙이고자 한다면 false 값을 넘겨 주면 됩니다. [[[Pass a false argument if you do not want the underscore in "_id":]]]
+어미에 "_id"의 언더스코어가 불필요한 경우에는 인수를 통해 `false`를 넘겨주면 됩니다.
 
 ```ruby
 "User".foreign_key(false) # => "userid"
 ```
 
-모델간의 관계설정시 이 메소드를 이용하여 외부키를 추측하게 되는데, 예를 들어 `has_one`과 `has_many`의 경우 다음과 같이 구현합니다. [[[Associations use this method to infer foreign keys, for example `has_one` and `has_many` do this:]]]
+Association에서 외래키의 이름을 추측할 때 이 메소드를 사용합니다. 예를 들어 `has_one`과 `has_many`에서는 다음과 같은 처리를 합니다.
 
 ```ruby
 # active_record/associations.rb
 foreign_key = options[:foreign_key] || reflection.active_record.name.foreign_key
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/inflections.rb`.]]]
+NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
-### [Conversions] 변환 메소드
+### Conversions
 
 #### `to_date`, `to_time`, `to_datetime`
 
-`to_date`, `to_time`, `to_datetime` 메소드는 기본적으로 `Date._parse`에 대한 사용상의 편의성을 제공해 줍니다. [[[The methods `to_date`, `to_time`, and `to_datetime` are basically convenience wrappers around `Date._parse`:]]]
+`to_date`, `to_time`, `to_datetime` 메소드는 `Date._parse`를 래핑하여 사용하기 편하게 해줍니다.
 
 ```ruby
 "2010-07-27".to_date              # => Tue, 27 Jul 2010
@@ -1794,27 +1866,27 @@ NOTE: 이 메소드는 `active_support/core_ext/string/inflections.rb` 파일내
 "2010-07-27 23:37:00".to_datetime # => Tue, 27 Jul 2010 23:37:00 +0000
 ```
 
-`to_time` 메소드는 `:utc` 또는 `:local` 옵션을 이용해서 원하는 시간대(타임존)를 지정할 수 있습니다. [[[`to_time` receives an optional argument `:utc` or `:local`, to indicate which time zone you want the time in:]]]
+`to_time`은 옵션으로 `:utc`나 `:local`을 인수로 받아 시간대를 지정할 수 있습니다.
 
 ```ruby
 "2010-07-27 23:42:00".to_time(:utc)   # => Tue Jul 27 23:42:00 UTC 2010
 "2010-07-27 23:42:00".to_time(:local) # => Tue Jul 27 23:42:00 +0200 2010
 ```
 
-디폴트 옵션은 `:utc`입니다. [[[Default is `:utc`.]]]
+기본값은 `:utc`입니다.
 
-더 자세한 내용은 `Date._parse` 문서를 참조하기 바랍니다. [[[Please refer to the documentation of `Date._parse` for further details.]]]
+더 자세한 내용은 `Date._parse`의 문서를 참조해주세요.
 
-INFO: receiver가 `blank` 인 경우에는 `nil` 값을 반환합니다. [[[The three of them return `nil` for blank receivers.]]]
+INFO: 3개의 메소드는 어느 것이든 리시버가 blank인 경우에는 `nil`을 반환합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/string/conversions.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/string/conversions.rb`.]]]
+NOTE: `active_support/core_ext/string/conversions.rb`에 정의되어 있습니다.
 
-[Extensions to `Numeric`] `Numeric`형에 대한 확장 메소드
+`Numeric` 확장
 -----------------------
 
-### Bytes
+### 바이트
 
-모든 숫자는 다음의 메소드에 반응합니다. [[[All numbers respond to these methods:]]]
+모든 숫자에 다음 메소드를 사용할 수 있습니다.
 
 ```ruby
 bytes
@@ -1826,7 +1898,7 @@ petabytes
 exabytes
 ```
 
-이 메소드들은 1024 변환인자에 근거해서 바이트 크기로 반환합니다. [[[They return the corresponding amount of bytes, using a conversion factor of 1024:]]]
+이 메소드는 대응하는 바이트 수를 돌려줄 때에 1024를 곱해줍니다.
 
 ```ruby
 2.kilobytes   # => 2048
@@ -1835,49 +1907,36 @@ exabytes
 -4.exabytes   # => -4611686018427387904
 ```
 
-단수형도 가능해서 다음과 같이 사용할 수 있습니다. [[[Singular forms are aliased so you are able to say:]]]
+단수형으로도 사용할 수 있습니다.
 
 ```ruby
 1.megabyte # => 1048576
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/numeric/bytes.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/numeric/bytes.rb`.]]]
+NOTE: `active_support/core_ext/numeric/bytes.rb`에 정의되어 있습니다.
 
 ### Time
 
-`45.minutes + 2.hours + 4.years`과 같이 시간계산과 선언이 가능합니다. [[[Enables the use of time calculations and declarations, like `45.minutes + 2.hours + 4.years`.]]]
+예를 들어 `45.minutes + 2.hours + 4.years`와 같이 시간을 계산하고 싶을 때가 있습니다.
 
-이 메소드들은 Time#advance를 이용해서 from_now, ago 등과 같은 메소드 뿐만 아니라 Time객체로부터 계산 결과를 더하거나 빼기를 하여 정확한 날짜 계산을 가능케 합니다. [[[These methods use Time#advance for precise date calculations when using from_now, ago, etc. as well as adding or subtracting their results from a Time object. For example:]]]
+이런 메소드에서는 from_now나 ago등을 사용하거나, 또는 Time 객체로부터 얻은 결과를 더하거나 뺄 때에 Time#advance를 사용하여 정확한 날짜 계산을 수행합니다. 아래는 예제입니다.
 
 ```ruby
-# Time.current.advance(months: 1)와 동일함
+# Time.current.advance(months: 1)와 동등
 1.month.from_now
 
-# Time.current.advance(years: 2)와 동일함
+# Time.current.advance(years: 2)와 동등
 2.years.from_now
 
-# Time.current.advance(months: 4, years: 5)와 동일함
+# Time.current.advance(months: 4, years: 5)와 동등
 (4.months + 5.years).from_now
 ```
 
-이 메소드들은 위와 같이 사용될 때 정확한 계산을 하게 되지만, 주의해야 할 것은, 사용전에 `months`, `years` 등의 결과가 변환된다면 정확성이 떨어지게 된다는 것입니다. [[[While these methods provide precise calculation when used as in the examples above, care should be taken to note that this is not true if the result of `months`, `years`, etc is converted before use:]]]
+### 형식 변환
 
-```ruby
-# 30.days.to_i.from_now와 동일함.
-1.month.to_i.from_now
+숫자는 다양한 방법으로 나타낼 수 있습니다.
 
-# 365.25.days.to_f.from_now와 동일함.
-1.year.to_f.from_now
-```
-
-이런 경우에는, 루비 코어 [Date](http://ruby-doc.org/stdlib/libdoc/date/rdoc/Date.html)와 [Time](http://ruby-doc.org/stdlib/libdoc/time/rdoc/Time.html)을 이용해서 정확한 날짜와 시간 연산을 해야 합니다. [[[In such cases, Ruby's core [Date](http://ruby-doc.org/stdlib/libdoc/date/rdoc/Date.html) and [Time](http://ruby-doc.org/stdlib/libdoc/time/rdoc/Time.html) should be used for precision date and time arithmetic.]]]
-
-NOTE: 이 메소드는 `active_support/core_ext/numeric/time.rb` 파일내에 정의되어 있습니다.  [[[Defined in `active_support/core_ext/numeric/time.rb`.]]]
-
-### [Formatting] 숫자의 포맷변환
-
-이것은 다양한 방법으로 숫자의 표시형태를 달리할 수 있게 해 줍니다. [[[Enables the formatting of numbers in a variety of ways.]]]
-임의의 숫자를 전화번호 포맷의 문자열로 반환해 줄 수 있습니다. [[[Produce a string representation of a number as a telephone number:]]]
+숫자를 전화번호 형식의 문자열로 변환할 수 있습니다.
 
 ```ruby
 5551234.to_s(:phone)
@@ -1894,7 +1953,7 @@ NOTE: 이 메소드는 `active_support/core_ext/numeric/time.rb` 파일내에 �
 # => +1-123-555-1234
 ```
 
-임의의 숫자를 통화 포맷의 문자열로 반환해 줄 수 있습니다. [[[Produce a string representation of a number as currency:]]]
+통화 형식으로 변환할 수 있습니다.
 
 ```ruby
 1234567890.50.to_s(:currency)                 # => $1,234,567,890.50
@@ -1902,7 +1961,7 @@ NOTE: 이 메소드는 `active_support/core_ext/numeric/time.rb` 파일내에 �
 1234567890.506.to_s(:currency, precision: 3)  # => $1,234,567,890.506
 ```
 
-임의의 숫자를 퍼센트 포맷의 문자열로 반환해 줄 수 있습니다. [[[Produce a string representation of a number as a percentage:]]]
+백분율로 변환할 수 있습니다.
 
 ```ruby
 100.to_s(:percentage)
@@ -1915,7 +1974,7 @@ NOTE: 이 메소드는 `active_support/core_ext/numeric/time.rb` 파일내에 �
 # => 302.24399%
 ```
 
-임의의 숫자를 구분자 포맷의 문자열로 반환해 줄 수 있습니다. [[[Produce a string representation of a number in delimited form:]]]
+구분자를 추가하여 문자열로 변환할 수 있습니다.
 
 ```ruby
 12345678.to_s(:delimited)                     # => 12,345,678
@@ -1925,7 +1984,7 @@ NOTE: 이 메소드는 `active_support/core_ext/numeric/time.rb` 파일내에 �
 12345678.05.to_s(:delimited, separator: " ")  # => 12,345,678 05
 ```
 
-임의의 숫자를 정밀도에 따라 반올림해서 문자열로 반환해 줄 수 있습니다. [[[Produce a string representation of a number rounded to a precision:]]]
+특정 자리수를 가지는 문자열로 변환할 수 있습니다.
 
 ```ruby
 111.2345.to_s(:rounded)                     # => 111.235
@@ -1935,7 +1994,7 @@ NOTE: 이 메소드는 `active_support/core_ext/numeric/time.rb` 파일내에 �
 111.2345.to_s(:rounded, significant: true)  # => 111
 ```
 
-임의의 숫자를 바이트 단위의 가독성 있는 숫자 포맷의 문자열로 반환해 줄 수 있습니다. [[[Produce a string representation of a number as a human-readable number of bytes:]]]
+사람에게 가독성이 좋은 바이트 형식으로 변환할 수 있습니다.
 
 ```ruby
 123.to_s(:human_size)            # => 123 Bytes
@@ -1946,7 +2005,7 @@ NOTE: 이 메소드는 `active_support/core_ext/numeric/time.rb` 파일내에 �
 1234567890123.to_s(:human_size)  # => 1.12 TB
 ```
 
-임의의 숫자를 가독성 있도록 문자열로 반환해 줄 수 있습니다. [[[Produce a string representation of a number in human-readable words:]]]
+사람에게 가독성이 좋은 숫자 단위를 사용할 수 있습니다.
 
 ```ruby
 123.to_s(:human)               # => "123"
@@ -1958,25 +2017,25 @@ NOTE: 이 메소드는 `active_support/core_ext/numeric/time.rb` 파일내에 �
 1234567890123456.to_s(:human)  # => "1.23 Quadrillion"
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/numeric/formatting.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/numeric/formatting.rb`.]]]
+NOTE: `active_support/core_ext/numeric/conversions.rb`에 정의되어 있습니다.
 
-[Extensions to `Integer`] `Integer`형에 대한 확장 메소드
+`Integer` 확장
 -----------------------
 
 ### `multiple_of?`
 
-`multiple_of?` 메소드는 임의의 정수가 인수에 대한 배수인지를 알려 줍니다. [[[The method `multiple_of?` tests whether an integer is multiple of the argument:]]]
+`multiple_of?` 메소드는 리시버의 정수가 인자로 넘긴 숫자의 배수인지 테스트합니다.
 
 ```ruby
 2.multiple_of?(1) # => true
 1.multiple_of?(2) # => false
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/integer/multiple.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/integer/multiple.rb`.]]]
+NOTE: `active_support/core_ext/integer/multiple.rb`에 정의되어 있습니다.
 
 ### `ordinal`
 
-`ordinal` 메소드는 receiver가 정수인 경우 그에 해당하는 서수 접미 문자열을 반환합니다. [[[The method `ordinal` returns the ordinal suffix string corresponding to the receiver integer:]]]
+`ordinal` 메소드는 리시버의 정수에 대응하는 서수 어미를 반환합니다.
 
 ```ruby
 1.ordinal    # => "st"
@@ -1987,11 +2046,11 @@ NOTE: 이 메소드는 `active_support/core_ext/integer/multiple.rb` 파일내�
 -134.ordinal # => "th"
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/integer/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/integer/inflections.rb`.]]]
+NOTE: `active_support/core_ext/integer/inflections.rb`에 정의되어 있습니다.
 
 ### `ordinalize`
 
-`ordinalize` 메소드는 receiver 정수에 해당하는 서수 문자열을 반환해 줍니다. 비교해 보면, `ordinal` 메소드는 **단지** 서수 접미 문자열만 반환한다는 것입니다. [[[The method `ordinalize` returns the ordinal string corresponding to the receiver integer. In comparison, note that the `ordinal` method returns **only** the suffix string.]]]
+`ordinalize` 메소드는 리시버의 정수에 대응하는 서수 문자열을 추가한 것을 반환합니다. 직전에 소개한 `ordinal`은 서수 문자열**만을** 반환한다는 점이 다릅니다.
 
 ```ruby
 1.ordinalize    # => "1st"
@@ -2002,26 +2061,51 @@ NOTE: 이 메소드는 `active_support/core_ext/integer/inflections.rb` 파일�
 -134.ordinalize # => "-134th"
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/integer/inflections.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/integer/inflections.rb`.]]]
+NOTE: `active_support/core_ext/integer/inflections.rb`에 정의되어 있습니다.
 
-[Extensions to `BigDecimal`] `BigDecimal`형에 대한 확장 메소드
+`BigDecimal` 확장
 --------------------------
+### `to_s`
 
-...
+이 `to_s` 메소드는 `to_formatted_s`의 별명입니다. 이 메소드는 부동소수점 표기법의 BigDecimal값을 간단하게 표시할 때 유용합니다.
 
-[Extensions to `Enumerable`] `Enumerable`형에 대한 확장 메소드
+```ruby
+BigDecimal.new(5.00, 6).to_s  # => "5.0"
+```
+
+### `to_formatted_s`
+
+이 `to_formatted_s` 메소드는 기본 수식자(specifier) "F"를 사용합니다. 다시말해 `to_formatted_s` 또는 `to_s`를 호출하면 엔지니어링 표기법(ex: '0.5E1')이 아닌 부동소수점 표현을 얻을 수 있습니다.
+
+```ruby
+BigDecimal.new(5.00, 6).to_formatted_s  # => "5.0"
+```
+
+또한 심볼을 사용하여 지정할 수도 있습니다.
+
+```ruby
+BigDecimal.new(5.00, 6).to_formatted_s(:db)  # => "5.0"
+```
+
+엔지니어링 표기법도 지원합니다.
+
+```ruby
+BigDecimal.new(5.00, 6).to_formatted_s("e")  # => "0.5E1"
+```
+
+`Enumerable` 확장
 --------------------------
 
 ### `sum`
 
-`sum` 메소드는 열거형 객체의 각요소들을 합산해 줍니다. [[[The method `sum` adds the elements of an enumerable:]]]
+`sum` 메소드는 enumerable에 있는 요소의 합을 반환합니다.
 
 ```ruby
 [1, 2, 3].sum # => 6
 (1..100).sum  # => 5050
 ```
 
-이 메소드는 각 요소들이 `+` 메소드에 대해서 반응을 보여야 하는 것으로 간주 합니다. [[[Addition only assumes the elements respond to `+`:]]]
+`+`에 응답하는 요소만이 덧셈의 대상이 됩니다.
 
 ```ruby
 [[1, 2], [2, 3], [3, 4]].sum    # => [1, 2, 2, 3, 3, 4]
@@ -2029,46 +2113,46 @@ NOTE: 이 메소드는 `active_support/core_ext/integer/inflections.rb` 파일�
 {a: 1, b: 2, c: 3}.sum # => [:b, 2, :c, 3, :a, 1]
 ```
 
-빈 컬렉션의 합산은 디폴트로 0이지만, 이 값을 변경할 수 있습니다. [[[The sum of an empty collection is zero by default, but this is customizable:]]]
+빈 컬렉션은 기본으로 0을 반환합니다만, 이 동작은 바꿀 수 있습니다.
 
 ```ruby
 [].sum    # => 0
 [].sum(1) # => 1
 ```
 
-코드블록을 넘겨 받는 경우, `sum` 메소드는 반복연산자가 되어 컬렉션의 각요소에 대해서 블록 실행결과를 합한 값을 반환하게 됩니다. [[[If a block is given, `sum` becomes an iterator that yields the elements of the collection and sums the returned values:]]]
+블럭을 넘긴 경우 `sum`은 이터레이터가 되어서 컬렉션의 요소를 yield하며, 거기서 돌려받은 값의 합을 반환합니다.
 
 ```ruby
 (1..5).sum {|n| n * 2 } # => 30
 [2, 4, 6, 8, 10].sum    # => 30
 ```
 
-아무런 값이 없는 비어있는 receiver에 대한 합산은 또한 다음과 같이 변경할 수 있습니다. [[[The sum of an empty receiver can be customized in this form as well:]]]
+블럭을 주는 경우에도 리시버가 비어있을 때의 기본값을 지정할 수 있습니다.
 
 ```ruby
 [].sum(1) {|n| n**3} # => 1
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/enumerable.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/enumerable.rb`.]]]
+NOTE: `active_support/core_ext/enumerable.rb`에 정의되어 있습니다.
 
 ### `index_by`
 
-`index_by` 메소드는 열거형 receiver의 각 요소를 임의의 키로 인덱싱하여 해시를 생성해 줍니다. [[[The method `index_by` generates a hash with the elements of an enumerable indexed by some key.]]]
+`index_by` 메소드는 어떤 키에 의해서 인덱싱된 enumerable의 요소를 가지는 해시를 생성합니다.
 
-이 메소드는 receiver 컬렉션의 각요소를 반복해서 블록으로 넘겨 줍니다. 이 때 반환되는 해시의 각 요소는 블록에서 반환하는 값을 키로 사용하게 됩니다. [[[It iterates through the collection and passes each element to a block. The element will be keyed by the value returned by the block:]]]
+이 메소드는 컬렉션을 돌며 각 요소를 블럭에 넘겨줍니다. 이 요소는 블럭으로부터 반환된 값에 의해서 인덱싱됩니다.
 
 ```ruby
 invoices.index_by(&:number)
 # => {'2009-032' => <Invoice ...>, '2009-008' => <Invoice ...>, ...}
 ```
 
-WARNING. 키들은 일반적으로 유일해야 합니다. 블록이 각기 다른 요소에 대해서 동일한 키 값을 반환하다면 해당 키에 대해서 또 다시 컬렉션이 생성되지 않을 것입니다. [[[Keys should normally be unique. If the block returns the same value for different elements no collection is built for that key. The last item will win.]]]
+WARNING: 키는 유일해야합니다. 다른 요소로부터 같은 값이 반환되면 가장 마지막 항목만이 저장됩니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/enumerable.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/enumerable.rb`.]]]
+NOTE: `active_support/core_ext/enumerable.rb에 정의되어 있습니다.
 
 ### `many?`
 
-`many?` 메소드는 `collection.size > 1`에 대한 단축형으로 생각하면 됩니다. [[[The method `many?` is shorthand for `collection.size > 1`:]]]
+`many?` 메소드는 `collection.size > 1`의 축약형입니다.
 
 ```erb
 <% if pages.many? %>
@@ -2076,37 +2160,48 @@ NOTE: 이 메소드는 `active_support/core_ext/enumerable.rb` 파일내에 정�
 <% end %>
 ```
 
-옵션으로 블록이 주어지면, 블록연산에서 true값을 반환하는 요소만을 카운트하게 됩니다. [[[If an optional block is given, `many?` only takes into account those elements that return true:]]]
+`many?`는 블럭을 넘길 수 있는데 이 블럭에서 true를 반환하는 것들만 세서 판정합니다.
 
 ```ruby
 @see_more = videos.many? {|video| video.category == params[:category]}
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/enumerable.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/enumerable.rb`.]]]
+NOTE: `active_support/core_ext/enumerable.rb`에 정의되어 있습니다.
 
 ### `exclude?`
 
-`exclude?` 메소드는 특정 객체가 receiver 컬렉션에 포함되지 **않았음**을 확인해 줍니다. 이것은 `include?` 메소드의 반대되는 기능입니다. [[[The predicate `exclude?` tests whether a given object does **not** belong to the collection. It is the negation of the built-in `include?`:]]]
+`exclude?`는 주어진 객체가 그 컬렉션에 속해 있지 **않은지** 테스트합니다. 다시 말해, `include?`의 반대 동작입니다.
 
 ```ruby
 to_visit << node if visited.exclude?(node)
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/enumerable.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/enumerable.rb`.]]]
+NOTE: `active_support/core_ext/enumerable.rb`에 정의되어 있습니다.
 
-[Extensions to `Array`] `Array`형에 대한 확장 메소드
+### `without`
+
+`without` 메소드는 지정한 요소를 제외한 enumerable의 사본을 반환합니다.
+
+
+```ruby
+["David", "Rafael", "Aaron", "Todd"].without("Aaron", "Todd") # => ["David", "Rafael"]
+```
+
+NOTE: `active_support/core_ext/enumerable.rb`에 정의되어 있습니다.
+
+`Array` 확장
 ---------------------
 
-### [Accessing] 접근하기
+### Accessing
 
-액티브서포트는 배열에 대한 접근법을 용이하게 하기 위해 배열 API의 기능을 보강해 줍니다. 예를 들면, `to` 메소드는 넘겨준 값의 위치에 있는 요소까지의 배열일부를 반환해 줍니다. [[[Active Support augments the API of arrays to ease certain ways of accessing them. For example, `to` returns the subarray of elements up to the one at the passed index:]]]
+Active Support에는 배열에 여러가지 API를 추가하며, 이는 배열을 편리하게 사용할 수 있도록 해줍니다. 예를 들어 `to` 메소드는 배열의 첫번째 요소부터 넘겨받은 인덱스가 가리키는 요소까지의 범위를 반환합니다.
 
 ```ruby
 %w(a b c d).to(2) # => %w(a b c)
 [].to(7)          # => []
 ```
 
-비슷한 방법으로, `from` 메소드는 넘겨준 값의 위치에 있는 요소부터 마지막 요소까지를 반환해 줍니다. 넘겨 준 값이 배열 길이보다는 큰 경우에는 빈 배열을 반환하게 됩니다. [[[Similarly, `from` returns the tail from the element at the passed index to the end. If the index is greater than the length of the array, it returns an empty array.]]]
+마찬가지로 `from` 메소드는 배열에서 인덱스가 가리키는 요소로부터 마지막 요소까지를 반환합니다. 넘겨받은 인덱스가 배열의 길이보다 길 경우에는 빈 배열을 반환합니다.
 
 ```ruby
 %w(a b c d).from(2)  # => %w(c d)
@@ -2114,54 +2209,55 @@ NOTE: 이 메소드는 `active_support/core_ext/enumerable.rb` 파일내에 정�
 [].from(0)           # => []
 ```
 
-확장 메소드인 `second`, `third`, `fourth`, `fifth`는 해당하는 요소를 반환해 주게 됩니다. 참고로 `first`는 루비의 내장 메소드입니다. 이를 바탕으로 `forty_two` 또한 가능하게 정의할 수 있습니다. [[[The methods `second`, `third`, `fourth`, and `fifth` return the corresponding element (`first` is built-in). Thanks to social wisdom and positive constructiveness all around, `forty_two` is also available.]]]
+`second`, `third`, `fourth`, `fifth`는 대응하는 요소를 반환합니다(`first`는 원래 내장되어 있는 메소드입니다). 재미를 위해 지금은 `forty_two`도 사용할 수 있습니다(역주: [Rails 2.2 이후](https://github.com/rails/rails/commit/9d8cc60ec3845fa3e6f9292a65b119fe4f619f7e)로 사용 가능합니다. '42'에 대해서는 Wikipedia의 [이 문서](https://ko.wikipedia.org/wiki/%EC%9D%80%ED%95%98%EC%88%98%EB%A5%BC_%EC%97%AC%ED%96%89%ED%95%98%EB%8A%94_%ED%9E%88%EC%B9%98%ED%95%98%EC%9D%B4%EC%BB%A4%EB%A5%BC_%EC%9C%84%ED%95%9C_%EC%95%88%EB%82%B4%EC%84%9C_(%EC%86%8C%EC%84%A4))의 줄거리를 참조해주세요.).
 
 ```ruby
 %w(a b c d).third # => c
 %w(a b c d).fifth # => nil
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/array/access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/access.rb`.]]]
+NOTE: `active_support/core_ext/array/access.rb`에 정의되어 있습니다.
 
-### [Adding Elements] 배열요소 추가하기
+### 요소를 추가하기
 
 #### `prepend`
 
-이 메소드는 `Array#unshift`의 별칭 메소드입니다. [[[This method is an alias of `Array#unshift`.]]]
+이 메소드는 `Array#unshift`의 별명입니다.
 
 ```ruby
 %w(a b c d).prepend('e')  # => %w(e a b c d)
 [].prepend(10)            # => [10]
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/array/prepend_and_append.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/prepend_and_append.rb`.]]]
+NOTE: `active_support/core_ext/array/prepend_and_append.rb`에 정의되어 있습니다.
 
 #### `append`
 
-이 메소드는 `Array#<<`의 별칭 메소드입니다. [[[This method is an alias of `Array#<<`.]]]
+이 메소드는 `Array#<<`의 별명입니다.
 
 ```ruby
 %w(a b c d).append('e')  # => %w(a b c d e)
 [].append([1,2])         # => [[1,2]]
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/array/prepend_and_append.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/prepend_and_append.rb`.]]]
+NOTE: `active_support/core_ext/array/prepend_and_append.rb`에 정의되어 있습니다.
 
-### [Options Extraction] 옵션 추출하기
+### 옵션을 전개하기
 
-메소드 호출시 마지막 인수가 `&block` 인수가 아닌 해시인 경우, 브래킷 `{}`을 생략할 수 있습니다. [[[When the last argument in a method call is a hash, except perhaps for a `&block` argument, Ruby allows you to omit the brackets:]]]
+Ruby에서는 메소드에 주어진 마지막 인수가 해시인 경우, 그것이 `&block` 인수인 경우를 제외하고 해시의 중괄호를 생략할 수 있습니다.
+Rubyでは、メソッドに与えられた最後の引数がハッシュの場合、それが`&block`引数である場合を除いて、ハッシュの波括弧を省略できます。
 
 ```ruby
 User.exists?(email: params[:email])
 ```
 
-이러한 문법상의 달콤함은 레일스에서 많이 사용되고 있는데, 이것은 메소드로 넘겨주는 인수가 너무 많은 경우 정확한 위치에 해당 인수를 넘겨 주는 것이 힘들게 되어 대신에 파라메터에 이름을 붙여서 사용(named parameters)할 수 있도록 인터페이스를 제공해 주기 위함입니다. 특히나, 옵션을 해시 형태로 사용하는 것은 매우 흔한 일입니다. [[[That syntactic sugar is used a lot in Rails to avoid positional arguments where there would be too many, offering instead interfaces that emulate named parameters. In particular it is very idiomatic to use a trailing hash for options.]]]
+이러한 편의 문법(Syntax sugar)은 인수들이 순서에 의존하지 않도록 만들고, 이름을 가지는 파라미터를 에뮬레이트하는 인터페이스를 제공하기 위해 Rails에서 빈번하게 사용되고 있습니다. 특히 말미에 옵션의 해시를 두는 것은 무척 일반적입니다.
 
-메소드의 인수의 갯수가 유동적일 경우에는 메소드 인수 선언시에 `*`를 사용합니다. 그러나, 인수 배열의 마지막 항목으로 해시형태의 옵션을 지정할 때는 제대로 작동하지 않게 됩니다. [[[If a method expects a variable number of arguments and uses `*` in its declaration, however, such an options hash ends up being an item of the array of arguments, where it loses its role.]]]
+그러나 어떤 메소드가 받는 인수의 숫자는 고정적이지 않으며, 메소드 선언에서 `*`가 사용될 경우 중괄호가 생략된 옵션 해시는 인수 배열의 마지막 원소가 되어버려서 해시로 처리되지 않습니다.
 
-이 때는 옵션 해시에 대해서 `extract_options!` 메소드로 처리해 주면 됩니다. 이 메소드는 배열의 마지막 요소를 점검하여 그것이 해시이면 꺼내서 반환해 주고 그렇지 않으면 빈 해시를 반환해 줍니다. [[[In those cases, you may give an options hash a distinguished treatment with `extract_options!`. This method checks the type of the last item of an array. If it is a hash it pops it and returns it, otherwise it returns an empty hash.]]]
+이런한 경우, `extract_options!`를 사용해서 배열 마지막 요소의 타입을 체크하고, 그것이 해시인 경우 그 해시를 꺼내 반환합니다. 해시가 아닌 경우에는 빈 해시를 돌려줍니다.
 
-예를 들어 `caches_action` 컨트롤러 매크로의 정의를 살펴 봅시다. [[[Let's see for example the definition of the `caches_action` controller macro:]]]
+`caches_action` 컨트롤러 매크로에서 사용된 예시를 확인해봅시다.
 
 ```ruby
 def caches_action(*actions)
@@ -2171,15 +2267,15 @@ def caches_action(*actions)
 end
 ```
 
-이 메소드는 액션명을 임의의 갯수만큼 받게되며, 마지막 인수를 해시형태로 취하게 됩니다. `extract_options!`을 호출하게 되면, 옵션 해시를 취해서 간단하고도 명료하게 `actions`에서 빼내서 `options`에 할당하게 됩니다. [[[This method receives an arbitrary number of action names, and an optional hash of options as last argument. With the call to `extract_options!` you obtain the options hash and remove it from `actions` in a simple and explicit way.]]]
+이 메소드는 여러개의 액션명을 인수로 받을 수 있으며, 인수의 마지막 항목에 옵션 해시를 사용할 수 있습니다. `extract_options!` 메소드를 사용하면 그 옵션 해시를 꺼내고, `actions`로부터는 제거하는 작업까지 간단하고 명시적으로 처리할 수 있습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/array/extract_options.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/extract_options.rb`.]]]
+NOTE: `active_support/core_ext/array/extract_options.rb`에 정의되어 있습니다.
 
-### [Conversions] 변환하기
+### Conversions
 
 #### `to_sentence`
 
-`to_sentence` 메소드는 배열을 취해서 각 요소들을 열거하는 문자열로 변환해 줍니다. [[[The method `to_sentence` turns an array into a string containing a sentence that enumerates its items:]]]
+`to_sentence` 메소드는 배열을 변환하여 각 요소를 열거하는 영어 문장으로 변환합니다.
 
 ```ruby
 %w().to_sentence                # => ""
@@ -2188,31 +2284,27 @@ NOTE: 이 메소드는 `active_support/core_ext/array/extract_options.rb` 파일
 %w(Earth Wind Fire).to_sentence # => "Earth, Wind, and Fire"
 ```
 
-이 메소드는 3가지 옵션을 가집니다. [[[This method accepts three options:]]]
+이 메소드는 3개의 옵션을 사용할 수 있습니다.
 
-* `:two_words_connector`: 배열의 길이가 2인 경우 사용하며 디폴트는 " and " 입니다. [[[What is used for arrays of length 2. Default is " and ".]]]
+* `:two_words_connector`: 항목이 2개일 경우의 접속사를 지정합니다. 기본값은 " and "입니다.
+* `:words_connector`: 3개 이상의 요소가 존재하는 경우 마지막 2개를 제외한 나머지에서 사용될 접속사를 지정합니다. 기본값은 ", "입니다.
+* `:last_word_connector`: 3개 이상의 요소가 존재하는 경우 마지막 2개의 요소를 연결할 때 사용할 접속사를 지정합니다. 기본값은 ", and "입니다.
 
-* `:words_connector`: 배열의 길이가 2이상인 경우 사용하며 마지막 2개의 요소에 대해서는 적용하지 않습니다. 디폴트는 ", " 입니다. [[[What is used to join the elements of arrays with 3 or more elements, except for the last two. Default is ", ".]]]
+이러한 값들은 국제화를 쉽게 할 수 있습니다. 사용되는 키는 다음과 같습니다.
 
-* `:last_word_connector`: 배열의 길이가 2이상인 경우 사용하며 마지막 요소들을 연결하기 위해서 사용합니다. 디폴트는 ", and " 입니다. [[[What is used to join the last items of an array with 3 or more elements. Default is ", and ".]]]
-
-이 옵션의 디폴트 값에 로케일을 적용할 수도 있는데, 해당 로케일 키는 아래와 같습니다. [[[The defaults for these options can be localized, their keys are:]]]
-
-| 옵션                    | I18n 키                              |
+| 옵션                 | I18n 키                            |
 | ---------------------- | ----------------------------------- |
 | `:two_words_connector` | `support.array.two_words_connector` |
 | `:words_connector`     | `support.array.words_connector`     |
 | `:last_word_connector` | `support.array.last_word_connector` |
 
-`:connector`와 `:skip_last_comma` 옵션은 더 이상 사용되지 않습니다. [[[Options `:connector` and `:skip_last_comma` are deprecated.]]]
-
-NOTE: 이 메소드는 `active_support/core_ext/array/conversions.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/conversions.rb`.]]]
+NOTE: `active_support/core_ext/array/conversions.rb`에 정의되어 있습니다.
 
 #### `to_formatted_s`
 
-`to_formatted_s` 메소드는 디폴트로 `to_s`와 같이 동작합니다. [[[The method `to_formatted_s` acts like `to_s` by default.]]]
+`to_formatted_s` 메소드는 기본으로 `to_s`와 동일한 동작을 합니다.
 
-그러나 배열이 `id` 값을 얻을 수 있는 요소를 포함할 경우에는 `:db` 심볼을 인수로 넘겨 줄 수 있습니다. 이것은 대개 액티브레코드 객체들의 컬렉션에 대해서 사용하며 반환되는 문자열은 아래와 같습니다. [[[If the array contains items that respond to `id`, however, the symbol `:db` may be passed as argument. That's typically used with collections of ActiveRecord objects. Returned strings are:]]]
+그러나 배열 내부에 `id`에 응답하는 항목이 존재하는 경우 `:db`라는 심볼을 넘길 수 있습니다. 이 방법은 Active Record 객체의 컬렉션을 다룰때 자주 사용됩니다. 반환되는 문자열은 다음과 같습니다.
 
 ```ruby
 [].to_formatted_s(:db)            # => "null"
@@ -2220,13 +2312,13 @@ NOTE: 이 메소드는 `active_support/core_ext/array/conversions.rb` 파일내�
 invoice.lines.to_formatted_s(:db) # => "23,567,556,12"
 ```
 
-위의 예에서 정수는 배열 각 요소에 대해서 `id`를 호출시에 반환되는 값이다. [[[Integers in the example above are supposed to come from the respective calls to `id`.]]]
+이 예제에서의 값은 `id`를 호출하여 받아온 값입니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/array/conversions.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/conversions.rb`.]]]
+NOTE: `active_support/core_ext/array/conversions.rb`에 정의되어 있습니다.
 
 #### `to_xml`
 
-`to_xml` 메소드는 receiver객체의 XML형 출력 문자열을 반환해 줍니다. [[[The method `to_xml` returns a string containing an XML representation of its receiver:]]]
+`to_xml` 메소드는 리시버를 XML 표현으로 변환한 결과를 문자열로 반환합니다.
 
 ```ruby
 Contributor.limit(2).order(:rank).to_xml
@@ -2248,11 +2340,11 @@ Contributor.limit(2).order(:rank).to_xml
 # </contributors>
 ```
 
-이를 위해서, 모든 배열요소에 차례대로 `to_xml` 메소드를 호출하여 루트 노드에 결과들을 모아 둡니다. 모든 요소는 `to_xml`을 호출할 수 있어야 하며 그렇지 않을 경우에는 예외를 발생시킵니다. [[[To do so it sends `to_xml` to every item in turn, and collects the results under a root node. All items must respond to `to_xml`, an exception is raised otherwise.]]]
+실제로는 `to_xml`를 모든 요소에게 호출하고, 결과를 루트 노드에 모읍니다. 이 메소드는 모든 요소가 `to_xml`에 응답해야할 필요가 있으며, 그렇지 않은 경우 예외를 발생시킵니다.
 
-디폴트로, 루트 요소의 이름은 나머지 요소들도 같은 데이터형에 속하고(`is_a?` 호출로 확인하여) 해시형이 아닐 때, 첫번째 요소의 클래스명에 대해서 `underscore`, `dasherize`, `pluralize` 메소드를 적용하여 결정됩니다. 위의 예에서는 "contributors"가 되겠습니다. [[[By default, the name of the root element is the underscorized and dasherized plural of the name of the class of the first item, provided the rest of elements belong to that type (checked with `is_a?`) and they are not hashes. In the example above that's "contributors".]]]
+기본적으로 루트 요소의 이름은 첫번째 요소의 클래스 이름을 언더스코어화(underscorize), 대시화(dasherize), 마지막으로 복수형으로 변환(pluralize)합니다. 나머지 요소들이 첫번째 요소와 같은 타입(`is_a?`로 테스트됩니다)이고, 해시가 아닐것이 전제 조건입니다. 이 예제에서는 "contributors"입니다.
 
-나머지 요소 중 첫번째 요소의 데이터형과 일치하지 않는 것이 있을 경우에는, 루트 노드명은 "objects"가 됩니다. [[[If there's any element that does not belong to the type of the first one the root node becomes "objects":]]]
+첫번째 요소와 같은 타입을 가지지 않는 요소가 하나라도 있을 경우, 루트 노드에는 `objects`가 사용됩니다.
 
 ```ruby
 [Contributor.first, Commit.first].to_xml
@@ -2280,7 +2372,7 @@ Contributor.limit(2).order(:rank).to_xml
 # </objects>
 ```
 
-또한 receiver객체가 해시의 배열형태로 되어 있는 경우에도 루트 노드명은 "objects"가 됩니다. [[[If the receiver is an array of hashes the root element is by default also "objects":]]]
+리시버가 해시의 배열인경우, 루트 요소는 기본적으로 `objects`가 됩니다.
 
 ```ruby
 [{a: 1, b: 2}, {c: 3}].to_xml
@@ -2297,11 +2389,11 @@ Contributor.limit(2).order(:rank).to_xml
 # </objects>
 ```
 
-WARNING. 컬렉션이 비어있을 경우에 루트 요소의 이름은 디폴트 값인 "nil-classes"가 됩니다. 미루어 알 수 있듯이, 예를 들어 contributors 목록의 루트 요소는 컬렉션이 비어있을 경우 "contributors" 가 아니고 "nil-classes" 가 되는 것입니다. 또한 `:root` 옵션을 사용할 경우 루트 노트를 일관성있게 유지할 수 있게 됩니다. [[[If the collection is empty the root element is by default "nil-classes". That's a gotcha, for example the root element of the list of contributors above would not be "contributors" if the collection was empty, but "nil-classes". You may use the `:root` option to ensure a consistent root element.]]]
+WARNING: 컬렉션이 비어있는 경우, 루트 요소는 기본으로 "nil-classes"가 됩니다. 여기에서도 알 수 있듯, 예를 들어 위의 예제에서 contributors 목록의 루트 요소는 컬렉션이 만약 비어 있다면 "contributors"가 아닌 "nil-classes"가 됩니다. `:root` 옵션을 통해 일관성 있는 루트 요소를 사용할 수도 있습니다.
 
-자식 노드의 이름은 디폴트로 루트 노드의 단수형이 됩니다. 위의 예에서, "contributor"와 "object"를 볼 수 있습니다. `:children` 옵션은 이와 같은 자식 노드의 이름을 설정할 수 있게 해 줍니다. [[[The name of children nodes is by default the name of the root node singularized. In the examples above we've seen "contributor" and "object". The option `:children` allows you to set these node names.]]]
+자식 노드의 이름은 기본으로는 루트 요소의 단수형이 사용됩니다. 위 예제라면 "contributor"나 "object"입니다. `:children` 옵션을 사용하면, 다른 노드명을 지정할 수 있습니다.
 
-디폴트 XML 빌더는 `Builder::XmlMarkup`의 인스턴스 객체가 됩니다. `:builder` 옵션을 이용하면 이러한 빌더의 기능을 변경할 수 있습니다. 또한 `:dasherize` 등과 같은 옵션을 사용할 수 있으며 해당 빌더로 전달 되기도 합니다. [[[The default XML builder is a fresh instance of `Builder::XmlMarkup`. You can configure your own builder via the `:builder` option. The method also accepts options like `:dasherize` and friends, they are forwarded to the builder:]]]
+기본 XML 빌더는 `Builder::XmlMarkup`으로부터 직접 생성된 인스턴스입니다. 옵션 `:builder`를 사용해서 독자적인 빌더를 구성할 수도 있습니다. 이 메소드에서는 `:dasherize`와 다른 옵션들을 마찬가지로 사용할 수 있으며 자동으로 빌더에 전송됩니다. 
 
 ```ruby
 Contributor.limit(2).order(:rank).to_xml(skip_types: true)
@@ -2323,19 +2415,17 @@ Contributor.limit(2).order(:rank).to_xml(skip_types: true)
 # </contributors>
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/array/conversions.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/conversions.rb`.]]]
+NOTE: `active_support/core_ext/array/conversions.rb`에 정의되어 있습니다.
 
 ### Wrapping
 
-`Array.wrap` 메소드는 인수가 배열(또는 배열류)이 아닌 경우 배열로 감싸 줍니다. [[[The method `Array.wrap` wraps its argument in an array unless it is already an array (or array-like).]]]
+`Array.wrap` 메소드는 배열에 어떤 인수가 배열(또는 배열 같은)이 아닌 경우, 이를 배열로 감싸줍니다.
 
-특히, [[[Specifically:]]]
+특징:
 
-* 인수가 `nil`이면 빈 목록이 반환됩니다. [[[If the argument is `nil` an empty list is returned.]]]
-
-* 그렇지 않을 경우,  인수가 `to_ary`에 반응한다면 호출되고 `to_ary`의 결과값이 `nil`이 아닐 경우에는 그것이 반환됩니다. [[[Otherwise, if the argument responds to `to_ary` it is invoked, and if the value of `to_ary` is not `nil`, it is returned.]]]
-
-* 그외의 인자가 있는 경우는 그것을 하나의 요소로 가지는 배열이 반환됩니다. [[[Otherwise, an array with the argument as its single element is returned.]]]
+* 인수가 `nil`인 경우에 빈 배열을 반환합니다.
+* 위를 제외한 상황에서 인수에 `to_ary`를 호출할 수 있는 경우 `to_ary`가 호출되며, `to_ary`의 값이 `nil`이 아닌 경우에 그 값을 사용합니다.
+* 그 이외의 경우 인수를 가지는 배열(요소가 1개인 배열)이 반환됩니다.
 
 ```ruby
 Array.wrap(nil)       # => []
@@ -2343,36 +2433,34 @@ Array.wrap([1, 2, 3]) # => [1, 2, 3]
 Array.wrap(0)         # => [0]
 ```
 
-이 메소드는 기능적으로는 `Kernel#Array`와 비슷하지만, 약간의 차이점이 있습니다. [[[This method is similar in purpose to `Kernel#Array`, but there are some differences:]]]
+이 메소드의 목적은 `Kernel#Array`와 비슷합니다만, 몇가지 다른 점이 있습니다.
 
-* 인수가 `to_ary`에 반응을 할 경우 메소드가 호출된다는 것입니다. `Kernel#Array`은 반환값이 `nil`일 경우 계속해서 `to_a`를 호출할 것이지만, `Array.wrap`은 즉시 `nil`값을 반환합니다. [[[If the argument responds to `to_ary` the method is invoked. `Kernel#Array` moves on to try `to_a` if the returned value is `nil`, but `Array.wrap` returns `nil` right away.]]]
+* 인수에서 `to_ary`를 호출할 수 있는 경우, 그 메소드를 호출합니다. `nil`이 반환된 경우 `Kernel#Array`는 `to_a`를 시도합니다만 `Array.wrap`는 그러지 않고 곧바로 단일 요소를 가지는 배열을 만들어 반환합니다.
+* `to_ary`로부터 반환된 값이 `nil`이 아니고, `Array` 객체도 아닌 경우 `Kernel#Array`는 예외를 발생시킵니다만, `Array.wrap`은 예외를 발생시키지 않고 그 값을 그대로 반환합니다.
+* 빈 배열을 반환하는 nil을 제외하고, 인수에 대해서 `to_a`를 호출하지 않습니다.
 
-* `to_ary`가 반환하는 값이 `nil`이 아니거나 `Array` 객체가 아니라면, `Kernel#Array`은 예외를 발생시키는 반면, `Array.wrap`은 반대로 단지 값만 반환하게 됩니다. [[[If the returned value from `to_ary` is neither `nil` nor an `Array` object, `Kernel#Array` raises an exception, while `Array.wrap` does not, it just returns the value.]]]
-
-* 빈 배열을 반환하기 위해 특별한 경우 `nil`인 경우가 있긴 하지만, 인수에 대해서 `to_a`를 호출하지 않습니다. [[[It does not call `to_a` on the argument, though special-cases `nil` to return an empty array.]]]
-
-마지막 것은 열거형에 대해서 특별히 비교할 만한 가치가 있습니다. [[[The last point is particularly worth comparing for some enumerables:]]]
+마지막 점은 열거형끼리 비교하는 경우에 유용합니다.
 
 ```ruby
 Array.wrap(foo: :bar) # => [{:foo=>:bar}]
 Array(foo: :bar)      # => [[:foo, :bar]]
 ```
 
-또한 splat 연산자를 사용하는 연관 용어도 있습니다. [[[There's also a related idiom that uses the splat operator:]]]
+이 동작은 splat 연산사를 사용하는 기법과도 관련이 있습니다.
 
 ```ruby
 [*object]
 ```
 
-이것은 루비 1.8에서 `nil`에 대해서 `[nil]`을 반환하고 그렇지 않으면 `Array(object)`를 호출합니다. (루비 1.9에서 정확한 기능을 알고 있다면 연락 주시기 바랍니다.) [[[which in Ruby 1.8 returns `[nil]` for `nil`, and calls to `Array(object)` otherwise. (Please if you know the exact behavior in 1.9 contact fxn.)]]]
+이는 Ruby 1.8일 경우 `nil`에 대해서 `[nil]`을 반환하며, 그 이외의 경우에는 `Array(object)`를 호출합니다(역주: Ruby 1.9 이후로는 빈 배열을 반환합니다).
 
-따라서, 이와 같은 경우에, `nil`에 대해서 각기 다르게 동작한다는 것이고, 위의 언급한 바와 같이 `Kernel#Array`에서의 차이점은 `object`에 대해서도 적용하게 됩니다. [[[Thus, in this case the behavior is different for `nil`, and the differences with `Kernel#Array` explained above apply to the rest of `object`s.]]]
+따라서 이 경우 `nil`에 대한 동작만이 다르며, 위에서 설명된 `Kernel#Array`에 대해서도 이 다른 동작이 나머지 `object`에도 적용됩니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/array/wrap.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/wrap.rb`.]]]
+NOTE: `active_support/core_ext/array/wrap.rb`에 정의되어 있습니다.
 
-### [Duplicating] 복제하기
+### 복제
 
-`Array.deep_dup` 메소드는 자신과 내부에 있는 모든 객체를 액티브서포트 메소드인 `Object#deep_dup`를 이용하여 재귀적 복제를 합니다. 배열 내부에 있는 각 객체에 대해서 `deep_dup`메소드를 적용하여 마치 `Array#map` 처럼 동작합니다. [[[The method `Array.deep_dup` duplicates itself and all objects inside recursively with ActiveSupport method `Object#deep_dup`. It works like `Array#map` with sending `deep_dup` method to each object inside.]]]
+`Array.deep_dup` 메소드는 자기 자신을 복사함과 동시에 그 내부에 있는 모든 객체를 Active Support의 `Object#deep_dup` 메소드를 사용하여 재귀적으로 복사합니다. 이 동작은 `Array#map`을 사용하여 `deep_dup` 메소드를 내부의 각 객체에 대해서 호출합니다.
 
 ```ruby
 array = [1, [2, 3]]
@@ -2381,19 +2469,19 @@ dup[1][2] = 4
 array[1][2] == nil   # => true
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/array/deep_dup.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/deep_dup.rb`.]]]
+NOTE: `active_support/core_ext/object/deep_dup.rb`에 정의되어 있습니다.
 
-### Grouping
+### 그룹화
 
 #### `in_groups_of(number, fill_with = nil)`
 
-`in_groups_of` 메소드는 넘겨 준 크기 만큼씩 배열 요소를 분리해서 그룹화해 줍니다. 이 메소드는 그룹을 가진 배열을 반환해 줍니다. [[[The method `in_groups_of` splits an array into consecutive groups of a certain size. It returns an array with the groups:]]]
+`in_groups_of` 메소드는 지정한 크기에서 배열을 연속되는 그룹으로 분할합니다. 분할된 그룹을 내포하는 배열을 하나 반환합니다.
 
 ```ruby
 [1, 2, 3].in_groups_of(2) # => [[1, 2], [3, nil]]
 ```
 
-또는 블록을 넘겨 주게 되면 그룹 크기만큼씩 차례대로 처리하게 됩니다. [[[or yields them in turn if a block is passed:]]]
+블럭을 넘긴 경우에는 yield를 호출합니다.
 
 ```html+erb
 <% sample.in_groups_of(3) do |a, b, c| %>
@@ -2405,32 +2493,32 @@ NOTE: 이 메소드는 `active_support/core_ext/array/deep_dup.rb` 파일내에 
 <% end %>
 ```
 
-첫번째 예에서는 `in_groups_of`가 마지막 그룹을 요청된 크기보다 모자라는 만큼의 `nil`요소로 채워 줍니다. 이렇게 채워주는 값을 두번째 옵션을 지정하여 변경할 수 있습니다. [[[The first example shows `in_groups_of` fills the last group with as many `nil` elements as needed to have the requested size. You can change this padding value using the second optional argument:]]]
+첫번째 예제에서는 `in_groups_of` 메소드는 마지막 그룹을 가급적 `nil` 요소로 채워서 요구받은 크기를 맞추려고 합니다. 이 빈 길이 만큼을 채울때 사용하는 요소를 인수로 지정할 수 있습니다.
 
 ```ruby
 [1, 2, 3].in_groups_of(2, 0) # => [[1, 2], [3, 0]]
 ```
 
-그리고 또한 두번째 옵션으로 `false`를 지정하면 마지막 그룹에서 모자라는 부분을 채우지 않도록 할 수 있습니다. [[[And you can tell the method not to fill the last group passing `false`:]]]
+두번째 옵션의 인수로 `false`를 넘겨주면 마지막 요소의 남는 길이를 채우지 않습니다.
 
 ```ruby
 [1, 2, 3].in_groups_of(2, false) # => [[1, 2], [3]]
 ```
 
-따라서, `false` 값은 마지막 그룹의 모자라는 요소를 채워주는 값으로 사용할 수 없다는 결론입니다. [[[As a consequence `false` can't be a used as a padding value.]]]
+따라서 `false`는 빈 공간을 채우는 값으로 사용할 수 없습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/array/grouping.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/grouping.rb`.]]]
+NOTE: `active_support/core_ext/array/grouping.rb`에 정의되어 있습니다.
 
 #### `in_groups(number, fill_with = nil)`
 
-`in_groups` 메소드는 배열을 지정한 갯수만큼의 그룹으로 분리합니다. 이 메소드는 그룹을 가진 배열을 반환합니다. [[[The method `in_groups` splits an array into a certain number of groups. The method returns an array with the groups:]]]
+`in_groups`은 배열을 지정한 갯수로 나누고, 분할된 그룹들을 가지고 있는 배열을 하나 반환합니다.
 
 ```ruby
 %w(1 2 3 4 5 6 7).in_groups(3)
 # => [["1", "2", "3"], ["4", "5", nil], ["6", "7", nil]]
 ```
 
-또는 블록을 넘겨주면 각 그룹에 대해서 차례대로 코드를 처리할 수 있습니다.[[[or yields them in turn if a block is passed:]]]
+블럭을 넘겼을 경우에는 yield를 호출합니다.
 
 ```ruby
 %w(1 2 3 4 5 6 7).in_groups(3) {|group| p group}
@@ -2439,56 +2527,56 @@ NOTE: 이 메소드는 `active_support/core_ext/array/grouping.rb` 파일내에 
 ["6", "7", nil]
 ```
 
-위의 예에서는 `in_groups` 메소드가 필요한 수만큼의 `nil` 요소로 그룹을 채워 줍니다. 하나의 그룹은 기껏해야 마지막 요소로 하나의 채움값을 가질 수 있습니다. 그리고 채움값을 가지는 그룹은 항상 마지막에 위치합니다. [[[The examples above show that `in_groups` fills some groups with a trailing `nil` element as needed. A group can get at most one of these extra elements, the rightmost one if any. And the groups that have them are always the last ones.]]]
+이 예제에서는 `in_groups`는 일부 그룹들의 뒤에 필요에 따라서 `nil` 요소로 채우고 있습니다. 하나의 그룹에는 이러한 여분의 요소가 각 그룹의 마지막에 필요한 만큼 최대 하나가 추가될 수 있습니다. 그러한 값을 가지는 그룹은 항상 전체에서 마지막에 존재하게 됩니다.
 
-두번째 옵션을 이용하면 그룹을 채우는 값을 변경할 수 있습니다.[[[You can change this padding value using the second optional argument:]]]
+공백을 채우는 값은 두번째 옵션 인수로 지정할 수 있습니다.
 
 ```ruby
 %w(1 2 3 4 5 6 7).in_groups(3, "0")
 # => [["1", "2", "3"], ["4", "5", "0"], ["6", "7", "0"]]
 ```
 
-그리고 두번째 옵션으로 `false` 값을 넘겨 주면 그룹의 빈 요소를 채우지 않도록 할 수 있습니다. [[[And you can tell the method not to fill the smaller groups passing `false`:]]]
+만약 `false`를 넘기면 요소의 갯수가 부족한 경우에도 채우지 않습니다.
 
 ```ruby
 %w(1 2 3 4 5 6 7).in_groups(3, false)
 # => [["1", "2", "3"], ["4", "5"], ["6", "7"]]
 ```
 
-따라서 `false` 값은 채우는 값으로 사용할 수 없다는 결론입니다. [[[As a consequence `false` can't be a used as a padding value.]]]
+따라서 `false`는 빈 공간을 채우는 값으로 사용할 수 없습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/array/grouping.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/grouping.rb`.]]]
+NOTE: `active_support/core_ext/array/grouping.rb`에 정의되어 있습니다.
 
 #### `split(value = nil)`
 
-`split` 메소드는 분리자로 배열을 나누어 줍니다. [[[The method `split` divides an array by a separator and returns the resulting chunks.]]]
+`split` 메소드는 지정된 구분자로 배열을 나누고, 분할된 결과를 반환합니다.
 
-블록이 넘어 올 경우에는, 분리자는 블록 수행결과 true 값을 반환하는 배열요소가 됩니다. [[[If a block is passed the separators are those elements of the array for which the block returns true:]]]
+블럭을 넘긴 경우에는 배열의 요소중 블록이 true를 돌려주는 요소가 구분자로 사용됩니다.
 
 ```ruby
 (-5..5).to_a.split { |i| i.multiple_of?(4) }
 # => [[-5], [-3, -2, -1], [1, 2, 3], [5]]
 ```
 
-그 외에는 값을 인수로 받게 되는데, 디폴트값은 `nil`이며, 이 값이 분리자가 되는 것입니다. [[[Otherwise, the value received as argument, which defaults to `nil`, is the separator:]]]
+블록을 넘기지 않은 경우, 인수로 받은 값을 구분자로 사용합니다. 기본 구분자는 `nil`입니다.
 
 ```ruby
 [0, 1, -5, 1, 1, "foo", "bar"].split(1)
 # => [[0], [-5], [], ["foo", "bar"]]
 ```
 
-TIP: 이전 예여서 주목해서 볼 것은 연속되는 구분자는 빈 배열을 반환하게 된다는 것입니다. [[[Observe in the previous example that consecutive separators result in empty arrays.]]]
+TIP: 이 예제에서 알 수 있듯, 구분자가 연속되면 빈 배열이 발생합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/array/grouping.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/array/grouping.rb`.]]]
+NOTE: `active_support/core_ext/array/grouping.rb`에 정의되어 있습니다.
 
-[Extensions to `Hash`] `Hash`형에 대한 확장 메소드
+`Hash` 확장
 --------------------
 
-### [Conversions] 해시 변환메소드
+### Conversions
 
 #### `to_xml`
 
-`to_xml` 메소드는 receiver 해시를 XML로 변환하여 문자열로 반환합니다. [[[The method `to_xml` returns a string containing an XML representation of its receiver:]]]
+`to_xml` 메소드는 리시버를 XML 표현으로 변환한 결과를 문자열로 반환합니다.
 
 ```ruby
 {"foo" => 1, "bar" => 2}.to_xml
@@ -2500,17 +2588,17 @@ NOTE: 이 메소드는 `active_support/core_ext/array/grouping.rb` 파일내에 
 # </hash>
 ```
 
-이를 위해서는, 메소드는 해시내 키/값 들에 대해서 루프를 돌면서 _value_ 에 따라 노드를 만들게 됩니다. `key`, `value` 쌍이 주어질 경우, [[[To do so, the method loops over the pairs and builds nodes that depend on the _values_. Given a pair `key`, `value`:]]]
+구체적으로는 이 메소드에 주어진 것들로부터 _값_에 대응하는 노드를 생성합니다. 키와 값을 사용해서 다음과 같은 동작을 수행합니다.
 
-* `value`가 해시인 경우에는 `key`를 `:root`로 하여 이 메소드를 반복호출하게 됩니다. [[[If `value` is a hash there's a recursive call with `key` as `:root`.]]]
+* 값이 해시일 때 키를 `:root`로 하여 재귀적으로 호출됩니다.
 
-* `value`가 배열인 경우에는 `key`를 `:root`로 하여 이 메소드를 반복호출하게 되며, 이 때 `key`는 `:children`으로 단수형을 취하게 됩니다. [[[If `value` is an array there's a recursive call with `key` as `:root`, and `key` singularized as `:children`.]]]
+* 값이 배열일 때 키를 `:root`로 키를 단수형으로(singularize)만든 것을 `:children`에 지정해서 재귀적으로 호출됩니다.
 
-* `value`가 호출가능한 객체일 경우에는 하나 또는 2개의 인수를 넘겨주어야 합니다. 인수의 갯수에 따라 객체는, `:root`를 `key`로 하는 첫번째 인수와, 단수형 `key`를 두번째 인수로 하는 `options` 해시를 넘겨주어 호출됩니다. 이 때 반환되는 결과가 새로운 노트가 됩니다. [[[If `value` is a callable object it must expect one or two arguments. Depending on the arity, the callable is invoked with the `options` hash as first argument with `key` as `:root`, and `key` singularized as second argument. Its return value becomes a new node.]]]
+* 값이 호출 가능한(callable) 객체인 경우, 인수가 하나 또는 두 개 필요합니다. 인수의 갯수에 따라서(arity 메소드로 확인) 객체를 옵션 해시와 함께 호출합니다. 옵션 해시의 첫번째 인수에는 `:root`에 사용되는 값이며, 두번째 인수에는 키를 단수형으로 만든 값이 사용됩니다. 반환값은 새 노드가 됩니다.
 
-* `value`가 `to_xml`에 반응하면 `key`를 `:root`로 해서 호출됩니다.[[[If `value` responds to `to_xml` the method is invoked with `key` as `:root`.]]]
+* `value`이 `to_xml` 메소드를 호출 가능한 경우 `:root`에 키를 사용합니다.
 
-* 그렇지 않을 경우에는, `key`를 태그명으로 하는 노드가 생성되고 이 때 `value`가 텍스트 노드로써 표시됩니다. `value`가 `nil`인 경우에는 "true"값을 가지는 "nil"이라는 속성이 추가됩니다. `:skip_types`라는 옵션이 true값으로 지정되지 않는 이상, "type"이라는 속성이 아래와 같은 규칙에 따라 추가됩니다. [[[Otherwise, a node with `key` as tag is created with a string representation of `value` as text node. If `value` is `nil` an attribute "nil" set to "true" is added. Unless the option `:skip_types` exists and is true, an attribute "type" is added as well according to the following mapping:]]]
+* 그 이외의 경우 `key`를 태그로 사용해서 `value`를 문자열 형식으로 변환한 텍스트 노드가 생성됩니다. `value`가 `nil`인 경우, "nil" 속성이 "true"로 설정된 노드가 추가됩니다. `:skip_types` 옵션이 true가 아닌 경우(또는 `:skip_types` 옵션이 없는 경우) 아래와 같은 맵핑을 통해서 "type" 속성이 추가됩니다.
 
 ```ruby
 XML_TYPE_NAMES = {
@@ -2527,73 +2615,73 @@ XML_TYPE_NAMES = {
 }
 ```
 
-디폴트로 루트 노드명은 "hash"이지만, `:root` 옵션을 이용해서 변경할 수 있습니다. [[[By default the root node is "hash", but that's configurable via the `:root` option.]]]
+기본으로 루트 노드는 "hash"가 됩니다만, `:root` 옵션을 통해 변경할 수 있습니다.
 
-디폴트 XML 빌더는 `Builder::XmlMarkup`의 인스턴스입니다. `:builder` 옵션을 사용하면 특화된 빌더를 설정할 수 있습니다. 또한 이 메소드는 `:dasherize`류의 옵션을 취해서 빌더로 전달해 줍니다. [[[The default XML builder is a fresh instance of `Builder::XmlMarkup`. You can configure your own builder with the `:builder` option. The method also accepts options like `:dasherize` and friends, they are forwarded to the builder.]]]
+기본 XML 빌더는 `Builder::XmlMarkup`로부터 직접 생성된 인스턴스입니다. `:builder` 옵션으로 직접 구성한 빌더를 사용할 수 있으며, 이 메소드에서는 `:dasherize`와 그 동족들, 그리고 다른 옵션들도 사용할 수 있습니다. 이 옵션들은 자동으로 빌더에 넘겨집니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/conversions.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/conversions.rb`.]]]
+NOTE: `active_support/core_ext/hash/conversions.rb`에 정의되어 있습니다.
 
-### [Merging] 해시 머지하기
+### 병합
 
-루비는 두개의 해시를 머지하는 `Hash#merge`라는 내장 메소드를 가지고 있습니다. [[[Ruby has a built-in method `Hash#merge` that merges two hashes:]]]
+Ruby에는 2개의 해시를 병합하는 내장 메소드 `Hash#merge`가 있습니다.
 
 ```ruby
 {a: 1, b: 1}.merge(a: 0, c: 2)
 # => {:a=>0, :b=>1, :c=>2}
 ```
 
-액티브서포트는 편리하게 사용할 수 있는 해시 머지 방법을 더 제공해 줍니다. [[[Active Support defines a few more ways of merging hashes that may be convenient.]]]
+Active Support에서는 이외에도 편리하게 해시를 병합할 수 있는 몇가지 방법을 제공합니다.
 
-#### [`reverse_merge` and `reverse_merge!`] `reverse_merge`와 `reverse_merge!`
+#### `reverse_merge`と`reverse_merge!`
 
-충돌이 있는 경우 인수 해시에 있는 키가 우선됩니다. 따라서 디폴트 값을 가지는 옵션 해시를 이와 같이 간결하게 지원할 수 있게 됩니다.  [[[In case of collision the key in the hash of the argument wins in `merge`. You can support option hashes with default values in a compact way with this idiom:]]]
+`merge`에서는 키가 충돌하는 경우, 인수로 받은 해시의 키가 우선됩니다. 다음과 같은 방법을 사용하는 것으로 기본값을 가지는 옵션 해시를 간단하게 사용할 수 있습니다.
 
 ```ruby
 options = {length: 30, omission: "..."}.merge(options)
 ```
 
-액티브서포트는 선호도에 따라 사용할 수 있는 대체 메소드로 `reverse_merge`를 정의합니다. [[[Active Support defines `reverse_merge` in case you prefer this alternative notation:]]]
+Active Support에서는 다른 방법을 사용하는 경우를 위해 `reverse_merge`도 정의하고 있습니다.
 
 ```ruby
 options = options.reverse_merge(length: 30, omission: "...")
 ```
 
-그리고 `reverse_merge!`와 같이 !(bang) 버전도 있습니다. [[[And a bang version `reverse_merge!` that performs the merge in place:]]]
+병합을 리시버에서 직접 수행하는 파괴적인 메소드 `reverse_merge!`도 있습니다.
 
 ```ruby
 options.reverse_merge!(length: 30, omission: "...")
 ```
 
-WARNING. 주의할 것은, 좋은 아이디어일지 아닐지는 모르지만, `reverse_merge!`는 호출자의 해시를 변경한다는 것을 염두에 두어야 합니다. [[[Take into account that `reverse_merge!` may change the hash in the caller, which may or may not be a good idea.]]]
+WARNING: `reverse_merge!`는 호출한 쪽의 해시값을 변경할 수 있다는 점을 주의해주세요. 그것이 의도된 동작이든 아니든, 조심해야 합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/reverse_merge.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/reverse_merge.rb`.]]]
+NOTE: `active_support/core_ext/hash/reverse_merge.rb`에 정의되어 있습니다.
 
 #### `reverse_update`
 
-`reverse_update` 메소드는 `reverse_merge!`와 동일한 메소드입니다. [[[The method `reverse_update` is an alias for `reverse_merge!`, explained above.]]]
+`reverse_update` 메소드는 위에서 설명한 `reverse_merge!`의 별명입니다.
 
-WARNING. 주의할 것은 `reverse_update` 메소드는 !(bang) 버전이 없다는 것입니다. [[[Note that `reverse_update` has no bang.]]]
+WARN: `reverse_update`에는 파괴적인 버전이 존재하지 않습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/reverse_merge.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/reverse_merge.rb`.]]]
+NOTE: `active_support/core_ext/hash/reverse_merge.rb`에 정의되어 있습니다.
 
-#### `deep_merge` and `deep_merge!`
+#### `deep_merge`와 `deep_merge!`
 
-이전 예에서 알 수 있듯이, 하나의 키가 양쪽 해시내에서 발견될 경우 인수에 있는 값이 우선합니다. [[[As you can see in the previous example if a key is found in both hashes the value in the one in the argument wins.]]]
+위의 예제에서 설명했듯이, 키가 리시버와 인수 양쪽에서 중복되어 있을 경우, 인수의 값이 우선됩니다.
 
-액티브서포트는 `Hash#deep_merge`를 정의합니다. 특정 키가 양쪽 해시에 있고 해당 값이 해시일 경우 _머지_ 결과는 해당 해시의 값이 됩니다. [[[Active Support defines `Hash#deep_merge`. In a deep merge, if a key is found in both hashes and their values are hashes in turn, then their _merge_ becomes the value in the resulting hash:]]]
+Active Support 에서는 `Hash#deep_merge`가 정의되어 있습니다. `deep_merge`에서는 양쪽에 같은 키가 존재하고, 나아가 둘 다 해시를 값으로 가지고 있는 경우에, 그 하위의 해시를 _병합_한 것을 최종적인 값으로 사용합니다.
 
 ```ruby
 {a: {b: 1}}.deep_merge(a: {c: 2})
 # => {:a=>{:b=>1, :c=>2}}
 ```
 
-`deep_merge!` 메소드는 receiver의 해시를 결과로 변경합니다. [[[The method `deep_merge!` performs a deep merge in place.]]]
+`deep_merge!` 메소드는 같은 동작을 파괴적으로 수행합니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/deep_merge.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/deep_merge.rb`.]]]
+NOTE: `active_support/core_ext/hash/deep_merge.rb`에 정의되어 있습니다.
 
-### Deep duplicating
+### Deep Duplicate
 
-`Hash.deep_dup` 메소드는 자신 뿐만아니라 해시내의 모든 키와 값을 액티브서포트 `Object#deep_dup` 메소드를 이용하여 반복적으로 복제합니다. 마치 `Enumerator#each_with_object`와 같이 작동하여 해시내의 각 쌍에 대해서 `deep_dup` 메소드를 실행하게 됩니다. [[[The method `Hash.deep_dup` duplicates itself and all keys and values inside recursively with ActiveSupport method `Object#deep_dup`. It works like `Enumerator#each_with_object` with sending `deep_dup` method to each pair inside.]]]
+`Hash.deep_dup` 메소드는 자기 자신을 복사하고, 나아가 그 내부의 모든 키와 값을 재귀적으로 복사합니다. 복사를 할 때에는 Active Support의 `Object#deep_dup` 메소드를 사용합니다. 이 동작은 `Enumerator#each_with_object`를 사용하여 내부에 존재하는 모든 객체에 대해서 `deep_dup`를 보내는 것과 유사합니다.
 
 ```ruby
 hash = { a: 1, b: { c: 2, d: [3, 4] } }
@@ -2606,123 +2694,91 @@ hash[:b][:e] == nil      # => true
 hash[:b][:d] == [3, 4]   # => true
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/deep_dup.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/deep_dup.rb`.]]]
+NOTE: `active_support/core_ext/object/deep_dup.rb`에 정의되어 있습니다.
 
-### Diffing
+### 해시 키 조작하기
 
-`diff` 메소드는 다음의 규칙에 근거해서 receiver와 인수의 차이를 해시로 반환해 줍니다. [[[The method `diff` returns a hash that represents a diff of the receiver and the argument with the following logic:]]]
+#### `except`와 `except!`
 
-* 양쪽 해시에 동일한 키와 값이 존재할 경우는 diff 해시에 포함되지 않습니다. [[[Pairs `key`, `value` that exist in both hashes do not belong to the diff hash.]]]
-
-* 양쪽 해시에서 동일한 키를 가지고 있으나 값이 다른 경우에는 receiver에 있는 키/값이 포함됩니다. [[[If both hashes have `key`, but with different values, the pair in the receiver wins.]]]
-
-* 나머지 경우는 단지 머지됩니다. [[[The rest is just merged.]]]
-
-```ruby
-{a: 1}.diff(a: 1)
-# => {}, first rule
-
-{a: 1}.diff(a: 2)
-# => {:a=>1}, second rule
-
-{a: 1}.diff(b: 2)
-# => {:a=>1, :b=>2}, third rule
-
-{a: 1, b: 2, c: 3}.diff(b: 1, c: 3, d: 4)
-# => {:a=>1, :b=>2, :d=>4}, all rules
-
-{}.diff({})        # => {}
-{a: 1}.diff({})    # => {:a=>1}
-{}.diff(a: 1)      # => {:a=>1}
-```
-
-이러한 diff 해시의 중요한 특징은 `diff` 메소드를 두번 적용할 경우 원본 해시를 반환해 주게 됩니다. [[[An important property of this diff hash is that you can retrieve the original hash by applying `diff` twice:]]]
-
-```ruby
-hash.diff(hash2).diff(hash2) == hash
-```
-
-diff 해시는 예를 들어, 옵션 해시 중에서 빠진 것에 대한 에러 메시지를 보여줄 때 유용하게 사용할 수 있습니다. [[[Diffing hashes may be useful for error messages related to expected option hashes for example.]]]
-
-NOTE: 이 메소드는 `active_support/core_ext/hash/diff.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/diff.rb`.]]]
-
-### [Working with Keys] 키로 작업하기
-
-#### [`except` and `except!`] `except` 와 `except!`
-
-`except` 메소드는 인수 목록에 있는 키가 존재할 경우 제거한 후에 해시를 반환해 줍니다. [[[The method `except` returns a hash with the keys in the argument list removed, if present:]]]
+`except` 메소드는 인수로 지정된 키가 존재한다면 리시버의 해시에서 그 키를 제거합니다.ㄴ
 
 ```ruby
 {a: 1, b: 2}.except(:a) # => {:b=>2}
 ```
 
-receiver 객체가 `convert_key` 메소드에 반응할 경우, 각 인수에 대해서 `except` 메소드가 호출됩니다. 따라서 예를 들어 `except` 메소드가 해시와 잘 동작할 수 있게 됩니다. [[[If the receiver responds to `convert_key`, the method is called on each of the arguments. This allows `except` to play nice with hashes with indifferent access for instance:]]]
+리시버에서 `convert_key`가 호출 가능한 경우, 그 메소드는 모든 인수에 대해서 호출 됩니다. 그 덕분에 `except` 메소드가 예를 들어 _with_indifferent_access_와도 잘 동작합니다.
 
 ```ruby
 {a: 1}.with_indifferent_access.except(:a)  # => {}
 {a: 1}.with_indifferent_access.except("a") # => {}
 ```
 
-receiver의 키를 바로 제거하는 bang 버전인 `except!` 메소드도 있습니다. [[[There's also the bang variant `except!` that removes keys in the very receiver.]]]
+리시버로부터 키를 제거하는 파괴적인 `except!`도 있습니다
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/except.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/except.rb`.]]]
+NOTE: `active_support/core_ext/hash/except.rb`에 정의되어 있습니다.
 
-#### [`transform_keys` and `transform_keys!`] `transform_keys` 와 `transform_keys!`
+#### `transform_keys`와 `transform_keys!`
 
-`transform_keys` 메소드는 하나의 블록을 받아서 receiver에 있는 각 키에 대해서 블록을 수행한 후 결과 해시를 반환해 줍니다. [[[The method `transform_keys` accepts a block and returns a hash that has applied the block operations to each of the keys in the receiver:]]]
+`transform_keys` 메소드는 블럭을 하나 받고, 해시를 하나 반환합니다. 반환되는 해시는 리시버의 각각의 키에 대해서 블럭으로 넘겨진 작업을 적용한 결과를 포함합니다.
 
 ```ruby
-{nil => nil, 1 => 1, a: :a}.transform_keys{ |key| key.to_s.upcase }
+{nil => nil, 1 => 1, a: :a}.transform_keys { |key| key.to_s.upcase }
 # => {"" => nil, "A" => :a, "1" => 1}
 ```
 
-키 충돌이 발생할 경우에는 결과가 정의되지 않게 됩니다. [[[The result in case of collision is undefined:]]]
+키가 중복되는 경우에는 그중 하나의 값이 우선됩니다. 우선되는 값은 같은 해시가 주어진 경우라도 같은 결과를 준다고 보장하지 않습니다.
 
 ```ruby
-{"a" => 1, a: 2}.transform_keys{ |key| key.to_s.upcase }
-# => {"A" => 2}, in my test, can't rely on this result though
+{"a" => 1, a: 2}.transform_keys { |key| key.to_s.upcase }
+# 어떻게 될지는 알 수 없음
+# => {"A"=>2}
+# 또는
+# => {"A"=>1}
 ```
 
-이 메소드는 예를 들어 특수한 변환을 하고자 할 때 유용합니다. 예를들어 `stringify_keys`와 `symbolize_keys` 메소드는 키변환을 위해서 `transform_keys` 메소드를 사용합니다. [[[This method may be useful for example to build specialized conversions. For instance `stringify_keys` and `symbolize_keys` use `transform_keys` to perform their key conversions:]]]
+이 메소드는 특수한 변환을 하고 싶을 때에 편리합니다. 예를 들어 `stringify_keys`와 `symbolize_keys`에서는 키를 변환할 때에 `transform_keys`를 사용합니다.
 
 ```ruby
 def stringify_keys
-  transform_keys{ |key| key.to_s }
+  transform_keys { |key| key.to_s }
 end
 ...
 def symbolize_keys
-  transform_keys{ |key| key.to_sym rescue key }
+  transform_keys { |key| key.to_sym rescue key }
 end
 ```
 
-물론 bang 버전인 `transform_keys!` 메소드는 블록 실행 후에 receiver의 키를 변경하게 됩니다. [[[There's also the bang variant `transform_keys!` that applies the block operations to keys in the very receiver.]]]
+리시버 자체의 키에 대해서 파괴적인 작업을 하는 `transform_keys!` 메소드도 있습니다.
 
-이 외에도, 해시내의 모든 키와 해당 키의 중첩된 해시에 있는 모든 키까지도 변형할 수 있는 `deep_transform_keys`와 `deep_transform_keys!` 메소드도 있습니다. [[[Besides that, one can use `deep_transform_keys` and `deep_transform_keys!` to perform the block operation on all the keys in the given hash and all the hashes nested into it. An example of the result is:]]]
+또한 `deep_transform_keys`나 `deep_transform_keys!`를 사용해서 주어진 해시의 모든 키와 그 내부에 중첩되어있는 모든 해시에 대해서 블럭의 작업을 수행할 수도 있습니다.
 
 ```ruby
-{nil => nil, 1 => 1, nested: {a: 3, 5 => 5}}.deep_transform_keys{ |key| key.to_s.upcase }
+{nil => nil, 1 => 1, nested: {a: 3, 5 => 5}}.deep_transform_keys { |key| key.to_s.upcase }
 # => {""=>nil, "1"=>1, "NESTED"=>{"A"=>3, "5"=>5}}
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/keys.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/keys.rb`.]]]
+NOTE: `active_support/core_ext/hash/keys.rb`에 정의되어 있습니다.
 
-#### [`stringify_keys` and `stringify_keys!`] `stringify_keys` 와 `stringify_keys!`
+#### `stringify_keys`와 `stringify_keys!`
 
-`stringify_keys` 메소드는 receiver 개첵에 있는 키들을 문자열로 변환한 해시를 반환합니다. 각 키에 대해서 `to_s` 메소드를 호출하여 문자열로 만들어 줍니다. [[[The method `stringify_keys` returns a hash that has a stringified version of the keys in the receiver. It does so by sending `to_s` to them:]]]
+`stringify_keys` 메소드는 리시버의 해시 키를 문자열로 변환한 해시를 돌려줍니다. 구체적으로는 리시버의 해시 키에 대해서 `to_s`를 호출합니다.
 
 ```ruby
 {nil => nil, 1 => 1, a: :a}.stringify_keys
 # => {"" => nil, "a" => :a, "1" => 1}
 ```
 
-이 때 키 충돌이 발생하면 결과가 정의되지 않게 됩니다. [[[The result in case of collision is undefined:]]]
+키가 중복되는 경우, 한 쪽의 값이 우선됩니다. 우선되는 값은 같은 해시가 주어진 경우에도 항상 같다고 보장하지 않습니다.
 
 ```ruby
 {"a" => 1, a: 2}.stringify_keys
-# => {"a" => 2}, in my test, can't rely on this result though
+# 어떤 값이 돌아올지 알 수 없음
+# => {"a"=>2}
+# 또는
+# => {"a"=>1}
 ```
 
-이 메소드는 예를 들어 심볼과 문자열을 모두 옵션으로 사용할 수 있게 할 때 유용합니다. 예를 들어, `ActionView::Helpers::FormHelper`에서 다음과 같은 정의를 볼 수 있습니다. [[[This method may be useful for example to easily accept both symbols and strings as options. For instance `ActionView::Helpers::FormHelper` defines:]]]
+이 메소드는 심볼과 문자열이 모두 포함되어 있는 해시를 옵션으로 받을 때에 유용합니다. 예를 들어 `ActionView::Helpers::FormHelper`에는 아래와 같은 메소드가 있습니다.
 
 ```ruby
 def to_check_box_tag(options = {}, checked_value = "1", unchecked_value = "0")
@@ -2732,38 +2788,41 @@ def to_check_box_tag(options = {}, checked_value = "1", unchecked_value = "0")
 end
 ```
 
-`:type` 이나 "type" 중 어떤 것을 넘겨 받아도 두번째 코드라인과 같이 "type" 키를 안전하게 접근할 수 있게 됩니다. [[[The second line can safely access the "type" key, and let the user to pass either `:type` or "type".]]]
+stringify_keys 메소드 덕분에 두번째 줄에서 키 "type"를 안전하게 사용할 수 있습니다. 그러므로 메소드의 사용자는 `:type`과 같은 심볼과 "type"같은 문자열을 취향대로 사용할 수 있습니다.
 
-bang 버전인 `stringify_keys!` 메소드는 receiver의 키를 직접 문자열로 변환하게 됩니다. [[[There's also the bang variant `stringify_keys!` that stringifies keys in the very receiver.]]]
+리시버의 키를 직접 문자열로 바꾸는 `stringify_keys!`도 있습니다.
 
-이 외에도, 해시에 있는 모든 키와 특정 키에 할당된 중첩된 해시 내의 모든 키에 대해서도 문자열로 변환해 주는 `deep_stringify_keys`와 `deep_stringify_keys!` 메소드도 있습니다. 결과에 대한 예를 다음에서 볼 수 있습니다. [[[Besides that, one can use `deep_stringify_keys` and `deep_stringify_keys!` to stringify all the keys in the given hash and all the hashes nested into it. An example of the result is:]]]
+또한 `deep_stringify_keys`나 `deep_stringify_keys!`를 사용해서 주어진 해시의 모든 키를 모두 문자열로 변환하고, 그 내부에 중첩되어 있는 모든 해시의 키 역시 문자열로 변환할 수 있습니다.
 
 ```ruby
 {nil => nil, 1 => 1, nested: {a: 3, 5 => 5}}.deep_stringify_keys
 # => {""=>nil, "1"=>1, "nested"=>{"a"=>3, "5"=>5}}
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/keys.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/keys.rb`.]]]
+NOTE: `active_support/core_ext/hash/keys.rb`에 정의되어 있습니다.
 
-#### [`symbolize_keys` and `symbolize_keys!`] `symbolize_keys` 와 `symbolize_keys!`
+#### `symbolize_keys`와 `symbolize_keys!`
 
-`symbolize_keys` 메소드는 receiver 객체에 있는 키를 가능한한 심볼로 변환한 해시를 반환합니다. 이 때 각 키에 대해서 `to_sym` 메소드를 호출하여 변환작업을 하게 됩니다. [[[The method `symbolize_keys` returns a hash that has a symbolized version of the keys in the receiver, where possible. It does so by sending `to_sym` to them:]]]
+`symbolize_keys` 메소드는 리시버의 해시 키를 심볼로 변환하여 돌려줍니다. 구체적으로는 리시버의 해시 키에 대해서 `to_sym`를 호출합니다.
 
 ```ruby
 {nil => nil, 1 => 1, "a" => "a"}.symbolize_keys
 # => {1=>1, nil=>nil, :a=>"a"}
 ```
 
-WARNING. 위 예제 코드에서와 단지 하나의 키만 심볼로 변환된 것을 주목하기 바랍니다. [[[Note in the previous example only one key was symbolized.]]]
+WARNING: 이 예제에서는 3개의 키중 마지막 하나만 심볼로 변환되지 않았다는 점에 주목하세요. 숫자와 nil은 심볼로 변환할 수 없습니다.
 
-이 때 키 충돌이 있는 경우 결과는 정의되지 않게 됩니다. [[[The result in case of collision is undefined:]]]
+키가 중복되는 경우, 한 쪽의 값이 우선됩니다. 우선되는 값은 같은 해시가 주어진 경우에도 항상 같다고 보장하지 않습니다.
 
 ```ruby
 {"a" => 1, a: 2}.symbolize_keys
-# => {:a=>2}, in my test, can't rely on this result though
+# 어떤 값이 돌아올지 알 수 없음
+# => {:a=>2}
+# 또는
+# => {:a=>1}
 ```
 
-예를 들어 이 메소드는 옵션으로 심볼과 문자열을 모두 사용할 때 유용합니다. 예를 들어 `ActionController::UrlRewriter`에서는 아래와 같은 메소드를 정의하고 있습니다. [[[This method may be useful for example to easily accept both symbols and strings as options. For instance `ActionController::UrlRewriter` defines]]]
+이 메소드는 심볼과 문자열이 모두 포함되어 있는 해시를 옵션으로 받을 때에 유용합니다. 예를 들어 `ActionController::UrlRewriter`에는 아래와 같은 메소드가 있습니다.
 
 ```ruby
 def rewrite_path(options)
@@ -2773,60 +2832,75 @@ def rewrite_path(options)
 end
 ```
 
-두번째 코드라인에서와 같이 `:params` 또는 "params" 중 어떤 것을 넘겨 주어도 안전하게 `:params` 키를 접근할 수 있게 됩니다. [[[The second line can safely access the `:params` key, and let the user to pass either `:params` or "params".]]]
+symbolize_keys 메소드 덕분에 두번째 줄에서 `:params` 키에 안전하게 접근할 수 있습니다. 메소드를 사용하는 사람은 `:params`와 같은 심볼과 "params" 같은 문자열 중에서 취향껏 고를 수 있습니다.
 
-또한 bang 버전인 `symbolize_keys!` 메소드는 receiver 객체의 키를 직접 변경하게 됩니다. [[[There's also the bang variant `symbolize_keys!` that symbolizes keys in the very receiver.]]]
+리시버의 키를 직접 심볼로 변환하는 파괴적인 `symbolize_keys!`도 있습니다.
 
-이외에도, 해시내의 모든 키와 특정에 할당된 해시내의 모든 키에 대해서 심볼로 변경할 수 있는 `deep_symbolize_keys` 와 `deep_symbolize_keys!` 메소드도 있습니다. 아래에 결과에 대한 예가 있습니다. [[[Besides that, one can use `deep_symbolize_keys` and `deep_symbolize_keys!` to symbolize all the keys in the given hash and all the hashes nested into it. An example of the result is:]]]
+나아가 `deep_symbolize_keys`나 `deep_symbolize_keys!`를 사용해서 주어진 해시의 모든 키와 그 안에 중첩되어있는 모든 해시의 키를 심볼로 변환할 수도 있습니다.
 
 ```ruby
 {nil => nil, 1 => 1, "nested" => {"a" => 3, 5 => 5}}.deep_symbolize_keys
 # => {nil=>nil, 1=>1, nested:{a:3, 5=>5}}
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/keys.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/keys.rb`.]]]
+NOTE: `active_support/core_ext/hash/keys.rb`에 정의되어 있습니다.
 
-#### [`to_options` and `to_options!`] `to_options` 와 `to_options!`
+#### `to_options`와 `to_options!`
 
-`to_options` 와 `to_options!` 메소드는 각각 `symbolize_keys` 와 `symbolize_keys!` 메소드에 대한 별칭입니다. [[[The methods `to_options` and `to_options!` are respectively aliases of `symbolize_keys` and `symbolize_keys!`.]]]
+`to_options` 메소드와 `to_options!` 메소드는 각각 `symbolize_keys` 메소드와 `symbolize_keys!` 메소드의 별명입니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/keys.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/keys.rb`.]]]
+NOTE: `active_support/core_ext/hash/keys.rb`에 정의되어 있습니다.
 
 #### `assert_valid_keys`
 
-이 메소드는 인수를 임의의 갯수로 취해서 receiver 해시에 해당 키가 있는지를 검사해서 없는 경우 `ArgumentError` 예외를 발생하게 됩니다. [[[The method `assert_valid_keys` receives an arbitrary number of arguments, and checks whether the receiver has any key outside that white list. If it does `ArgumentError` is raised.]]]
+`assert_valid_keys` 메소드는 임의의 갯수의 인수를 받을 수 있으며, 화이트리스트에 포함되어 있지 않은 키가 리시버에 존재하는지 테스트합니다. 그러한 키가 발견되었을 경우 `ArgumentError`를 발생시킵니다.
 
 ```ruby
-{a: 1}.assert_valid_keys(:a)  # passes
-{a: 1}.assert_valid_keys("a") # ArgumentError
+{a: 1}.assert_valid_keys(:a)  # 넘어간다
+{a: 1}.assert_valid_keys("a") # ArgumentError 발생
 ```
 
-예를 들면, 액티브레코드는 관계를 생성할 때 알려지지 않은 옵션을 사용할 경우 받아들이지 않습니다. 이 때 바로 `assert_valid_keys` 메소드를 호출하여 작성을 수행하게 됩니다. [[[Active Record does not accept unknown options when building associations, for example. It implements that control via `assert_valid_keys`.]]]
+Active Record는 예를 들어 Association을 만들 때 잘 모르는 옵션들을 받지 않습니다. 이는 `assert_valid_keys`를 사용하여 구현되고 있습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/keys.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/keys.rb`.]]]
+NOTE: `active_support/core_ext/hash/keys.rb`에 정의되어 있습니다.
 
-### Slicing
+### 값을 조작하기
 
-루비는 문자열과 배열의 일부를 반환하는 내장 메소드를 가지고 있습니다. 액티브서포트는 이러한 기능을 해시에 대해서도 지원합니다. [[[Ruby has built-in support for taking slices out of strings and arrays. Active Support extends slicing to hashes:]]]
+#### `transform_values`와 `transform_values!`
+
+`transform_values` 메소드는 블럭을 하나 받고 해시를 하나 반환합니다. 반환되는 해시에는 리시버의 각각의 값에 대해서 블럭의 작업을 수행한 결과가 포함됩니다.
+
+```ruby
+{ nil => nil, 1 => 1, :x => :a }.transform_values { |value| value.to_s.upcase }
+# => {nil=>"", 1=>"1", :x=>"A"}
+```
+
+리시버 자체의 키에 대해서 파괴적으로 동작하는 `transform_values!` 메소드도 있습니다.
+
+NOTE: `active_support/core_ext/hash/transform_values.rb`에 정의되어 있습니다.
+
+### 자르기
+
+Ruby에는 문자열이나 배열을 나누어 일부를 꺼내는 내장 메소드가 있습니다. Active Support는 이 동작을 해시에서도 동작하도록 확장합니다.
 
 ```ruby
 {a: 1, b: 2, c: 3}.slice(:a, :c)
 # => {:c=>3, :a=>1}
 
 {a: 1, b: 2, c: 3}.slice(:b, :X)
-# => {:b=>2} # non-existing keys are ignored
+# => {:b=>2} # 존재하지 않는 키는 무시
 ```
 
-receiver가 `convert_key`에 반등할 경우 키들은 정상화됩니다. [[[If the receiver responds to `convert_key` keys are normalized:]]]
+리시버에서 `convert_key`가 호출 가능한 경우 키를 정규화합니다.
 
 ```ruby
 {a: 1, b: 2}.with_indifferent_access.slice("a")
 # => {:a=>1}
 ```
 
-NOTE. 이 메소드는 옵션 해시 중에서 인식가능한 키 목록을 알아내는데 편리할 수 있습니다. [[[Slicing may come in handy for sanitizing option hashes with a white list of keys.]]]
+NOTE: 나누는 작업은 키의 화이트리스트를 사용하여 옵션 해시를 깨끗하게 만들때 유용합니다.
 
-bang 버전인 `slice!` 메소드는 receiver에 대해서 직접 slice 작업할 뿐 아나리 제거된 키/값을 반환해 줍니다. [[[There's also `slice!` which in addition to perform a slice in place returns what's removed:]]]
+파괴적인 나누기 작업을 하는 `slice!` 메소드도 있습니다. 이 메소드의 반환값은 삭제된 요소입니다.
 
 ```ruby
 hash = {a: 1, b: 2}
@@ -2834,11 +2908,11 @@ rest = hash.slice!(:a) # => {:b=>2}
 hash                   # => {:a=>1}
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/slice.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/slice.rb`.]]]
+NOTE: `active_support/core_ext/hash/slice.rb`에 정의되어 있습니다.
 
-### Extracting
+### 추출
 
-`extract!` 메소드는 해당 키에 일치하는 키/값 쌍을 제거하여 반환해 줍니다. [[[The method `extract!` removes and returns the key/value pairs matching the given keys.]]]
+`extract!` 메소드는 주어진 키와 일치하는 키/값 쌍을 추출합니다.
 
 ```ruby
 hash = {a: 1, b: 2}
@@ -2846,7 +2920,7 @@ rest = hash.extract!(:a) # => {:a=>1}
 hash                     # => {:b=>2}
 ```
 
-`extract!` 메소드는 receiver와 동일한 해시 클래스를 반환합니다. [[[The method `extract!` returns the same subclass of Hash, that the receiver is.]]]
+`extract!` 메소드는 리시버의 해시의 자식 클래스와 동일한 클래스로 돌려줍니다.
 
 ```ruby
 hash = {a: 1, b: 2}.with_indifferent_access
@@ -2854,34 +2928,44 @@ rest = hash.extract!(:a).class
 # => ActiveSupport::HashWithIndifferentAccess
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/slice.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/slice.rb`.]]]
+NOTE: `active_support/core_ext/hash/slice.rb`에 정의되어 있습니다.
 
-### Indifferent Access
+### 해시 키가 심볼이든 문자열이든 동일하기 다루기(indifferent access)
 
-`with_indifferent_access` 메소드는 receiver로부터 `ActiveSupport::HashWithIndifferentAccess`를 반환합니다. [[[The method `with_indifferent_access` returns an `ActiveSupport::HashWithIndifferentAccess` out of its receiver:]]]
+`with_indifferent_access` 메소드는 리시버에 대해서 `ActiveSupport::HashWithIndifferentAccess`를 실행한 결과를 반환합니다.
 
 ```ruby
 {a: 1}.with_indifferent_access["a"] # => 1
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/hash/indifferent_access.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/hash/indifferent_access.rb`.]]]
+NOTE: `active_support/core_ext/hash/indifferent_access.rb`에 정의되어 있습니다.
 
-[Extensions to `Regexp`] `Regexp`의 확장메소드 
+### Compacting
+
+`compact` 메소드와 `compact!` 메소드는 해시로부터 `nil` 값을 제거한 뒤 반환합니다.
+
+```ruby
+{a: 1, b: 2, c: nil}.compact # => {a: 1, b: 2}
+```
+
+NOTE: `active_support/core_ext/hash/compact.rb`에 정의되어 있습니다.
+
+`Regexp` 확장
 ----------------------
 
 ### `multiline?`
 
-`multiline?` 메소드는 정규표현식이 `/m` 플래그 설정이 되었는지를 즉, dot가 개행문자에 해당하는지를 알려 줍니다. [[[The method `multiline?` says whether a regexp has the `/m` flag set, that is, whether the dot matches newlines.]]]
+`multiline?` 메소드는 정규표현에 `/m` 플래그가 설정되어 있는지를 확인합니다. 이 플래그가 설정되어 있으면 마침표(.)를 개행으로 인식하고, 여러줄을 처리할 수 있게 해줍니다.
 
 ```ruby
-%r{.}.multiline?  # => false
+%r{.}.multiline? # => false
 %r{.}m.multiline? # => true
 
 Regexp.new('.').multiline?                    # => false
 Regexp.new('.', Regexp::MULTILINE).multiline? # => true
 ```
 
-레일스는 딱 한 곳, 라우팅 코드에서만 이 메소드를 사용합니다. 다중라인 정규표현식은 라우트 requirements에서 사용할 수 없기 때문에 이 플래그를 사용하면 해당 규칙을 강제로 하는 것을 덜어 주게 됩니다. [[[Rails uses this method in a single place, also in the routing code. Multiline regexps are disallowed for route requirements and this flag eases enforcing that constraint.]]]
+Rails는 이 메소드를 라우팅에서 사용하고 있습니다. 라우팅에서는 정규표현에서 여러줄을 다루는 것을 용납하지 않기 때문에 이러한 플래그를 통해서 제한을 추가하고 있습니다.
 
 ```ruby
 def assign_route_options(segments, defaults, requirements)
@@ -2893,14 +2977,14 @@ def assign_route_options(segments, defaults, requirements)
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/regexp.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/regexp.rb`.]]]
+NOTE: `active_support/core_ext/regexp.rb`에 정의되어 있습니다.
 
-[Extensions to `Range`] `Range`형에 대한 확장메소드
+`Range` 확장
 ---------------------
 
 ### `to_s`
 
-액티브서포트는 `Range#to_s` 메소드를 확장해서 포맷 인수를 옵션으로 지정할 수 있습니다. 본 가이드를 작성하는 현 시점에서 지정할 수 있는 유일한 옵션은 `:db` 입니다. [[[Active Support extends the method `Range#to_s` so that it understands an optional format argument. As of this writing the only supported non-default format is `:db`:]]]
+Active Support는 `Range#to_s` 메소드를 확장해서 포맷 인수를 옵션으로 받을 수 있습니다. 이 가이드를 작성하는 시점에서는 기본이 아닌 포맷으로서 지원되고 있는 것은 `:db` 뿐입니다.
 
 ```ruby
 (Date.today..Date.tomorrow).to_s
@@ -2910,19 +2994,19 @@ NOTE: 이 메소드는 `active_support/core_ext/regexp.rb` 파일내에 정의�
 # => "BETWEEN '2009-10-25' AND '2009-10-26'"
 ```
 
-위의 예제 코드에서 기술하는 바와 같이, `:db` 포맷은 SQL 구문인 `BETWEEN`을 만들어 줍니다. 이것은 조건절에서 범주형 값을 이용할 수 있도록 지원하여 액티브레코드에서 사용하게 됩니다. [[[As the example depicts, the `:db` format generates a `BETWEEN` SQL clause. That is used by Active Record in its support for range values in conditions.]]]
+이 예제에서도 알 수 있듯이, 포맷에 `:db`를 지정하면 SQL의 `BETWEEN` 절이 생성됩니다. 이 포맷은 Active Record에서 조건의 값의 Range를 처리하기 위해서 사용됩니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/range/conversions.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/range/conversions.rb`.]]]
+NOTE: `active_support/core_ext/range/conversions.rb`에 정의되어 있습니다.
 
 ### `include?`
 
-`Range#include?`와 `Range#===` 메소드는 주어진 범주 객체의 시작과 끝 값 사이에 임의의 값이 존재하는지를 알려 줍니다. [[[The methods `Range#include?` and `Range#===` say whether some value falls between the ends of a given instance:]]]
+`Range#include?` 메소드와 `Range#===` 메소드는 주어진 인스턴스의 Range에 값이 포함되는 지를 확인합니다.
 
 ```ruby
 (2..3).include?(Math::E) # => true
 ```
 
-액티브서포트는 이 메소드를 확장하여 인수로 다른 범주객체를 지정할 수 있도록 해 줍니다. 이와 같은 경우, 인술 지정된 범주객체가 receiver 범주내에 존재하는지를 테스트해 볼 수 있습니다. [[[Active Support extends these methods so that the argument may be another range in turn. In that case we test whether the ends of the argument range belong to the receiver themselves:]]]
+Active Support에서는 이러한 메소드를 확장하여 Range 객체를 인수로 받을 수 있게끔 만들었습니다. 이 경우 인수의 범위가 리시버의 범위에 포함되는 지를 확인합니다.
 
 ```ruby
 (1..10).include?(3..7)  # => true
@@ -2936,11 +3020,11 @@ NOTE: 이 메소드는 `active_support/core_ext/range/conversions.rb` 파일내�
 (1...9) === (3..9)  # => false
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/range/include_range.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/range/include_range.rb`.]]]
+NOTE: `active_support/core_ext/range/include_range.rb`에 정의되어 있습니다.
 
 ### `overlaps?`
 
-`Range#overlaps?` 메소드는 두개의 범주형 데이터가 서로 겹치는 부분이 있는지를 알려 줍니다. [[[The method `Range#overlaps?` says whether any two given ranges have non-void intersection:]]]
+`Range#overlaps?` 메소드는 주어진 2개의 (비어있지 않은) 범위가 겹치는지를 확인합니다.
 
 ```ruby
 (1..10).overlaps?(7..11)  # => true
@@ -2948,75 +3032,28 @@ NOTE: 이 메소드는 `active_support/core_ext/range/include_range.rb` 파일�
 (1..10).overlaps?(11..27) # => false
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/range/overlaps.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/range/overlaps.rb`.]]]
+NOTE: `active_support/core_ext/range/overlaps.rb`에 정의되어 있습니다.
 
-[Extensions to `Proc`] `Proc`형에 대한 확장메소드
+`Date` 확장
 --------------------
 
-### `bind`
+### 계산
 
-알다시피, 루비는 `UnboundMethod`라는 클래스를 가지고 있습니다. 이 클래스의 인스턴스는 self 객체가 존재하지 않는 애매한 상태의 메소드들에 속합니다. `Module#instance_method` 메소드는 예를 들어 unbound 메소드를 반환합니다. [[[As you surely know Ruby has an `UnboundMethod` class whose instances are methods that belong to the limbo of methods without a self. The method `Module#instance_method` returns an unbound method for example:]]]
+NOTE: 다음 메소드들은 모두 같은 파일 `active_support/core_ext/date/calculations.rb`에 위치하고 있습니다.
 
-```ruby
-Hash.instance_method(:delete) # => #<UnboundMethod: Hash#delete>
-```
-
-unbound 메소드는 그 자체로는 호출할 수 없기 때문에, `bind` 메소드를 이용하여 특정 객체에 먼저 bind할 필요가 있습니다. [[[An unbound method is not callable as is, you need to bind it first to an object with `bind`:]]]
-
-```ruby
-clear = Hash.instance_method(:clear)
-clear.bind({a: 1}).call # => {}
-```
-
-액티브서포트는 동일한 목적으로 `Proc#bind` 메소드를 정의합니다. [[[Active Support defines `Proc#bind` with an analogous purpose:]]]
-
-```ruby
-Proc.new { size }.bind([]).call # => 0
-```
-
-인수에 bind되어 호출가능하게 되면 알다시피, 그 반환값은 비로서 하나의 `Method`가 되는 것입니다. [[[As you see that's callable and bound to the argument, the return value is indeed a `Method`.]]]
-
-NOTE: 이를 위해서 `Proc#bind` 메소드는 실제로 백그라운드에서 하나의 메소드를 생성합니다. `__bind_1256598120_237302`와 같은 이상한 이름을 스택 상에서 보게 될 경우 이 메소드가 어디로부터 유래한 것인지를 알 수 있을 것입니다. [[[To do so `Proc#bind` actually creates a method under the hood. If you ever see a method with a weird name like `__bind_1256598120_237302` in a stack trace you know now where it comes from.]]]
-
-예를 들어 액션팩은 이러한 기법을 `rescue_from`에서 사용하는데, 이 메소드는 메소드명과 해당 예외를 처리할 콜백으로 하나의 Proc객체를 받게 됩니다. 이러한 예외를 처리하기 위해서는 해당 메소드와 콜백을 호출해야 하며 `handler_for_rescue` 메소드는 하나의 bound 메소드를 반환함으로써 호출자에서 코드를 간소화해 줍니다. [[[Action Pack uses this trick in `rescue_from` for example, which accepts the name of a method and also a proc as callbacks for a given rescued exception. It has to call them in either case, so a bound method is returned by `handler_for_rescue`, thus simplifying the code in the caller:]]]
-
-```ruby
-def handler_for_rescue(exception)
-  _, rescuer = Array(rescue_handlers).reverse.detect do |klass_name, handler|
-    ...
-  end
-
-  case rescuer
-  when Symbol
-    method(rescuer)
-  when Proc
-    rescuer.bind(self)
-  end
-end
-```
-
-NOTE: 이 메소드는 `active_support/core_ext/proc.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/proc.rb`.]]]
-
-[Extensions to `Date`] `Date`형에 대한 확장메소드
---------------------
-
-### [Calculations] 날짜계산
-
-NOTE: 다음에 나오는 모든 메소드는 `active_support/core_ext/date/calculations.rb` 파일내에 정의되어 있습니다. [[[All the following methods are defined in `active_support/core_ext/date/calculations.rb`.]]]
-
-INFO: 다음의 날짜 연산 메소드들은 1582년 10월에 대해서 5..14 사이의 날짜가 존재하지 않기 때문에 극단적인 경우를 보여 줍니다. 본 가이드는 지면을 절약하기 위해 이 날짜들에 대한 이상한 동작에 대해서 기술하지 않지만 예상대로 동작한다고 말하기에 충분합니다. 즉, `Date.new(1582, 10, 4).tomorrow`는 `Date.new(1582, 10, 15)` 등과 같이 반환하게 되는데, 자세한 것을 `test/core_ext/date_ext_test.rb` 파일을 검토해 보기 바랍니다. [[[The following calculation methods have edge cases in October 1582, since days 5..14 just do not exist. This guide does not document their behavior around those days for brevity, but it is enough to say that they do what you would expect. That is, `Date.new(1582, 10, 4).tomorrow` returns `Date.new(1582, 10, 15)` and so on. Please check `test/core_ext/date_ext_test.rb` in the Active Support test suite for expected behavior.]]]
+INFO: 다음 계산 방법들 중의 일부에서는 1582년 10월을 극단적인 예외로서 사용하고 있습니다. 이 달에는 율리우스 력으로부터 그레고리 력으로 변경이 이루어져서 10월 5일부터 10월 14일까지가 존재하지 않습니다. 이 가이드에서는 이 특수한 달에 대해서 길게 이야기하지 않습니다만, 메소드가 이 달에서도 기대대로 동작한다는 점을 설명해두고 싶습니다. 구체적인 예시로는 `Date.new(1582, 10, 4).tomorrow`를 실행하면 `Date.new(1582, 10, 15)`가 반환됩니다. 기대대로 동작한다는 것은 Active Support의 `test/core_ext/date_ext_test.rb`용의 테스트 코드에서 확인하실 수 있습니다.
 
 #### `Date.current`
 
-액티브서포트는 현재 시간대역의 금일 날짜를 알려주는 `Date.current` 메소드를 지원합니다. 사용자 시간대역(정의되어 있다면)을 고려하는 것만 제외하고는 `Date.today` 메소드와 비슷합니다. 한편 `Date.yesterday`와 `Date.tomorrow` 메소드도 지원하고 기타 `past?`, `today?`, `future?` 메소드도 지원합니다. 이 모든 메소드는 `Date.current`에 대한 상대적인 결과를 반환해 줍니다. [[[Active Support defines `Date.current` to be today in the current time zone. That's like `Date.today`, except that it honors the user time zone, if defined. It also defines `Date.yesterday` and `Date.tomorrow`, and the instance predicates `past?`, `today?`, and `future?`, all of them relative to `Date.current`.]]]
+Active Support에서는 `Date.current`를 정의하고 현재의 시간대에 맞는 '오늘'을 돌려줍니다. 이 메소드는 `Date.today`와 유사합니다만, 사용자가 정의한 시간대이 있는 경우에 그것을 고려한다는 점이 다릅니다. Active Support에서는 `Date.yesterday` 메소드와 `Date.tomorrow`도 정의하고 있습니다. 인스턴스에서는 `past?`, `today?`, `future?`를 사용할 수 있으며, 이들은 모두 `Date.current`를 기준으로 계산됩니다.
 
-사용자 시간대역을 고려하는 메소드를 이용하여 날짜 비교를 할 때 `Date.today`보다는 `Date.current` 메소드를 사용해야 합니다. 그러나 사용자 시간대역을 시스템 시간대역과 비교해야 할 경우도 있을 것입니다. 이 때 시스템 시간대역은 `Date.today` 메소드가 디폴트로 사용합니다. 이 말은 `Date.today`와 `Date.yesterday` 결과 값이 같을 수 있다는 것을 의미합니다. [[[When making Date comparisons using methods which honor the user time zone, make sure to use `Date.current` and not `Date.today`. There are cases where the user time zone might be in the future compared to the system time zone, which `Date.today` uses by default. This means `Date.today` may equal `Date.yesterday`.]]]
+사용자가 정의한 시간대를 사용하는 메소드를 통해 날짜를 비교하고 싶은 경우 `Date.today` 대신 `Date.current`를 반드시 사용해주세요. 이후에 사용자가 정의한 시간대와 시스템의 시간대를 비교해야하는 상황이 있을 수도 있습니다. 시스템의 시간대에서는 `Date.today`가 사용됩니다. 다시 말해서 `Date.today`가 `Date.yesterday`와 같은 상황도 존재할 수 있습니다.
 
-#### [Named dates] 이름을 가지는 날짜들
+#### 이름이 있는 날짜
 
 ##### `prev_year`, `next_year`
 
-루비 1.9에서, `prev_year`와 `next_year` 메소드는 각각 지난해 또는 다음해의 동일한 일자를 가지는 날짜를 반환합니다. [[[In Ruby 1.9 `prev_year` and `next_year` return a date with the same day/month in the last or next year:]]]
+Ruby 1.9의 `prev_year` 메소드와 `next_year` 메소드는 각각 작년과 올해를 동일한 일자와 월로 반환합니다.
 
 ```ruby
 d = Date.new(2010, 5, 8) # => Sat, 08 May 2010
@@ -3024,7 +3061,7 @@ d.prev_year              # => Fri, 08 May 2009
 d.next_year              # => Sun, 08 May 2011
 ```
 
-만약, 윤년 2월 29일일 경우에는 각 메소드의 반환값은 28일자가 될 것입니다. [[[If date is the 29th of February of a leap year, you obtain the 28th:]]]
+윤년의 2월 29일인 경우, 작년과 올해의 날짜는 모두 2월 28일로 변경됩니다.
 
 ```ruby
 d = Date.new(2000, 2, 29) # => Tue, 29 Feb 2000
@@ -3032,11 +3069,11 @@ d.prev_year               # => Sun, 28 Feb 1999
 d.next_year               # => Wed, 28 Feb 2001
 ```
 
-`prev_year`와 같은 기능을 하는 메소드로 `last_year`가 있습니다. [[[`prev_year` is aliased to `last_year`.]]]
+`prev_year`는 `last_year`의 별명입니다.
 
 ##### `prev_month`, `next_month`
 
-루비 1.9에서, `prev_month`와 `next_month` 메소드는 각각 이전달 또는 다음달의 동일 일자를 가지는 날짜를 반환합니다. [[[In Ruby 1.9 `prev_month` and `next_month` return the date with the same day in the last or next month:]]]
+Ruby 1.9의 `prev_month` 메소드와 `next_month` 메소드는 각각 전월과 다음 달의 같은 일자를 반환합니다.
 
 ```ruby
 d = Date.new(2010, 5, 8) # => Sat, 08 May 2010
@@ -3044,7 +3081,7 @@ d.prev_month             # => Thu, 08 Apr 2010
 d.next_month             # => Tue, 08 Jun 2010
 ```
 
-만약 해당 일자가 존재하지 않을 경우 해당 월의 마지막 날짜 값이 반환됩니다. [[[If such a day does not exist, the last day of the corresponding month is returned:]]]
+같은 일자가 존재하지 않는 경우, 그 달의 마지막 날짜를 사용합니다.
 
 ```ruby
 Date.new(2000, 5, 31).prev_month # => Sun, 30 Apr 2000
@@ -3053,11 +3090,11 @@ Date.new(2000, 5, 31).next_month # => Fri, 30 Jun 2000
 Date.new(2000, 1, 31).next_month # => Tue, 29 Feb 2000
 ```
 
-`prev_month` 와 동일한 기능을 하는 메소드로 `last_month` 가 있습니다. [[[`prev_month` is aliased to `last_month`.]]]
+`prev_month`는 `last_month`의 별명입니다.
 
 ##### `prev_quarter`, `next_quarter`
 
-`prev_month`와 `next_month`의 경우와 같습니다. 이전 분기 또는 다음 분기의 동일한 일자를 가지는 날짜를 반환합니다. [[[Same as `prev_month` and `next_month`. It returns the date with the same day in the previous or next quarter:]]]
+`prev_month`와 `next_month`는 기본적으로 같은 방식으로 동작합니다. 전 분기, 또는 후 분기의 같은 일자를 반환합니다.
 
 ```ruby
 t = Time.local(2010, 5, 8) # => Sat, 08 May 2010
@@ -3065,7 +3102,7 @@ t.prev_quarter             # => Mon, 08 Feb 2010
 t.next_quarter             # => Sun, 08 Aug 2010
 ```
 
-해당 일자가 존재하지 않는 경우에는, 해당 월의 마지막 일자가 반환됩니다. [[[If such a day does not exist, the last day of the corresponding month is returned:]]]
+같은 일자가 존재하지 않는 경우, 그 경우에는 그 달의 마지막 일자를 돌려줍니다.
 
 ```ruby
 Time.local(2000, 7, 31).prev_quarter  # => Sun, 30 Apr 2000
@@ -3074,11 +3111,11 @@ Time.local(2000, 10, 31).prev_quarter # => Mon, 30 Oct 2000
 Time.local(2000, 11, 31).next_quarter # => Wed, 28 Feb 2001
 ```
 
-`prev_quarter`와 동일한 기능을 하는 메소드로 `last_quarter`가 있습니다. [[[`prev_quarter` is aliased to `last_quarter`.]]]
+`prev_quarter`는 `last_quarter`의 별명입니다.
 
 ##### `beginning_of_week`, `end_of_week`
 
-`beginning_of_week`와 `end_of_week` 메소드는 각각 해당 중의 시작일과 종료일을 반환합니다. 일주일의 시작은 월요일이지만 인수(start_day)를 넘겨주어 변경할 수 있습니다. 즉, `Date.beginning_of_week` 또는 `config.beginning_of_week`에 지정해 주면 됩니다. [[[The methods `beginning_of_week` and `end_of_week` return the dates for the beginning and end of the week, respectively. Weeks are assumed to start on Monday, but that can be changed passing an argument, setting thread local `Date.beginning_of_week` or `config.beginning_of_week`.]]]
+`beginning_of_week` 메소드와 `end_of_week` 메소드는 각각 해당 주간의 첫번째 날짜와 마지막 날짜를 반환합니다. 주의 시작은 기본적으로 월요일입니다만, 인수를 통해 변경할 수 있습니다. 그때에 스레드의 로컬에 `Date.beginning_of_week` 또는 `config.beginning_of_week`을 설정합니다.
 
 ```ruby
 d = Date.new(2010, 5, 8)     # => Sat, 08 May 2010
@@ -3088,11 +3125,11 @@ d.end_of_week                # => Sun, 09 May 2010
 d.end_of_week(:sunday)       # => Sat, 08 May 2010
 ```
 
-`beginning_of_week`은 `at_beginning_of_week`와 같은 메소드이고 `end_of_week`은 `at_end_of_week`와 같은 메소드입니다. [[[`beginning_of_week` is aliased to `at_beginning_of_week` and `end_of_week` is aliased to `at_end_of_week`.]]]
+`beginning_of_week`는 `at_beginning_of_week`의 별명, `end_of_week`는 `at_end_of_week`의 별명입니다.
 
 ##### `monday`, `sunday`
 
-아래의 예제 코드에서, `monday`와 `sunday` 메소드는 각각 지난 월요일과 다가올 일요일에 해당하는 날짜를 반환합니다. [[[The methods `monday` and `sunday` return the dates for the previous Monday and next Sunday, respectively.]]]
+`monday` 메소드와 `sunday` 메소드는 각각 직전의 월요일, 직후의 일요일을 반환합니다.
 
 ```ruby
 d = Date.new(2010, 5, 8)     # => Sat, 08 May 2010
@@ -3108,7 +3145,7 @@ d.sunday                     # => Sun, 16 Sep 2012
 
 ##### `prev_week`, `next_week`
 
-`next_week` 메소드는 영어로 요일명에 대한 심볼명을 인수로 받아서 해당 일자를 반환합니다. 여기서 디폴트 인수는 `Date.beginning_of_week`, `config.beginning_of_week`, 또는 `:monday` 입니다. [[[The method `next_week` receives a symbol with a day name in English (default is the thread local `Date.beginning_of_week`, or `config.beginning_of_week`, or `:monday`) and it returns the date corresponding to that day.]]]
+`next_week` 메소드는 영어표기(기본으로 스레드 로컬의 `Date.beginning_of_week` 또는 `config.beginning_of_week` 또는 `:monday`)의 날짜를 심볼로 받아서 거기에 대응하는 날짜를 돌려줍니다.
 
 ```ruby
 d = Date.new(2010, 5, 9) # => Sun, 09 May 2010
@@ -3116,7 +3153,7 @@ d.next_week              # => Mon, 10 May 2010
 d.next_week(:saturday)   # => Sat, 15 May 2010
 ```
 
-`prev_week` 메소드도 동일하게 적용됩니다. [[[The method `prev_week` is analogous:]]]
+`prev_week`도 마찬가지입니다.
 
 ```ruby
 d.prev_week              # => Mon, 26 Apr 2010
@@ -3124,13 +3161,13 @@ d.prev_week(:saturday)   # => Sat, 01 May 2010
 d.prev_week(:friday)     # => Fri, 30 Apr 2010
 ```
 
-`prev_week`와 동일한 기능을 하는 메소드로 `last_week`가 있습니다. [[[`prev_week` is aliased to `last_week`.]]]
+`prev_week`는 `last_week`의 별명입니다.
 
-`next_week`와 `prev_week`는 `Date.beginning_of_week` 또는 `config.beginning_of_week`가 설정이 된 상태에서만 제대로 동작하게 됩니다. [[[Both `next_week` and `prev_week` work as expected when `Date.beginning_of_week` or `config.beginning_of_week` are set.]]]
+`Date.beginning_of_week` 또는 `config.beginning_of_week`가 설정되어 있다면, `next_week`와 `prev_week`는 어느쪽도 기대한대로 동작합니다.
 
 ##### `beginning_of_month`, `end_of_month`
 
-`beginning_of_month` 와 `end_of_month` 메소드는 해당 월의 시작일과 종료일을 반환합니다. [[[The methods `beginning_of_month` and `end_of_month` return the dates for the beginning and end of the month:]]]
+`beginning_of_month` 메소드와 `end_of_month` 메소드는 각각 해당하는 달의 첫번째 날짜와 마지막 날짜를 반환합니다.
 
 ```ruby
 d = Date.new(2010, 5, 9) # => Sun, 09 May 2010
@@ -3138,11 +3175,11 @@ d.beginning_of_month     # => Sat, 01 May 2010
 d.end_of_month           # => Mon, 31 May 2010
 ```
 
-`beginning_of_month`와 동일한 기능을 하는 메소드로 `at_beginning_of_month`가 있고, `end_of_month`에 대해서는 `at_end_of_month` 메소드가 있습니다. [[[`beginning_of_month` is aliased to `at_beginning_of_month`, and `end_of_month` is aliased to `at_end_of_month`.]]]
+`beginning_of_month`는 `at_beginning_of_month`의 별명, `end_of_month`는 `at_end_of_month`의 별명입니다.
 
 ##### `beginning_of_quarter`, `end_of_quarter`
 
-`beginning_of_quarter`와 `end_of_quarter` 메소드는 각각 receiver 칼렌더 년도의 시작과 종료 분기에 해당하는 일자를 반환합니다. [[[The methods `beginning_of_quarter` and `end_of_quarter` return the dates for the beginning and end of the quarter of the receiver's calendar year:]]]
+`beginning_of_quarter` 메소드와 `end_of_quarter` 메소드는 리시버의 달력의 연도를 기준으로 각 분기의 첫번째 날, 마지막 날을 반환합니다.
 
 ```ruby
 d = Date.new(2010, 5, 9) # => Sun, 09 May 2010
@@ -3150,11 +3187,11 @@ d.beginning_of_quarter   # => Thu, 01 Apr 2010
 d.end_of_quarter         # => Wed, 30 Jun 2010
 ```
 
-`beginning_of_quarter`와 동일한 기능을 하는 메소드로 `at_beginning_of_quarter`가 있고, `end_of_quarter`에 대해서는 `at_end_of_quarter`가 있습니다. [[[`beginning_of_quarter` is aliased to `at_beginning_of_quarter`, and `end_of_quarter` is aliased to `at_end_of_quarter`.]]]
+`beginning_of_quarter`는 `at_beginning_of_quarter`의 별명, `end_of_quarter`는 `at_end_of_quarter`의 별명입니다.
 
 ##### `beginning_of_year`, `end_of_year`
 
-`beginning_of_year`와 `end_of_year` 메소드는 각각 해당 년도의 시작과 종료일에 해당하는 날짜를 반환합니다. [[[The methods `beginning_of_year` and `end_of_year` return the dates for the beginning and end of the year:]]]
+`beginning_of_year` 메소드와 `end_of_year` 메소드는 해당 년도의 첫번째 날과 마지막 날을 반환합니다.
 
 ```ruby
 d = Date.new(2010, 5, 9) # => Sun, 09 May 2010
@@ -3162,27 +3199,27 @@ d.beginning_of_year      # => Fri, 01 Jan 2010
 d.end_of_year            # => Fri, 31 Dec 2010
 ```
 
-`beginning_of_year`와 동일한 기능을 하는 메소드로 `at_beginning_of_year`가 있고, `end_of_year`에 대해서는 `at_end_of_year`가 있습니다. [[[`beginning_of_year` is aliased to `at_beginning_of_year`, and `end_of_year` is aliased to `at_end_of_year`.]]]
+`beginning_of_year`는 `at_beginning_of_year`의 별명, `end_of_year`는 `at_end_of_year`의 별명입니다.
 
-#### [Other Date Computations] 기타 날짜 연산
+#### 그 이외의 날짜 계산 메소드
 
 ##### `years_ago`, `years_since`
 
-`years_ago` 메소드는 년도 수를 인수로 받아서 해당 년도 이전의 동일한 일자를 반환합니다. [[[The method `years_ago` receives a number of years and returns the same date those many years ago:]]]
+`years_ago` 메소드는 년수를 받아 그 년만큼 이전의 같은 월, 일의 날짜를 반환합니다.
 
 ```ruby
 date = Date.new(2010, 6, 7)
 date.years_ago(10) # => Wed, 07 Jun 2000
 ```
 
-`year_since` 메소드는 년도 수를 인수로 받아서 해당 년도 이후의 동일한 일자를 반환합니다. [[[`years_since` moves forward in time:]]]
+`years_since`도 마찬가지의 방법으로 그 만큼 이후의 동일한 날짜를 반환합니다.
 
 ```ruby
 date = Date.new(2010, 6, 7)
 date.years_since(10) # => Sun, 07 Jun 2020
 ```
 
-해당 일자가 존재하지 않을 경우에는 해당 월의 마지막 일자를 반환합니다. [[[If such a day does not exist, the last day of the corresponding month is returned:]]]
+같은 날짜가 존재하지 않는 경우에는 그 달의 마지막 날짜를 사용합니다.
 
 ```ruby
 Date.new(2012, 2, 29).years_ago(3)     # => Sat, 28 Feb 2009
@@ -3191,14 +3228,14 @@ Date.new(2012, 2, 29).years_since(3)   # => Sat, 28 Feb 2015
 
 ##### `months_ago`, `months_since`
 
-`months_ago`와 `months_since` 메소드는 월에 대해서 동일하게 동작합니다. [[[The methods `months_ago` and `months_since` work analogously for months:]]]
+`months_ago` 메소드와 `months_since` 메소드는 위와 같은 방법을 달에 대해서 수행합니다.
 
 ```ruby
 Date.new(2010, 4, 30).months_ago(2)   # => Sun, 28 Feb 2010
 Date.new(2010, 4, 30).months_since(2) # => Wed, 30 Jun 2010
 ```
 
-해당 일자가 존재하지 않을 경우 해당 월의 마지막 일자를 반환합니다. [[[If such a day does not exist, the last day of the corresponding month is returned:]]]
+같은 날이 존재하지 않는 경우에는 그 달의 마지막 날짜를 사용합니다.
 
 ```ruby
 Date.new(2010, 4, 30).months_ago(2)    # => Sun, 28 Feb 2010
@@ -3207,7 +3244,7 @@ Date.new(2009, 12, 31).months_since(2) # => Sun, 28 Feb 2010
 
 ##### `weeks_ago`
 
-`weeks_ago` 메소드는 주에 대해서 동일하게 동작합니다. [[[The method `weeks_ago` works analogously for weeks:]]]
+`weeks_ago` 메소드는 위와 같은 방법을 주간에 대해서 적용합니다.
 
 ```ruby
 Date.new(2010, 5, 24).weeks_ago(1)    # => Mon, 17 May 2010
@@ -3216,7 +3253,7 @@ Date.new(2010, 5, 24).weeks_ago(2)    # => Mon, 10 May 2010
 
 ##### `advance`
 
-다른 일자로 이동하는 가장 일반적인 방법은 `advance` 메소드를 사용하는 것입니다. 이 메소드는 `:years`, `:months`, `:weeks`, `:days` 키를 가지는 해시를 인수로 받아서 현재의 키값만큼 이동한 일자를 반환합니다. [[[The most generic way to jump to other days is `advance`. This method receives a hash with keys `:years`, `:months`, `:weeks`, `:days`, and returns a date advanced as much as the present keys indicate:]]]
+날짜를 계싼하는 가장 일반적인 방법은 `advance` 메소드를 사용하는 것입니다. 이 메소드는 `:years`, `:months`, `:weeks`, `:days`를 키로 가지는 해시를 받으며, 날짜를 가능한 상세한 형식으로, 현재의 키에서 요구하는대로 돌려줍니다.
 
 ```ruby
 date = Date.new(2010, 6, 6)
@@ -3224,43 +3261,43 @@ date.advance(years: 1, weeks: 2)  # => Mon, 20 Jun 2011
 date.advance(months: 2, days: -2) # => Wed, 04 Aug 2010
 ```
 
-이전 예제 코드에서 음수 값을 지정할 수 있음을 주목하기 바랍니다. [[[Note in the previous example that increments may be negative.]]]
+예제에서 볼 수 있듯, 값으로는 음수도 사용할 수 있습니다.
 
-날짜 연산을 위해서 메소드는 먼저 년도를 증가시키고 이후에 월, 주, 마지막에 일수를 증가시키게 됩니다. 이 순서는 월 말일에 대한 연산시에 중요한데, 예를 들어 2010년 2월 말일에서 1달 1일만큼 추가한다고 가정해 보겠습니다. [[[To perform the computation the method first increments years, then months, then weeks, and finally days. This order is important towards the end of months. Say for example we are at the end of February of 2010, and we want to move one month and one day forward.]]]
+계산의 순서는 우선 연도를 계산하고, 다음에 월, 마지막으로 일을 계산합니다. 이 순서로 계산한다는 점은 특히 월을 계산할 때에 중요합니다. 예를 들어 현재가 2010년 2월 마지막 날로, 거기에서 1개월과 1일 뒤로 가고 싶다고 합시다.
 
-`advance` 메소드는 먼저 1달을 추가한 후에 1일 추가하여 결과(2010년 3월 29일)는 다음과 같습니다. [[[The method `advance` advances first one month, and then one day, the result is:]]]
+`advance` 메소드는 우선 한달을 더하고, 하루를 더합니다. 결과로 다음을 얻을 수 있습니다.
 
 ```ruby
 Date.new(2010, 2, 28).advance(months: 1, days: 1)
 # => Sun, 29 Mar 2010
 ```
 
-순서를 달리할 경우에는 아래와 같이 다른 결과를 얻게 될 것입니다. [[[While if it did it the other way around the result would be different:]]]
+계산의 순서가 다를 경우, 같은 결과를 얻을수 없을 수도 있습니다.
 
 ```ruby
 Date.new(2010, 2, 28).advance(days: 1).advance(months: 1)
 # => Thu, 01 Apr 2010
 ```
 
-#### [Changing Components] 년/월/일 요소 변경하기
+#### change
 
-`change` 메소드는 receiver 날짜 객체의 년, 월, 일 값을 변경할 때 사용할 수 있습니다. [[[The method `change` allows you to get a new date which is the same as the receiver except for the given year, month, or day:]]]
+`change` 메소드는 주어진 년, 월, 일에 대해서 리시버의 날짜를 변경하고, 주어지지 않은 부분을 그대로 반환합니다.
 
 ```ruby
 Date.new(2010, 12, 23).change(year: 2011, month: 11)
 # => Wed, 23 Nov 2011
 ```
 
-이 메소드는 존재하지 않는 일자에 대해서 매끄럽게 처리하지 못합니다. 그래서 변경할 일자가 유효하지 않을 경우, `ArgumentError` 예외를 발생시키게 됩니다. [[[This method is not tolerant to non-existing dates, if the change is invalid `ArgumentError` is raised:]]]
+존재하지 않는 날짜를 지정하면 `ArgumentError`를 발생시킵니다.
 
 ```ruby
 Date.new(2010, 1, 31).change(month: 2)
 # => ArgumentError: invalid date
 ```
 
-#### [Durations] 기간연산
+#### 기간
 
-일자에서 일정 기간을 더하고 뺄 수 있습니다. [[[Durations can be added to and subtracted from dates:]]]
+날짜에 대해서 기간을 계산할 수 있습니다.
 
 ```ruby
 d = Date.current
@@ -3271,103 +3308,103 @@ d - 3.hours
 # => Sun, 08 Aug 2010 21:00:00 UTC +00:00
 ```
 
-이러한 연산을 위해서 `since` 또는 `advance` 메소드를 적절하게 호출하게 됩니다. 예를 들어, [[[They translate to calls to `since` or `advance`. For example here we get the correct jump in the calendar reform:]]]
+이러한 계산은 내부에서 `since` 메소드나 `advance` 메소드를 통해서 처리됩니다. 예를 들어, 달력이 변경되는 때에도 올바르게 계산됩니다.
 
 ```ruby
 Date.new(1582, 10, 4) + 1.day
 # => Fri, 15 Oct 1582
 ```
 
-#### [Timestamps] 타임스탬프
+#### 타임스탬프
 
-INFO: 다음의 메소드들은 가능한한 `Time` 객체를 반환하지만, 그렇지 못할 경우에는 `DateTime` 객체를 반환할 것입니다. 시간대역이 설정되어 있을 때는 사용자의 시간대역이 반영되어 표시될 것입니다. [[[The following methods return a `Time` object if possible, otherwise a `DateTime`. If set, they honor the user time zone.]]]
+INFO: 다음 메소드들은 가능하다면 `Time` 객체를 반환하고, 그 이외의 경우에는 `DateTime`을 반환합니다. 시간대를 설정해 놓으면 이를 반영합니다.
 
 ##### `beginning_of_day`, `end_of_day`
 
-`beginning_of_day` 메소드는 하루의 시작 시점(00:00:00)을 반환합니다. [[[The method `beginning_of_day` returns a timestamp at the beginning of the day (00:00:00):]]]
+`beginning_of_day` 메소드는 그 날의 시작 시점(00:00:00)의 타임스탬프를 반환합니다.
 
 ```ruby
 date = Date.new(2010, 6, 7)
 date.beginning_of_day # => Mon Jun 07 00:00:00 +0200 2010
 ```
 
-`end_of_day` 메소드는 하루의 종료 시점(23:59:59)을 반환합니다. [[[The method `end_of_day` returns a timestamp at the end of the day (23:59:59):]]]
+`end_of_day` 메소드는 그 날의 마지막 시각(23:59:59)의 타임스탬프를 반환합니다.
 
 ```ruby
 date = Date.new(2010, 6, 7)
 date.end_of_day # => Mon Jun 07 23:59:59 +0200 2010
 ```
 
-`beginning_of_day`와 동일한 기능을 하는 메소드로 `at_beginning_of_day`, `midnight`, `at_midnight`가 있습니다. [[[`beginning_of_day` is aliased to `at_beginning_of_day`, `midnight`, `at_midnight`.]]]
+`beginning_of_day`는 `at_beginning_of_day`, `midnight`, `at_midnight`와 같습니다.
 
 ##### `beginning_of_hour`, `end_of_hour`
 
-`beginning_of_hour` 메소드는 한시간의 시작(hh:00:00) 시점의 타임스탬프를 반환합니다. [[[The method `beginning_of_hour` returns a timestamp at the beginning of the hour (hh:00:00):]]]
+`beginning_of_hour` 메소드는 그 시각의 시작 지점(hh:00:00)의 타임스탬프를 돌려줍니다.
 
 ```ruby
 date = DateTime.new(2010, 6, 7, 19, 55, 25)
 date.beginning_of_hour # => Mon Jun 07 19:00:00 +0200 2010
 ```
 
-`end_of_hour` 메소드는 한시간의 종료(hh:59:59) 시점의 타임스탬프를 반환합니다. [[[The method `end_of_hour` returns a timestamp at the end of the hour (hh:59:59):]]]
+`end_of_hour` 메소드는 그 시각의 마지막 지점(hh:59:59)의 타임스탬프를 돌려줍니다.
 
 ```ruby
 date = DateTime.new(2010, 6, 7, 19, 55, 25)
 date.end_of_hour # => Mon Jun 07 19:59:59 +0200 2010
 ```
 
-`beginning_of_hour`와 동일한 기능을 가지는 메소드로 `at_beginning_of_hour`가 있습니다. [[[`beginning_of_hour` is aliased to `at_beginning_of_hour`.]]]
+`beginning_of_hour`는 `at_beginning_of_hour`의 별명입니다.
 
 ##### `beginning_of_minute`, `end_of_minute`
 
-`beginning_of_minute` 메소드는 일분의 시작(hh:mm:00) 시점에 해당하는 타임스탬프를 반환합니다. [[[The method `beginning_of_minute` returns a timestamp at the beginning of the minute (hh:mm:00):]]]
+`beginning_of_minute`는 해당 분의 시작 지점(hh:mm:00)의 타임스탬프를 돌려줍니다.
 
 ```ruby
 date = DateTime.new(2010, 6, 7, 19, 55, 25)
 date.beginning_of_minute # => Mon Jun 07 19:55:00 +0200 2010
 ```
 
-`end_of_minute` 메소드는 일분의 종료(hh:mm:59) 시점에 해당하는 타임스탬프를 반환합니다. [[[The method `end_of_minute` returns a timestamp at the end of the minute (hh:mm:59):]]]
+`end_of_minute`는 해당 분의 마지막 지점(hh:mm:59)의 타임스탬프를 돌려줍니다.
 
 ```ruby
 date = DateTime.new(2010, 6, 7, 19, 55, 25)
 date.end_of_minute # => Mon Jun 07 19:55:59 +0200 2010
 ```
 
-`beginning_of_minute`와 동일한 기능을 가지는 메소드는 `at_beginning_of_minute`가 있습니다. [[[`beginning_of_minute` is aliased to `at_beginning_of_minute`.]]]
+`beginning_of_minute`는 `at_beginning_of_minute`의 별명입니다.
 
-INFO: `beginning_of_hour`, `end_of_hour`, `beginning_of_minute`, `end_of_minute`  메소드는 `Time`과 `DateTime`에 대해서 실행되지만 `Date` 객체에 대해서 시간이나 분에 대한 시작 또는 종료 시점을 요구시에는 **실행되지 않습니다**. [[[`beginning_of_hour`, `end_of_hour`, `beginning_of_minute` and `end_of_minute` are implemented for `Time` and `DateTime` but **not** `Date` as it does not make sense to request the beginning or end of an hour or minute on a `Date` instance.]]]
+INFO: `beginning_of_hour`, `end_of_hour`, `beginning_of_minute`, `end_of_minute`는 `Time` 또는 `DateTime`를 위한 구현입니다. `Date` 인스턴스에서는 시간이나 분, 초를 물어본다는 것이 의미가 없기 때문입니다.
 
 ##### `ago`, `since`
 
-`ago` 메소드는 인수로 초단위의 숫자를 받아서 자정에서 해당 초만큼을 뺀 시간을 타임스탬프로 반환해 줍니다. [[[The method `ago` receives a number of seconds as argument and returns a timestamp those many seconds ago from midnight:]]]
+`ago` 메소드는 초를 인수로 받아, 0시를 기준으로 그 초만큼을 뺀 타임스탬프를 반환합니다.
 
 ```ruby
 date = Date.current # => Fri, 11 Jun 2010
 date.ago(1)         # => Thu, 10 Jun 2010 23:59:59 EDT -04:00
 ```
 
-위와 같이, `since` 메소드는 초단위 숫자만큼을 더한 결과를 타임스탬프형으로 반환합니다. [[[Similarly, `since` moves forward:]]]
+`since` 메소드는 마찬가지로 초를 받아 그만큼을 더합니다.
 
 ```ruby
 date = Date.current # => Fri, 11 Jun 2010
 date.since(1)       # => Fri, 11 Jun 2010 00:00:01 EDT -04:00
 ```
 
-#### [Other Time Computations] 기타 시간 계산
+#### 그 이외의 시간 계산
 
 ### Conversions
 
-[Extensions to `DateTime`] `DateTime`형에 대한 확장메소드
+`DateTime` 확장
 ------------------------
 
-WARNING: `DateTime`은 DST(Daylight Saving Time)을 알지 못해서 DST가 변경될 때 일부 메소드는 극단의 상황을 맞을 수 있습니다. 예를 들면, `seconds_since_midmight` 메소드는 그러한 경우에는 실제 시간만큼을 반영하지 못할 수 있습니다. [[[`DateTime` is not aware of DST rules and so some of these methods have edge cases when a DST change is going on. For example `seconds_since_midnight` might not return the real amount in such a day.]]]
+WARNING: `DateTime`는 섬머타임(DST)에 대해서 모릅니다. DST에 의한 시간대 변경이 이루어 졌을 경우, 메소드의 일부는 생각한대로 동작하지 않을 수 있습니다. 예를 들어 `seconds_since_midnight` 메소드가 반환하는 초수가 실제의 값과 다를 수 있습니다.
 
-### [Calculations] 계산
+### 계산
 
-NOTE: 다음의 모든 메소드는 `active_support/core_ext/date_time/calculations.rb` 파일내에 정의되어 있습니다. [[[All the following methods are defined in `active_support/core_ext/date_time/calculations.rb`.]]]
+NOTE: 이것들은 모두 `active_support/core_ext/date_time/calculations.rb`에 있습니다.
 
-`DateTime` 클래스는 `Date`의 하위 클래스이기 때문에 `active_support/core_ext/date/calculations.rb`를 로딩하면 이러한 메소드(와 기타 별칭메소드)를 그대로 상속받아 사용할 수 있습니다. 이때 이들 메소드가 반환하는 것은 datetime형이 될 것입니다. [[[The class `DateTime` is a subclass of `Date` so by loading `active_support/core_ext/date/calculations.rb` you inherit these methods and their aliases, except that they will always return datetimes:]]]
+`DateTime` 클래스는 `Date`의 자식클래스이며 `active_support/core_ext/date/calculations.rb`를 읽는 것으로 이러한 메소드를 별도로 상속할 수 있습니다. 단 이들이 항상 datetime을 반환하게 된다는 점을 주의하세요.
 
 ```ruby
 yesterday
@@ -3395,7 +3432,7 @@ prev_year (last_year)
 next_year
 ```
 
-다음의 메소드들은 (내부적으로 to_time 메소드가 실행되어) 재구현 되기 때문에 이들 메소드를 실행하기 위해 `active_support/core_ext/date/calculations.rb` 파일을 로드할 **필요가 없습니다**. [[[The following methods are reimplemented so you do **not** need to load `active_support/core_ext/date/calculations.rb` for these ones:]]]
+이하의 메소드는 모두 재정의되기 때문에 이들을 사용하기 위해서 `active_support/core_ext/date/calculations.rb`를 불러올 필요는 **없습니다**.
 
 ```ruby
 beginning_of_day (midnight, at_midnight, at_beginning_of_day)
@@ -3404,26 +3441,26 @@ ago
 since (in)
 ```
 
-한편, `advance`와 `change` 메소드도 정의되어 있고 더 많은 옵션을 지원하며 아래에 문서화 되어 있습니다. [[[On the other hand, `advance` and `change` are also defined and support more options, they are documented below.]]]
+반면 `advance`와 `change`도 정의됩니다만, 좀 더 많은 옵션을 사용할 수 있게 됩니다. 이에 대해서는 나중에 다시 설명하겠습니다.
 
-다음의 메소드들은 `active_support/core_ext/date_time/calculations.rb` 파일내에서만 구현되어 있어서 `DateTime` 객체에 대해서 사용할 때만 실행될 것입니다. [[[The following methods are only implemented in `active_support/core_ext/date_time/calculations.rb` as they only make sense when used with a `DateTime` instance:]]]
+다음 메소드는 `active_support/core_ext/date_time/calculations.rb`에서만 구현되어 있습니다. 이들은 `DateTime` 인스턴스가 아니면 의미가 없기 때문입니다.
 
 ```ruby
 beginning_of_hour (at_beginning_of_hour)
 end_of_hour
 ```
 
-#### [Named Datetimes] 이름이 붙은 DateTime형의 확장메소드
+#### 이름을 가지는 Datetime
 
 ##### `DateTime.current`
 
-액티브서포트는 `Time.now.to_datetime`과 같이 `DateTime.current` 메소드를 정의합니다. 단, 이 때는 정의가 된 경우 사용자 시간대역을 반영하게 됩니다. 또한, `DateTime.current` 메소드의 반환값에 대해 상대적인 값을 반환하는 `DateTime.yesterday`와 `DateTime,tomorrow`, 그리고 서술형 메소드인 `past?`, `future?` 메소드도 정의합니다. [[[Active Support defines `DateTime.current` to be like `Time.now.to_datetime`, except that it honors the user time zone, if defined. It also defines `DateTime.yesterday` and `DateTime.tomorrow`, and the instance predicates `past?`, and `future?` relative to `DateTime.current`.]]]
+Active Support에서는 `DateTime.current`를 `Time.now.to_datetime`과 같은 방식으로 정의하고 있습니다. 단 `DateTime.current`는 사용자의 시간대가 정의되어 있을 경우를 처리해준다는 점이 다릅니다. Active Support에서는 `Date.yesterday`와 `Date.tomorrow`도 정의되어 있습니다. 인스턴스에서는 `past?`와 `future?`도 사용할 수 있습니다.
 
-#### [Other Extensions] 기타 확장메소드
+#### 그 이외의 확장
 
 ##### `seconds_since_midnight`
 
-`seconds_since_midnight` 메소드는 자정이후의 경과시간을 초단위로 반환합니다. [[[The method `seconds_since_midnight` returns the number of seconds since midnight:]]]
+`seconds_since_midnight` 메소드는 자정을 기준으로 몇초가 경과했는지를 알려줍니다.
 
 ```ruby
 now = DateTime.current     # => Mon, 07 Jun 2010 20:26:36 +0000
@@ -3432,28 +3469,28 @@ now.seconds_since_midnight # => 73596
 
 ##### `utc`
 
-`utc` 메소드는 receiver의 datetime 시간을 UTC로 변환해서 반환합니다. [[[The method `utc` gives you the same datetime in the receiver expressed in UTC.]]]
+`utc` 메소드는 리시버의 날짜를 UTC로 변환합니다.
 
 ```ruby
 now = DateTime.current # => Mon, 07 Jun 2010 19:27:52 -0400
 now.utc                # => Mon, 07 Jun 2010 23:27:52 +0000
 ```
 
-이 메소드는 또한 `getutc` 메소드로도 호출할 수 있습니다. [[[This method is also aliased as `getutc`.]]]
+`getutc`는 이 메소드의 별명입니다.
 
 ##### `utc?`
 
-기술형 메소드인 `utc?`는 receiver가 UTC 시간대역을 가지는지를 알려 줍니다. [[[The predicate `utc?` says whether the receiver has UTC as its time zone:]]]
+`utc?`는 리시버가 UTC시간을 가지고 있는지를 확인합니다.
 
 ```ruby
 now = DateTime.now # => Mon, 07 Jun 2010 19:30:47 -0400
-now.utc?           # => false
-now.utc.utc?       # => true
+now.utc?          # => false
+now.utc.utc?      # => true
 ```
 
 ##### `advance`
 
-다른 datetime으로 이동하는 가장 일반적인 방법은 `advance` 메소드를 사용하는 것입니다. 이 메소드는 `:years`, `:months`, `:weeks`, `:days`, `:hours`, `:minutes`, `:seconds` 키를 가지는 해시를 인수로 받아서 현재 키 값만큼 datetime을 이동하여 반환합니다. [[[The most generic way to jump to another datetime is `advance`. This method receives a hash with keys `:years`, `:months`, `:weeks`, `:days`, `:hours`, `:minutes`, and `:seconds`, and returns a datetime advanced as much as the present keys indicate.]]]
+날자를 바꾸는 가장 일반적인 방법은 `advance` 메소드를 사용하는 것입니다. 이 메소드는 `:years`,`:months`, `:weeks`, `:days`, `:hours`, `:minutes` 그리고 `:seconds`를 키로 가지는 해시를 받아서 날짜를 가능한 자세한 형태로 옵션이 지정하는대로 변환하여 반환합니다.
 
 ```ruby
 d = DateTime.current
@@ -3462,9 +3499,9 @@ d.advance(years: 1, months: 1, days: 1, hours: 1, minutes: 1, seconds: 1)
 # => Tue, 06 Sep 2011 12:34:32 +0000
 ```
 
-이 메소드는 먼저 위에서 언급했던 `Date#advance` 메소드로 `:years`, `:months`, `:weeks`, `:days` 키를 넘겨 주어 결과 일자를 계산하게 됩니다. 이후에, 초단위 시간을 인수로 받아 `since` 메소드를 호출하므로써 시간을 조절하게 됩니다. 옵션의 적용 순서가 연관되기 때문에, 적용순서를 달리하면 몇몇 극단적인 상황에서는 datetime이 다른 값을 가지게 될 것입니다. `Date#advance`에서의 예를 적용해서 기능 확장을 하면 시간과 관련해서 순서에 따른 연관성을 보여 줄 수 있습니다. [[[This method first computes the destination date passing `:years`, `:months`, `:weeks`, and `:days` to `Date#advance` documented above. After that, it adjusts the time calling `since` with the number of seconds to advance. This order is relevant, a different ordering would give different datetimes in some edge-cases. The example in `Date#advance` applies, and we can extend it to show order relevance related to the time bits.]]]
+이 메소드는 우선 위에서 설명되어 있는 `Date#advance`에 대응하는 년수(`:years`), 달수(`:months`), 주수(`:weeks`), 일수(`days`)로 변경할 날짜를 계산합니다. 이어서 그 날짜에 `since` 메소드를 사용해서 변경된 초를 보정합니다. 이 실행 순서에는 의미가 있습니다. 극단적인 상황으로 순서가 달라지면 계산 결과가 달라지는 경우가 있기 때문입니다. 이것은 위에서의 `Date#advance`에서 보여준 예제와 동일합니다. 상대적인 시간 계산에서도 계산 순서는 중요합니다.
 
-먼저 날짜 값만큼 이동한 후 시간 값을 이동하면 (예를 들어) 아래와 같은 연산결과를 얻게 될 것입니다. [[[If we first move the date bits (that have also a relative order of processing, as documented before), and then the time bits we get for example the following computation:]]]
+만약 일자 부분을 먼저 계산하고 이어서 시간 부분을 계산하게 되면 아래와 같은 계산 결과를 얻을 수 있습니다.
 
 ```ruby
 d = DateTime.new(2010, 2, 28, 23, 59, 59)
@@ -3473,18 +3510,18 @@ d.advance(months: 1, seconds: 1)
 # => Mon, 29 Mar 2010 00:00:00 +0000
 ```
 
-그러나 다른 식으로 계산할 경우, 결과 달라지게 될 것입니다. [[[but if we computed them the other way around, the result would be different:]]]
+계산 순서를 바꾸어보면, 결과가 달라집니다.
 
 ```ruby
 d.advance(seconds: 1).advance(months: 1)
 # => Thu, 01 Apr 2010 00:00:00 +0000
 ```
 
-WARNING: `DateTime` 클래스는 DST를 인식하지 못하기 때문에 존재하지 않는 시점에서 경고나 에러 없이 연산처리가 종료될 수 있습니다. [[[Since `DateTime` is not DST-aware you can end up in a non-existing point in time with no warning or error telling you so.]]]
+WARNING: `DateTime`는 섬머 타임(DST)을 고려하지 않습니다. 계산된 시간이 최종적으로 존재하지 않는 시간이 되더라도 경고나 에러는 발생하지 않습니다.
 
-#### [Changing Components] 날짜시간 요소 변경하기
+#### 요소 변경하기
 
-`:year`, `:month`, `:day`, `:hour`, `:min`, `:sec`, `:offset`, `:start` 옵션을 지정하여 `change` 메소드를 이용하면, receiver와 같은 새로운 datetime형 객체를 생성할 수 있습니다. [[[The method `change` allows you to get a new datetime which is the same as the receiver except for the given options, which may include `:year`, `:month`, `:day`, `:hour`, `:min`, `:sec`, `:offset`, `:start`:]]]
+`change` 메소드를 사용해서 리시버의 날짜/시각의 일부를 변경하여 새로운 날짜를 만들 수 있습니다. 변경 가능한 요소는 `:year`, `:month`, `:day`, `:hour`, `:min`, `:sec`, `:offset`, `:start` 등으로 지정할 수 있습니다.
 
 ```ruby
 now = DateTime.current
@@ -3493,30 +3530,30 @@ now.change(year: 2011, offset: Rational(-6, 24))
 # => Wed, 08 Jun 2011 01:56:22 -0600
 ```
 
-`:hour` 옵션을 0로 지정하여 호출하면 분과 초 값도 별도로 지정하지 않는 한 0로 설정됩니다. [[[If hours are zeroed, then minutes and seconds are too (unless they have given values):]]]
+시각(hour)이 0인 경우 분과 초가 지정되어 있지 않으면 함께 0이 됩니다.
 
 ```ruby
 now.change(hour: 0)
 # => Tue, 08 Jun 2010 00:00:00 +0000
 ```
 
-분을 0으로 지정하여 호출할 경우에도, 별도로 지정하지 않는 한, 초 값도 0로 설정됩니다. [[[Similarly, if minutes are zeroed, then seconds are too (unless it has given a value):]]]
+마찬가지로 분이 0인 경우, 초가 지정되지 않으면 함께 0이 됩니다.
 
 ```ruby
 now.change(min: 0)
 # => Tue, 08 Jun 2010 01:00:00 +0000
 ```
 
-이 메소드의 실행결과, 존재하지 않는 일자를 반환할 경우 `Arguement Error` 예외를 발생시킬 것입니다.[[[This method is not tolerant to non-existing dates, if the change is invalid `ArgumentError` is raised:]]]
+존재하지 않는 날짜를 지정하면 `ArgumentError`가 발생합니다.
 
 ```ruby
 DateTime.current.change(month: 2, day: 30)
 # => ArgumentError: invalid date
 ```
 
-#### [Durations] 기간연산
+#### 기간
 
-datetime으로부터 일정 기간을 더하거나 뺄 수 있습니다. [[[Durations can be added to and subtracted from datetimes:]]]
+날짜에 대해 기간을 계산할 수 있습니다.
 
 ```ruby
 now = DateTime.current
@@ -3527,21 +3564,21 @@ now - 1.week
 # => Mon, 02 Aug 2010 23:15:17 +0000
 ```
 
-이 때 기간연산을 위해 `since`와 `advance` 메소드를 호출하게 됩니다. 예를 들어, 아래와 같이 정확히 시간 이동을 할 수 있게 됩니다. [[[They translate to calls to `since` or `advance`. For example here we get the correct jump in the calendar reform:]]]
+이러한 계산은 내부적으로 `since` 메소드나 `advance` 메소드를 사용합니다. 그러므로 달력이 변경되는 시점에서도 올바르게 계산 됩니다.
 
 ```ruby
 DateTime.new(1582, 10, 4, 23) + 1.hour
 # => Fri, 15 Oct 1582 00:00:00 +0000
 ```
 
-[Extensions to `Time`] `Time`형에 대한 확장메소드
+`Time` 확장
 --------------------
 
-### [Calculations] 시간계산
+### 계산
 
-NOTE: 다음의 모든 메소드는 `active_support/core_ext/time/calculations.rb` 파일내에 정의되어 있습니다. [[[All the following methods are defined in `active_support/core_ext/time/calculations.rb`.]]]
+NOTE: 이들은 모두 `active_support/core_ext/time/calculations.rb`에 정의되어 있습니다.
 
-액티브서포트는 `DateTime` 클래스에 정의되어 있는 많은 메소드를 `Time` 클래스에도 정의해 두었습니다. [[[Active Support adds to `Time` many of the methods available for `DateTime`:]]]
+Active Support는 `DateTime`에서 사용할 수 있는 메소드의 다수를 `Time`에 추가합니다.
 
 ```ruby
 past?
@@ -3581,34 +3618,33 @@ prev_year (last_year)
 next_year
 ```
 
-이 메소드들은 유사하게 동작합니다. 이미 소개한 바 있는 각각에 대한 문서화 내용을 참고하고 다음의 차이점을 고려하기 바랍니다. [[[They are analogous. Please refer to their documentation above and take into account the following differences:]]]
+이들은 동일하게 동작하며, 관련된 문서를 참조하시고, 다음과 같은 차이점에 대해서도 기억해주세요.
 
-* `change` 메소드는 `:usec`라는 추가 옵션을 지정할 수 있습니다. [[[`change` accepts an additional `:usec` option.]]]
-
-* `Time` 클래스는 DST를 인식하기 때문에, DST가 정확하게 계산된 결과를 얻을 수 있게 됩니다. [[[`Time` understands DST, so you get correct DST calculations as in]]]
-
-* `since`와 `age` 메소드의 실행결과 `Time` 객체로 표현할 수 없는 시간을 반환할 경우에는 대신에 `DateTime` 객체를 반환할 것입니다.  [[[If `since` or `ago` jump to a time that can't be expressed with `Time` a `DateTime` object is returned instead.]]]
+* `change` 메소드에 추가로 `:usec` 옵션을 사용할 수 있습니다.
+* `Time`은 섬머타임(DST)을 이해합니다. 아래와 같은 DST처리도 올바르게 됩니다.
 
 ```ruby
 Time.zone_default
 # => #<ActiveSupport::TimeZone:0x7f73654d4f38 @utc_offset=nil, @name="Madrid", ...>
 
-# In Barcelona, 2010/03/28 02:00 +0100 becomes 2010/03/28 03:00 +0200 due to DST.
+# 바르셀로나에서는 DST에 의해서 2010/03/28 02:00 +0100이 2010/03/28 03:00 +0200가 됨
 t = Time.local(2010, 3, 28, 1, 59, 59)
 # => Sun Mar 28 01:59:59 +0100 2010
 t.advance(seconds: 1)
 # => Sun Mar 28 03:00:00 +0200 2010
 ```
 
+* `since`나 `ago`로 계산 결과의 시간을 `Time`으로 표현할 수 없는 경우 `DateTime` 객체가 반환됩니다.
+
 #### `Time.current`
 
-액티브서포트는 현재 시간대역에서 금일을 표시하는 `Time.current` 메소드를 정의합니다. `Time.now`와 같아 보이지만, `Time.current`의 경우, 정의되어 있을 경우, 사용자의 시간대역을 반영한다는 차이가 있습니다. `Time.current`를 기준으로 상대적인 값을 반환하는 메소드로, `Time.yesterday`, `Time.tomorrow`, 서술형 메소드인 `past?`, `today?`, `future?`도 정의되어 있습니다. [[[Active Support defines `Time.current` to be today in the current time zone. That's like `Time.now`, except that it honors the user time zone, if defined. It also defines `Time.yesterday` and `Time.tomorrow`, and the instance predicates `past?`, `today?`, and `future?`, all of them relative to `Time.current`.]]]
+Active Support 에서는 `Time.current`를 정의해서 현재의 시간대에 맞는 '오늘'을 반환합니다. 이 메소드는 `Time.now`와도 비슷합니다만, 사용자의 시간대를 고려한다는 점이 다릅니다. Active Support에서는 `past?`, `today?`, `future?`라는 메소드가 정의되어 있으며, 이것들은 내부적으로 `Time.current`를 사용합니다.
 
-사용자 시간대역을 반영하는 메소드를 사용하여 시간을 비교할 때는 `Time.now` 대신에 `Time.current` 메소드를 사용해야 합니다. 사용자 시간대역을 `Time.today` 메소드가 디폴트로 사용하는 시스템 시간대역과 비교할 경우가 있을 것입니다. 즉, `Time.now`가 `Time.yesterday`의 결과값과 같을 수가 있다는 것입니다. [[[When making Time comparisons using methods which honor the user time zone, make sure to use `Time.current` and not `Time.now`. There are cases where the user time zone might be in the future compared to the system time zone, which `Time.today` uses by default. This means `Time.now` may equal `Time.yesterday`.]]]
+사용자의 시간대를 고려하는 메소드를 사용해서 날짜를 비교하고 싶은 경우 `Time.now`가 아닌 `Time.current`를 반드시 사용해주세요. 이후 사용자 시간대와 시스템의 시간대를 비교해야 하는 경우가 존재할 수 있습니다. 시스템의 타임존에서는 기본으로 `Time#now`이 사용됩니다. 다시 말해, `Time.now`이 `Time.currentyesterday`와 같은 상황이 있을 수 있습니다.
 
-#### `all_day`, `all_week`, `all_month`, `all_quarter` and `all_year`
+#### `all_day`, `all_week`, `all_month`, `all_quarter`, `all_year`
 
-`all_day` 메소드는 현재 시간의 하루를 표시하는 범위형 객체를 반환합니다. [[[The method `all_day` returns a range representing the whole day of the current time.]]]
+`all_day` 메소드는 현재 시각을 포함하는 하루를 Range 객체로 돌려줍니다.
 
 ```ruby
 now = Time.current
@@ -3617,7 +3653,7 @@ now.all_day
 # => Mon, 09 Aug 2010 00:00:00 UTC +00:00..Mon, 09 Aug 2010 23:59:59 UTC +00:00
 ```
 
-이와 유사하게, `all_week`, `all_month`, `all_quarter`, `all_year` 메소드들도 시간 범위형 객체를 생성하게 됩니다. [[[Analogously, `all_week`, `all_month`, `all_quarter` and `all_year` all serve the purpose of generating time ranges.]]]
+마찬가지로 `all_week`, `all_month`, `all_quarter`, `all_year`도 기간의 Range 객체를 생성합니다.
 
 ```ruby
 now = Time.current
@@ -3634,9 +3670,9 @@ now.all_year
 # => Fri, 01 Jan 2010 00:00:00 UTC +00:00..Fri, 31 Dec 2010 23:59:59 UTC +00:00
 ```
 
-### [Time Constructors] Time 생성자
+### Time 생성자
 
-액티브서포트는 사용자 시간대역이 정의되어 있는 경우 `Time.current`가 `Time.zone.now` 결과값을 반환하도록 정의합니다. 그렇지 못할 경우에는 `Time.now` 값을 반환합니다. [[[Active Support defines `Time.current` to be `Time.zone.now` if there's a user time zone defined, with fallback to `Time.now`:]]]
+사용자의 시간대가 정의되어 있는 경우, Active Support가 정의하는 `Time.current`의 값은 `Time.zone.now`와 동일합니다. 시간대가 정의되어 있지 않은 경우에는 `Time.now`와 같습니다.
 
 ```ruby
 Time.zone_default
@@ -3645,13 +3681,13 @@ Time.current
 # => Fri, 06 Aug 2010 17:11:58 CEST +02:00
 ```
 
-`DateTime`과 유사하게, 서술형 메소드인 `past?`와 `future?`는 `Time.current` 값에 대한 상대적인 결과를 반환합니다. [[[Analogously to `DateTime`, the predicates `past?`, and `future?` are relative to `Time.current`.]]]
+`DateTime`와 마찬가지로 `past?`와 `future?`는 `Time.current`를 사용합니다.
 
-운영 플랫폼에서 `Time` 클래스가 지원하는 범위 밖의 값을 가지게 될 때 usec 값은 버려지고 `DateTime` 객체가 대신 반환됩니다. [[[If the time to be constructed lies beyond the range supported by `Time` in the runtime platform, usecs are discarded and a `DateTime` object is returned instead.]]]
+구성된 시간이 실행 플랫폼의 `Time`에서 지원되는 범위를 넘어서는 경우에는 usec이 파기되고 `DateTime` 객체가 대신 반환됩니다.
 
-#### [Durations] 기간계산
+#### 기간
 
-타임 객체로부터 기간을 더하거나 뺄 수 있습니다. [[[Durations can be added to and subtracted from time objects:]]]
+Time 객체에 대해서 기간으로 계산할 수 있습니다.
 
 ```ruby
 now = Time.current
@@ -3662,23 +3698,23 @@ now - 1.week
 # => Mon, 02 Aug 2010 23:21:11 UTC +00:00
 ```
 
-이 메소드들은 `since` 또는 `advance` 메소드를 적절하게 호출하게 되는데, 아래의 예와 같이 달력상에서 정확하게 이동할 수 있게 됩니다. [[[They translate to calls to `since` or `advance`. For example here we get the correct jump in the calendar reform:]]]
+이런 계산은 내부에서 `since` 메소드나 `advance` 메소드로 구현됩니다. 그러므로 달력 변경 시점에서도 올바르게 처리됩니다.
 
 ```ruby
 Time.utc(1582, 10, 3) + 5.days
 # => Mon Oct 18 00:00:00 UTC 1582
 ```
 
-[Extensions to `File`] `File`형에 대한 확장메소드
+`File` 확장
 --------------------
 
 ### `atomic_write`
 
-`File.atomic_write` 클래스 메소드를 사용하면 사용자가 일부만 작성된 내용을 볼 수 없게 파일을 작성할 수 있습니다. [[[With the class method `File.atomic_write` you can write to a file in a way that will prevent any reader from seeing half-written content.]]]
+`File.atomic_write` 클래스 메소드를 사용하면, 작성중인 내용을 동시에 읽지 못하게 하며 파일에 저장할 수 있습니다.
 
-파일명을 인수로 넘겨 주면 메소드가 파일쓰기용 파일 핸들을 만들어 줍니다. 코드블록이 실행된 후에 `atomic_write`는 파일핸들을 닫고 작업을 완료합니다. [[[The name of the file is passed as an argument, and the method yields a file handle opened for writing. Once the block is done `atomic_write` closes the file handle and completes its job.]]]
+이 메소드에 파일명을 인수로 넘기면, 쓰기용으로 생성된 파일 핸들이 생성됩니다. 블럭의 작업이 완료되면 `atomic_write`는 파일 핸들을 닫고 처리를 완료합니다.
 
-예를 들어, 액션팩은 이 메소드를 이용해서 `all.css`와 같은 asset 캐시를 작성하게 됩니다. [[[For example, Action Pack uses this method to write asset cache files like `all.css`:]]]
+Action Pack은 이 메소드를 사용해서 `all.css`등의 캐시파일 등을 처리합니다. 
 
 ```ruby
 File.atomic_write(joined_asset_path) do |cache|
@@ -3686,123 +3722,80 @@ File.atomic_write(joined_asset_path) do |cache|
 end
 ```
 
-`atomic_write` 메소드가 작업을 수행하기 위해서는 임시파일이 생성한 후에 실제로 코드블록의 작업결과를 이 파일에 기록하게 됩니다. 작업이 완료되면, 임시파일의 이름이 변경되는데, 바로 이것을 POSIX 시스템 상에서 atomic 작업이라고 합니다. 대상 파일이 이미 존재할 경우에는 해당 파일을 덮어쓰기하고 파일 소유자와 퍼미션은 그대로 유지하게 됩니다. 그러나, 어떤 경우에는, 해당 파일의 소유권이나 퍼미션을 변경하지 못할 수 있습니다. 이러한 에러는 발생하더라도 무시되고 사용자 파일시스템을 신뢰하여 해당 파일을 필요로 하는 프로세스에서 자유롭게 접근할 수 있도록 합니다. [[[To accomplish this `atomic_write` creates a temporary file. That's the file the code in the block actually writes to. On completion, the temporary file is renamed, which is an atomic operation on POSIX systems. If the target file exists `atomic_write` overwrites it and keeps owners and permissions. However there are a few cases where `atomic_write` cannot change the file ownership or permissions, this error is caught and skipped over trusting in the user/filesystem to ensure the file is accessible to the processes that need it.]]]
+`atomic_write`는 코드를 실행하며 임시 파일을 생성합니다. 블럭 내의 코드가 실제로 쓰기를 수행하는 것은 이 파일입니다. 처리가 완려되면 이 임시 파일의 이름이 변경됩니다. 이름 변경은 POSIX 시스템의 아토믹 조작에 의해서 이루어집니다. 쓰기 파일이 이미 존재하는 경우 `atomic_write`는 그것을 덮어쓰고 소유자와 권한을 유지합니다. 단 `atomic_write` 메소드가 파일의 소유권과 권한을 변경할 수 없는 경우가 드물게 있습니다. 이런 에러는 무시되고 사용자의 파일 시스템을 신뢰하는 것으로 그 파일이 그것을 필요로 하는 프로세스로부터 접근할 수 있도록 합니다.
 
-NOTE. `atomic_write`가 수행하는 chomod 명령으로 인하여, 대상 파일이 ACL 설정이 되어 있는 경우 이 ACL 설정은 다시 계산되고 변경될 것입니다. [[[Due to the chmod operation `atomic_write` performs, if the target file has an ACL(Access Control List) set on it this ACL will be recalculated/modified.]]]
+NOTE: `atomic_write`가 실행하는 chmod 조작이 원인으로, 쓰기 대상 파일이 ACL 셋을 가지고 있을 경우에 그 ACL이 재계산/변경됩니다.
+WARNING: `atomic_write`는 내용을 추가(append)할 수 없습니다.
 
-WARNING. `atomic_write` 메소드를 이용하여 append 작업을 할 수 없다는 것을 주목하기 바랍니다. [[[Note you can't append with `atomic_write`.]]]
+임시 파일은 시스템 표준의 임시 파일용 폴더에 생성됩니다만, 두번째의 인수로 생성될 폴더를 지정할 수도 있습니다.
 
-임시 파일을 만들기 위해서 보조 파일이 표준 디렉토리에서 작성되지만, 두번째 인수로 원하는 디렉토리를 지정할 수 있습니다. [[[The auxiliary file is written in a standard directory for temporary files, but you can pass a directory of your choice as second argument.]]]
+NOTE: `active_support/core_ext/file/atomic.rb`에 정의되어 있습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/file/atomic.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/file/atomic.rb`.]]]
-
-[Extensions to `Marshal`] `Marshal` 클래스 확장메소드
+`Marshal` 확장
 -----------------------
 
 ### `load`
 
-액티브서포트는 마샬 `load` 메소드에 대해서 상수 자동로딩 지원을 추가합니다. [[[Active Support adds constant autoloading support to `load`.]]]
+Active Support는 `load`에 자동 읽기 기능을 추가합니다.
 
-예를 들어, 해당 파일 캐시 저장소는 다음과 같이 파일을 비직렬화(로드)합니다. [[[For example, the file cache store deserializes this way:]]]
+예를 들어 파일 캐시 저장소에서는 아래와 같은 역직렬화(deserialize)를 합니다.
 
 ```ruby
 File.open(file_name) { |f| Marshal.load(f) }
 ```
 
-캐시 데이터가 그 순간에 알려지지 않은 상수를 참조할 경우에는 자동로딩 기전이 작동하게 되고, 성공할 경우에, 비직렬화과정이 명확하게 재시도됩니다. [[[If the cached data refers to a constant that is unknown at that point, the autoloading mechanism is triggered and if it succeeds the deserialization is retried transparently.]]]
+캐시 데이터가 알수 없는 상수를 참조하고 있는 경우, 자동 읽기 기능이 호출됩니다. 읽기가 성공한 경우에는 역직렬화를 명백하게 재실행합니다.
 
-WARNING. 인수가 `IO`일 경우, 재시도시에 `rewind` 메소드에 반응할 필요가 있습니다. [[[If the argument is an `IO` it needs to respond to `rewind` to be able to retry. Regular files respond to `rewind`.]]]
+WARNING: 인수가 `IO`인 경우 재실행을 위해서 `rewind`에 응답해야할 필요가 있습니다. 일반적인 파일은 `rewind`을 호출할 수 있습니다.
 
-NOTE: 이 메소드는 `active_support/core_ext/marshal.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/marshal.rb`.]]]
+NOTE: `active_support/core_ext/marshal.rb`에 정의되어 있습니다.
 
-[Extensions to `Logger`] `Logger` 클래스 확장메소드
-----------------------
-
-### `around_[level]`
-
-두개의 인수(`before_message`와 `after_message`)를 받아서 `Logger` 인스턴스에 대해서 현재의 level 메소드(`debug`, `info`, `warn`, `error`, `fatal`)를 호출하여 `before_message`, 특정 메시지, 그리고 최종적으로 `after_message`를 순차적으로 넘겨주게 됩니다. [[[Takes two arguments, a `before_message` and `after_message` and calls the current level method on the `Logger` instance, passing in the `before_message`, then the specified message, then the `after_message`:]]]
-
-```ruby
-logger = Logger.new("log/development.log")
-logger.around_info("before", "after") { |logger| logger.info("during") }
-```
-
-### `silence`
-
-코드블록을 실행하는 동안 특정 레벨로 모든 로그 레벨을 낮추어 줍니다. 로그 레벨 순서는 debug, info, error, fatal 순입니다. [[[Silences every log level lesser to the specified one for the duration of the given block. Log level orders are: debug, info, error and fatal.]]]
-
-```ruby
-logger = Logger.new("log/development.log")
-logger.silence(Logger::INFO) do
-  logger.debug("In space, no one can hear you scream.")
-  logger.info("Scream all you want, small mailman!")
-end
-```
-
-### `datetime_format=`
-
-이 로거와 연관된 formatter 클래스를 이용하여 datetime 포맷을 변경합니다. 해당 formatter 클래스가 `datetime_format` 메소드를 가지고 있지 않으면, 이것은 무시됩니다. [[[Modifies the datetime format output by the formatter class associated with this logger. If the formatter class does not have a `datetime_format` method then this is ignored.]]]
-
-```ruby
-class Logger::FormatWithTime < Logger::Formatter
-  cattr_accessor(:datetime_format) { "%Y%m%d%H%m%S" }
-
-  def self.call(severity, timestamp, progname, msg)
-    "#{timestamp.strftime(datetime_format)} -- #{String === msg ? msg : msg.inspect}\n"
-  end
-end
-
-logger = Logger.new("log/development.log")
-logger.formatter = Logger::FormatWithTime
-logger.info("<- is the current time")
-```
-
-NOTE: 이 메소드는 `active_support/core_ext/logger.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/logger.rb`.]]]
-
-[Extensions to `NameError`] `NameError` 클래스 확장메소드
+`NameError` 확장
 -------------------------
 
-액티브서포트는 `NameError` 클래스에 `missing_name?` 메소드를 추가해 줍니다. 이 메소드는 인수로 넘겨준 해당 이름으로 인하여 예외가 발생했는지를 점검해 줍니다. [[[Active Support adds `missing_name?` to `NameError`, which tests whether the exception was raised because of the name passed as argument.]]]
+Active Support는 `NameError`에 `missing_name?` 메소드를 추가합니다. 이 메소드는 인수로 넘긴 이름 때문에 예외가 발생하는지를 테스트합니다.
 
-이 이름은 심볼이나 문자열로 지정할 수 있습니다. 심볼명은 상수명에 대해서, 문자열은 절대 경로를 포함한 상수명에 대해서 점검하게 됩니다. [[[The name may be given as a symbol or string. A symbol is tested against the bare constant name, a string is against the fully-qualified constant name.]]]
+넘긴 이름은 심볼 또는 문자열일 것입니다. 심볼을 넘긴 경우에는 단순히 상수명을 테스트하고, 문자열을 넘긴 경우에는 경로를 포함한 이름을 테스트합니다.
 
-TIP: 심볼은 `:"ActiveRecord::Base`와 같이 절대경로를 포함한 상수명으로 표시할 수 있습니다. 따라서 심볼에 대한 기능은 기술적인 문제가 아니라 편리함 때문에 정의하여 사용합니다. [[[A symbol can represent a fully-qualified constant name as in `:"ActiveRecord::Base"`, so the behavior for symbols is defined for convenience, not because it has to be that way technically.]]]
+TIP: 심볼은 `:"ActiveRecord::Base"`에서처럼 절대경로를 포하만 상수명으로 나타낼 수 있습니다. 심볼이 그렇게 동작하는 이유는 기술적인 이유가 아니라, 편의를 위해서 입니다.
 
-예를 들면, `PostsController`의 임의의 액션이 호출될 때, 레일스는 `PostsHelper`를 사용하고자 할 것입니다. 이 helper 모듈이 존재하지 않아도 문제가 없기 때문에, 해당 상수명에 대한 예외가 발생하더라도 무시되어야 합니다. 그러나, 실제로 존재하지 않는 상수로 인하여 `posts_helper.rb`가 `NameError` 예외를 발생시키게 되는 경우가 있을 수 있습니다. 그러한 경우는 다시금 예외를 발생시켜주어야 하는데 바로 `missing_name?` 메소드가 이러한 두 경우를 구분하는 방법을 제공해 주게 되는 것입니다. [[[For example, when an action of `PostsController` is called Rails tries optimistically to use `PostsHelper`. It is OK that the helper module does not exist, so if an exception for that constant name is raised it should be silenced. But it could be the case that `posts_helper.rb` raises a `NameError` due to an actual unknown constant. That should be reraised. The method `missing_name?` provides a way to distinguish both cases:]]]
+예를 들어, `ArticlesController`의 액션이 호출되면 Rails는 그 이름으로부터 바로 추측할 수 있는 `ArticleHelper`를 사용하려고 합니다. 여기에서는 그 헬퍼 모듈이 존재하지 않아도 문제가 없기 때문에 그 상수명으로 예외가 발생하더라도 무시되어야 합니다. 하지만 실제로는 존재하지 않는 상수명 때문에 `articles_helper.rb`이 `NameError`를 발생시킬 수 있습니다. 그러한 경우에는 다시 예외를 던지지 않으면 안됩니다. `missing_name?` 메소드는 이러한 경우를 구분하기 위해서 사용됩니다.
 
 ```ruby
 def default_helper_module!
   module_name = name.sub(/Controller$/, '')
   module_path = module_name.underscore
   helper module_path
-rescue MissingSourceFile => e
-  raise e unless e.is_missing? "#{module_path}_helper"
-rescue NameError => e
-  raise e unless e.missing_name? "#{module_name}Helper"
-end
-```
-
-NOTE: 이 메소드는 `active_support/core_ext/name_error.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/name_error.rb`.]]]
-
-[Extensions to `LoadError`] `LoadError` 클래스 확장메소드
--------------------------
-
-액티브서포트는 `LoadError` 클래스에 `is_missing?` 메소드를 추가해 줍니다. 그리고 이전 버전과의 호환성을 위해서 이 클래스에 `MissingSourceFile` 상수를 할당해 줍니다. [[[Active Support adds `is_missing?` to `LoadError`, and also assigns that class to the constant `MissingSourceFile` for backwards compatibility.]]]
-
-경로명이 주어질 때 `is_missing`? 메소드는 ".rb" 확장자를 제외한 특정 파일에 기인한 예외가 발생했는지를 알려 줍니다. [[[Given a path name `is_missing?` tests whether the exception was raised due to that particular file (except perhaps for the ".rb" extension).]]]
-
-예를 들면, `PostsController`의 특정 액션이 호출될 때 레일스는 `posts_helper.rb` 파일을 로드하기 위한 시도를 합니다. 그러나, 이 파일이 존재하지 않을 수 있습니다. 그래도 별 문제는 발생하지 않는데, 헬퍼 모듈이 반드시 있어야 하는 것이 아니기 때문에 레일스는 파일 로드시 발생하는 에러를 묵인하고 넘어갑니다. 그러나, 헬퍼 모듈이 존재하는 경우 존재하지 않는 또 다른 라이브러리를 요구할 수 있습니다. 이런 경우에 레일스는 예외를 재발생시켜야만 합니다. `is_missing?` 메소드는 이 둘 경우를 구분할 수 있는 방법을 제공해 줍니다. [[[For example, when an action of `PostsController` is called Rails tries to load `posts_helper.rb`, but that file may not exist. That's fine, the helper module is not mandatory so Rails silences a load error. But it could be the case that the helper module does exist and in turn requires another library that is missing. In that case Rails must reraise the exception. The method `is_missing?` provides a way to distinguish both cases:]]]
-
-```ruby
-def default_helper_module!
-  module_name = name.sub(/Controller$/, '')
-  module_path = module_name.underscore
-  helper module_path
-rescue MissingSourceFile => e
+rescue LoadError => e
   raise e unless e.is_missing? "helpers/#{module_path}_helper"
 rescue NameError => e
   raise e unless e.missing_name? "#{module_name}Helper"
 end
 ```
 
-NOTE: 이 메소드는 `active_support/core_ext/load_error.rb` 파일내에 정의되어 있습니다. [[[Defined in `active_support/core_ext/load_error.rb`.]]]
+NOTE: `active_support/core_ext/name_error.rb`에 정의되어 있습니다.
+
+`LoadError` 확장
+-------------------------
+
+Active Support는 `is_missing?`을 `LoadError`에 추가합니다.
+
+`is_missing?`은 경로명을 인수로 받아서, 특정 파일이 없어서 에러가 발생하는지를 테스트합니다(".rb" 확장자가 원인으로 보여지는 경우를 제외합니다).
+
+예를 들어 `ArticlesController`의 액션이 호출되면 Rails는 `articles_helper.rb`를 읽으려고 시도합니다만, 이 파일이 존재하지 않는 경우가 있습니다. 헬퍼 모듈은 필수가 아니므로 Rails는 읽기 에러를 예외로 처리하지 않고 무시합니다. 그러나 헬퍼 모듈이 존재하지 않기 때문에 다른 라이브러리가 필요한 경우가 있는데, 그 라이브러리를 찾을 수 없는 경우도 존재합니다. Rails는 그런 경우에는 예외를 던지지 않을 수 없습니다. `is_missing?`은 이 두가지 경우를 구분하기 위해서 사용됩니다.
+
+```ruby
+def default_helper_module!
+  module_name = name.sub(/Controller$/, '')
+  module_path = module_name.underscore
+  helper module_path
+rescue LoadError => e
+  raise e unless e.is_missing? "helpers/#{module_path}_helper"
+rescue NameError => e
+  raise e unless e.missing_name? "#{module_name}Helper"
+end
+```
+
+NOTE: `active_support/core_ext/load_error.rb`에 정의되어 있습니다.
+
+TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.
