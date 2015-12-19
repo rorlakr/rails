@@ -130,4 +130,4 @@
 
 ## License
 
-Ruby on Rails is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+레일스 가이드는 [Creative Commons Attribution-ShareAlike 4.0 International](update license as same as origin repository) License로 배포되고 있습니다.
