@@ -18,6 +18,7 @@ require 'models/minivan'
 require 'models/aircraft'
 require "models/possession"
 require "models/reader"
+require "models/categorization"
 
 class RelationTest < ActiveRecord::TestCase
   fixtures :authors, :topics, :entrants, :developers, :companies, :developers_projects, :accounts, :categories, :categorizations, :posts, :comments,
@@ -295,6 +296,11 @@ class RelationTest < ActiveRecord::TestCase
   def test_finding_with_complex_order
     tags = Tag.includes(:taggings).references(:taggings).order("REPLACE('abc', taggings.taggable_type, taggings.taggable_type)").to_a
     assert_equal 3, tags.length
+  end
+
+  def test_finding_with_sanitized_order
+    query = Tag.order(["field(id, ?)", [1,3,2]]).to_sql
+    assert_match(/field\(id, 1,3,2\)/, query)
   end
 
   def test_finding_with_order_limit_and_offset
@@ -911,6 +917,12 @@ class RelationTest < ActiveRecord::TestCase
     post = authors(:david).posts.first
     authors = Author.includes(:posts).where(name: "David", posts: { id: post.id })
     assert authors.exists?(authors(:david).id)
+  end
+
+  def test_any_with_scope_on_hash_includes
+    post = authors(:david).posts.first
+    categories = Categorization.includes(author: :posts).where(posts: { id: post.id })
+    assert categories.exists?
   end
 
   def test_last

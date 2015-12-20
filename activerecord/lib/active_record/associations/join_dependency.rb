@@ -32,7 +32,7 @@ module ActiveRecord
           @alias_cache[node][column]
         end
 
-        class Table < Struct.new(:node, :columns)
+        class Table < Struct.new(:node, :columns) # :nodoc:
           def table
             Arel::Nodes::TableAlias.new node.table, node.aliased_table_name
           end
@@ -103,9 +103,14 @@ module ActiveRecord
         join_root.drop(1).map!(&:reflection)
       end
 
-      def join_constraints(outer_joins)
+      def join_constraints(outer_joins, join_type)
         joins = join_root.children.flat_map { |child|
-          make_inner_joins join_root, child
+
+          if join_type == Arel::Nodes::OuterJoin
+            make_left_outer_joins join_root, child
+          else
+            make_inner_joins join_root, child
+          end
         }
 
         joins.concat outer_joins.flat_map { |oj|
@@ -150,7 +155,8 @@ module ActiveRecord
 
         message_bus.instrument('instantiation.active_record', payload) do
           result_set.each { |row_hash|
-            parent = parents[row_hash[primary_key]] ||= join_root.instantiate(row_hash, column_aliases)
+            parent_key = primary_key ? row_hash[primary_key] : row_hash
+            parent = parents[parent_key] ||= join_root.instantiate(row_hash, column_aliases)
             construct(parent, join_root, row_hash, result_set, seen, model_cache, aliases)
           }
         end
@@ -173,6 +179,14 @@ module ActiveRecord
         info      = make_constraints parent, child, tables, join_type
 
         [info] + child.children.flat_map { |c| make_outer_joins(child, c) }
+      end
+
+      def make_left_outer_joins(parent, child)
+        tables    = child.tables
+        join_type = Arel::Nodes::OuterJoin
+        info      = make_constraints parent, child, tables, join_type
+
+        [info] + child.children.flat_map { |c| make_left_outer_joins(child, c) }
       end
 
       def make_inner_joins(parent, child)

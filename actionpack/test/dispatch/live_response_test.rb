@@ -1,12 +1,12 @@
 require 'abstract_unit'
-require 'concurrent/atomics'
+require 'concurrent/atomic/count_down_latch'
 
 module ActionController
   module Live
     class ResponseTest < ActiveSupport::TestCase
       def setup
         @response = Live::Response.new
-        @response.request = ActionDispatch::Request.new({}) #yolo
+        @response.request = ActionDispatch::Request.empty
       end
 
       def test_header_merge

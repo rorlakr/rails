@@ -55,7 +55,7 @@ module ActionView
       #   # => <script src="http://www.example.com/xmlhr.js"></script>
       def javascript_include_tag(*sources)
         options = sources.extract_options!.stringify_keys
-        path_options = options.extract!('protocol', 'extname').symbolize_keys
+        path_options = options.extract!('protocol', 'extname', 'host').symbolize_keys
         sources.uniq.map { |source|
           tag_options = {
             "src" => path_to_javascript(source, path_options)
@@ -91,7 +91,7 @@ module ActionView
       #   #    <link href="/css/stylish.css" media="screen" rel="stylesheet" />
       def stylesheet_link_tag(*sources)
         options = sources.extract_options!.stringify_keys
-        path_options = options.extract!('protocol').symbolize_keys
+        path_options = options.extract!('protocol', 'host').symbolize_keys
 
         sources.uniq.map { |source|
           tag_options = {
@@ -205,6 +205,8 @@ module ActionView
       #   # => <img alt="Icon" height="32" src="/icons/icon.gif" width="32" />
       #   image_tag("/icons/icon.gif", class: "menu_icon")
       #   # => <img alt="Icon" class="menu_icon" src="/icons/icon.gif" />
+      #   image_tag("/icons/icon.gif", data: { title: 'Rails Application' })
+      #   # => <img data-title="Rails Application" src="/icons/icon.gif" />
       def image_tag(source, options={})
         options = options.symbolize_keys
         check_for_image_tag_errors(options)

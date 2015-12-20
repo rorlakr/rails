@@ -232,6 +232,7 @@ Active Record
 | `:sql`           | SQL statement         |
 | `:name`          | Name of the operation |
 | `:connection_id` | `self.object_id`      |
+| `:binds`         | Bind parameters       |
 
 INFO. The adapters will add their own data as well.
 
@@ -457,7 +458,7 @@ The block receives the following arguments:
 * The name of the event
 * Time when it started
 * Time when it finished
-* An unique ID for this event
+* A unique ID for this event
 * The payload (described in previous sections)
 
 ```ruby

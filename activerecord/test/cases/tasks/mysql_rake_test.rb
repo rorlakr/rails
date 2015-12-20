@@ -1,12 +1,12 @@
 require 'cases/helper'
 
-if current_adapter?(:MysqlAdapter, :Mysql2Adapter)
+if current_adapter?(:Mysql2Adapter)
 module ActiveRecord
   class MysqlDBCreateTest < ActiveRecord::TestCase
     def setup
       @connection    = stub(:create_database => true)
       @configuration = {
-        'adapter'  => 'mysql',
+        'adapter'  => 'mysql2',
         'database' => 'my-app-db'
       }
 
@@ -16,33 +16,26 @@ module ActiveRecord
 
     def test_establishes_connection_without_database
       ActiveRecord::Base.expects(:establish_connection).
-        with('adapter' => 'mysql', 'database' => nil)
+        with('adapter' => 'mysql2', 'database' => nil)
 
       ActiveRecord::Tasks::DatabaseTasks.create @configuration
     end
 
-    def test_creates_database_with_default_encoding_and_collation
+    def test_creates_database_with_no_default_options
       @connection.expects(:create_database).
-        with('my-app-db', charset: 'utf8', collation: 'utf8_unicode_ci')
+        with('my-app-db', {})
 
       ActiveRecord::Tasks::DatabaseTasks.create @configuration
     end
 
-    def test_creates_database_with_given_encoding_and_default_collation
-      @connection.expects(:create_database).
-        with('my-app-db', charset: 'utf8', collation: 'utf8_unicode_ci')
-
-      ActiveRecord::Tasks::DatabaseTasks.create @configuration.merge('encoding' => 'utf8')
-    end
-
-    def test_creates_database_with_given_encoding_and_no_collation
+    def test_creates_database_with_given_encoding
       @connection.expects(:create_database).
         with('my-app-db', charset: 'latin1')
 
       ActiveRecord::Tasks::DatabaseTasks.create @configuration.merge('encoding' => 'latin1')
     end
 
-    def test_creates_database_with_given_collation_and_no_encoding
+    def test_creates_database_with_given_collation
       @connection.expects(:create_database).
         with('my-app-db', collation: 'latin1_swedish_ci')
 
@@ -72,7 +65,7 @@ module ActiveRecord
         @connection    = stub("Connection", create_database: true)
         @error         = Mysql::Error.new "Invalid permissions"
         @configuration = {
-          'adapter'  => 'mysql',
+          'adapter'  => 'mysql2',
           'database' => 'my-app-db',
           'username' => 'pat',
           'password' => 'wossname'
@@ -99,7 +92,7 @@ module ActiveRecord
       def test_connection_established_as_root
         assert_permissions_granted_for "pat"
         ActiveRecord::Base.expects(:establish_connection).with(
-          'adapter'  => 'mysql',
+          'adapter'  => 'mysql2',
           'database' => nil,
           'username' => 'root',
           'password' => 'secret'
@@ -111,7 +104,7 @@ module ActiveRecord
       def test_database_created_by_root
         assert_permissions_granted_for "pat"
         @connection.expects(:create_database).
-          with('my-app-db', :charset => 'utf8', :collation => 'utf8_unicode_ci')
+          with('my-app-db', {})
 
         ActiveRecord::Tasks::DatabaseTasks.create @configuration
       end
@@ -131,7 +124,7 @@ module ActiveRecord
         assert_permissions_granted_for "pat"
         ActiveRecord::Base.expects(:establish_connection).returns do
           ActiveRecord::Base.expects(:establish_connection).with(
-            'adapter'  => 'mysql',
+            'adapter'  => 'mysql2',
             'database' => 'my-app-db',
             'username' => 'pat',
             'password' => 'secret'
@@ -164,7 +157,7 @@ module ActiveRecord
     def setup
       @connection    = stub(:drop_database => true)
       @configuration = {
-        'adapter'  => 'mysql',
+        'adapter'  => 'mysql2',
         'database' => 'my-app-db'
       }
 
@@ -189,7 +182,7 @@ module ActiveRecord
     def setup
       @connection    = stub(:recreate_database => true)
       @configuration = {
-        'adapter'  => 'mysql',
+        'adapter'  => 'mysql2',
         'database' => 'test-db'
       }
 
@@ -203,9 +196,9 @@ module ActiveRecord
       ActiveRecord::Tasks::DatabaseTasks.purge @configuration
     end
 
-    def test_recreates_database_with_the_default_options
+    def test_recreates_database_with_no_default_options
       @connection.expects(:recreate_database).
-        with('test-db', charset: 'utf8', collation: 'utf8_unicode_ci')
+        with('test-db', {})
 
       ActiveRecord::Tasks::DatabaseTasks.purge @configuration
     end
@@ -223,7 +216,7 @@ module ActiveRecord
     def setup
       @connection    = stub(:create_database => true)
       @configuration = {
-        'adapter'  => 'mysql',
+        'adapter'  => 'mysql2',
         'database' => 'my-app-db'
       }
 
@@ -241,7 +234,7 @@ module ActiveRecord
     def setup
       @connection    = stub(:create_database => true)
       @configuration = {
-        'adapter'  => 'mysql',
+        'adapter'  => 'mysql2',
         'database' => 'my-app-db'
       }
 
@@ -258,7 +251,7 @@ module ActiveRecord
   class MySQLStructureDumpTest < ActiveRecord::TestCase
     def setup
       @configuration = {
-        'adapter'  => 'mysql',
+        'adapter'  => 'mysql2',
         'database' => 'test-db'
       }
     end
@@ -304,7 +297,7 @@ module ActiveRecord
   class MySQLStructureLoadTest < ActiveRecord::TestCase
     def setup
       @configuration = {
-        'adapter'  => 'mysql',
+        'adapter'  => 'mysql2',
         'database' => 'test-db'
       }
     end

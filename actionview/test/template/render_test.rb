@@ -9,6 +9,10 @@ module RenderTestCases
     @assigns = { :secret => 'in the sauce' }
     @view = Class.new(ActionView::Base) do
       def view_cache_dependencies; end
+
+      def fragment_cache_key(key)
+        ActiveSupport::Cache.expand_cache_key(key, :views)
+      end
     end.new(paths, @assigns)
 
     @controller_view = TestController.new.view_context
@@ -247,6 +251,8 @@ module RenderTestCases
 
   def test_render_object
     assert_equal "Hello: david", @view.render(:partial => "test/customer", :object => Customer.new("david"))
+    assert_equal "FalseClass", @view.render(:partial => "test/klass", :object => false)
+    assert_equal "NilClass", @view.render(:partial => "test/klass", :object => nil)
   end
 
   def test_render_object_with_array
@@ -352,8 +358,8 @@ module RenderTestCases
     exception = assert_raises ActionView::Template::Error do
       @controller_view.render("partial_name_local_variable")
     end
-    assert_instance_of NameError, exception.original_exception
-    assert_equal :partial_name_local_variable, exception.original_exception.name
+    assert_instance_of NameError, exception.cause
+    assert_equal :partial_name_local_variable, exception.cause.name
   end
 
   # TODO: The reason for this test is unclear, improve documentation
@@ -590,14 +596,14 @@ class LazyViewRenderTest < ActiveSupport::TestCase
   def test_render_utf8_template_with_incompatible_external_encoding
     with_external_encoding Encoding::SHIFT_JIS do
       e = assert_raises(ActionView::Template::Error) { @view.render(:file => "test/utf8", :formats => [:html], :layouts => "layouts/yield") }
-      assert_match 'Your template was not saved as valid Shift_JIS', e.original_exception.message
+      assert_match 'Your template was not saved as valid Shift_JIS', e.cause.message
     end
   end
 
   def test_render_utf8_template_with_partial_with_incompatible_encoding
     with_external_encoding Encoding::SHIFT_JIS do
       e = assert_raises(ActionView::Template::Error) { @view.render(:file => "test/utf8_magic_with_bare_partial", :formats => [:html], :layouts => "layouts/yield") }
-      assert_match 'Your template was not saved as valid Shift_JIS', e.original_exception.message
+      assert_match 'Your template was not saved as valid Shift_JIS', e.cause.message
     end
   end
 

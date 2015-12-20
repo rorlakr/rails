@@ -275,7 +275,7 @@ module ActiveRecord
       # when just after creating a table you want to populate it with some default
       # values, eg:
       #
-      #  class CreateJobLevels < ActiveRecord::Migration
+      #  class CreateJobLevels < ActiveRecord::Migration[5.0]
       #    def up
       #      create_table :job_levels do |t|
       #        t.integer :id
@@ -339,6 +339,9 @@ module ActiveRecord
         @columns = nil
         @columns_hash = nil
         @attribute_names = nil
+        direct_descendants.each do |descendant|
+          descendant.send(:reload_schema_from_cache)
+        end
       end
 
       # Guesses the table name, but does not decorate it with prefix and suffix information.
@@ -382,7 +385,7 @@ module ActiveRecord
 
             If you'd like the new behavior today, you can add this line:
 
-              attribute :#{column.name}, :rails_5_1_point#{array_arguments}
+              attribute :#{column.name}, :point#{array_arguments}
           WARNING
         end
       end

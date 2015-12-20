@@ -95,14 +95,15 @@ module ActiveRecord
 
       attr_reader :prepared_statements
 
-      def initialize(connection, logger = nil, pool = nil) #:nodoc:
+      def initialize(connection, logger = nil, config = {}) # :nodoc:
         super()
 
         @connection          = connection
         @owner               = nil
         @instrumenter        = ActiveSupport::Notifications.instrumenter
         @logger              = logger
-        @pool                = pool
+        @config              = config
+        @pool                = nil
         @schema_cache        = SchemaCache.new self
         @visitor             = nil
         @prepared_statements = false
@@ -214,6 +215,11 @@ module ActiveRecord
         false
       end
 
+      # Does this adapter support application-enforced advisory locking?
+      def supports_advisory_locks?
+        false
+      end
+
       # Should primary key values be selected from their corresponding
       # sequence before the insert statement? If true, next_sequence_value
       # is called before each insert to set the record's primary key.
@@ -278,6 +284,20 @@ module ActiveRecord
 
       # This is meant to be implemented by the adapters that support extensions
       def enable_extension(name)
+      end
+
+      # This is meant to be implemented by the adapters that support advisory
+      # locks
+      #
+      # Return true if we got the lock, otherwise false
+      def get_advisory_lock(lock_id) # :nodoc:
+      end
+
+      # This is meant to be implemented by the adapters that support advisory
+      # locks.
+      #
+      # Return true if we released the lock, otherwise false
+      def release_advisory_lock(lock_id) # :nodoc:
       end
 
       # A list of extensions, to be filled in by adapters that support them.
@@ -519,7 +539,7 @@ module ActiveRecord
 
       def translate_exception(exception, message)
         # override in derived class
-        ActiveRecord::StatementInvalid.new(message, exception)
+        ActiveRecord::StatementInvalid.new(message)
       end
 
       def without_prepared_statement?(binds)

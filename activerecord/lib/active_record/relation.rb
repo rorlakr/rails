@@ -4,7 +4,7 @@ module ActiveRecord
   # = Active Record \Relation
   class Relation
     MULTI_VALUE_METHODS  = [:includes, :eager_load, :preload, :select, :group,
-                            :order, :joins, :references,
+                            :order, :joins, :left_joins, :left_outer_joins, :references,
                             :extending, :unscope]
 
     SINGLE_VALUE_METHODS = [:limit, :offset, :lock, :readonly, :reordering,
@@ -347,9 +347,8 @@ module ActiveRecord
 
     # Updates all records in the current relation with details given. This method constructs a single SQL UPDATE
     # statement and sends it straight to the database. It does not instantiate the involved models and it does not
-    # trigger Active Record callbacks or validations. Values passed to #update_all will not go through
-    # Active Record's type-casting behavior. It should receive only values that can be passed as-is to the SQL
-    # database.
+    # trigger Active Record callbacks or validations. However, values passed to #update_all will still go through
+    # Active Record's normal type casting and serialization.
     #
     # ==== Parameters
     #

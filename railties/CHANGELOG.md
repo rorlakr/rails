@@ -1,3 +1,110 @@
+## Rails 5.0.0.beta1 (December 18, 2015) ##
+
+*   No changes.
+
+
+*   Newly generated plugins get a `README.md` in Markdown.
+
+    *Yuji Yaginuma*
+
+*   The generated config file for the development environment includes a new
+    config line, commented out, showing how to enable the evented file watcher.
+
+    *Xavier Noria*
+
+*   `config.debug_exception_response_format` configures the format used
+    in responses when errors occur in development mode.
+
+    Set `config.debug_exception_response_format` to render an HTML page with
+    debug info (using the value `:default`) or render debug info preserving
+    the response format (using the value `:api`).
+
+    *Jorge Bejar*
+
+*   Fix setting exit status code for rake test tasks. The exit status code
+    was not set when tests were fired with `rake`. Now, it is being set and it matches
+    behavior of running tests via `rails` command (`rails test`), so no matter if
+    `rake test` or `rails test` command is used the exit code will be set.
+
+    *Arkadiusz Fal*
+
+*   Add Command infrastructure to replace rake.
+
+    Also move `rake dev:cache` to new infrastructure. You'll need to use
+    `rails dev:cache` to toggle development caching from now on.
+
+    *Chuck Callebs*
+
+*   Allow use of minitest-rails gem with Rails test runner.
+
+    Fixes #22455.
+
+    *Chris Kottom*
+
+*   Add `bin/test` script to rails plugin.
+
+    `bin/test` can use the same API as `bin/rails test`.
+
+    *Yuji Yaginuma*
+
+*   Make `static_index` part of the `config.public_file_server` config and
+    call it `public_file_server.index_name`.
+
+    *Yuki Nishijima*
+
+*   Deprecate `serve_static_files` in favor of `public_file_server.enabled`.
+
+    Unifies the static asset options under `public_file_server`.
+
+    To upgrade, replace occurrences of:
+
+    ```
+    config.serve_static_files = # false or true
+    ```
+
+    in your environment files, with:
+
+    ```
+    config.public_file_server.enabled = # false or true
+    ```
+
+    *Kasper Timm Hansen*
+
+*   Deprecate `config.static_cache_control` in favor of
+    `config.public_file_server.headers`.
+
+    To upgrade, replace occurrences of:
+
+    ```
+    config.static_cache_control = 'public, max-age=60'
+    ```
+
+    in your environment files, with:
+
+    ```
+    config.public_file_server.headers = {
+      'Cache-Control' => 'public, max-age=60'
+    }
+    ```
+
+    `config.public_file_server.headers` can set arbitrary headers, sent along when
+    a response is delivered.
+
+    *Yuki Nishijima*
+
+*   Route generator should be idempotent
+    running generators several times no longer require you to cleanup routes.rb
+
+    *Thiago Pinto*
+
+*   Allow passing an environment to `config_for`.
+
+    *Simon Eskildsen*
+
+*   Allow rake:stats to account for rake tasks in lib/tasks
+
+    *Kevin Deisz*
+
 *   Added javascript to update the URL on mailer previews with the currently
     selected email format. Reloading the page now keeps you on your selected
     format rather than going back to the default html version.

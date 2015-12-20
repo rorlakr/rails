@@ -134,9 +134,7 @@ module ActiveRecord
         time:        { name: "time" },
         date:        { name: "date" },
         binary:      { name: "blob" },
-        blob:        { name: "blob" },
         boolean:     { name: "tinyint", limit: 1 },
-        bigint:      { name: "bigint" },
         json:        { name: "json" },
       }
 
@@ -145,8 +143,7 @@ module ActiveRecord
 
       # FIXME: Make the first parameter more similar for the two adapters
       def initialize(connection, logger, connection_options, config)
-        super(connection, logger)
-        @connection_options, @config = connection_options, config
+        super(connection, logger, config)
         @quoted_column_names, @quoted_table_names = {}, {}
 
         @visitor = Arel::Visitors::MySQL.new self
@@ -218,6 +215,20 @@ module ActiveRecord
 
       def supports_datetime_with_precision?
         version >= '5.6.4'
+      end
+
+      # 5.0.0 definitely supports it, possibly supported by earlier versions but
+      # not sure
+      def supports_advisory_locks?
+        version >= '5.0.0'
+      end
+
+      def get_advisory_lock(lock_name, timeout = 0) # :nodoc:
+        select_value("SELECT GET_LOCK('#{lock_name}', #{timeout});").to_s == '1'
+      end
+
+      def release_advisory_lock(lock_name) # :nodoc:
+        select_value("SELECT RELEASE_LOCK('#{lock_name}')").to_s == '1'
       end
 
       def native_database_types
@@ -483,18 +494,43 @@ module ActiveRecord
       end
 
       def tables(name = nil) # :nodoc:
+        ActiveSupport::Deprecation.warn(<<-MSG.squish)
+          #tables currently returns both tables and views.
+          This behavior is deprecated and will be changed with Rails 5.1 to only return tables.
+          Use #data_sources instead.
+        MSG
+
+        if name
+          ActiveSupport::Deprecation.warn(<<-MSG.squish)
+            Passing arguments to #tables is deprecated without replacement.
+          MSG
+        end
+
+        data_sources
+      end
+
+      def data_sources
         sql = "SELECT table_name FROM information_schema.tables "
         sql << "WHERE table_schema = #{quote(@config[:database])}"
 
         select_values(sql, 'SCHEMA')
       end
-      alias data_sources tables
 
       def truncate(table_name, name = nil)
         execute "TRUNCATE TABLE #{quote_table_name(table_name)}", name
       end
 
       def table_exists?(table_name)
+        ActiveSupport::Deprecation.warn(<<-MSG.squish)
+          #table_exists? currently checks both tables and views.
+          This behavior is deprecated and will be changed with Rails 5.1 to only check tables.
+          Use #data_source_exists? instead.
+        MSG
+
+        data_source_exists?(table_name)
+      end
+
+      def data_source_exists?(table_name)
         return false unless table_name.present?
 
         schema, name = table_name.to_s.split('.', 2)
@@ -505,7 +541,6 @@ module ActiveRecord
 
         select_values(sql, 'SCHEMA').any?
       end
-      alias data_source_exists? table_exists?
 
       def views # :nodoc:
         select_values("SHOW FULL TABLES WHERE table_type = 'VIEW'", 'SCHEMA')
@@ -552,10 +587,8 @@ module ActiveRecord
         sql = "SHOW FULL FIELDS FROM #{quote_table_name(table_name)}"
         execute_and_free(sql, 'SCHEMA') do |result|
           each_hash(result).map do |field|
-            field_name = set_field_encoding(field[:Field])
-            sql_type = field[:Type]
-            type_metadata = fetch_type_metadata(sql_type, field[:Extra])
-            new_column(field_name, field[:Default], type_metadata, field[:Null] == "YES", nil, field[:Collation])
+            type_metadata = fetch_type_metadata(field[:Type], field[:Extra])
+            new_column(field[:Field], field[:Default], type_metadata, field[:Null] == "YES", nil, field[:Collation])
           end
         end
       end
@@ -853,9 +886,9 @@ module ActiveRecord
       def translate_exception(exception, message)
         case error_number(exception)
         when 1062
-          RecordNotUnique.new(message, exception)
+          RecordNotUnique.new(message)
         when 1452
-          InvalidForeignKey.new(message, exception)
+          InvalidForeignKey.new(message)
         else
           super
         end
@@ -1005,7 +1038,7 @@ module ActiveRecord
       end
 
       def create_table_definition(name, temporary = false, options = nil, as = nil) # :nodoc:
-        MySQL::TableDefinition.new(native_database_types, name, temporary, options, as)
+        MySQL::TableDefinition.new(name, temporary, options, as)
       end
 
       def integer_to_sql(limit) # :nodoc:
@@ -1068,11 +1101,8 @@ module ActiveRecord
         end
       end
 
-      ActiveRecord::Type.register(:json, MysqlJson, adapter: :mysql)
       ActiveRecord::Type.register(:json, MysqlJson, adapter: :mysql2)
-      ActiveRecord::Type.register(:string, MysqlString, adapter: :mysql)
       ActiveRecord::Type.register(:string, MysqlString, adapter: :mysql2)
-      ActiveRecord::Type.register(:unsigned_integer, Type::UnsignedInteger, adapter: :mysql)
       ActiveRecord::Type.register(:unsigned_integer, Type::UnsignedInteger, adapter: :mysql2)
     end
   end
