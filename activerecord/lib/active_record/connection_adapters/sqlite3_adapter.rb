@@ -33,7 +33,7 @@ module ActiveRecord
       ConnectionAdapters::SQLite3Adapter.new(db, logger, nil, config)
     rescue Errno::ENOENT => error
       if error.message.include?("No such file or directory")
-        raise ActiveRecord::NoDatabaseError.new(error.message, error)
+        raise ActiveRecord::NoDatabaseError
       else
         raise
       end
@@ -78,11 +78,10 @@ module ActiveRecord
       end
 
       def initialize(connection, logger, connection_options, config)
-        super(connection, logger)
+        super(connection, logger, config)
 
         @active     = nil
         @statements = StatementPool.new(self.class.type_cast_config_to_integer(config.fetch(:statement_limit) { 1000 }))
-        @config = config
 
         @visitor = Arel::Visitors::SQLite.new self
         @quoted_column_names = {}
@@ -127,6 +126,10 @@ module ActiveRecord
       end
 
       def supports_views?
+        true
+      end
+
+      def supports_datetime_with_precision?
         true
       end
 
@@ -312,11 +315,36 @@ module ActiveRecord
       # SCHEMA STATEMENTS ========================================
 
       def tables(name = nil) # :nodoc:
+        ActiveSupport::Deprecation.warn(<<-MSG.squish)
+          #tables currently returns both tables and views.
+          This behavior is deprecated and will be changed with Rails 5.1 to only return tables.
+          Use #data_sources instead.
+        MSG
+
+        if name
+          ActiveSupport::Deprecation.warn(<<-MSG.squish)
+            Passing arguments to #tables is deprecated without replacement.
+          MSG
+        end
+
+        data_sources
+      end
+
+      def data_sources
         select_values("SELECT name FROM sqlite_master WHERE type IN ('table','view') AND name <> 'sqlite_sequence'", 'SCHEMA')
       end
-      alias data_sources tables
 
       def table_exists?(table_name)
+        ActiveSupport::Deprecation.warn(<<-MSG.squish)
+          #table_exists? currently checks both tables and views.
+          This behavior is deprecated and will be changed with Rails 5.1 to only check tables.
+          Use #data_source_exists? instead.
+        MSG
+
+        data_source_exists?(table_name)
+      end
+
+      def data_source_exists?(table_name)
         return false unless table_name.present?
 
         sql = "SELECT name FROM sqlite_master WHERE type IN ('table','view') AND name <> 'sqlite_sequence'"
@@ -324,7 +352,6 @@ module ActiveRecord
 
         select_values(sql, 'SCHEMA').any?
       end
-      alias data_source_exists? table_exists?
 
       def views # :nodoc:
         select_values("SELECT name FROM sqlite_master WHERE type = 'view' AND name <> 'sqlite_sequence'", 'SCHEMA')
@@ -559,7 +586,7 @@ module ActiveRecord
           # Older versions of SQLite return:
           #   column *column_name* is not unique
           when /column(s)? .* (is|are) not unique/, /UNIQUE constraint failed: .*/
-            RecordNotUnique.new(message, exception)
+            RecordNotUnique.new(message)
           else
             super
           end

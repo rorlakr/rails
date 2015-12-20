@@ -18,6 +18,9 @@ module ActiveRecord
       #   sanitize_sql_for_conditions(["name=? and group_id=?", "foo'bar", 4])
       #   # => "name='foo''bar' and group_id=4"
       #
+      #   sanitize_sql_for_conditions(["name=:name and group_id=:group_id", name: "foo'bar", group_id: 4])
+      #   # => "name='foo''bar' and group_id='4'"
+      #
       #   sanitize_sql_for_conditions(["name='%s' and group_id='%s'", "foo'bar", 4])
       #   # => "name='foo''bar' and group_id='4'"
       #
@@ -40,6 +43,9 @@ module ActiveRecord
       #   sanitize_sql_for_assignment(["name=? and group_id=?", nil, 4])
       #   # => "name=NULL and group_id=4"
       #
+      #   sanitize_sql_for_assignment(["name=:name and group_id=:group_id", name: nil, group_id: 4])
+      #   # => "name=NULL and group_id=4"
+      #
       #   Post.send(:sanitize_sql_for_assignment, { name: nil, group_id: 4 })
       #   # => "`posts`.`name` = NULL, `posts`.`group_id` = 4"
       #
@@ -50,6 +56,22 @@ module ActiveRecord
         when Array; sanitize_sql_array(assignments)
         when Hash;  sanitize_sql_hash_for_assignment(assignments, default_table_name)
         else        assignments
+        end
+      end
+
+      # Accepts an array, or string of SQL conditions and sanitizes
+      # them into a valid SQL fragment for a ORDER clause.
+      #
+      #   sanitize_sql_for_order(["field(id, ?)", [1,3,2]])
+      #   # => "field(id, 1,3,2)"
+      #
+      #   sanitize_sql_for_order("id ASC")
+      #   # => "id ASC"
+      def sanitize_sql_for_order(condition)
+        if condition.is_a?(Array) && condition.first.to_s.include?('?')
+          sanitize_sql_array(condition)
+        else
+          condition
         end
       end
 
@@ -122,6 +144,9 @@ module ActiveRecord
       # sanitized and interpolated into the SQL statement.
       #
       #   sanitize_sql_array(["name=? and group_id=?", "foo'bar", 4])
+      #   # => "name='foo''bar' and group_id=4"
+      #
+      #   sanitize_sql_array(["name=:name and group_id=:group_id", name: "foo'bar", group_id: 4])
       #   # => "name='foo''bar' and group_id=4"
       #
       #   sanitize_sql_array(["name='%s' and group_id='%s'", "foo'bar", 4])

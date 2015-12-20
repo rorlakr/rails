@@ -10,17 +10,16 @@ module ActiveRecord
       config = config.symbolize_keys
 
       config[:username] = 'root' if config[:username].nil?
-
+      config[:flags] ||= 0
       if Mysql2::Client.const_defined? :FOUND_ROWS
-        config[:flags] = Mysql2::Client::FOUND_ROWS
+        config[:flags] |= Mysql2::Client::FOUND_ROWS
       end
 
       client = Mysql2::Client.new(config)
-      options = [config[:host], config[:username], config[:password], config[:database], config[:port], config[:socket], 0]
-      ConnectionAdapters::Mysql2Adapter.new(client, logger, options, config)
+      ConnectionAdapters::Mysql2Adapter.new(client, logger, nil, config)
     rescue Mysql2::Error => error
       if error.message.include?("Unknown database")
-        raise ActiveRecord::NoDatabaseError.new(error.message, error)
+        raise ActiveRecord::NoDatabaseError
       else
         raise
       end
@@ -184,10 +183,6 @@ module ActiveRecord
 
       def full_version
         @full_version ||= @connection.server_info[:version]
-      end
-
-      def set_field_encoding field_name
-        field_name
       end
     end
   end

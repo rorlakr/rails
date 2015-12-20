@@ -42,7 +42,11 @@ class DebugExceptionsTest < ActionDispatch::IntegrationTest
       when "/unprocessable_entity"
         raise ActionController::InvalidAuthenticityToken
       when "/not_found_original_exception"
-        raise ActionView::Template::Error.new('template', AbstractController::ActionNotFound.new)
+        begin
+          raise AbstractController::ActionNotFound.new
+        rescue
+          raise ActionView::Template::Error.new('template')
+        end
       when "/missing_template"
         raise ActionView::MissingTemplate.new(%w(foo), 'foo/index', %w(foo), false, 'mailer')
       when "/bad_request"
@@ -56,18 +60,25 @@ class DebugExceptionsTest < ActionDispatch::IntegrationTest
       when "/syntax_error_into_view"
         begin
           eval 'broke_syntax ='
-        rescue Exception => e
+        rescue Exception
           template = ActionView::Template.new(File.read(__FILE__),
                                               __FILE__,
                                               ActionView::Template::Handlers::Raw.new,
                                               {})
-          raise ActionView::Template::Error.new(template, e)
+          raise ActionView::Template::Error.new(template)
         end
       when "/framework_raises"
         method_that_raises
       else
         raise "puke!"
       end
+    end
+  end
+
+  class BoomerAPI < Boomer
+    def call(env)
+      env['action_dispatch.show_detailed_exceptions'] = @detailed
+      raise "puke!"
     end
   end
 
@@ -162,6 +173,14 @@ class DebugExceptionsTest < ActionDispatch::IntegrationTest
     assert_equal "text/plain", response.content_type
     assert_match(/RuntimeError\npuke/, body)
 
+    Rails.stub :root, Pathname.new('.') do
+      get "/", headers: xhr_request_env
+
+      assert_response 500
+      assert_match 'Extracted source (around line #', body
+      assert_select 'pre', { count: 0 }, body
+    end
+
     get "/not_found", headers: xhr_request_env
     assert_response 404
     assert_no_match(/<body>/, body)
@@ -191,6 +210,68 @@ class DebugExceptionsTest < ActionDispatch::IntegrationTest
     assert_no_match(/<body>/, body)
     assert_equal "text/plain", response.content_type
     assert_match(/ActionController::ParameterMissing/, body)
+  end
+
+  test "rescue with json error for API request" do
+    @app = ActionDispatch::DebugExceptions.new(Boomer.new(true), RoutesApp, :api)
+
+    get "/", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_response 500
+    assert_no_match(/<header>/, body)
+    assert_no_match(/<body>/, body)
+    assert_equal "application/json", response.content_type
+    assert_match(/RuntimeError: puke/, body)
+
+    get "/not_found", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_response 404
+    assert_no_match(/<body>/, body)
+    assert_equal "application/json", response.content_type
+    assert_match(/#{AbstractController::ActionNotFound.name}/, body)
+
+    get "/method_not_allowed", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_response 405
+    assert_no_match(/<body>/, body)
+    assert_equal "application/json", response.content_type
+    assert_match(/ActionController::MethodNotAllowed/, body)
+
+    get "/unknown_http_method", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_response 405
+    assert_no_match(/<body>/, body)
+    assert_equal "application/json", response.content_type
+    assert_match(/ActionController::UnknownHttpMethod/, body)
+
+    get "/bad_request", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_response 400
+    assert_no_match(/<body>/, body)
+    assert_equal "application/json", response.content_type
+    assert_match(/ActionController::BadRequest/, body)
+
+    get "/parameter_missing", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_response 400
+    assert_no_match(/<body>/, body)
+    assert_equal "application/json", response.content_type
+    assert_match(/ActionController::ParameterMissing/, body)
+  end
+
+  test "rescue with json on API request returns only allowed formats or json as a fallback" do
+    @app = ActionDispatch::DebugExceptions.new(Boomer.new(true), RoutesApp, :api)
+
+    get "/index.json", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_response 500
+    assert_equal "application/json", response.content_type
+    assert_match(/RuntimeError: puke/, body)
+
+    get "/index.html", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_response 500
+    assert_no_match(/<header>/, body)
+    assert_no_match(/<body>/, body)
+    assert_equal "application/json", response.content_type
+    assert_match(/RuntimeError: puke/, body)
+
+    get "/index.xml", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_response 500
+    assert_equal "application/xml", response.content_type
+    assert_match(/RuntimeError: puke/, body)
   end
 
   test "does not show filtered parameters" do
@@ -360,7 +441,7 @@ class DebugExceptionsTest < ActionDispatch::IntegrationTest
         assert_select 'pre code a:first', %r{test/dispatch/debug_exceptions_test\.rb:\d+:in `call}
       end
 
-      # assert framework trace that that threw the error is first
+      # assert framework trace that threw the error is first
       assert_select '#Framework-Trace' do
         assert_select 'pre code a:first', /method_that_raises/
       end

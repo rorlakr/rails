@@ -54,6 +54,16 @@ class TranslationHelperTest < ActiveSupport::TestCase
     end
   end
 
+  def test_returns_missing_tranlation_message_without_span_wrap
+    old_value = ActionView::Base.debug_missing_translation
+    ActionView::Base.debug_missing_translation = false
+
+    expected = 'translation missing: en.translations.missing'
+    assert_equal expected, translate(:"translations.missing")
+  ensure
+    ActionView::Base.debug_missing_translation = old_value
+  end
+
   def test_returns_missing_translation_message_wrapped_into_span
     expected = '<span class="translation_missing" title="translation missing: en.translations.missing">Missing</span>'
     assert_equal expected, translate(:"translations.missing")
@@ -64,6 +74,14 @@ class TranslationHelperTest < ActiveSupport::TestCase
     expected = '<span class="translation_missing" title="translation missing: en.translations.missing, name: Kir, year: 2015, vulnerable: &amp;quot; onclick=&amp;quot;alert()&amp;quot;">Missing</span>'
     assert_equal expected, translate(:"translations.missing", name: "Kir", year: "2015", vulnerable: %{" onclick="alert()"})
     assert translate(:"translations.missing").html_safe?
+  end
+
+  def test_returns_missing_translation_message_does_filters_out_i18n_options
+    expected = '<span class="translation_missing" title="translation missing: en.translations.missing, year: 2015">Missing</span>'
+    assert_equal expected, translate(:"translations.missing", year: '2015', default: [])
+
+    expected = '<span class="translation_missing" title="translation missing: en.scoped.translations.missing, year: 2015">Missing</span>'
+    assert_equal expected, translate(:"translations.missing", year: '2015', scope: %i(scoped))
   end
 
   def test_raises_missing_translation_message_with_raise_config_option

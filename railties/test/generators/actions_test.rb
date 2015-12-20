@@ -235,6 +235,21 @@ class ActionsTest < Rails::Generators::TestCase
     assert_file 'config/routes.rb', /#{Regexp.escape(route_command)}/
   end
 
+  def test_route_should_be_idempotent
+    run_generator
+    route_path = File.expand_path('config/routes.rb', destination_root)
+
+    # runs first time, not asserting
+    action :route, "root 'welcome#index'"
+    content_1 = File.read(route_path)
+
+    # runs second time
+    action :route, "root 'welcome#index'"
+    content_2 = File.read(route_path)
+
+    assert_equal content_1, content_2
+  end
+
   def test_route_should_add_data_with_an_new_line
     run_generator
     action :route, "root 'welcome#index'"
@@ -246,7 +261,14 @@ class ActionsTest < Rails::Generators::TestCase
     content.gsub!(/^\n/, '')
 
     File.open(route_path, "wb") { |file| file.write(content) }
-    assert_file "config/routes.rb", /\.routes\.draw do\n  root 'welcome#index'\nend\n\z/
+
+    routes = <<-F
+Rails.application.routes.draw do
+  root 'welcome#index'
+end
+F
+
+    assert_file "config/routes.rb", routes
 
     action :route, "resources :product_lines"
 

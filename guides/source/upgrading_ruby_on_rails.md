@@ -53,7 +53,26 @@ Don't forget to review the difference, to see if there were any unexpected chang
 Upgrading from Rails 4.2 to Rails 5.0
 -------------------------------------
 
-### Halting callback chains by returning `false`
+### Active Record models now inherit from ApplicationRecord by default
+
+In Rails 4.2 an Active Record model inherits from `ActiveRecord::Base`. In Rails 5.0,
+all models inherit from `ApplicationRecord`.
+
+`ApplicationRecord` is a new superclass for all app models, analogous to app
+controllers subclassing `ApplicationController` instead of
+`ActionController::Base`. This gives apps a single spot to configure app-wide
+model behavior
+
+When upgrading from Rails 4.2 to Rails 5.0 you need to create an
+`application_record.rb` file in `app/models/` and add the following content:
+
+```
+class ApplicationRecord < ActiveRecord::Base
+  self.abstract_class = true
+end
+```
+
+### Halting callback chains via `throw(:abort)`
 
 In Rails 4.2, when a 'before' callback returns `false` in Active Record
 and Active Model, then the entire callback chain is halted. In other words,
@@ -1090,7 +1109,7 @@ config.active_record.auto_explain_threshold_in_seconds = 0.5
 
 ### config/environments/test.rb
 
-The `mass_assignment_sanitizer` configuration setting should also be be added to `config/environments/test.rb`:
+The `mass_assignment_sanitizer` configuration setting should also be added to `config/environments/test.rb`:
 
 ```ruby
 # Raise exception on mass assignment protection for Active Record models
@@ -1191,8 +1210,10 @@ You can help test performance with these additions to your test environment:
 
 ```ruby
 # Configure static asset server for tests with Cache-Control for performance
-config.serve_static_files = true
-config.static_cache_control = 'public, max-age=3600'
+config.public_file_server.enabled = true
+config.public_file_server.headers = {
+  'Cache-Control' => 'public, max-age=3600'
+}
 ```
 
 ### config/initializers/wrap_parameters.rb

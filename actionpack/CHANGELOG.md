@@ -1,3 +1,71 @@
+## Rails 5.0.0.beta1 (December 18, 2015) ##
+
+*   No changes.
+
+
+*   Deprecate `redirect_to :back` in favor of `redirect_back`, which accepts a
+    required `fallback_location` argument, thus eliminating the possibility of a
+    `RedirectBackError`.
+
+    *Derek Prior*
+
+*   Add `redirect_back` method to `ActionController::Redirecting` to provide a
+    way to safely redirect to the `HTTP_REFERER` if it is present, falling back
+    to a provided redirect otherwise.
+
+    *Derek Prior*
+
+*   `ActionController::TestCase` will be moved to it's own gem in Rails 5.1
+
+    With the speed improvements made to `ActionDispatch::IntegrationTest` we no
+    longer need to keep two separate code bases for testing controllers. In
+    Rails 5.1 `ActionController::TestCase` will be deprecated and moved into a
+    gem outside of Rails source.
+
+    This is a documentation deprecation so that going forward so new tests will use
+    `ActionDispatch::IntegrationTest` instead of `ActionController::TestCase`.
+
+    *Eileen M. Uchitelle*
+
+*   Add a `response_format` option to `ActionDispatch::DebugExceptions`
+    to configure the format of the response when errors occur in
+    development mode.
+
+    If `response_format` is `:default` the debug info will be rendered
+    in an HTML page. In the other hand, if the provided value is `:api`
+    the debug info will be rendered in the original response format.
+
+    *Jorge Bejar*
+
+*   Change the `protect_from_forgery` prepend default to `false`
+
+    Per this comment
+    https://github.com/rails/rails/pull/18334#issuecomment-69234050 we want
+    `protect_from_forgery` to default to `prepend: false`.
+
+    `protect_from_forgery` will now be insterted into the callback chain at the
+    point it is called in your application. This is useful for cases where you
+    want to `protect_from_forgery` after you perform required authentication
+    callbacks or other callbacks that are required to run after forgery protection.
+
+    If you want `protect_from_forgery` callbacks to always run first, regardless of
+    position they are called in your application then you can add `prepend: true`
+    to your `protect_from_forgery` call.
+
+    Example:
+
+    ```ruby
+    protect_from_forgery prepend: true
+    ```
+
+    *Eileen M. Uchitelle*
+
+*   In url_for, never append a question mark to the URL when the query string
+    is empty anyway.  (It used to do that when called like `url_for(controller:
+    'x', action: 'y', q: {})`.)
+
+    *Paul Grayson*
+
 *   Catch invalid UTF-8 querystring values and respond with BadRequest
 
     Check querystring params for invalid UTF-8 characters, and raise an
@@ -16,11 +84,6 @@
     Fixes #21923.
 
     *Agis Anastasopoulos*
-
-*   Deprecate `config.static_cache_control` in favor of
-    `config.public_file_server.headers`
-
-    *Yuki Nishijima*
 
 *   Add the ability of returning arbitrary headers to ActionDispatch::Static
 

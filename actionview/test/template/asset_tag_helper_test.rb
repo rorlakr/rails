@@ -27,6 +27,8 @@ class AssetTagHelperTest < ActionView::TestCase
   end
 
   AssetPathToTag = {
+    %(asset_path(""))             => %(),
+    %(asset_path("   "))          => %(),
     %(asset_path("foo"))          => %(/foo),
     %(asset_path("style.css"))    => %(/style.css),
     %(asset_path("xmlhr.js"))     => %(/xmlhr.js),
@@ -97,6 +99,7 @@ class AssetTagHelperTest < ActionView::TestCase
     %(javascript_include_tag("bank")) => %(<script src="/javascripts/bank.js" ></script>),
     %(javascript_include_tag("bank.js")) => %(<script src="/javascripts/bank.js" ></script>),
     %(javascript_include_tag("bank", :lang => "vbscript")) => %(<script lang="vbscript" src="/javascripts/bank.js" ></script>),
+    %(javascript_include_tag("bank", :host => "assets.example.com")) => %(<script src="http://assets.example.com/javascripts/bank.js"></script>),
 
     %(javascript_include_tag("http://example.com/all")) => %(<script src="http://example.com/all"></script>),
     %(javascript_include_tag("http://example.com/all.js")) => %(<script src="http://example.com/all.js"></script>),
@@ -141,6 +144,7 @@ class AssetTagHelperTest < ActionView::TestCase
     %(stylesheet_link_tag("/elsewhere/file")) => %(<link href="/elsewhere/file.css" media="screen" rel="stylesheet" />),
     %(stylesheet_link_tag("subdir/subdir")) => %(<link href="/stylesheets/subdir/subdir.css" media="screen" rel="stylesheet" />),
     %(stylesheet_link_tag("bank", :media => "all")) => %(<link href="/stylesheets/bank.css" media="all" rel="stylesheet" />),
+    %(stylesheet_link_tag("bank", :host => "assets.example.com")) => %(<link href="http://assets.example.com/stylesheets/bank.css" media="screen" rel="stylesheet" />),
 
     %(stylesheet_link_tag("http://www.example.com/styles/style")) => %(<link href="http://www.example.com/styles/style" media="screen" rel="stylesheet" />),
     %(stylesheet_link_tag("http://www.example.com/styles/style.css")) => %(<link href="http://www.example.com/styles/style.css" media="screen" rel="stylesheet" />),
@@ -191,7 +195,8 @@ class AssetTagHelperTest < ActionView::TestCase
     %(image_tag("//www.rubyonrails.com/images/rails.png")) => %(<img alt="Rails" src="//www.rubyonrails.com/images/rails.png" />),
     %(image_tag("mouse.png", :alt => nil)) => %(<img src="/images/mouse.png" />),
     %(image_tag("data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==", :alt => nil)) => %(<img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" />),
-    %(image_tag("")) => %(<img src="" />)
+    %(image_tag("")) => %(<img src="" />),
+    %(image_tag("gold.png", data: { title: 'Rails Application' })) => %(<img data-title="Rails Application" src="/images/gold.png" alt="Gold" />)
   }
 
   FaviconLinkToTag = {

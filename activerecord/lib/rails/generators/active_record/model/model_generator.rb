@@ -29,23 +29,30 @@ module ActiveRecord
         template 'module.rb', File.join('app/models', "#{class_path.join('/')}.rb") if behavior == :invoke
       end
 
-      def attributes_with_index
-        attributes.select { |a| !a.reference? && a.has_index? }
-      end
-
-      def accessible_attributes
-        attributes.reject(&:reference?)
-      end
-
       hook_for :test_framework
 
       protected
 
-        # Used by the migration template to determine the parent name of the model
-        def parent_class_name
-          options[:parent] || "ActiveRecord::Base"
+        def attributes_with_index
+          attributes.select { |a| !a.reference? && a.has_index? }
         end
 
+        # Used by the migration template to determine the parent name of the model
+        def parent_class_name
+          options[:parent] || determine_default_parent_class
+        end
+
+        def determine_default_parent_class
+          application_record = nil
+
+          in_root { application_record = File.exist?('app/models/application_record.rb') }
+
+          if application_record
+            "ApplicationRecord"
+          else
+            "ActiveRecord::Base"
+          end
+        end
     end
   end
 end

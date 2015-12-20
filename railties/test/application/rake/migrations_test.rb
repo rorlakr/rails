@@ -18,7 +18,7 @@ module ApplicationTests
           `bin/rails generate model user username:string password:string`
 
           app_file "db/migrate/01_a_migration.bukkits.rb", <<-MIGRATION
-            class AMigration < ActiveRecord::Migration
+            class AMigration < ActiveRecord::Migration::Current
             end
           MIGRATION
 
@@ -151,6 +151,28 @@ module ApplicationTests
 
            assert_match(/up\s+\d{3,}\s+Create users/, output)
            assert_match(/up\s+\d{3,}\s+Add email to users/, output)
+        end
+      end
+
+      test 'running migrations with not timestamp head migration files' do
+        Dir.chdir(app_path) do
+
+          app_file "db/migrate/1_one_migration.rb", <<-MIGRATION
+            class OneMigration < ActiveRecord::Migration::Current
+            end
+          MIGRATION
+
+          app_file "db/migrate/02_two_migration.rb", <<-MIGRATION
+            class TwoMigration < ActiveRecord::Migration::Current
+            end
+          MIGRATION
+
+          `bin/rake db:migrate`
+
+           output = `bin/rake db:migrate:status`
+
+           assert_match(/up\s+001\s+One migration/, output)
+           assert_match(/up\s+002\s+Two migration/, output)
         end
       end
 

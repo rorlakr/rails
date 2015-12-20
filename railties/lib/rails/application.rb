@@ -167,6 +167,9 @@ module Rails
       # team. Details at https://github.com/rails/rails/pull/6952#issuecomment-7661220
       @caching_key_generator ||=
         if secrets.secret_key_base
+          unless secrets.secret_key_base.kind_of?(String)
+            raise ArgumentError, "`secret_key_base` for #{Rails.env} environment must be a type of String, change this value in `config/secrets.yml`"
+          end
           key_generator = ActiveSupport::KeyGenerator.new(secrets.secret_key_base, iterations: 1000)
           ActiveSupport::CachingKeyGenerator.new(key_generator)
         else
@@ -215,12 +218,16 @@ module Rails
     #     Rails.application.configure do
     #       config.middleware.use ExceptionNotifier, config_for(:exception_notification)
     #     end
-    def config_for(name)
-      yaml = Pathname.new("#{paths["config"].existent.first}/#{name}.yml")
+    def config_for(name, env: Rails.env)
+      if name.is_a?(Pathname)
+        yaml = name
+      else
+        yaml = Pathname.new("#{paths["config"].existent.first}/#{name}.yml")
+      end
 
       if yaml.exist?
         require "erb"
-        (YAML.load(ERB.new(yaml.read).result) || {})[Rails.env] || {}
+        (YAML.load(ERB.new(yaml.read).result) || {})[env] || {}
       else
         raise "Could not load configuration. No such file - #{yaml}"
       end

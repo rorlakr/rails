@@ -37,7 +37,7 @@ module ActionController
 
     module ClassMethods
       def make_response!(request)
-        if request.env["HTTP_VERSION"] == "HTTP/1.0"
+        if request.get_header("HTTP_VERSION") == "HTTP/1.0"
           super
         else
           Live::Response.new.tap do |res|
@@ -222,12 +222,6 @@ module ActionController
         jar.write self unless committed?
       end
 
-      def before_sending
-        super
-        request.cookie_jar.commit!
-        headers.freeze
-      end
-
       def build_buffer(response, body)
         buf = Live::Buffer.new response
         body.each { |part| buf.write part }
@@ -291,10 +285,6 @@ module ActionController
     def response_body=(body)
       super
       response.close if response
-    end
-
-    def set_response!(request)
-      @_response = self.class.make_response! request
     end
   end
 end

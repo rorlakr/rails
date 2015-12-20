@@ -169,7 +169,7 @@ directory. Files in this directory are served by the Sprockets middleware.
 
 Assets can still be placed in the `public` hierarchy. Any assets under `public`
 will be served as static files by the application or web server when
-`config.serve_static_files` is set to true. You should use `app/assets` for
+`config.public_file_server.enabled` is set to true. You should use `app/assets` for
 files that must undergo some pre-processing before they are served.
 
 In production, Rails precompiles these files to `public/assets` by default. The
@@ -676,7 +676,7 @@ content changes.
 
 ### Precompiling Assets
 
-Rails comes bundled with a rake task to compile the asset manifests and other
+Rails comes bundled with a task to compile the asset manifests and other
 files in the pipeline.
 
 Compiled assets are written to the location specified in `config.assets.prefix`.
@@ -686,10 +686,10 @@ You can call this task on the server during deployment to create compiled
 versions of your assets directly on the server. See the next section for
 information on compiling locally.
 
-The rake task is:
+The task is:
 
 ```bash
-$ RAILS_ENV=production bin/rake assets:precompile
+$ RAILS_ENV=production bin/rails assets:precompile
 ```
 
 Capistrano (v2.15.1 and above) includes a recipe to handle this in deployment.
@@ -731,7 +731,7 @@ Rails.application.config.assets.precompile += ['admin.js', 'admin.css', 'swfObje
 NOTE. Always specify an expected compiled filename that ends with .js or .css,
 even if you want to add Sass or CoffeeScript files to the precompile array.
 
-The rake task also generates a `manifest-md5hash.json` that contains a list with
+The task also generates a `manifest-md5hash.json` that contains a list with
 all your assets and their respective fingerprints. This is used by the Rails
 helper methods to avoid handing the mapping requests back to Sprockets. A
 typical manifest file looks like:
@@ -1021,7 +1021,7 @@ header](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9) is a W3C
 specification that describes how a request can be cached. When no CDN is used, a
 browser will use this information to cache contents. This is very helpful for
 assets that are not modified so that a browser does not need to re-download a
-website's CSS or javascript on every request. Generally we want our Rails server
+website's CSS or JavaScript on every request. Generally we want our Rails server
 to tell our CDN (and browser) that the asset is "public", that means any cache
 can store the request. Also we commonly want to set `max-age` which is how long
 the cache will store the object before invalidating the cache. The `max-age`
@@ -1029,7 +1029,9 @@ value is set to seconds with a maximum possible value of `31536000` which is one
 year. You can do this in your rails application by setting
 
 ```
-config.static_cache_control = "public, max-age=31536000"
+config.public_file_server.headers = {
+  'Cache-Control' => 'public, max-age=31536000'
+}
 ```
 
 Now when your application serves an asset in production, the CDN will store the

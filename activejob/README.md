@@ -44,7 +44,7 @@ end
 Enqueue a job like so:
 
 ```ruby
-MyJob.perform_later record  # Enqueue a job to be performed as soon the queueing system is free.
+MyJob.perform_later record  # Enqueue a job to be performed as soon as the queueing system is free.
 ```
 
 ```ruby
@@ -102,7 +102,7 @@ see the API Documentation for [ActiveJob::QueueAdapters](http://api.rubyonrails.
 The latest version of Active Job can be installed with RubyGems:
 
 ```
-  % gem install activejob
+  $ gem install activejob
 ```
 
 Source code can be downloaded as part of the Rails project on GitHub

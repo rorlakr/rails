@@ -1,5 +1,5 @@
 require 'tzinfo'
-require 'concurrent'
+require 'concurrent/map'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/object/try'
 
@@ -86,7 +86,8 @@ module ActiveSupport
       "Paris"                        => "Europe/Paris",
       "Amsterdam"                    => "Europe/Amsterdam",
       "Berlin"                       => "Europe/Berlin",
-      "Bern"                         => "Europe/Berlin",
+      "Bern"                         => "Europe/Zurich",
+      "Zurich"                       => "Europe/Zurich",
       "Rome"                         => "Europe/Rome",
       "Stockholm"                    => "Europe/Stockholm",
       "Vienna"                       => "Europe/Vienna",

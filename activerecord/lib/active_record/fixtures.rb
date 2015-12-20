@@ -401,7 +401,7 @@ module ActiveRecord
   # It's possible to set the fixture's model class directly in the YAML file.
   # This is helpful when fixtures are loaded outside tests and
   # +set_fixture_class+ is not available (e.g.
-  # when running <tt>rake db:fixtures:load</tt>).
+  # when running <tt>rails db:fixtures:load</tt>).
   #
   #   _fixture:
   #     model_class: User
@@ -875,9 +875,7 @@ module ActiveRecord
       self.pre_loaded_fixtures = false
       self.config = ActiveRecord::Base
 
-      self.fixture_class_names = Hash.new do |h, fixture_set_name|
-        h[fixture_set_name] = ActiveRecord::FixtureSet.default_fixture_model_name(fixture_set_name, self.config)
-      end
+      self.fixture_class_names = {}
 
       silence_warnings do
         define_singleton_method :use_transactional_tests do

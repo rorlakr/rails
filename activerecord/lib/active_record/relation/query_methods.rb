@@ -3,6 +3,7 @@ require "active_record/relation/query_attribute"
 require "active_record/relation/where_clause"
 require "active_record/relation/where_clause_factory"
 require 'active_model/forbidden_attributes_protection'
+require 'active_support/core_ext/string/filters'
 
 module ActiveRecord
   module QueryMethods
@@ -13,6 +14,8 @@ module ActiveRecord
     # WhereChain objects act as placeholder for queries in which #where does not have any parameter.
     # In this case, #where must be chained with #not to return a new relation.
     class WhereChain
+      include ActiveModel::ForbiddenAttributesProtection
+
       def initialize(scope)
         @scope = scope
       end
@@ -41,6 +44,8 @@ module ActiveRecord
       #    User.where.not(name: "Jon", role: "admin")
       #    # SELECT * FROM users WHERE name != 'Jon' AND role != 'admin'
       def not(opts, *rest)
+        opts = sanitize_forbidden_attributes(opts)
+
         where_clause = @scope.send(:where_clause_factory).build(opts, rest)
 
         @scope.references!(PredicateBuilder.references(opts)) if Hash === opts
@@ -93,7 +98,22 @@ module ActiveRecord
     end
 
     def bound_attributes
-      from_clause.binds + arel.bind_values + where_clause.binds + having_clause.binds
+      result = from_clause.binds + arel.bind_values + where_clause.binds + having_clause.binds
+      if limit_value && !string_containing_comma?(limit_value)
+        result << Attribute.with_cast_value(
+          "LIMIT".freeze,
+          connection.sanitize_limit(limit_value),
+          Type::Value.new,
+        )
+      end
+      if offset_value
+        result << Attribute.with_cast_value(
+          "OFFSET".freeze,
+          offset_value.to_i,
+          Type::Value.new,
+        )
+      end
+      result
     end
 
     def create_with_value # :nodoc:
@@ -407,10 +427,30 @@ module ActiveRecord
       self
     end
 
-    # Performs a joins on +args+:
+    # Performs a joins on +args+. The given symbol(s) should match the name of
+    # the association(s).
     #
     #   User.joins(:posts)
-    #   # SELECT "users".* FROM "users" INNER JOIN "posts" ON "posts"."user_id" = "users"."id"
+    #   # SELECT "users".*
+    #   # FROM "users"
+    #   # INNER JOIN "posts" ON "posts"."user_id" = "users"."id"
+    #
+    # Multiple joins:
+    #
+    #   User.joins(:posts, :account)
+    #   # SELECT "users".*
+    #   # FROM "users"
+    #   # INNER JOIN "posts" ON "posts"."user_id" = "users"."id"
+    #   # INNER JOIN "accounts" ON "accounts"."id" = "users"."account_id"
+    #
+    # Nested joins:
+    #
+    #   User.joins(posts: [:comments])
+    #   # SELECT "users".*
+    #   # FROM "users"
+    #   # INNER JOIN "posts" ON "posts"."user_id" = "users"."id"
+    #   # INNER JOIN "comments" "comments_posts"
+    #   #   ON "comments_posts"."post_id" = "posts"."id"
     #
     # You can use strings in order to customize your joins:
     #
@@ -427,6 +467,27 @@ module ActiveRecord
       self.joins_values += args
       self
     end
+
+    # Performs a left outer joins on +args+:
+    #
+    #   User.left_outer_joins(:posts)
+    #   => SELECT "users".* FROM "users" LEFT OUTER JOIN "posts" ON "posts"."user_id" = "users"."id"
+    #
+    def left_outer_joins(*args)
+      check_if_method_has_arguments!(:left_outer_joins, args)
+
+      args.compact!
+      args.flatten!
+
+      spawn.left_outer_joins!(*args)
+    end
+    alias :left_joins :left_outer_joins
+
+    def left_outer_joins!(*args) # :nodoc:
+      self.left_outer_joins_values += args
+      self
+    end
+    alias :left_joins! :left_outer_joins!
 
     # Returns a new relation, which is the result of filtering the current relation
     # according to the conditions in the arguments.
@@ -632,6 +693,13 @@ module ActiveRecord
     end
 
     def limit!(value) # :nodoc:
+      if string_containing_comma?(value)
+        # Remove `string_containing_comma?` when removing this deprecation
+        ActiveSupport::Deprecation.warn(<<-WARNING.squish)
+          Passing a string to limit in the form "1,2" is deprecated and will be
+          removed in Rails 5.1. Please call `offset` explicitly instead.
+        WARNING
+      end
       self.limit_value = value
       self
     end
@@ -878,11 +946,18 @@ module ActiveRecord
       arel = Arel::SelectManager.new(table)
 
       build_joins(arel, joins_values.flatten) unless joins_values.empty?
+      build_left_outer_joins(arel, left_outer_joins_values.flatten) unless left_outer_joins_values.empty?
 
       arel.where(where_clause.ast) unless where_clause.empty?
       arel.having(having_clause.ast) unless having_clause.empty?
-      arel.take(connection.sanitize_limit(limit_value)) if limit_value
-      arel.skip(offset_value.to_i) if offset_value
+      if limit_value
+        if string_containing_comma?(limit_value)
+          arel.take(connection.sanitize_limit(limit_value))
+        else
+          arel.take(Arel::Nodes::BindParam.new)
+        end
+      end
+      arel.skip(Arel::Nodes::BindParam.new) if offset_value
       arel.group(*arel_columns(group_values.uniq.reject(&:blank?))) unless group_values.empty?
 
       build_order(arel)
@@ -937,6 +1012,19 @@ module ActiveRecord
       end
     end
 
+    def build_left_outer_joins(manager, outer_joins)
+      buckets = outer_joins.group_by do |join|
+        case join
+        when Hash, Symbol, Array
+          :association_join
+        else
+          raise ArgumentError, 'only Hash, Symbol and Array are allowed'
+        end
+      end
+
+      build_join_query(manager, buckets, Arel::Nodes::OuterJoin)
+    end
+
     def build_joins(manager, joins)
       buckets = joins.group_by do |join|
         case join
@@ -952,6 +1040,11 @@ module ActiveRecord
           raise 'unknown class: %s' % join.class.name
         end
       end
+
+      build_join_query(manager, buckets, Arel::Nodes::InnerJoin)
+    end
+
+    def build_join_query(manager, buckets, join_type)
       buckets.default = []
 
       association_joins         = buckets[:association_join]
@@ -967,7 +1060,7 @@ module ActiveRecord
         join_list
       )
 
-      join_infos = join_dependency.join_constraints stashed_association_joins
+      join_infos = join_dependency.join_constraints stashed_association_joins, join_type
 
       join_infos.each do |info|
         info.joins.each { |join| manager.from(join) }
@@ -1045,6 +1138,9 @@ module ActiveRecord
     end
 
     def preprocess_order_args(order_args)
+      order_args.map! do |arg|
+        klass.send(:sanitize_sql_for_order, arg)
+      end
       order_args.flatten!
       validate_order_args(order_args)
 
@@ -1109,6 +1205,10 @@ module ActiveRecord
 
     def new_from_clause
       Relation::FromClause.empty
+    end
+
+    def string_containing_comma?(value)
+      ::String === value && value.include?(",")
     end
   end
 end

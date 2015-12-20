@@ -248,6 +248,13 @@ end
 @person.try { |p| "#{p.first_name} #{p.last_name}" }
 ```
 
+Note that `try` will swallow no-method errors, returning nil instead. If you want to protect against typos, use `try!` instead:
+
+```ruby
+@number.try(:nest)  # => nil
+@number.try!(:nest) # NoMethodError: undefined method `nest' for 1:Fixnum
+```
+
 NOTE: Defined in `active_support/core_ext/object/try.rb`.
 
 ### `class_eval(*args, &block)`
@@ -390,7 +397,7 @@ The method `with_options` provides a way to factor out common options in a serie
 Given a default options hash, `with_options` yields a proxy object to a block. Within the block, methods called on the proxy are forwarded to the receiver with their options merged. For example, you get rid of the duplication in:
 
 ```ruby
-class Account < ActiveRecord::Base
+class Account < ApplicationRecord
   has_many :customers, dependent: :destroy
   has_many :products,  dependent: :destroy
   has_many :invoices,  dependent: :destroy
@@ -401,7 +408,7 @@ end
 this way:
 
 ```ruby
-class Account < ActiveRecord::Base
+class Account < ApplicationRecord
   with_options dependent: :destroy do |assoc|
     assoc.has_many :customers
     assoc.has_many :products
@@ -510,17 +517,17 @@ Extensions to `Module`
 
 Using plain Ruby you can wrap methods with other methods, that's called _alias chaining_.
 
-For example, let's say you'd like params to be strings in functional tests, as they are in real requests, but still want the convenience of assigning integers and other kind of values. To accomplish that you could wrap `ActionController::TestCase#process` this way in `test/test_helper.rb`:
+For example, let's say you'd like params to be strings in functional tests, as they are in real requests, but still want the convenience of assigning integers and other kind of values. To accomplish that you could wrap `ActionDispatch::IntegrationTest#process` this way in `test/test_helper.rb`:
 
 ```ruby
-ActionController::TestCase.class_eval do
+ActionDispatch::IntegrationTest.class_eval do
   # save a reference to the original process method
   alias_method :original_process, :process
 
   # now redefine process and delegate to original_process
-  def process(action, params=nil, session=nil, flash=nil, http_method='GET')
+  def process('GET', path, params: nil, headers: nil, env: nil, xhr: false)
     params = Hash[*params.map {|k, v| [k, v.to_s]}.flatten]
-    original_process(action, params, session, flash, http_method)
+    original_process('GET', path, params: params)
   end
 end
 ```
@@ -530,10 +537,10 @@ That's the method `get`, `post`, etc., delegate the work to.
 That technique has a risk, it could be the case that `:original_process` was taken. To try to avoid collisions people choose some label that characterizes what the chaining is about:
 
 ```ruby
-ActionController::TestCase.class_eval do
+ActionDispatch::IntegrationTest.class_eval do
   def process_with_stringified_params(...)
     params = Hash[*params.map {|k, v| [k, v.to_s]}.flatten]
-    process_without_stringified_params(action, params, session, flash, http_method)
+    process_without_stringified_params(method, path, params: params)
   end
   alias_method :process_without_stringified_params, :process
   alias_method :process, :process_with_stringified_params
@@ -543,10 +550,10 @@ end
 The method `alias_method_chain` provides a shortcut for that pattern:
 
 ```ruby
-ActionController::TestCase.class_eval do
+ActionDispatch::IntegrationTest.class_eval do
   def process_with_stringified_params(...)
     params = Hash[*params.map {|k, v| [k, v.to_s]}.flatten]
-    process_without_stringified_params(action, params, session, flash, http_method)
+    process_without_stringified_params(method, path, params: params)
   end
   alias_method_chain :process, :stringified_params
 end
@@ -561,7 +568,7 @@ NOTE: Defined in `active_support/core_ext/module/aliasing.rb`.
 Model attributes have a reader, a writer, and a predicate. You can alias a model attribute having the corresponding three methods defined for you in one shot. As in other aliasing methods, the new name is the first argument, and the old name is the second (one mnemonic is that they go in the same order as if you did an assignment):
 
 ```ruby
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   # You can refer to the email column as "login".
   # This can be meaningful for authentication code.
   alias_attribute :login, :email
@@ -869,7 +876,7 @@ The macro `delegate` offers an easy way to forward methods.
 Let's imagine that users in some application have login information in the `User` model but name and other data in a separate `Profile` model:
 
 ```ruby
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   has_one :profile
 end
 ```
@@ -877,7 +884,7 @@ end
 With that configuration you get a user's name via their profile, `user.profile.name`, but it could be handy to still be able to access such attribute directly:
 
 ```ruby
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   has_one :profile
 
   def name
@@ -889,7 +896,7 @@ end
 That is what `delegate` does for you:
 
 ```ruby
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   has_one :profile
 
   delegate :name, to: :profile
@@ -1701,6 +1708,20 @@ The method `parameterize` normalizes its receiver in a way that can be used in p
 ```ruby
 "John Smith".parameterize # => "john-smith"
 "Kurt Gödel".parameterize # => "kurt-godel"
+```
+
+To preserve the case of the string, set the `preserve_case` argument to true. By default, `preserve_case` is set to false.
+
+```ruby
+"John Smith".parameterize(preserve_case: true) # => "John-Smith"
+"Kurt Gödel".parameterize(preserve_case: true) # => "Kurt-Godel"
+```
+
+To use a custom separator, override the `separator` argument.
+
+```ruby
+"John Smith".parameterize(separator: "_") # => "john\_smith"
+"Kurt Gödel".parameterize(separator: "_") # => "kurt\_godel"
 ```
 
 In fact, the result string is wrapped in an instance of `ActiveSupport::Multibyte::Chars`.

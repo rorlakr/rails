@@ -114,7 +114,7 @@ ActiveRecord::Schema.define do
   create_table :bulbs, force: true do |t|
     t.integer :car_id
     t.string  :name
-    t.boolean :frickinawesome
+    t.boolean :frickinawesome, default: false
     t.string :color
   end
 
@@ -206,6 +206,14 @@ ActiveRecord::Schema.define do
   add_index :companies, [:firm_id, :type, :rating], name: "company_index"
   add_index :companies, [:firm_id, :type], name: "company_partial_index", where: "rating > 10"
   add_index :companies, :name, name: 'company_name_index', using: :btree
+
+  create_table :content, force: true do |t|
+    t.string :title
+  end
+
+  create_table :content_positions, force: true do |t|
+    t.integer :content_id
+  end
 
   create_table :vegetables, force: true do |t|
     t.string :name
@@ -346,6 +354,10 @@ ActiveRecord::Schema.define do
 
   create_table :guids, force: true do |t|
     t.column :key, :string
+  end
+
+  create_table :guitars, force: true do |t|
+    t.string :color
   end
 
   create_table :inept_wizards, force: true do |t|
@@ -849,6 +861,11 @@ ActiveRecord::Schema.define do
     t.column :looter_id, :integer
     t.column :looter_type, :string
     t.belongs_to :ship
+  end
+
+  create_table :tuning_pegs, force: true do |t|
+    t.integer :guitar_id
+    t.float :pitch
   end
 
   create_table :tyres, force: true do |t|

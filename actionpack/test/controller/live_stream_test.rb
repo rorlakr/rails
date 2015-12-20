@@ -1,5 +1,5 @@
 require 'abstract_unit'
-require 'concurrent/atomics'
+require 'concurrent/atomic/count_down_latch'
 Thread.abort_on_exception = true
 
 module ActionController
@@ -440,5 +440,44 @@ module ActionController
       buf = ActionController::Live::Buffer.new nil
       assert buf.call_on_error
     end
+  end
+end
+
+class LiveStreamRouterTest < ActionDispatch::IntegrationTest
+  class TestController < ActionController::Base
+    include ActionController::Live
+
+    def index
+      response.headers['Content-Type'] = 'text/event-stream'
+      sse = SSE.new(response.stream)
+      sse.write("{\"name\":\"John\"}")
+      sse.write({ name: "Ryan" })
+    ensure
+      sse.close
+    end
+  end
+
+  def self.call(env)
+    routes.call(env)
+  end
+
+  def self.routes
+    @routes ||= ActionDispatch::Routing::RouteSet.new
+  end
+
+  routes.draw do
+    get '/test' => 'live_stream_router_test/test#index'
+  end
+
+  def app
+    self.class
+  end
+
+  test "streaming served through the router" do
+    get "/test"
+
+    assert_response :ok
+    assert_match(/data: {\"name\":\"John\"}/, response.body)
+    assert_match(/data: {\"name\":\"Ryan\"}/, response.body)
   end
 end

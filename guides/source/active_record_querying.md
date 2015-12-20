@@ -25,7 +25,7 @@ Code examples throughout this guide will refer to one or more of the following m
 TIP: All of the following models use `id` as the primary key, unless specified otherwise.
 
 ```ruby
-class Client < ActiveRecord::Base
+class Client < ApplicationRecord
   has_one :address
   has_many :orders
   has_and_belongs_to_many :roles
@@ -33,19 +33,19 @@ end
 ```
 
 ```ruby
-class Address < ActiveRecord::Base
+class Address < ApplicationRecord
   belongs_to :client
 end
 ```
 
 ```ruby
-class Order < ActiveRecord::Base
+class Order < ApplicationRecord
   belongs_to :client, counter_cache: true
 end
 ```
 
 ```ruby
-class Role < ActiveRecord::Base
+class Role < ApplicationRecord
   has_and_belongs_to_many :clients
 end
 ```
@@ -69,6 +69,7 @@ The methods are:
 * `having`
 * `includes`
 * `joins`
+* `left_outer_joins`
 * `limit`
 * `lock`
 * `none`
@@ -80,7 +81,7 @@ The methods are:
 * `reorder`
 * `reverse_order`
 * `select`
-* `uniq`
+* `distinct`
 * `where`
 
 All of the above methods return an instance of `ActiveRecord::Relation`.
@@ -184,6 +185,8 @@ SELECT * FROM clients ORDER BY clients.id ASC LIMIT 1
 
 The `first` method returns `nil` if no matching record is found and no exception will be raised.
 
+If your [default scope](active_record_querying.html#applying-a-default-scope) contains an order method, `first` will return the first record according to this ordering.
+
 You can pass in a numerical argument to the `first` method to return up to that number of results. For example
 
 ```ruby
@@ -219,6 +222,8 @@ SELECT * FROM clients ORDER BY clients.id DESC LIMIT 1
 ```
 
 The `last` method returns `nil` if no matching record is found and no exception will be raised.
+
+If your [default scope](active_record_querying.html#applying-a-default-scope) contains an order method, `last` will return the last record according to this ordering.
 
 You can pass in a numerical argument to the `last` method to return up to that number of results. For example
 
@@ -735,7 +740,7 @@ SELECT "articles".* FROM "articles" WHERE (id > 10) ORDER BY id desc LIMIT 20
 The `reorder` method overrides the default scope order. For example:
 
 ```ruby
-class Article < ActiveRecord::Base
+class Article < ApplicationRecord
   has_many :comments, -> { order('posted_at DESC') }
 end
 
@@ -884,7 +889,7 @@ This behavior can be turned off by setting `ActiveRecord::Base.lock_optimistical
 To override the name of the `lock_version` column, `ActiveRecord::Base` provides a class attribute called `locking_column`:
 
 ```ruby
-class Client < ActiveRecord::Base
+class Client < ApplicationRecord
   self.locking_column = :lock_client_column
 end
 ```
@@ -935,58 +940,63 @@ end
 Joining Tables
 --------------
 
-Active Record provides a finder method called `joins` for specifying `JOIN` clauses on the resulting SQL. There are multiple ways to use the `joins` method.
+Active Record provides two finder methods for specifying `JOIN` clauses on the
+resulting SQL: `joins` and `left_outer_joins`.
+While `joins` should be used for `INNER JOIN` or custom queries,
+`left_outer_joins` is used for queries using `LEFT OUTER JOIN`.
 
-### Using a String SQL Fragment
+### `joins`
+
+There are multiple ways to use the `joins` method.
+
+#### Using a String SQL Fragment
 
 You can just supply the raw SQL specifying the `JOIN` clause to `joins`:
 
 ```ruby
-Client.joins('LEFT OUTER JOIN addresses ON addresses.client_id = clients.id')
+Author.joins("INNER JOIN posts ON posts.author_id = author.id AND posts.published = 't'")
 ```
 
 This will result in the following SQL:
 
 ```sql
-SELECT clients.* FROM clients LEFT OUTER JOIN addresses ON addresses.client_id = clients.id
+SELECT clients.* FROM clients INNER JOIN posts ON posts.author_id = author.id AND posts.published = 't'
 ```
 
-### Using Array/Hash of Named Associations
-
-WARNING: This method only works with `INNER JOIN`.
+#### Using Array/Hash of Named Associations
 
 Active Record lets you use the names of the [associations](association_basics.html) defined on the model as a shortcut for specifying `JOIN` clauses for those associations when using the `joins` method.
 
 For example, consider the following `Category`, `Article`, `Comment`, `Guest` and `Tag` models:
 
 ```ruby
-class Category < ActiveRecord::Base
+class Category < ApplicationRecord
   has_many :articles
 end
 
-class Article < ActiveRecord::Base
+class Article < ApplicationRecord
   belongs_to :category
   has_many :comments
   has_many :tags
 end
 
-class Comment < ActiveRecord::Base
+class Comment < ApplicationRecord
   belongs_to :article
   has_one :guest
 end
 
-class Guest < ActiveRecord::Base
+class Guest < ApplicationRecord
   belongs_to :comment
 end
 
-class Tag < ActiveRecord::Base
+class Tag < ApplicationRecord
   belongs_to :article
 end
 ```
 
 Now all of the following will produce the expected join queries using `INNER JOIN`:
 
-#### Joining a Single Association
+##### Joining a Single Association
 
 ```ruby
 Category.joins(:articles)
@@ -999,7 +1009,7 @@ SELECT categories.* FROM categories
   INNER JOIN articles ON articles.category_id = categories.id
 ```
 
-Or, in English: "return a Category object for all categories with articles". Note that you will see duplicate categories if more than one article has the same category. If you want unique categories, you can use `Category.joins(:articles).uniq`.
+Or, in English: "return a Category object for all categories with articles". Note that you will see duplicate categories if more than one article has the same category. If you want unique categories, you can use `Category.joins(:articles).distinct`.
 
 #### Joining Multiple Associations
 
@@ -1017,7 +1027,7 @@ SELECT articles.* FROM articles
 
 Or, in English: "return all articles that have a category and at least one comment". Note again that articles with multiple comments will show up multiple times.
 
-#### Joining Nested Associations (Single Level)
+##### Joining Nested Associations (Single Level)
 
 ```ruby
 Article.joins(comments: :guest)
@@ -1033,7 +1043,7 @@ SELECT articles.* FROM articles
 
 Or, in English: "return all articles that have a comment made by a guest."
 
-#### Joining Nested Associations (Multiple Level)
+##### Joining Nested Associations (Multiple Level)
 
 ```ruby
 Category.joins(articles: [{ comments: :guest }, :tags])
@@ -1049,7 +1059,7 @@ SELECT categories.* FROM categories
   INNER JOIN tags ON tags.article_id = articles.id
 ```
 
-### Specifying Conditions on the Joined Tables
+#### Specifying Conditions on the Joined Tables
 
 You can specify conditions on the joined tables using the regular [Array](#array-conditions) and [String](#pure-string-conditions) conditions. [Hash conditions](#hash-conditions) provide a special syntax for specifying conditions for the joined tables:
 
@@ -1066,6 +1076,26 @@ Client.joins(:orders).where(orders: { created_at: time_range })
 ```
 
 This will find all clients who have orders that were created yesterday, again using a `BETWEEN` SQL expression.
+
+### `left_outer_joins`
+
+If you want to select a set of records whether or not they have associated
+records you can use the `left_outer_joins` method.
+
+```ruby
+Author.left_outer_joins(:posts).uniq.select('authors.*, COUNT(posts.*) AS posts_count').group('authors.id')
+```
+
+Which produces:
+
+```sql
+SELECT DISTINCT authors.*, COUNT(posts.*) AS posts_count FROM "authors"
+LEFT OUTER JOIN posts ON posts.author_id = authors.id GROUP BY authors.id
+```
+
+Which means: "return all authors with their count of posts, whether or not they
+have any posts at all"
+
 
 Eager Loading Associations
 --------------------------
@@ -1169,7 +1199,7 @@ Scoping allows you to specify commonly-used queries which can be referenced as m
 To define a simple scope, we use the `scope` method inside the class, passing the query that we'd like to run when this scope is called:
 
 ```ruby
-class Article < ActiveRecord::Base
+class Article < ApplicationRecord
   scope :published, -> { where(published: true) }
 end
 ```
@@ -1177,7 +1207,7 @@ end
 This is exactly the same as defining a class method, and which you use is a matter of personal preference:
 
 ```ruby
-class Article < ActiveRecord::Base
+class Article < ApplicationRecord
   def self.published
     where(published: true)
   end
@@ -1187,7 +1217,7 @@ end
 Scopes are also chainable within scopes:
 
 ```ruby
-class Article < ActiveRecord::Base
+class Article < ApplicationRecord
   scope :published,               -> { where(published: true) }
   scope :published_and_commented, -> { published.where("comments_count > 0") }
 end
@@ -1211,7 +1241,7 @@ category.articles.published # => [published articles belonging to this category]
 Your scope can take arguments:
 
 ```ruby
-class Article < ActiveRecord::Base
+class Article < ApplicationRecord
   scope :created_before, ->(time) { where("created_at < ?", time) }
 end
 ```
@@ -1225,7 +1255,7 @@ Article.created_before(Time.zone.now)
 However, this is just duplicating the functionality that would be provided to you by a class method.
 
 ```ruby
-class Article < ActiveRecord::Base
+class Article < ApplicationRecord
   def self.created_before(time)
     where("created_at < ?", time)
   end
@@ -1244,7 +1274,7 @@ If we wish for a scope to be applied across all queries to the model we can use 
 `default_scope` method within the model itself.
 
 ```ruby
-class Client < ActiveRecord::Base
+class Client < ApplicationRecord
   default_scope { where("removed_at IS NULL") }
 end
 ```
@@ -1260,7 +1290,7 @@ If you need to do more complex things with a default scope, you can alternativel
 define it as a class method:
 
 ```ruby
-class Client < ActiveRecord::Base
+class Client < ApplicationRecord
   def self.default_scope
     # Should return an ActiveRecord::Relation.
   end
@@ -1271,7 +1301,7 @@ NOTE: The `default_scope` is also applied while creating/building a record.
 It is not applied while updating a record. E.g.:
 
 ```ruby
-class Client < ActiveRecord::Base
+class Client < ApplicationRecord
   default_scope { where(active: true) }
 end
 
@@ -1284,7 +1314,7 @@ Client.unscoped.new # => #<Client id: nil, active: nil>
 Just like `where` clauses scopes are merged using `AND` conditions.
 
 ```ruby
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   scope :active, -> { where state: 'active' }
   scope :inactive, -> { where state: 'inactive' }
 end
@@ -1313,7 +1343,7 @@ One important caveat is that `default_scope` will be prepended in
 `scope` and `where` conditions.
 
 ```ruby
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   default_scope { where state: 'pending' }
   scope :active, -> { where state: 'active' }
   scope :inactive, -> { where state: 'inactive' }
@@ -1344,8 +1374,15 @@ Client.unscoped.load
 
 This method removes all scoping and will do a normal query on the table.
 
-Note that chaining `unscoped` with a `scope` does not work. In these cases, it is
-recommended that you use the block form of `unscoped`:
+```ruby
+Client.unscoped.all
+# SELECT "clients".* FROM "clients"
+
+Client.where(published: false).unscoped.all
+# SELECT "clients".* FROM "clients"
+```
+
+`unscoped` can also accept a block.
 
 ```ruby
 Client.unscoped {
@@ -1361,6 +1398,36 @@ For every field (also known as an attribute) you define in your table, Active Re
 You can specify an exclamation point (`!`) on the end of the dynamic finders to get them to raise an `ActiveRecord::RecordNotFound` error if they do not return any records, like `Client.find_by_name!("Ryan")`
 
 If you want to find both by name and locked, you can chain these finders together by simply typing "`and`" between the fields. For example, `Client.find_by_first_name_and_locked("Ryan", true)`.
+
+Enums
+-----
+
+The `enum` macro maps an integer column to a set of possible values.
+
+```ruby
+class Book < ApplicationRecord
+  enum availability: [:available, :unavailable]
+end
+```
+
+This will automatically create the corresponding [scopes](#scopes) to query the
+model. Methods to transition between states and query the current state are also
+added.
+
+```ruby
+# Both examples below query just available books.
+Book.available
+# or
+Book.where(availability: :available)
+
+book = Book.new(availability: :available)
+book.available?   # => true
+book.unavailable! # => true
+book.available?   # => false
+```
+
+Read the full documentation about enums
+[in the Rails API docs](http://api.rubyonrails.org/classes/ActiveRecord/Enum.html).
 
 Understanding The Method Chaining
 ---------------------------------
@@ -1590,7 +1657,7 @@ a large or often-running query. However, any model method overrides will
 not be available. For example:
 
 ```ruby
-class Client < ActiveRecord::Base
+class Client < ApplicationRecord
   def name
     "I am #{super}"
   end
@@ -1625,7 +1692,7 @@ Person.ids
 ```
 
 ```ruby
-class Person < ActiveRecord::Base
+class Person < ApplicationRecord
   self.primary_key = "person_id"
 end
 

@@ -44,8 +44,20 @@
   $ cd sources/ko
   ```
 
+<<<<<<< HEAD
 2. 본인이 번역하기를 원하는 파일이나 수정이 필요한 파일을 찾아 에디터로 열고 작업을 한다. 
 3. 번역 작업 중간 중간에 html 파일로 확인하여 작성한 번역이 제대로 포맷되었는지 확인한다. 이 과정은 반드시 필요하다. 아래와 같이 명령을 실행하면 `rails-guides/guides/output/ko` 디렉토리로 `html` 파일이 생성/업데이트되는데, 본인이 작업한 파일명의 `.html` 확장자를 가진 파일을 브라우져로 열어 본다. 
+=======
+Active Record, Active Model, Action Pack, and Action View can each be used independently outside Rails.
+In addition to them, Rails also comes with Action Mailer ([README](actionmailer/README.rdoc)), a library
+to generate and send emails; Active Job ([README](activejob/README.md)), a
+framework for declaring jobs and making them run on a variety of queueing
+backends; Action Cable ([README](actioncable/README.md)), a framework to
+integrate WebSockets with a Rails application;
+and Active Support ([README](activesupport/README.rdoc)), a collection
+of utility classes and standard library extensions that are useful for Rails,
+and may also be used independently outside Rails.
+>>>>>>> master
 
   ```bash
   $ cd rails-guides/guides
@@ -55,10 +67,18 @@
   ```
 
 
+<<<<<<< HEAD
   > **노트** : `ALL=1` 옵션을 붙이지 않으면 변경된 파일만 생성
+=======
+        $ gem install rails
+>>>>>>> master
 
 
+<<<<<<< HEAD
 4. 작업이 완료되면 적절한 메시지와 함께 커밋한다.
+=======
+        $ rails new myapp
+>>>>>>> master
 
   ```bash
   $ cd rails-guides
@@ -70,7 +90,12 @@
 5. 이제 브라우저 상에서 github 본인계정 상의 rails-guides 저장소로 이동한 후 `pull request"을 작성한다. 
 
 
+<<<<<<< HEAD
 ## 번역 작업시 자동으로 html 파일 빌드하기
+=======
+        $ cd myapp
+        $ rails server
+>>>>>>> master
 
 파일 수정시마다 커맨드라인에서 html 파일을 빌드하는 것은 매우 번거롭습니다. `guard-shell` 젬을 이용하면 파일 변경시마다 자동으로 빌드과정을 수행할 수 있습니다. 
 

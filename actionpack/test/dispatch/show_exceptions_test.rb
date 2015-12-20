@@ -8,14 +8,22 @@ class ShowExceptionsTest < ActionDispatch::IntegrationTest
       case req.path
       when "/not_found"
         raise AbstractController::ActionNotFound
-      when "/bad_params"
-        raise ActionDispatch::ParamsParser::ParseError.new("", StandardError.new)
+      when "/bad_params", "/bad_params.json"
+        begin
+          raise StandardError.new
+        rescue
+          raise ActionDispatch::ParamsParser::ParseError
+        end
       when "/method_not_allowed"
         raise ActionController::MethodNotAllowed, 'PUT'
       when "/unknown_http_method"
         raise ActionController::UnknownHttpMethod
       when "/not_found_original_exception"
-        raise ActionView::Template::Error.new('template', AbstractController::ActionNotFound.new)
+        begin
+          raise AbstractController::ActionNotFound.new
+        rescue
+          raise ActionView::Template::Error.new('template')
+        end
       else
         raise "puke!"
       end
@@ -111,5 +119,19 @@ class ShowExceptionsTest < ActionDispatch::IntegrationTest
     get "/method_not_allowed", headers: { 'action_dispatch.show_exceptions' => true }
     assert_response 405
     assert_equal "", body
+  end
+
+  test "bad params exception is returned in the correct format" do
+    @app = ProductionApp
+
+    get "/bad_params", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_equal "text/html; charset=utf-8", response.headers["Content-Type"]
+    assert_response 400
+    assert_match(/400 error/, body)
+
+    get "/bad_params.json", headers: { 'action_dispatch.show_exceptions' => true }
+    assert_equal "application/json; charset=utf-8", response.headers["Content-Type"]
+    assert_response 400
+    assert_equal("{\"status\":400,\"error\":\"Bad Request\"}", body)
   end
 end

@@ -20,6 +20,10 @@ module ActiveRecord
       def self.table_name
         'fake_table'
       end
+
+      def self.sanitize_sql_for_order(sql)
+        sql
+      end
     end
 
     def test_construction
@@ -229,6 +233,13 @@ module ActiveRecord
       relation = Post.joins(:comments).merge Comment.joins(:ratings)
 
       assert_equal 3, relation.where(id: post.id).pluck(:id).size
+    end
+
+    def test_merge_raises_with_invalid_argument
+      assert_raises ArgumentError do
+        relation = Relation.new(FakeKlass, :b, nil)
+        relation.merge(true)
+      end
     end
 
     def test_respond_to_for_non_selected_element

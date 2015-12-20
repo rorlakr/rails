@@ -7,6 +7,9 @@ require 'action_controller/template_assertions'
 require 'rails-dom-testing'
 
 module ActionController
+  # :stopdoc:
+  # ActionController::TestCase will be deprecated and moved to a gem in Rails 5.1.
+  # Please use ActionDispatch::IntegrationTest going forward.
   class TestRequest < ActionDispatch::TestRequest #:nodoc:
     DEFAULT_ENV = ActionDispatch::TestRequest::DEFAULT_ENV.dup
     DEFAULT_ENV.delete 'PATH_INFO'
@@ -210,11 +213,11 @@ module ActionController
   #       # Simulate a POST response with the given HTTP parameters.
   #       post(:create, params: { book: { title: "Love Hina" }})
   #
-  #       # Assert that the controller tried to redirect us to
+  #       # Asserts that the controller tried to redirect us to
   #       # the created book's URI.
   #       assert_response :found
   #
-  #       # Assert that the controller really put the book in the database.
+  #       # Asserts that the controller really put the book in the database.
   #       assert_not_nil Book.find_by(title: "Love Hina")
   #     end
   #   end
@@ -509,20 +512,19 @@ module ActionController
           end
         end
 
-        @controller.request  = @request
-        @controller.response = @response
-
         @request.fetch_header("SCRIPT_NAME") do |k|
           @request.set_header k, @controller.config.relative_url_root
         end
 
         @controller.recycle!
-        @controller.process(action)
+        @controller.dispatch(action, @request, @response)
+        @request = @controller.request
+        @response = @controller.response
 
         @request.delete_header 'HTTP_COOKIE'
 
         if @request.have_cookie_jar?
-          unless @response.committed?
+          unless @request.cookie_jar.committed?
             @request.cookie_jar.write(@response)
             self.cookies.update(@request.cookie_jar.instance_variable_get(:@cookies))
           end
@@ -659,4 +661,5 @@ module ActionController
 
     include Behavior
   end
+  # :startdoc:
 end

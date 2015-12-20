@@ -94,8 +94,9 @@ module ActiveRecord
       rescue DatabaseAlreadyExists
         $stderr.puts "#{configuration['database']} already exists"
       rescue Exception => error
-        $stderr.puts error, *(error.backtrace)
+        $stderr.puts error
         $stderr.puts "Couldn't create database for #{configuration.inspect}"
+        raise
       end
 
       def create_all
@@ -115,8 +116,9 @@ module ActiveRecord
       rescue ActiveRecord::NoDatabaseError
         $stderr.puts "Database '#{configuration['database']}' does not exist"
       rescue Exception => error
-        $stderr.puts error, *(error.backtrace)
+        $stderr.puts error
         $stderr.puts "Couldn't drop #{configuration['database']}"
+        raise
       end
 
       def drop_all
@@ -230,7 +232,7 @@ module ActiveRecord
 
       def check_schema_file(filename)
         unless File.exist?(filename)
-          message = %{#{filename} doesn't exist yet. Run `rake db:migrate` to create it, then try again.}
+          message = %{#{filename} doesn't exist yet. Run `rails db:migrate` to create it, then try again.}
           message << %{ If you do not intend to use a database, you should instead alter #{Rails.root}/config/application.rb to limit the frameworks that will be loaded.} if defined?(::Rails)
           Kernel.abort message
         end
