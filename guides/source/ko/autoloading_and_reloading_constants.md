@@ -1,28 +1,27 @@
-**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
 
-Autoloading and Reloading Constants
+상수 자동 로딩과 리로딩
 ===================================
 
-This guide documents how constant autoloading and reloading works.
+여기에서는 Rails의 상수 자동 로딩과 리로딩의 구조에 대해서 설명합니다.
 
-After reading this guide, you will know:
+이 가이드의 내용:
 
-* Key aspects of Ruby constants
-* What is `autoload_paths`
-* How constant autoloading works
-* What is `require_dependency`
-* How constant reloading works
-* Solutions to common autoloading gotchas
+* Ruby에서 사용되는 상수의 특징
+* `autoload_paths`에 대해서
+* 상수가 자동으로 로딩되는 방식
+* `require_dependency`에 대해서
+* 상수가 리로딩되는 방식
+* 리로딩에서 자주 발생하는 문제의 해결 방법
 
 --------------------------------------------------------------------------------
 
 
-Introduction
+들어가며
 ------------
 
-Ruby on Rails allows applications to be written as if their code was preloaded.
+Ruby on Rails에서는 코드를 변경하면 개발자가 서버를 다시 시동하지 않더라도 이미 애플리케이션이 그 정보를 읽어들인 것처럼 동작합니다.
 
-In a normal Ruby program classes need to load their dependencies:
+일반 Ruby 프로그램의 클래스라면 의존 관계가 있는 프로그램을 명시적으로 읽어올 필요가 있습니다.
 
 ```ruby
 require 'application_controller'
@@ -35,16 +34,11 @@ class PostsController < ApplicationController
 end
 ```
 
-Our Rubyist instinct quickly sees some redundancy in there: If classes were
-defined in files matching their name, couldn't their loading be automated
-somehow? We could save scanning the file for dependencies, which is brittle.
+Rubyist로서의 본능은 위의 코드를 본 순간 여기에는 불필요한 코드가 있다는 것을 금방 눈치챌 것입니다. 클래스가 그것이 저장되어 있는 파일명과 같은 이름으로 정의되어 있다면, 어떻게 자동으로 읽어올 수 는 없을까요? 의존하는 파일을 탐색해서 그 결과를 저장해두면 됩니다만, 이러한 의존 관계는 불안정합니다.
 
-Moreover, `Kernel#require` loads files once, but development is much more smooth
-if code gets refreshed when it changes without restarting the server. It would
-be nice to be able to use `Kernel#load` in development, and `Kernel#require` in
-production.
+나아가 `Kernel#require`는 파일을 한번만 읽어옵니다만, 읽어온 뒤의 파일이 변경되었을 때에 서버를 재기동하지 않고 새로운 변경사항을 반영할 수 있다면, 개발이 편해질 것입니다. 개발 중에는 `Kernel#load`를 사용하고 실제 환경에서는 `Kernel#require`를 상황에 따라서 사용하는 식으로 만들 수 있다면 편리할 것입니다.
 
-Indeed, those features are provided by Ruby on Rails, where we just write
+그리고 Ruby on Rails에서는 아래와 같이 작성하는 것으로 바로 이런 기능을 편하게 이용할 수 있습니다.
 
 ```ruby
 class PostsController < ApplicationController
@@ -54,22 +48,19 @@ class PostsController < ApplicationController
 end
 ```
 
-This guide documents how that works.
+여기에서는 이 기능의 구조에 대해서 설명합니다.
 
 
-Constants Refresher
+상수 갱신
 -------------------
 
-While constants are trivial in most programming languages, they are a rich
-topic in Ruby.
+많은 프로그래밍 언어에 대해서는 상수는 그렇게 중요한 위치를 점하고 있지 않습니다만, Ruby에 있어서는 상수에 대한 화제가 무척 많습니다.
 
-It is beyond the scope of this guide to document Ruby constants, but we are
-nevertheless going to highlight a few key topics. Truly grasping the following
-sections is instrumental to understanding constant autoloading and reloading.
+Ruby 언어에서의 상수를 설명하는 것은 이 가이드의 범주를 벗어나므로 자세하게는 설명하지 않습니다만, 상수의 몇몇 중요한 부분을 짚고 넘어가겠습니다. 이후의 설명을 잘 이해한다면, Rails에서의 상수 자동 로딩과 리로딩을 이해할 때에 좋은 무기가 될 것입니다.
 
-### Nesting
+### 중첩
 
-Class and module definitions can be nested to create namespaces:
+클래스 및 모듈의 정의를 중첩하는 것으로 네임스페이스를 생성할 수 있습니다.
 
 ```ruby
 module XML
@@ -79,20 +70,15 @@ module XML
 end
 ```
 
-The *nesting* at any given place is the collection of enclosing nested class and
-module objects outwards. The nesting at any given place can be inspected with
-`Module.nesting`. For example, in the previous example, the nesting at
-(1) is
+어떤 위치에서의 *중첩*은 중첩된 클래스와 모듈 객체를 중첩 안쪽에서부터 나열한 컬렉션이 됩니다. 이 예제에서의 위치 (1)의 중첩은 다음과 같습니다.
 
 ```ruby
 [XML::SAXParser, XML]
 ```
 
-It is important to understand that the nesting is composed of class and module
-*objects*, it has nothing to do with the constants used to access them, and is
-also unrelated to their names.
+중첩은 클래스나 모듈의 '객체'로 구성되어 있다는 점을 이해하는 것이 중요합니다. 중첩은 거기에 접근하기 위한 상수와 아무런 관계도 없으며, 중첩된 이름과도 관계가 없습니다.
 
-For instance, while this definition is similar to the previous one:
+예를 들어, 다음의 정의는 위의 예제와 비슷합니다.
 
 ```ruby
 class XML::SAXParser
@@ -100,30 +86,19 @@ class XML::SAXParser
 end
 ```
 
-the nesting in (2) is different:
+(2)에서 중첩을 확인한 결과는 다음과 같습니다.
 
 ```ruby
 [XML::SAXParser]
 ```
 
-`XML` does not belong to it.
+`XML` 자체는 중첩에 포함되지 않습니다.
 
-We can see in this example that the name of a class or module that belongs to a
-certain nesting does not necessarily correlate with the namespaces at the spot.
+이 예제에서 확인할 수 있듯이, 어떤 특정 중첩에 속하는 클래스 명이나 모듈 명은 중첩의 위치에 따른 네임스페이스와 항상 연관이 있는 것은 아닙니다.
 
-Even more, they are totally independent, take for instance
+나아가 각각은 연관이 있는 것이 아니라, 완전히 독립적입니다. 다음의 예제를 생각해 봅시다.
 
 ```ruby
-module X
-  module Y
-  end
-end
-
-module A
-  module B
-  end
-end
-
 module X::Y
   module A::B
     # (3)
@@ -131,111 +106,87 @@ module X::Y
 end
 ```
 
-The nesting in (3) consists of two module objects:
+위치 (3)의 중첩은 아래의 2개의 모듈 객체로 구성됩니다.
 
 ```ruby
 [A::B, X::Y]
 ```
 
-So, it not only doesn't end in `A`, which does not even belong to the nesting,
-but it also contains `X::Y`, which is independent from `A::B`.
+이 중첩은 `A`로 끝나는 것이 아니라(그 전에 이 `A`는 중첩 관계에 속해있지도 않습니다), 중첩에 `X::Y`도 포함되어 있습니다. 이 `X::Y`와 `A::B`는 서로 독립적입니다.
 
-The nesting is an internal stack maintained by the interpreter, and it gets
-modified according to these rules:
+이 중첩은 Ruby 인터프리터에 의해서 유지되고 있는 내부 스택이며, 아래의 규칙에 따라서 변경됩니다.
 
-* The class object following a `class` keyword gets pushed when its body is
-executed, and popped after it.
+* `class` 키워드 뒤에 있는 클래스 객체는 그 내용이 실행되기 전에 스택에 들어가서, 실행 완료 후에 스택에서 방출됩니다.
 
-* The module object following a `module` keyword gets pushed when its body is
-executed, and popped after it.
+* `module` 키워드 뒤에 있는 모듈 객체는 그 내용이 실행되기 전에 스택에 들어가서, 실행 완료 후에 스택에서 방출됩니다.
 
-* A singleton class opened with `class << object` gets pushed, and popped later.
+* 싱글톤 클래스는 `class << object`로 정의 될 때 스택에 들어가며, 이후에 스택에서 방출됩니다.
 
-* When `instance_eval` is called using a string argument,
-the singleton class of the receiver is pushed to the nesting of the eval'ed
-code. When `class_eval` or `module_eval` is called using a string argument,
-the receiver is pushed to the nesting of the eval'ed code.
+* `*_eval`로 끝나는 메소드가 문자열을 하나 사용하여 호출되면, 그 리시버의 싱글톤 클래스는 eval된 코드의 중첩에 들어갑니다.
 
-* The nesting at the top-level of code interpreted by `Kernel#load` is empty
-unless the `load` call receives a true value as second argument, in which case
-a newly created anonymous module is pushed by Ruby.
+* `Kernel#load`에 의해서 해석되는 코드의 최상위에 존재하는 네스트는 빈 공간이 됩니다. 단, `load` 호출이 두번째 인수로서 true를 받은 경우를 제외합니다. 이 값이 지정되면 익명 모듈이 새롭게 생성되어 Ruby에 의해 스택에 들어갑니다.
 
-It is interesting to observe that blocks do not modify the stack. In particular
-the blocks that may be passed to `Class.new` and `Module.new` do not get the
-class or module being defined pushed to their nesting. That's one of the
-differences between defining classes and modules in one way or another.
+여기서 흥미로운 점은 블럭이 스택에 아무런 영향을 주지 않는다는 점입니다. 특히 `Class.new`나 `Module.new`에 넘겨질 가능성이 있는 블럭은 `new` 메소드에 의해서 정의된 클래스나 모듈을 중첩에 집어넣지 않습니다. 이 부분이 블럭을 사용하지 않고 어떤 클래스나 모듈을 정의할 때와 다른 점 중 하나입니다.
+`Module.nesting`를 사용하여 임의의 위치에 있는 중첩을 조사(inspect)할 수 있습니다.
 
-### Class and Module Definitions are Constant Assignments
+### 클래스나 모듈의 정의란 상수 대입
 
-Let's suppose the following snippet creates a class (rather than reopening it):
+아래의 코드를 실행하면 클래스가(다시 열리는 것이 아니라) 새로 생성된다고 가정합시다.
 
 ```ruby
 class C
 end
 ```
 
-Ruby creates a constant `C` in `Object` and stores in that constant a class
-object. The name of the class instance is "C", a string, named after the
-constant.
+Ruby는 `Object`에 `C`라는 상수를 생성하고, 그 상수에 클래스 객체를 저장합니다. 이 클래스 인스턴스의 이름은 "C"라는 문자열이 되며, 이는 상수의 이름으로부터 붙여진 이름입니다.
 
-That is,
+다시 말해,
 
 ```ruby
 class Project < ActiveRecord::Base
 end
 ```
 
-performs a constant assignment equivalent to
+이 코드는 상수 대입(constant assignment)를 합니다. 이 코드는 다음과 동등합니다.
 
 ```ruby
 Project = Class.new(ActiveRecord::Base)
 ```
 
-including setting the name of the class as a side-effect:
+이 때, 클래스 이름은 아래와 같이 사이드 이펙트로서 설정됩니다.
 
 ```ruby
 Project.name # => "Project"
 ```
 
-Constant assignment has a special rule to make that happen: if the object
-being assigned is an anonymous class or module, Ruby sets the object's name to
-the name of the constant.
+이 동작을 구현하기 위해서 상수 대입에는 하나의 특수한 규칙이 정의되어 있습니다. 대입되는 객체가 익명 클래스 또는 모듈인 경우, Ruby는 그것들의 객체 이름을 그 상수의 이름을 인용하여 명명합니다.
 
-INFO. From then on, what happens to the constant and the instance does not
-matter. For example, the constant could be deleted, the class object could be
-assigned to a different constant, be stored in no constant anymore, etc. Once
-the name is set, it doesn't change.
+INFO: 익명 클래스나 익명 모듈에 이름이 부여된 이후에는 상소와 인스턴스에서 무슨 일이 진행되는가는 중요하지 않습니다. 예를 들어, 상수를 삭제할 수도 있으며, 클래스 객체를 다른 상수에 대입하거나 이를 저장하지 않을 수도 있습니다. 이름은 일단 설정되면 그 이후에는 변경되지 않게 됩니다.
 
-Similarly, module creation using the `module` keyword as in
+`module` 키워드를 지정하여 아래와 같이 모듈을 생성한 경우에도 클래스와 마찬가지로 동작합니다.
 
 ```ruby
 module Admin
 end
 ```
 
-performs a constant assignment equivalent to
+이 코드는 상수 대입을 수행합니다. 이는 아래와 동등합니다.
 
 ```ruby
 Admin = Module.new
 ```
 
-including setting the name as a side-effect:
+이 때, 아래와 같이 모듈의 이름은 사이드 이펙트로서 설정됩니다.
 
 ```ruby
 Admin.name # => "Admin"
 ```
 
-WARNING. The execution context of a block passed to `Class.new` or `Module.new`
-is not entirely equivalent to the one of the body of the definitions using the
-`class` and `module` keywords. But both idioms result in the same constant
-assignment.
+WARNING: `Class.new`나 `Module.new`에 넘겨지는 블록의 실행 컨텍스트는 `class` 또는 `module` 키워드를 사용하는 시점의 실행 컨텍스트와 완전히 동등하지 않은 경우가 있습니다. 그러나, 상수 대입은 어떤 방식을 사용한 경우라도 동일하게 이루어집니다.
 
-Thus, when one informally says "the `String` class", that really means: the
-class object stored in the constant called "String" in the class object stored
-in the `Object` constant. `String` is otherwise an ordinary Ruby constant and
-everything related to constants such as resolution algorithms applies to it.
+어디서인가 "`String` 클래스"라고 부른다면, 그 진짜 의미는 이렇습니다. "`String` 클래스"란 `Object`라는 상수가 있으며, 거기에 클래스 객체가 저장되어 있고, 나아가 그 중에 "String"이라는 상수가 있으며, 거기에 저장되어 있는 클래스 객체를 의미합니다. `String`은 Ruby에 많고 많은 하나의 상수에 불과하며, 해결 알고리즘이나 그에 관련된 모든 것들이 이 `String`이라는 상수에 적용되게 됩니다.
 
-Likewise, in the controller
+컨트롤러에 대해서도 같은 방식으로 생각할 수 있습니다.
 
 ```ruby
 class PostsController < ApplicationController
@@ -245,22 +196,17 @@ class PostsController < ApplicationController
 end
 ```
 
-`Post` is not syntax for a class. Rather, `Post` is a regular Ruby constant. If
-all is good, the constant is evaluated to an object that responds to `all`.
+이 코드에서의 `Post`는 클래스를 위한 문법이 아닌, Ruby에 존재하는 하나의 상수입니다. 문제가 없다면 이 상수는 `all` 메소드를 가지는 객체일 것이라고 평가됩니다.
 
-That is why we talk about *constant* autoloading, Rails has the ability to
-load constants on the fly.
+이것이 바로 *상수*의 자동 로딩에 대해서 이야기하는 이유입니다. Rails는 상수를 필요에 따라서 자동으로 읽어오는 기능을 가지고 있습니다.
 
-### Constants are Stored in Modules
+### 상수는 모듈에 저장된다
 
-Constants belong to modules in a very literal sense. Classes and modules have
-a constant table; think of it as a hash table.
+Ruby의 상수는 문자 그대로 '모듈에 저장되어 있습니다'. 클래스와 모듈에는 상수 테이블이 존재합니다. 이것은 해시 테이블과 비슷한 것이라고 상상해주세요.
 
-Let's analyze an example to really understand what that means. While common
-abuses of language like "the `String` class" are convenient, the exposition is
-going to be precise here for didactic purposes.
+이것이 어떤 것인지를 충분히 이해하기 위해서 하나의 예를 들어서 분석해봅시다. "이 `String` 클래스"와 같은 애매한 표현은 설명하는 쪽에서는 편리하지만, 여기에서는 이해하기 쉽도록 좀 더 엄밀하게 설명합니다.
 
-Let's consider the following module definition:
+다음과 같은 모듈 정의를 생각해봅시다.
 
 ```ruby
 module Colors
@@ -268,204 +214,139 @@ module Colors
 end
 ```
 
-First, when the `module` keyword is processed, the interpreter creates a new
-entry in the constant table of the class object stored in the `Object` constant.
-Said entry associates the name "Colors" to a newly created module object.
-Furthermore, the interpreter sets the name of the new module object to be the
-string "Colors".
+처음 `module` 키워드를 처리하면 Ruby 인터프리터는 `Object` 상수에 저장된 클래스 객체의 상수 테이블에 새로운 값을 하나 추가합니다. 이 값은 "Colors"라는 이름과, 새롭게 생성된 모듈 객체를 연결합니다. 그리고 Ruby 인터프리터는 새로운 모듈 객체의 이름을 "Colors"라는 문자열로 설정합니다.
 
-Later, when the body of the module definition is interpreted, a new entry is
-created in the constant table of the module object stored in the `Colors`
-constant. That entry maps the name "RED" to the string "0xff0000".
+그리고 이 모듈 정의의 본체가 Ruby 인터프리터에 의해서 해석되면, `Colors` 상수에 저장된 모듈 객체의 상수 테이블에 새로운 값이 하나 추가됩니다. 이 값은 "RED"라는 이름을 "0xff0000"라는 문자열과 연결합니다.
 
-In particular, `Colors::RED` is totally unrelated to any other `RED` constant
-that may live in any other class or module object. If there were any, they
-would have separate entries in their respective constant tables.
+특히 이 `Colors::RED`는 다른 클래스 객체나 모듈 객체에 존재할 지도 모르는 다른 `RED` 정소와는 아무런 관련이 없다는 점에 주목해주세요. 만약 다른 `RED` 상수가 우연히 존재한다고 한다면, 그것은 다른 상수 테이블에 또 다른 값으로 존재하고 있을 것입니다.
 
-Pay special attention in the previous paragraphs to the distinction between
-class and module objects, constant names, and value objects associated to them
-in constant tables.
+이 설명을 읽을 때에는 클래스 객체, 모듈 객체, 상수명, 상수 테이블에 연결되는 값 객체를 각각 혼동하지 않도록 주의해주세요.
 
-### Resolution Algorithms
+### 해결 알고리즘
 
-#### Resolution Algorithm for Relative Constants
+#### 상대 상수를 해결하는 알고리즘
 
-At any given place in the code, let's define *cref* to be the first element of
-the nesting if it is not empty, or `Object` otherwise.
+중첩이 비어있지 않다면, 그 첫번째 요소, 비어있는 경우에는 `Object`를 코드의 임의의 장소에서 *cref*라고 합시다(역주: cref는 Ruby 내부에서의 클래스 참조(class reference)의 약어이며, Ruby의 상수가 가지는 암묵적인 컨텍스트 입니다).
 
-Without getting too much into the details, the resolution algorithm for relative
-constant references goes like this:
+여기서 자세한 설명은 하지 않습니다만, 상대적인 상수 참조를 해결하는 알고리즘은 아래와 같습니다.
 
-1. If the nesting is not empty the constant is looked up in its elements and in
-order. The ancestors of those elements are ignored.
+1. 중첩이 존재하는 경우, 그 중첩의 요소를 순서대로 탐색합니다. 그 요소들의 부모들은 무시됩니다.
 
-2. If not found, then the algorithm walks up the ancestor chain of the cref.
+2. 발견되지 않는 경우에는 cref의 부모 체인(상속 체인)을 탐색합니다.
 
-3. If not found, `const_missing` is invoked on the cref. The default
-implementation of `const_missing` raises `NameError`, but it can be overridden.
+3. 발견되지 않는 경우에는 `Object`를 탐색합니다.
 
-Rails autoloading **does not emulate this algorithm**, but its starting point is
-the name of the constant to be autoloaded, and the cref. See more in [Relative
-References](#autoloading-algorithms-relative-references).
+4. 발견되지 않는 경우에는 cref에 대해서 `const_missing`이 호출됩니다. `const_missing`의 기본 구현은 `NameError`를 던집니다만, 이는 재정의가 가능합니다.
 
-#### Resolution Algorithm for Qualified Constants
+Rails의 자동 로딩은 **이 알고리즘을 에뮬레이트하고 있지 않다는 점을 기억해주세요**. 단 탐색의 시작 지점은 자동 로딩되는 상수의 이름과, cref 자신입니다. 자세한 설명은 [상대참조](#상대참조)를 확인해주세요.
 
-Qualified constants look like this:
+#### 검증된 상수를 해결하는 알고리즘
+
+검증된(qualified) 상수는 아래와 같은 것들입니다.
 
 ```ruby
 Billing::Invoice
 ```
 
-`Billing::Invoice` is composed of two constants: `Billing` is relative and is
-resolved using the algorithm of the previous section.
+`Billing::Invoice`에는 두 개의 상수가 포함되어 있습니다. 처음의 `Billing`은 상대적인 상수이며, 위에서 설명했던 알고리즘에 의해서 해결됩니다.
 
-INFO. Leading colons would make the first segment absolute rather than
-relative: `::Billing::Invoice`. That would force `Billing` to be looked up
-only as a top-level constant.
+INFO: `::Billing::Invoice`처럼 앞에 콜론을 2개 두는 것으로 이 경로를 절대 경로로 변경할 수 있습니다. 이렇게 작성하면 `Billing`은 최상위 레벨의 상수로서 참조됩니다.
 
-`Invoice` on the other hand is qualified by `Billing` and we are going to see
-its resolution next. Let's define *parent* to be that qualifying class or module
-object, that is, `Billing` in the example above. The algorithm for qualified
-constants goes like this:
+두번째의 `Invoice` 상수는 `Billing`으로 검증되어 있습니다. 이 상수를 해결하는 방법에 대해서는 나중에 설명합니다. 여기에서는 검증한 쪽의 클래스나 모듈 객체(여기에서는 `Billing`)을 *부모*로 정의합니다. 검증된 상수를 해결하는 알고리즘은 다음과 같습니다.
 
-1. The constant is looked up in the parent and its ancestors.
+1. 이 상수는 그 부모와 조상들에서만 탐색됩니다.
 
-2. If the lookup fails, `const_missing` is invoked in the parent. The default
-implementation of `const_missing` raises `NameError`, but it can be overridden.
+2. 아무 것도 발견하지 못했을 경우, 부모의 `const_missing`가 호출됩니다. `const_missing`은 `NameError`를 던집니다만, 재정의할 수 있습니다.
 
-As you see, this algorithm is simpler than the one for relative constants. In
-particular, the nesting plays no role here, and modules are not special-cased,
-if neither they nor their ancestors have the constants, `Object` is **not**
-checked.
+지금까지 보았던 대로, 이 탐색 알고리즘은 상대 상수일 경우보다도 간단합니다. 특히 중첩이 아무런 영향을 주지 않는다는 점에 주목해주세요. 그리고 모듈을 특별 취급하지도 않으며, 모듈 자신 또는 모듈의 부모 어느쪽에도 상수가 없는 경우에는 `Object`를 탐색하지 않는다는 점도 다릅니다.
 
-Rails autoloading **does not emulate this algorithm**, but its starting point is
-the name of the constant to be autoloaded, and the parent. See more in
-[Qualified References](#autoloading-algorithms-qualified-references).
+Rails의 자동 로딩은 **이 알고리즘을 에뮬레이트하지 않는다**는 점에 주의해주세요. 단 탐색 시작 지점은 자동 로딩이 되는 상수의 이름과 그 부모입니다. 자세한 설명은 [검증된 상수 참조](#검증된-상수-참조)를 참고해주세요.
 
 
-Vocabulary
+용어 설명
 ----------
 
-### Parent Namespaces
+### 부모의 네임스페이스
 
-Given a string with a constant path we define its *parent namespace* to be the
-string that results from removing its rightmost segment.
+상수 경로로 주어진 문자열을 사용해서 **부모의 네임스페이스**가 정의됩니다. 부모의 네임스페이스는 상수 경로로부터 오른쪽 부분을 제거한 문자열이 됩니다.
 
-For example, the parent namespace of the string "A::B::C" is the string "A::B",
-the parent namespace of "A::B" is "A", and the parent namespace of "A" is "".
+예를 들어서, "A::B::C"라는 문자열의 부모 네임스페이스는 "A::B"라는 문자열이 되며, "A::B"라는 문자열의 부모 네임스페이스는 "A", "A"의 부모 네임스페이스는 ""가 됩니다.
 
-The interpretation of a parent namespace when thinking about classes and modules
-is tricky though. Let's consider a module M named "A::B":
+하지만 클래스나 모듈에 대해서 고찰하는 경우, 부모의 네임스페이스의 해석에는 특이한 부분이 있으므로 주의해야할 필요가 있습니다. 예를 들어 "A::B"라는 이름을 가지는 모듈 M에 대해서 생각해봅시다.
 
-* The parent namespace, "A", may not reflect nesting at a given spot.
+* 부모의 네임스페이스 "A"는 주어진 위치에서의 네스트를 반영하고 있지 않을 수 있다.
 
-* The constant `A` may no longer exist, some code could have removed it from
-`Object`.
+* `A`라는 상수는 이미 존재하지 않을 가능성이 있다. 이 상수는 어떠한 코드에 의해서 `Object`로부터 삭제되었을 수도 있다.
 
-* If `A` exists, the class or module that was originally in `A` may not be there
-anymore. For example, if after a constant removal there was another constant
-assignment there would generally be a different object in there.
+* 만약 `A`라는 상수가 존재한다고 하더라도 이전에 `A`라는 이름을 가진 클래스 또는 모듈이 이제 존재하지 않을 가능성도 있다. 예를 들어, 상수가 하나 삭제된 후에 다른 상수에 대입되었다면, 일반적으로 그것은 다른 객체를 가리키고 있을 것이라고 생각해야한다.
 
-* In such case, it could even happen that the reassigned `A` held a new class or
-module called also "A"!
+* 그러한 상황에서 `A`라는 같은 이름을 가지는 상수에 다시 대입하게 되면, 그 `A`는 같은 "A"라는 이름을 가지는 새로운 클래스 또는 모듈일 가능성도 있다.
 
-* In the previous scenarios M would no longer be reachable through `A::B` but
-the module object itself could still be alive somewhere and its name would
-still be "A::B".
+* 위의 상황이 발생한 경우 `A::B`라는 이름으로 M이라는 모듈을 참조할 수 없게 되지만, M이라는 모듈 객체 자신은 "A::B"라는 이름을 가지고 삭제되지도 않은 채 어딘가에 살아있을 가능성이 있다.
 
-The idea of a parent namespace is at the core of the autoloading algorithms
-and helps explain and understand their motivation intuitively, but as you see
-that metaphor leaks easily. Given an edge case to reason about, take always into
-account that by "parent namespace" the guide means exactly that specific string
-derivation.
+이 '부모 네임스페이스'는 자동 로딩 알고리즘의 핵심이 되는 아이디어이며, 알고리즘 개발 중의 의도를 즉흥적으로 설명할 때에 도움이 됩니다만, 이 메타포만으로는 설명할 수 없는 부분이 많습니다. 실제 상황에서 어떤 일이 발생하는지 정확히 이해하기 위해서 여기에서 설명한 '부모 네임스페이스'라는 개념과 그 의미를 잘 이해한 뒤에, 이를 의식하면서 뒷부분을 읽어주세요.
 
-### Loading Mechanism
+### 로딩 메커니즘
 
-Rails autoloads files with `Kernel#load` when `config.cache_classes` is false,
-the default in development mode, and with `Kernel#require` otherwise, the
-default in production mode.
+`config.cache_classes`가 false일 경우 `Kernel#load`를 사용해서 로딩이 이루어집니다. 이것은 development 환경에서의 기본값입니다. 반면 `Kernel#require`를 사용한 로딩은 production 환경일 때의 기본값입니다.
 
-`Kernel#load` allows Rails to execute files more than once if [constant
-reloading](#constant-reloading) is enabled.
+[상수 리로딩](#상수-리로딩)이 활성화되어 있는 경우 `Kernel#load`가 사용되며, 파일을 반복해서 다시 읽어오게 됩니다.
 
-This guide uses the word "load" freely to mean a given file is interpreted, but
-the actual mechanism can be `Kernel#load` or `Kernel#require` depending on that
-flag.
+여기에서는 '로딩'이라는 말을 지정된 파일이 Rails에 의해서 해석된다는 의미로 사용하고 있습니다만, 실제의 메카니즘에서는 플래그에 따라서 `Kernel#load`나 `Kernel#require`가 사용됩니다.
 
 
-Autoloading Availability
+자동 로딩이 가능한 상황
 ------------------------
 
-Rails is always able to autoload provided its environment is in place. For
-example the `runner` command autoloads:
+Rails는 적당한 환경이 준비되어 있으면 언제나 자동 로딩을 사용합니다. 예를 들어 다음의 `runner` 명령을 실행하면 자동 로딩을 사용합니다.
 
 ```
 $ bin/rails runner 'p User.column_names'
 ["id", "email", "created_at", "updated_at"]
 ```
 
-The console autoloads, the test suite autoloads, and of course the application
-autoloads.
+이 경우 콘솔, 테스트 세트, 애플리케이션의 모든 것들을 자동으로 로딩합니다.
 
-By default, Rails eager loads the application files when it boots in production
-mode, so most of the autoloading going on in development does not happen. But
-autoloading may still be triggered during eager loading.
+production 환경에서 실행된 경우에는 기본으로 파일들을 한번에 읽어오기(eager loading) 때문에, development 환경처럼 자동 로딩이 거의 발생하지 않습니다. 단, 한번에 읽어오는 상황에서도 자동 로딩이 발생할 수 있습니다.
 
-For example, given
+다음의 상황을 봅시다.
 
 ```ruby
 class BeachHouse < House
 end
 ```
 
-if `House` is still unknown when `app/models/beach_house.rb` is being eager
-loaded, Rails autoloads it.
+`app/models/beach_house.rb`는 미리 읽어왔음에도 불구하고 `House`가 발견되지 않은 경우, Rails는 이 클래스를 자동 로딩합니다.
 
 
 autoload_paths
 --------------
 
-As you probably know, when `require` gets a relative file name:
+여기에 대해서는 알고 계시는 분들이 많을 것입니다. 다음과 같이 `require`로 상대 경로를 지정했다고 합시다.
 
 ```ruby
 require 'erb'
 ```
 
-Ruby looks for the file in the directories listed in `$LOAD_PATH`. That is, Ruby
-iterates over all its directories and for each one of them checks whether they
-have a file called "erb.rb", or "erb.so", or "erb.o", or "erb.dll". If it finds
-any of them, the interpreter loads it and ends the search. Otherwise, it tries
-again in the next directory of the list. If the list gets exhausted, `LoadError`
-is raised.
+이 때, Ruby는 `$LOAD_PATH`로 지정되어 있는 폴더에서 이 파일을 탐색합니다. 구체적으로 Ruby는 지정된 모든 폴더에 대해서 재귀적으로 "erb.rb"나 "erb.so", "erb.dll" 등의 이름을 가지는 파일이 있는지를 확인합니다. 이에 해당하는 파일을 발견하면 Ruby 인터프리터에 파일을 읽어오고 탐색을 거기에서 종료합니다. 발견하지 못한 경우에는 목록에 있는 다른 폴더에 대해서 같은 탐색 작업을 수행합니다. 목록을 전부 탐색한 뒤에도 발견하지 못한 경우에는 `LoadError`가 발생합니다.
 
-We are going to cover how constant autoloading works in more detail later, but
-the idea is that when a constant like `Post` is hit and missing, if there's a
-`post.rb` file for example in `app/models` Rails is going to find it, evaluate
-it, and have `Post` defined as a side-effect.
+여기부터는 상수의 자동 로딩을 자세하게 설명합니다만, 그 핵심에 있는 아이디어는 다음과 같습니다. 예를 들어 `Post`와 같은 상수가 코드에 출현한 시점에서는 아직 정의되지 않은 상태라고 가정합니다. 이 때 `app/models` 폴더에 `post.rb`라는 파일이 있다면, Rails는 이 상수를 탐색, 평가하고 그 결과 `Post`라는 상수를 '사이드 이펙트'로서 정의합니다.
 
-Alright, Rails has a collection of directories similar to `$LOAD_PATH` in which
-to look up `post.rb`. That collection is called `autoload_paths` and by
-default it contains:
+그런데, Rails에는 `post.rb`와 같은 파일을 탐색하는 `$LOAD_PATH`와 비슷한 폴더 목록이 있습니다. 이 목록은 `autoload_paths`이라고 불리고 있으며 기본으로는 다음과 같은 것들이 포함되어 있습니다.
 
-* All subdirectories of `app` in the application and engines. For example,
-  `app/controllers`. They do not need to be the default ones, any custom
-  directories like `app/workers` belong automatically to `autoload_paths`.
+* 애플리케이션과 엔진의 `app` 폴더 하의 모든 폴더들. `app/controllers` 등이 대상. `app` 밑에 있는 `app/workers` 등의 폴더들도 모두 `autoload_paths`에 자동적으로 포함되므로, 기본 폴더로 지정할 필요는 없습니다.
 
-* Any existing second level directories called `app/*/concerns` in the
-  application and engines.
+* 애플리케이션과 엔진의 모든 `app/*/concerns` 제2의 하위 폴더.
 
-* The directory `test/mailers/previews`.
+* `test/mailers/previews` 폴더
 
-Also, this collection is configurable via `config.autoload_paths`. For example,
-`lib` was in the list years ago, but no longer is. An application can opt-in
-by adding this to `config/application.rb`:
+이 목록은 `config.autoload_paths`에서 변경할 수 있습니다. 예를 들어, `lib` 폴더는 이전에는 목록에 포함되어 있었습니다만, 현재는 포함되지 않습니다. 필요하다면 `config/application.rb`에 다음의 코드를 추가하여 `lib` 폴더를 autoload_paths에 추가할 수 있습니다.
 
 ```ruby
 config.autoload_paths += "#{Rails.root}/lib"
 ```
 
-The value of `autoload_paths` can be inspected. In a just generated application
-it is (edited):
+`autoload_paths`의 값을 직접 확인해볼 수도 있습니다. 방금 생성한 Rails 애플리케이션에서는 다음과 같은 느낌입니다.
 
 ```
 $ bin/rails r 'puts ActiveSupport::Dependencies.autoload_paths'
@@ -479,17 +360,15 @@ $ bin/rails r 'puts ActiveSupport::Dependencies.autoload_paths'
 .../test/mailers/previews
 ```
 
-INFO. `autoload_paths` is computed and cached during the initialization process.
-The application needs to be restarted to reflect any changes in the directory
-structure.
+INFO: `autoload_paths`는 초기화 중에 계산되어 캐싱됩니다. 폴더의 구조가 조금이라도 변경된 경우, 이 변경을 반영하기 위해서는 애플리케이션을 다시 기동해야합니다.
 
 
-Autoloading Algorithms
+자동 로딩 알고리즘
 ----------------------
 
-### Relative References
+### 상대참조
 
-A relative constant reference may appear in several places, for example, in
+상수의 상대참조는 다음과 같이 다양한 곳에서 이루어집니다.
 
 ```ruby
 class PostsController < ApplicationController
@@ -499,51 +378,35 @@ class PostsController < ApplicationController
 end
 ```
 
-all three constant references are relative.
+이 코드에서 사용되고 있는 3개의 상수는 모두 상대참조를 사용하고 있습니다.
 
-#### Constants after the `class` and `module` Keywords
+#### `class`, 그리고 `module` 키워드 뒤에 있는 상수
 
-Ruby performs a lookup for the constant that follows a `class` or `module`
-keyword because it needs to know if the class or module is going to be created
-or reopened.
+Ruby는 `class`나 `module` 키워드의 뒤에 오는 상수를 탐색합니다. 그러한 클래스나 모듈이 그 장소에서 처음 생성된 것인지, 재정의하는 것인지를 확인하기 위해서입니다.
 
-If the constant is not defined at that point it is not considered to be a
-missing constant, autoloading is **not** triggered.
+그 시점에서 상수가 정의되어 있지 않은 경우, Ruby는 상수가 발견되지 않았으므로, 자동 로딩을 하지 않습니다.
 
-So, in the previous example, if `PostsController` is not defined when the file
-is interpreted Rails autoloading is not going to be triggered, Ruby will just
-define the controller.
+직전의 예제로 설명하자면, 파일이 Ruby 인터프리터에 의해서 해석되는 시점에서 `PostsController`가 정의되어 있지 않은 경우, Rails의 자동 로딩이 실행되지 않고, Ruby는 단순히 컨트롤러를 새로 정의합니다.
 
-#### Top-Level Constants
+#### 최상위 상수
 
-On the contrary, if `ApplicationController` is unknown, the constant is
-considered missing and an autoload is going to be attempted by Rails.
+반대로 `ApplicationController`가 지금까지 출현한 적이 없었던 경우, 이 상수는 '발견되지 않았음'으로 간주되어 Rails에 의해서 자동 로딩이 실행됩니다.
 
-In order to load `ApplicationController`, Rails iterates over `autoload_paths`.
-First checks if `app/assets/application_controller.rb` exists. If it does not,
-which is normally the case, it continues and finds
-`app/controllers/application_controller.rb`.
+Rails는 `ApplicationController`를 로딩하기 위해서 `autoload_paths`에 존재하는 경로들을 순서대로 탐색합니다. 처음에 `app/assets/application_controller.rb`가 존재하는지를 확인합니다. 발견하지 못한 경우(이것이 정상입니다), 다음 경로로 `app/controllers/application_controller.rb`를 탐색합니다.
 
-If the file defines the constant `ApplicationController` all is fine, otherwise
-`LoadError` is raised:
+발견한 파일에서 `ApplicationController`가 정의되어 있으면 OK입니다. 정의되지 않은 경우에는 `LoadError`를 발생시킵니다.
 
 ```
-unable to autoload constant ApplicationController, expected
-<full path to application_controller.rb> to define it (LoadError)
+unable to autoload constant ApplicationController, expected <application_controller.rb의 전체 경로> to define it (LoadError)
 ```
 
-INFO. Rails does not require the value of autoloaded constants to be a class or
-module object. For example, if the file `app/models/max_clients.rb` defines
-`MAX_CLIENTS = 100` autoloading `MAX_CLIENTS` works just fine.
+INFO: Rails에서는 자동 로딩된 상수의 값이 클래스 객체이거나 모듈 객체일 필요는 없습니다. 예를 들어 `app/models/max_clients.rb`라는 파일에서 `MAX_CLIENTS = 100`라고 정의되어 있는 경우 `MAX_CLIENTS`의 자동 로딩은 문제없이 이루어집니다.
 
-#### Namespaces
+#### 네임스페이스
 
-Autoloading `ApplicationController` looks directly under the directories of
-`autoload_paths` because the nesting in that spot is empty. The situation of
-`Post` is different, the nesting in that line is `[PostsController]` and support
-for namespaces comes into play.
+`ApplicationController`의 자동 로딩은 발생하는 시점에서의 네스트가 비어있기 때문에 `autoload_paths`의 폴더 목록에서 직접 이루어지는 것처럼 보입니다. `Post`의 경우는 이와 조금 다릅니다. 그 시점에서의 네스트는 `[PostsController]`이므로, 네임스페이스의 영향을 받기 때문입니다.
 
-The basic idea is that given
+기본적인 발상은 아래에서 설명합니다.
 
 ```ruby
 module Admin
@@ -553,9 +416,7 @@ module Admin
 end
 ```
 
-to autoload `Role` we are going to check if it is defined in the current or
-parent namespaces, one at a time. So, conceptually we want to try to autoload
-any of
+`Role`을 자동 로딩하려면 부모의 네임스페이스나, 자기 자신에게서 `Role`이 정의가 되어있는지 아닌지를 체크합니다. 다시 말해서, 개념 상으로는 자동 로딩을 다음 순서대로 시도하게 됩니다.
 
 ```
 Admin::BaseController::Role
@@ -563,8 +424,7 @@ Admin::Role
 Role
 ```
 
-in that order. That's the idea. To do so, Rails looks in `autoload_paths`
-respectively for file names like these:
+여기가 중요합니다. 이를 실행하기 위해서 Rails는 `autoload_paths`의 경로를 파일명 순서대로 다음과 같이 탐색합니다.
 
 ```
 admin/base_controller/role.rb
@@ -572,16 +432,13 @@ admin/role.rb
 role.rb
 ```
 
-modulus some additional directory lookups we are going to cover soon.
+탐색 대상이 되는 그 이외의 표준적인 폴더에 대해서는 뒤에서 설명합니다.
 
-INFO. `'Constant::Name'.underscore` gives the relative path without extension of
-the file name where `Constant::Name` is expected to be defined.
+INFO. `'Constant::Name'.underscore`는 `Constant::Name`이 정의되어 있을 것이라고 기대되는 파일의 상대 경로를 돌려줍니다. 이 파일명에는 확장자를 포함하지 않습니다.
 
-Let's see how Rails autoloads the `Post` constant in the `PostsController`
-above assuming the application has a `Post` model defined in
-`app/models/post.rb`.
+Rails가 `Post` 상수를 어떤식으로 다루어서 `PostsController`에서 자동으로 읽어오는지 자세히 살펴봅시다. 이 애플리케이션에서는 `app/models/post.rb`에 `Post` 모델이 있다고 가정합니다.
 
-First it checks for `posts_controller/post.rb` in `autoload_paths`:
+처음에 `autoload_paths`의 경로 중에서 `posts_controller/post.rb`가 있는지를 확인합니다.
 
 ```
 app/assets/posts_controller/post.rb
@@ -591,8 +448,7 @@ app/helpers/posts_controller/post.rb
 test/mailers/previews/posts_controller/post.rb
 ```
 
-Since the lookup is exhausted without success, a similar search for a directory
-is performed, we are going to see why in the [next section](#automatic-modules):
+이 탐색은 실패하므로, 다음에는 폴더의 유무를 확인합니다. 그 이유에 대해서는 [다음 절](#자동-모듈)에서 설명합니다.
 
 ```
 app/assets/posts_controller/post
@@ -602,8 +458,7 @@ app/helpers/posts_controller/post
 test/mailers/previews/posts_controller/post
 ```
 
-If all those attempts fail, then Rails starts the lookup again in the parent
-namespace. In this case only the top-level remains:
+이 탐색이 모두 실패하면, Rails는 부모의 네임스페이스에서 탐색을 진행합니다. 이 예제의 경우, 부모는 최상위뿐입니다.
 
 ```
 app/assets/post.rb
@@ -613,17 +468,13 @@ app/mailers/post.rb
 app/models/post.rb
 ```
 
-A matching file is found in `app/models/post.rb`. The lookup stops there and the
-file is loaded. If the file actually defines `Post` all is fine, otherwise
-`LoadError` is raised.
+드디어 매칭되는 파일 `app/models/post.rb`를 찾았습니다. 탐색은 여기서 종료하고, 파일을 읽어옵니다. `Post`가 이 파일에 실제로 정의되어 있다면 OK입니다. 정의되어 있지 않다면 `LoadError`를 발생시킵니다.
 
-### Qualified References
+### 검증된 상수 참조
 
-When a qualified constant is missing Rails does not look for it in the parent
-namespaces. But there is a caveat: When a constant is missing, Rails is
-unable to tell if the trigger was a relative reference or a qualified one.
+검증된(qualified) 상수를 찾을 수 없는 경우, 이 상수는 부모의 네임스페이스에서 탐색하지 않습니다. 단, 여기에서는 주의해야할 점이 있습니다. 상수가 발견되지 않는 경우, Rails는 그 트리거가 상대 참조인지, 검증된 상수 참조인지 알 수 없게 됩니다.
 
-For example, consider
+다음의 예제를 봅시다.
 
 ```ruby
 module Admin
@@ -631,30 +482,25 @@ module Admin
 end
 ```
 
-and
+그리고 다음의 코드가 있습니다.
 
 ```ruby
 Admin::User
 ```
 
-If `User` is missing, in either case all Rails knows is that a constant called
-"User" was missing in a module called "Admin".
+`User`가 발견되지 않는다면 어느 쪽이든 Rails는 "User"라는 상수가 "Admin"이라는 모듈에는 없다는 것을 이해합니다.
 
-If there is a top-level `User` Ruby would resolve it in the former example, but
-wouldn't in the latter. In general, Rails does not emulate the Ruby constant
-resolution algorithms, but in this case it tries using the following heuristic:
+이 `User`가 최상위에 있다고 가정하면, 첫번째의 예제는 Ruby에 의해서 해결됩니다만, 두번째의 예제는 그렇지 않습니다. Rails는 Ruby의 상수 해결 알고리즘을 모방하지 않으므로, 이러한 경우에는 다음의 휴리스틱을 이용해서 해결을 시도합니다.
 
-> If none of the parent namespaces of the class or module has the missing
-> constant then Rails assumes the reference is relative. Otherwise qualified.
+> 발견되지 않는 상수가 그 클래스, 또는 모듈의 부모 네임스페이스에도 없는 경우, Rails는 그 상수를 상대참조라고 가정한다. 그렇지 않은 경우에는 검증된 상수 참조라고 가정한다.
 
-For example, if this code triggers autoloading
+예를 들자면, 다음의 코드가 자동 로딩을 하고,
 
 ```ruby
 Admin::User
 ```
 
-and the `User` constant is already present in `Object`, it is not possible that
-the situation is
+`User` 상수가 `Object`에 이미 존재하는 경우, 다음의 코드에서는 같은 상황이 발생하지 않습니다.
 
 ```ruby
 module Admin
@@ -662,55 +508,35 @@ module Admin
 end
 ```
 
-because otherwise Ruby would have resolved `User` and no autoloading would have
-been triggered in the first place. Thus, Rails assumes a qualified reference and
-considers the file `admin/user.rb` and directory `admin/user` to be the only
-valid options.
+그렇지 않다면 Ruby는 `User`를 해결할 수 있으며, 애초에 처음 위치에서 자동로딩이 발생하지 않을 것입니다. 이러한 경우 Rails는 이 상수가 검증된 상수라고 가정하고, `admin/user.rb` 파일과 `admin/user` 폴더만이 올바른 선택지라고 생각합니다.
 
-In practice, this works quite well as long as the nesting matches all parent
-namespaces respectively and the constants that make the rule apply are known at
-that time.
+이 중첩이 모든 부모 네임스페이스에 각각 매칭하고, 그 규칙을 적용시킨 상수의 존재가 그 시점에서 Ruby에게 인식되어 있다면 이 방법은 실질적으로 문제없이 동작합니다.
 
-However, autoloading happens on demand. If by chance the top-level `User` was
-not yet loaded, then Rails assumes a relative reference by contract.
+하지만 자동 로딩은 요구에 따라서 발생하는 것입니다. 그 시점에서 운나쁘게 최상위에 `User`가 로딩되어 있지 않다면, Rails는 이 휴리스틱에 따라서 상수를 상대참조일 것이라고 가정하게 됩니다.
 
-Naming conflicts of this kind are rare in practice, but if one occurs,
-`require_dependency` provides a solution by ensuring that the constant needed
-to trigger the heuristic is defined in the conflicting place.
+이러한 이름의 경합은 실제로는 거의 발생하지 않습니다만, 만약 이로 인한 문제가 발생한 경우는 `require_dependency`를 사용해서 이 휴리스틱을 발생시키는 상수를 정의해야합니다.
 
-### Automatic Modules
+### 자동 모듈
 
-When a module acts as a namespace, Rails does not require the application to
-defines a file for it, a directory matching the namespace is enough.
+모듈이 하나의 네임스페이스처럼 동작하는 경우, Rails 애플리케이션에서 그 모듈을 위한 파일을 정의할 필요가 없습니다. 그 네임스페이스에 매칭하는 폴더를 만들기만 하면 됩니다.
 
-Suppose an application has a back office whose controllers are stored in
-`app/controllers/admin`. If the `Admin` module is not yet loaded when
-`Admin::UsersController` is hit, Rails needs first to autoload the constant
-`Admin`.
+어떤 Rails 애플리케이션에 관리 기능이 있어, 이를 위한 컨트롤러가 `app/controllers/admin`에 저장한다고 해봅시다. 이 `Admin` 모듈이 로딩되지 않은 상태에서 `Admin::UsersController`에 대한 접근이 발생한 경우, Rails는 우선 `Admin`이라는 상수를 자동 로딩해야합니다.
 
-If `autoload_paths` has a file called `admin.rb` Rails is going to load that
-one, but if there's no such file and a directory called `admin` is found, Rails
-creates an empty module and assigns it to the `Admin` constant on the fly.
+`admin.rb`라는 파일이 `autoload_paths`의 경로에 포함되어 있는 경우에는 Rails가 자동으로 불러옵니다. 하지만 그런 파일이 발견되지 않고 `admin`라는 폴더가 발견 된 경우, Rails는 빈 모듈을 하나 만들고 `Admin` 상수를 거기에 대입합니다.
 
-### Generic Procedure
+### 일반적인 순서
 
-Relative references are reported to be missing in the cref where they were hit,
-and qualified references are reported to be missing in their parent (see
-[Resolution Algorithm for Relative
-Constants](#resolution-algorithm-for-relative-constants) at the beginning of
-this guide for the definition of *cref*, and [Resolution Algorithm for Qualified
-Constants](#resolution-algorithm-for-qualified-constants) for the definition of
-*parent*).
+상대참조는 발견된 cref에는 발견되지 않았다고 보고됩니다. 검증된 상수 참조는 그 부모로부터 발견되지 않았다고 보고됩니다(*cref*의 정의에 대해서는 [상대 상수를 해결하는 알고리즘](#상대-상수를-해결하는-알고리)를, *부모*의 정의에 대해서는 [검증된 상수를 해결하는 알고리즘](#검증된-상수를-해결하는-알고리즘)를 참조해주세요).
 
-The procedure to autoload constant `C` in an arbitrary situation is as follows:
+임의의 상황에서 상수`C`를 자동 로딩하는 순서를 과정은 다음과 같이 표현할 수 있습니다.
 
 ```
-if the class or module in which C is missing is Object
+if 상수 C가 발견되지 않은 클래스 또는 모듈 객체
   let ns = ''
 else
-  let M = the class or module in which C is missing
+  let M = 상수C가 발견되지 않은 클래스 또는 모듈
 
-  if M is anonymous
+  if M이 익명임
     let ns = ''
   else
     let ns = M.name
@@ -718,12 +544,12 @@ else
 end
 
 loop do
-  # Look for a regular file.
+  # 일반 파일들을 탐색
   for dir in autoload_paths
-    if the file "#{dir}/#{ns.underscore}/c.rb" exists
+    if "#{dir}/#{ns.underscore}/c.rb" 파일이 존재
       load/require "#{dir}/#{ns.underscore}/c.rb"
 
-      if C is now defined
+      if 상수C가 정의되어 있음
         return
       else
         raise LoadError
@@ -731,10 +557,10 @@ loop do
     end
   end
 
-  # Look for an automatic module.
+  # 자동 모듈을 탐색
   for dir in autoload_paths
-    if the directory "#{dir}/#{ns.underscore}/c" exists
-      if ns is an empty string
+    if "#{dir}/#{ns.underscore}/c" 폴더가 존재
+      if ns가 공백문자임
         let C = Module.new in Object and return
       else
         let C = Module.new in ns.constantize and return
@@ -742,15 +568,15 @@ loop do
     end
   end
 
-  if ns is empty
-    # We reached the top-level without finding the constant.
+  if ns이 비었음
+    # 상수가 발견되지 않은 채 최상위 네임스페이스에 도착
     raise NameError
   else
-    if C exists in any of the parent namespaces
-      # Qualified constants heuristic.
+    if C가 부모 네임스페이스 어딘가에 존재
+      # 검증된 상수의 휴리스틱
       raise NameError
     else
-      # Try again in the parent namespace.
+      # 부모의 네임스페이스에서 탐색을 재시도
       let ns = the parent namespace of ns and retry
     end
   end
@@ -761,101 +587,67 @@ end
 require_dependency
 ------------------
 
-Constant autoloading is triggered on demand and therefore code that uses a
-certain constant may have it already defined or may trigger an autoload. That
-depends on the execution path and it may vary between runs.
+상수의 자동 로딩은 필요에 따라서 자동적으로 이루어지므로, 사용할 때에는 정의가 되어 있는 상수도 있고, 자동 로딩을 발생시키는 상수도 있어 동작이 일정하지 않습니다. 자동 로딩은 실행 경로에 의존합니다만, 실행 경로는 애플리케이션이 실행하는 도중에 변경될 수 있으므로, 이 역시 일정하지 않습니다.
 
-There are times, however, in which you want to make sure a certain constant is
-known when the execution reaches some code. `require_dependency` provides a way
-to load a file using the current [loading mechanism](#loading-mechanism), and
-keeping track of constants defined in that file as if they were autoloaded to
-have them reloaded as needed.
+하지만 이러한 상수의 동작을 확실히 만들고 싶은 경우가 가끔 있습니다. 특정 코드를 실행할 때에 거기에 있는 상수가 존재하고 있는 것처럼 만들어서 자동 로딩이 발생하지 않도록 할수는 없을까요? 이러한 경우에는 `require_dependency`를 사용합니다. 이것은 그 시점에서 [로딩 메커니즘](#로딩-메커니즘)을 사용해서 파일을 읽어올 수 있으며, 필요에 따라서 그 파일에 정의되어 있는 상수를 이미 읽어둔 것처럼 추적할 수도 있습니다.
 
-`require_dependency` is rarely needed, but see a couple of use-cases in
-[Autoloading and STI](#autoloading-and-sti) and [When Constants aren't
-Triggered](#when-constants-aren-t-missed).
+`require_dependency`가 필요할 경우는 흔하지 않습니다만, [자동 로딩과 STI](#자동-로딩과-STI)나 [상수가 트리거되지 않는 경우](#상수가-트리거되지-않는-경우)에서 몇가지 실제 예시를 참고해주세요.
 
-WARNING. Unlike autoloading, `require_dependency` does not expect the file to
-define any particular constant. Exploiting this behavior would be a bad practice
-though, file and constant paths should match.
+WARNING: `require_dependency`는 자동 로딩과는 다르며, 그 파일에서 특정 상수가 정의되어 있을 것을 전제하지 않습니다. 이 동작에 의존하는 것은 좋지 않습니다만, 파일과 상수의 경로를 일치시켜둘 필요가 있습니다.
 
 
-Constant Reloading
+상수 리로딩
 ------------------
 
-When `config.cache_classes` is false Rails is able to reload autoloaded
-constants.
+`config.cache_classes`가 false인 경우, Rails는 자동 로딩된 상수를 다시 불러오게 됩니다.
 
-For example, in you're in a console session and edit some file behind the
-scenes, the code can be reloaded with the `reload!` command:
+예를 들어 Rails의 콘솔 세션을 열어둔 상태에서, 몇몇 파일이 갱신된 경우, `reload!` 명령을 사용해서 상수들을 다시 읽어올 수 있습니다.
 
 ```
 > reload!
 ```
 
-When the application runs, code is reloaded when something relevant to this
-logic changes. In order to do that, Rails monitors a number of things:
+애플리케이션을 실행하는 도중에 로직을 변경되면, 리로딩이 발생합니다. 이를 실현하기 위해서 Rails는 아래의 다양한 파일들을 감시하고 있습니다.
 
-* `config/routes.rb`.
+* `config/routes.rb`
 
-* Locales.
+* 로케일
 
-* Ruby files under `autoload_paths`.
+* `autoload_paths`의 경로에 존재하는 Ruby 파일
 
-* `db/schema.rb` and `db/structure.sql`.
+* `db/schema.rb`와 `db/structure.sql` 파일
 
-If anything in there changes, there is a middleware that detects it and reloads
-the code.
+이 중에 어떤 파일이 변경되면, 미들웨어가 변경사항을 확인한 코드를 다시 읽어오게 됩니다.
 
-Autoloading keeps track of autoloaded constants. Reloading is implemented by
-removing them all from their respective classes and modules using
-`Module#remove_const`. That way, when the code goes on, those constants are
-going to be unknown again, and files reloaded on demand.
+자동 로딩된 상수는 자동 로딩 인프라에 의해서 감시받습니다. 리로딩의 구체적인 구현은 `Module#remove_const` 메소드를 호출하여 관련된 클래스와 모듈을 전부 삭제하는 식입니다. 이를 통해서 그 코드가 실행되면 상수가 다시 알 수 없는 상수가 되므로, 필요에 따라서 파일을 다시 불러오게 됩니다.
 
-INFO. This is an all-or-nothing operation, Rails does not attempt to reload only
-what changed since dependencies between classes makes that really tricky.
-Instead, everything is wiped.
+INFO: 이 동작은 'all-or-nothing'입니다. Rails의 클래스나 모듈 간에는 무척 미묘한 의존관계가 있기 때문에, 변경이 발생한 클래스나 모듈만이 부분적으로 리로딩되는 것이 아닙니다. 대신, 클래스나 모듈은 변경이 발생될 때마다 모두 삭제됩니다.
 
 
-Module#autoload isn't Involved
+Module#autoload가 관여하지 않는 경우
 ------------------------------
 
-`Module#autoload` provides a lazy way to load constants that is fully integrated
-with the Ruby constant lookup algorithms, dynamic constant API, etc. It is quite
-transparent.
+`Module#autoload`는 상수를 지연 로딩하는 기능을 제공합니다. 이 기능은 Ruby의 상수 탐색 알고리즘이나 동적 상수 API등과 완전히 통합되어 있습니다. 이 동작은 굉장히 투명합니다.
 
-Rails internals make extensive use of it to defer as much work as possible from
-the boot process. But constant autoloading in Rails is **not** implemented with
-`Module#autoload`.
+Rails 내부에서는 기동 프로세스 이후의 작업을 가능한 지연시키기 위해서 이 기능을 폭넓게 사용하고 있습니다. 단, Rails의 상수 자동 로딩에서는 `Module#autoload`를 사용해서 **구현하지 않았습니다**.
 
-One possible implementation based on `Module#autoload` would be to walk the
-application tree and issue `autoload` calls that map existing file names to
-their conventional constant name.
+구현에서 `Module#autoload`를 사용하는 한가지 방법은 예를 들어 애플리케이션의 트리를 전부 스캔하여 기존의 파일명과 기존의 상수명을 연결하기 위해서 `autoload`를 호출하는 것입니다.
 
-There are a number of reasons that prevent Rails from using that implementation.
+하지만 Rails에서 이러한 구현을 하지 않는 데에는 몇가지 이유가 있습니다.
 
-For example, `Module#autoload` is only capable of loading files using `require`,
-so reloading would not be possible. Not only that, it uses an internal `require`
-which is not `Kernel#require`.
+예를 들어, `Module#autoload`는 `require`를 사용하는 파일만을 로딩할 수 있기 때문에, 리로딩에서는 사용할 수 없습니다. 심지어, 이 모듈 내부에서는 `Kernel#require`와는 다른 `require`가 사용되고 있습니다.
 
-Then, it provides no way to remove declarations in case a file is deleted. If a
-constant gets removed with `Module#remove_const` its `autoload` is not triggered
-again. Also, it doesn't support qualified names, so files with namespaces should
-be interpreted during the walk tree to install their own `autoload` calls, but
-those files could have constant references not yet configured.
+이 때문에 이 모듈에서는 파일이 삭제된 경우에도 그 선언을 삭제할 방법을 제공하지 않습니다. 상수를`Module#remove_const`로 삭제하면 나중에 `autoload`를 사용할 수 없게 됩니다. 또한 이 모듈에서는 검증된 상수명을 지원하지 않습니다. 애플리케이션의 트리를 탐색하여 각각의 `autoload` 호출을 설치할 때 네임스페이스를 해석해야 합니다만, 그러한 파일의 상수 참조가 그 시점에서는 아직 구성이 되어있지 않을 가능성이 있습니다.
 
-An implementation based on `Module#autoload` would be awesome but, as you see,
-at least as of today it is not possible. Constant autoloading in Rails is
-implemented with `Module#const_missing`, and that's why it has its own contract,
-documented in this guide.
+`Module#autoload`를 사용해서 자동 로딩을 구현했으면 좋았습니다만, 위에서 설명한 이유로 현 시점에서는 어렵습니다. Rails의 상수 자동 로딩은 현재 `Module#const_missing`를 사용해서 구현되어 있습니다. 이러한 방법을 사용한 것은 위에서 설명한 이유 때문입니다.
 
 
-Common Gotchas
+자주하는 실수
 --------------
 
-### Nesting and Qualified Constants
+### 중첩과 검증된 상수
 
-Let's consider
+아래의 두 가지에 대해서 생각해봅시다.
 
 ```ruby
 module Admin
@@ -867,7 +659,7 @@ module Admin
 end
 ```
 
-and
+그리고,
 
 ```ruby
 class Admin::UsersController < ApplicationController
@@ -877,17 +669,11 @@ class Admin::UsersController < ApplicationController
 end
 ```
 
-To resolve `User` Ruby checks `Admin` in the former case, but it does not in
-the latter because it does not belong to the nesting (see [Nesting](#nesting)
-and [Resolution Algorithms](#resolution-algorithms)).
+Ruby는 `User`를 해결하기 위해서 첫번째 예제에서는 `Admin`을 확인합니다만, 두번째의 예시에서는 중첩에 속해있지 않으므로 `Admin`을 확인하지 않습니다([중첩](#중첩), [해결 알고리즘](#해결 알고리즘)을 참고).
 
-Unfortunately Rails autoloading does not know the nesting in the spot where the
-constant was missing and so it is not able to act as Ruby would. In particular,
-`Admin::User` will get autoloaded in either case.
+아쉽게도 Rails의 자동 로딩은 이 상수가 발견되지 않는 상황에서 중첩이 발생했는지 아닌지를 인식하지 못하므로, 일반적인 Ruby와 마찬가지로 동작하지 않습니다. 특히 `Admin::User`는 어느 경우에도 자동 로딩이 발생합니다.
 
-Albeit qualified constants with `class` and `module` keywords may technically
-work with autoloading in some cases, it is preferable to use relative constants
-instead:
+몇몇 상황에서 `class` 키워드나 `module` 키워드의 검증된 상수는 자동 로딩이 동작하기는 하지만, 검증된 상수보다는 상대 상수를 사용하기를 권장합니다.
 
 ```ruby
 module Admin
@@ -899,12 +685,9 @@ module Admin
 end
 ```
 
-### Autoloading and STI
+### 자동 로딩과 STI
 
-Single Table Inheritance (STI) is a feature of Active Record that enables
-storing a hierarchy of models in one single table. The API of such models is
-aware of the hierarchy and encapsulates some common needs. For example, given
-these classes:
+단일 테이블 상속(STI: Single Table Inheritance)는 Active Record의 기능 중 하나로, 모델의 계층구조를 하나의 테이블로 저장할 수 있습니다. 이러한 모델의 API는 계층 구조를 인식하고 자주 사용되는 요소가 거기에 캡슐화됩니다. 예를 들자면, 다음과 같은 클래스가 있다고 합시다.
 
 ```ruby
 # app/models/polygon.rb
@@ -920,36 +703,24 @@ class Rectangle < Polygon
 end
 ```
 
-`Triangle.create` creates a row that represents a triangle, and
-`Rectangle.create` creates a row that represents a rectangle. If `id` is the
-ID of an existing record, `Polygon.find(id)` returns an object of the correct
-type.
+`Triangle.create`는 삼각형을 나타내는 레코드를 하나 생성하고 `Rectangle.create`는 사각형을 나타내는 레코드를 하나 만듭니다. `id`는 기존의 레코드의 ID라면 `Polygon.find(id)`로 올바른 종류의 객체를 가져올 수 있습니다.
 
-Methods that operate on collections are also aware of the hierarchy. For
-example, `Polygon.all` returns all the records of the table, because all
-rectangles and triangles are polygons. Active Record takes care of returning
-instances of their corresponding class in the result set.
+컬렉션에 대해서 실행되는 메소드는 계층구조도 인식합니다. 예를 들어, 삼각혀오가 사각형, 둘다 다각형(polygon)에 포함되므로 `Polygon.all`은 테이블의 모든 레코드를 가져옵니다. Active Record가ㅏ 반환한 결과에서는 결과마다 거기에 맞는 클래스 객체를 반환하도록 되어 있습니다.
 
-Types are autoloaded as needed. For example, if `Polygon.first` is a rectangle
-and `Rectangle` has not yet been loaded, Active Record autoloads it and the
-record is correctly instantiated.
+종류는 필요에 따라서 자동 로딩됩니다. 예를 들어 `Polygon.first`의 결과가 사각형(rectangle)이고, `Rectangle`가 그 시점에 로딩되지 않았다면 Active Record에 의해서 `Rectangle`가 로딩되어 그 레코드는 올바르게 인스턴스로 변환됩니다.
 
-All good, but if instead of performing queries based on the root class we need
-to work on some subclass, things get interesting.
+여기까지는 아무런 문제도 없습니다. 하지만 최상위 클래스에서의 쿼리가 아닌, 어떤 하위 클래스를 사용해야만 하는 상황의 경우에는 사정이 다릅니다.
 
-While working with `Polygon` you do not need to be aware of all its descendants,
-because anything in the table is by definition a polygon, but when working with
-subclasses Active Record needs to be able to enumerate the types it is looking
-for. Let’s see an example.
+`Polygon`을 조작하려면 테이블 내의 모든 값은 polygon으로 정의되어 있으므로, 어떤 자식에 대해서도 따로 고려할 필요는 없습니다, 단 `Polygon`의 하위 클래스에서 조작을 하는 경우, Active Record가 탐색하려는 것들을 그 하위 클래스에서 사용가능하게 만들어야 합니다. 다음의 예시를 봅시다.
 
-`Rectangle.all` only loads rectangles by adding a type constraint to the query:
+아래와 같이, 쿼리에 가져오고 싶은 종류 제한을 추가하면 `Rectangle.all`은 rectangle만을 가져옵니다.
 
 ```sql
 SELECT "polygons".* FROM "polygons"
 WHERE "polygons"."type" IN ("Rectangle")
 ```
 
-Let’s introduce now a subclass of `Rectangle`:
+이번에는 `Rectangle`의 하위 클래스를 만들어봅시다.
 
 ```ruby
 # app/models/square.rb
@@ -957,29 +728,25 @@ class Square < Rectangle
 end
 ```
 
-`Rectangle.all` should now return rectangles **and** squares:
+`Rectangle.all`는 사각형과 정사각형을 **모두** 돌려줍니다.
 
 ```sql
 SELECT "polygons".* FROM "polygons"
 WHERE "polygons"."type" IN ("Rectangle", "Square")
 ```
 
-But there’s a caveat here: How does Active Record know that the class `Square`
-exists at all?
+단 여기에서는 주의가 필요합니다. Active Record는 `Square` 클래스의 존재를 어떤식으로 이해하고 있는 것일까요?
 
-Even if the file `app/models/square.rb` exists and defines the `Square` class,
-if no code yet used that class, `Rectangle.all` issues the query
+`app/models/square.rb`라는 파일이 존재해서 `Square`가 정의되어 있다고 하더라도, 클래스 내의 코드가 그 시점까지 사용된 적이 없었다면 `Rectangle.all`에 의해서 다음의 쿼리가 생성됩니다.
 
 ```sql
 SELECT "polygons".* FROM "polygons"
 WHERE "polygons"."type" IN ("Rectangle")
 ```
 
-That is not a bug, the query includes all *known* descendants of `Rectangle`.
+이것은 버그가 아닙니다. `Rectangle` 클래스의 그 시점에서 *알려진* 자식이 쿼리에 모두 포함되어 있습니다.
 
-A way to ensure this works correctly regardless of the order of execution is to
-load the leaves of the tree by hand at the bottom of the file that defines the
-root class:
+코드의 실행순서에 관계없이 항상 기대한 대로 동작하게 만드는 수단으로서, 최상위 클래스가 정의되어 있는 파일에 그 자식 클래스를 명시적으로 로딩하는 방법이 있습니다.
 
 ```ruby
 # app/models/polygon.rb
@@ -988,43 +755,33 @@ end
 require_dependency ‘square’
 ```
 
-Only the leaves that are **at least grandchildren** need to be loaded this
-way. Direct subclasses do not need to be preloaded. If the hierarchy is
-deeper, intermediate classes will be autoloaded recursively from the bottom
-because their constant will appear in the class definitions as superclass.
+이 방법으로 명시적으로 읽어와야 하는 것은 **최하위에 있는** 클래스들로 충분합니다. 직계 사직에 대해서는 미리 불러올 필요가 없습니다. 만약 계층 구조가 더 복잡하더라도, 가장 하위에 있는 클래스를 지정해두면 그 중간에 포함되어 있는 클래스들은 재귀적으로 자동 로딩됩니다.
 
-### Autoloading and `require`
+### 자동 로딩과 `require`
 
-Files defining constants to be autoloaded should never be `require`d:
+자동 로딩되는 상수를 정의한 파일은 `require`를 해서는 안됩니다.
 
 ```ruby
-require 'user' # DO NOT DO THIS
+require 'user' # 실행하지 말 것
 
 class UsersController < ApplicationController
   ...
 end
 ```
 
-There are two possible gotchas here in development mode:
+이는 development 환경에서 다음의 두가지 문제를 야기할 가능성이 있습니다.
 
-1. If `User` is autoloaded before reaching the `require`, `app/models/user.rb`
-runs again because `load` does not update `$LOADED_FEATURES`.
+1. 이 `require`가 실행되기 전에 `User`가 자동 로딩되면 `$LOADED_FEATURES`가 `load`에 의해서 갱신되지 않으므로, `app/models/user.rb`가 다시 실행되고 맙니다.
 
-2. If the `require` runs first Rails does not mark `User` as an autoloaded
-constant and changes to `app/models/user.rb` aren't reloaded.
+2. 이 `require`가 처음에 실행되면 Rails는 `User`를 자동 로딩 상수라고 인식하지 않기 때문에 `app/models/user.rb`의 변경사항을 반영하지 못하게 됩니다.
 
-Just follow the flow and use constant autoloading always, never mix
-autoloading and `require`. As a last resort, if some file absolutely needs to
-load a certain file use `require_dependency` to play nice with constant
-autoloading. This option is rarely needed in practice, though.
+흐름에 따라서 '항상' 상수의 자동 로딩을 사용해주세요. 자동 로딩과 `require`는 절대로 함께 사용해서는 안됩니다. 어쩔 수 없는 사정으로 파일에서 특정 파일을 읽어오고 싶은 경우에는 마지막 수단으로 `require_dependency`를 사용해서 상수를 자동 로딩과 함께 사용할 수 있도록 해주세요. 다만, 이 옵션이 실제로 필요한 경우는 거의 없을 것입니다.
 
-Of course, using `require` in autoloaded files to load ordinary 3rd party
-libraries is fine, and Rails is able to distinguish their constants, they are
-not marked as autoloaded.
+물론 일반적인 플러그인 라이브러리들은 자동 로딩될 파일 내에서도 `require`로 불러오더라도 문제 없습니다. Rails는 플러그인 라이브러리의 상수를 구별하고 있으므로, 이들을 자동 로딩 대상으로 인식하지 않기 때문입니다.
 
-### Autoloading and Initializers
+### 자동 로딩과 initializer
 
-Consider this assignment in `config/initializers/set_auth_service.rb`:
+`config/initializers/set_auth_service.rb`에서 아래의 대입을 쓰는 상황에 대해서 생각해봅시다.
 
 ```ruby
 AUTH_SERVICE = if Rails.env.production?
@@ -1034,17 +791,11 @@ else
 end
 ```
 
-The purpose of this setup would be that the application uses the class that
-corresponds to the environment via `AUTH_SERVICE`. In development mode
-`MockedAuthService` gets autoloaded when the initializer runs. Let’s suppose
-we do some requests, change its implementation, and hit the application again.
-To our surprise the changes are not reflected. Why?
+이 설정의 목적은 `AUTH_SERVICE`에서 각 환경에 대응한 클래스를 Rails 애플리케이션에서 사용하기 위함입니다. development 환경에서는 initializer를 실행할 때에 `MockedAuthService`가 자동 로딩 됩니다. 여기서 애플리케이션에 몇몇 요청을 처리한 뒤, 구현을 변경하고, 다시 애플리케이션에 접근했다고 합시다. 놀랍게도, 변경해둔 코드가 반영되지 않습니다. 이것은 왜일까요?
 
-As [we saw earlier](#constant-reloading), Rails removes autoloaded constants,
-but `AUTH_SERVICE` stores the original class object. Stale, non-reachable
-using the original constant, but perfectly functional.
+[위에서도](#상수-리로딩) 언급했듯, 자동 로딩된 상수는 Rails에 의해서 삭제됩니다만, `AUTH_SERVICE`에는 원래의 클래스가 저장되어 있습니다. 이 객체는 최신의 상태가 아니므로, 원래의 상수를 사용해서 접근 할 수 없게 되었습니다만, 완전히 동작합니다.
 
-The following code summarizes the situation:
+다음은 이 상황을 정리한 것입니다.
 
 ```ruby
 class C
@@ -1060,10 +811,9 @@ X.name      # => C
 C           # => uninitialized constant C (NameError)
 ```
 
-Because of that, it is not a good idea to autoload constants on application
-initialization.
+이러한 이유로, Rails 애플리케이션의 초기화 시에 상수를 자동 로딩하는 것은 좋은 아이디어라고 말할 수 없습니다.
 
-In the case above we could implement a dynamic access point:
+이러한 경우에는 다음과 같이 동적인 접근 포인트를 구현하고,
 
 ```ruby
 # app/models/auth_service.rb
@@ -1080,30 +830,23 @@ class AuthService
 end
 ```
 
-and have the application use `AuthService.instance` instead. `AuthService`
-would be loaded on demand and be autoload-friendly.
+나아가 애플리케이션에서 `AuthService.instance`를 이용하는 방법이 있습니다. `AuthService`는 필요에 따라서 로딩되고, 자동 로딩과 잘 동작합니다.
 
-### `require_dependency` and Initializers
+### `require_dependency`와 initializer
 
-As we saw before, `require_dependency` loads files in an autoloading-friendly
-way. Normally, though, such a call does not make sense in an initializer.
+이미 언급했듯, `require_dependency`는 자동 로딩과 잘 동작하도록 파일을 불러옵니다. 하지만, 이러한 호출은 initializer에서는 의미가 없는 경우가 대부분입니다.
 
-One could think about doing some [`require_dependency`](#require-dependency)
-calls in an initializer to make sure certain constants are loaded upfront, for
-example as an attempt to address the [gotcha with STIs](#autoloading-and-sti).
+initializer 내에서 [`require_dependency`](#require-dependency)를 호출하여, 예를 들자면 [자동 로딩과 STI](#자동-로딩과-STI)의 문제를 해결하려고 했던 것처럼 특정 상수를 확실히 불러올 수 있습니다.
 
-Problem is, in development mode [autoloaded constants are wiped](#constant-reloading)
-if there is any relevant change in the file system. If that happens then
-we are in the very same situation the initializer wanted to avoid!
+이 방법의 문제는 development 환경에서는 관련한 변경이 파일 시스템 상에서 발생하지 않은 경우에 [자동 로딩된 상수가 완전히 삭제된다는](#상수-리로딩) 점입니다. initializer에서의 이러한 상수의 완전 상제는 가급적 피하고 싶은 부분입니다.
 
-Calls to `require_dependency` have to be strategically written in autoloaded
-spots.
+자동 로딩이 발생하는 위치에서 `require_dependency`를 사용하는 경우에는 충분히 사용법을 고민해야 합니다.
 
-### When Constants aren't Missed
+### 상수가 트리거되지 않는 경우
 
-#### Relative References
+#### 상대참조
 
-Let's consider a flight simulator. The application has a default flight model
+비행 시뮬레이터에 대해 생각해봅시다. 이 애플리케이션에는 다음의 기본 비행 모델이 하나 있습니다.
 
 ```ruby
 # app/models/flight_model.rb
@@ -1111,7 +854,7 @@ class FlightModel
 end
 ```
 
-that can be overridden by each airplane, for instance
+이것은 다음과 같이 각각 비행기에 덮어 씌울 수 있습니다.
 
 ```ruby
 # app/models/bell_x1/flight_model.rb
@@ -1130,14 +873,11 @@ module BellX1
 end
 ```
 
-The initializer wants to create a `BellX1::FlightModel` and nesting has
-`BellX1`, that looks good. But if the default flight model is loaded and the
-one for the Bell-X1 is not, the interpreter is able to resolve the top-level
-`FlightModel` and autoloading is thus not triggered for `BellX1::FlightModel`.
+initializer는 `BellX1::FlightModel`을 하나 생성하려고 시도하고, 중첩에는 `BellX1`가 있습니다. 얼핏 보기에는 문제가 없어보입니다. 하지만 여기서 기본 비행 모델이 로딩되고, Bell-X1의 비행 모델이 로딩되지 않았다고 해봅시다. 이때, Ruby 인터프리터는 최상위의 `FlightModel`를 해결할 수 있으므로 `BellX1::FlightModel`의 자동 로딩이 실행되지 않습니다.
 
-That code depends on the execution path.
+이 코드의 동작은 실행 경로의 내용에 의존합니다.
 
-These kind of ambiguities can often be resolved using qualified constants:
+이러한 애매한 해결에는 다음과 같은 검증된 상수가 도움이 되는 경우가 가끔 있습니다.
 
 ```ruby
 module BellX1
@@ -1149,7 +889,7 @@ module BellX1
 end
 ```
 
-Also, `require_dependency` is a solution:
+다음고 같이 `require_dependency`를 사용해서 해결할 수도 있습니다.
 
 ```ruby
 require_dependency 'bell_x1/flight_model'
@@ -1163,9 +903,9 @@ module BellX1
 end
 ```
 
-#### Qualified References
+#### 검증된 상수 참조
 
-Given
+다음의 예제에 대해서 생각해봅시다.
 
 ```ruby
 # app/models/hotel.rb
@@ -1183,43 +923,36 @@ class Hotel
 end
 ```
 
-the expression `Hotel::Image` is ambiguous because it depends on the execution
-path.
+`Hotel::Image`는 실행 경로에 의존하므로, 이 선언에는 불명확함이 있습니다.
 
-As [we saw before](#resolution-algorithm-for-qualified-constants), Ruby looks
-up the constant in `Hotel` and its ancestors. If `app/models/image.rb` has
-been loaded but `app/models/hotel/image.rb` hasn't, Ruby does not find `Image`
-in `Hotel`, but it does in `Object`:
+[위에서 언급했듯](#검증된-상수를-해결하는-알고리즘), Ruby는 `Hotel`과 그 부모 상수를 탐색합니다. `app/models/image.rb`가 로딩되어 있지만 `app/models/hotel/image.rb`가 로딩되어 있지 않은 경우, Ruby는 `Image`를 `Hotel` 내에서가 아니라 `Object`에서 찾습니다.
 
 ```
 $ bin/rails r 'Image; p Hotel::Image' 2>/dev/null
-Image # NOT Hotel::Image!
+Image # Hotel::Image이 아님
 ```
 
-The code evaluating `Hotel::Image` needs to make sure
-`app/models/hotel/image.rb` has been loaded, possibly with
-`require_dependency`.
+`Hotel::Image`를 평가하는 코드는(아마도 `require_dependency`를 사용해서) `app/models/hotel/image.rb`를 사전에 읽어둘 필요가 있습니다.
 
-In these cases the interpreter issues a warning though:
+단, 이 방법을 사용하는 경우, Ruby 인터프리터는 다음과 같은 경고를 출력합니다.
 
 ```
 warning: toplevel constant Image referenced by Hotel::Image
 ```
 
-This surprising constant resolution can be observed with any qualifying class:
+이런 놀라운 상수 해결 방법은 사실 어떤 클래스의 검증할 때에도 볼 수 있습니다.
 
 ```
 2.1.5 :001 > String::Array
 (irb):1: warning: toplevel constant Array referenced by String::Array
- => Array
+=> Array
 ```
 
-WARNING. To find this gotcha the qualifying namespace has to be a class,
-`Object` is not an ancestor of modules.
+WARNING: 이 문제를 실제로 발견하려면, 네임스페이스의 수식부가 클래스일 필요가 있습니다. `Object`는 모듈의 상위 클래스가 아니기 때문입니다.
 
-### Autoloading within Singleton Classes
+### 싱글톤 클래스에서 자동 로딩하기
 
-Let's suppose we have these class definitions:
+다음의 클래스 정의를 생각해봅시다.
 
 ```ruby
 # app/models/hotel/services.rb
@@ -1238,18 +971,13 @@ module Hotel
 end
 ```
 
-If `Hotel::Services` is known by the time `app/models/hotel/geo_location.rb`
-is being loaded, `Services` is resolved by Ruby because `Hotel` belongs to the
-nesting when the singleton class of `Hotel::GeoLocation` is opened.
+`app/models/hotel/geo_location.rb`가 로딩되기 전에 `Hotel::Services`가 인식되어 있다면, `Services`는 Ruby에 의해서 해결됩니다. 이것은 `Hotel::GeoLocation`의 싱글톤 클래스가 열려 있을 때 `Hotel`이 중첩에 포함되어 있기 때문입니다.
 
-But if `Hotel::Services` is not known, Rails is not able to autoload it, the
-application raises `NameError`.
+하지만 `Hotel::Services`가 그 시점에서 인식되어 있지 않다면, Rails는 `Hotel::Services`를 자동 로딩하지 못하고 `NameError`를 던집니다.
 
-The reason is that autoloading is triggered for the singleton class, which is
-anonymous, and as [we saw before](#generic-procedure), Rails only checks the
-top-level namespace in that edge case.
+그 이유는 자동 로딩은 싱글톤 클래스를 위해서 발생하기 때문입니다. 싱글톤 클래스는 익명이며, Rails는 [위에서 설명](#일반적인-순서)한대로 극단적인 상황에서는 최상위 도메인만 확인하기 때문입니다.
 
-An easy solution to this caveat is to qualify the constant:
+이 경고를 해결하는 간단한 방법으로는, 상수를 검증된 상수로 바꾸는 법이 있습니다.
 
 ```ruby
 module Hotel
@@ -1261,10 +989,9 @@ module Hotel
 end
 ```
 
-### Autoloading in `BasicObject`
+### `BasicObject`에서 자동 로딩을 하기
 
-Direct descendants of `BasicObject` do not have `Object` among their ancestors
-and cannot resolve top-level constants:
+`BasicObject`의 직계 자손에 대해서는 그 조상에 `Object`가 존재하지 않기 때문에 최상위 레벨의 상수를 해결할 수 없습니다.
 
 ```ruby
 class C < BasicObject
@@ -1272,39 +999,36 @@ class C < BasicObject
 end
 ```
 
-When autoloading is involved that plot has a twist. Let's consider:
+여기에서 자동 로딩이 포함되면 상황이 복잡해집니다. 다음을 생각해봅시다.
 
 ```ruby
 class C < BasicObject
   def user
-    User # WRONG
+    User # 실수
   end
 end
 ```
 
-Since Rails checks the top-level namespace `User` gets autoloaded just fine the
-first time the `user` method is invoked. You only get the exception if the
-`User` constant is known at that point, in particular in a *second* call to
-`user`:
+Rails는 최상위 레벨의 네임스페이스를 확인하므로, 자동 로딩된 `User`는 `user` 메소드가 '처음' 호출될 때에는 문제 없이 동작합니다. 그러나 `User` 상수를 알고 있는 경우, 특히 `user`를 *2번째로* 호출한 경우에는 예외가 발생합니다.
 
 ```ruby
 c = C.new
-c.user # surprisingly fine, User
+c.user # 놀랍게도 문제가 없음
 c.user # NameError: uninitialized constant C::User
 ```
 
-because it detects that a parent namespace already has the constant (see [Qualified
-References](#autoloading-algorithms-qualified-references)).
+이것은 부모 네임스페이스에 이미 상수가 존재하기 때문입니다([검증된 상수 참조](#검증된-상수-참조)를 참고).
 
-As with pure Ruby, within the body of a direct descendant of `BasicObject` use
-always absolute constant paths:
+순수한 Ruby와 마찬가지로 `BasicObject`의 직계 자손 객체에는 언제나 절대 상수 경로를 사용해주세요.
 
 ```ruby
 class C < BasicObject
-  ::String # RIGHT
+  ::String # 올바름
 
   def user
-    ::User # RIGHT
+    ::User # 올바름
   end
 end
 ```
+
+TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.
