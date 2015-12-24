@@ -125,7 +125,7 @@
       description: Rails 4 내부의 초기화 프로세스에 대해서 설명합니다.
     -
       name: 상수 자동 읽기와 다시 읽기
-      url: constant_autoloading_and_reloading.html
+      url: autoloading_and_reloading_constants.html
       description: 상수 자동 읽기와 다시 읽기가 어떻게 이루어지는지 설명합니다.
 -
   name: Rails 확장하기
