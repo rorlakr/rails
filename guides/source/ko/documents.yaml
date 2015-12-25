@@ -140,7 +140,7 @@
       url: rails_on_rack.html
       description: Rails와 Rack이 어떤식으로 통합되어 있는지, 그리고 다른 Rack 컴포넌트와의 인터페이스에 대해서 설명합니다.
     -
-      name: Rails 제너레이터
+      name: Rails 제너레이터와 템플릿
       url: generators.html
       description: 새로운 제너레이터를 추가하거나 Rails의 내장 제너레이터에 새로운 요소(예를 들어, scaffold 제너레이터에 새로운 테스트 스텁 등)를 추가하는 방법에 대해서 설명합니다.
 -
