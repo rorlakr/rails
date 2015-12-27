@@ -324,7 +324,7 @@ development:
 Action Pack
 -----------
 
-자세한 변경사항은 [Changelog][https://github.com/rails/rails/blob/4-2-stable/actionpack/CHANGELOG.md]를 참고해주세요.
+자세한 변경사항은 [Changelog][action-pack]를 참고해주세요.
 
 ### 삭제된 것들
 
@@ -428,7 +428,7 @@ Action Pack
 Action View
 -----------
 
-자세한 변경사항은 [Changelog][https://github.com/rails/rails/blob/4-2-stable/actionview/CHANGELOG.md]를 참조해주세요.
+자세한 변경사항은 [Changelog][action-view]를 참조해주세요.
 
 ### Deprecated
 
@@ -457,7 +457,7 @@ Action View
 Action Mailer
 -------------
 
-자세한 변경사항은 [Changelog][https://github.com/rails/rails/blob/4-2-stable/actionmailer/CHANGELOG.md]를 참고해주세요.
+자세한 변경사항은 [Changelog][action-mailer]를 참고해주세요.
 
 ### Deprecated
 
@@ -482,7 +482,7 @@ Action Mailer
 Active Record
 -------------
 
-자세한 변경사항은 [Changelog][https://github.com/rails/rails/blob/4-2-stable/activerecord/CHANGELOG.md]를 참고해주세요.
+자세한 변경사항은 [Changelog][active-record]를 참고해주세요.
 
 ### 삭제된 것들
 
@@ -591,7 +591,7 @@ Active Record
 Active Model
 ------------
 
-자세한 변경 사항은 [Changelog][https://github.com/rails/rails/blob/4-2-stable/activemodel/CHANGELOG.md]을 참조해주세요.
+자세한 변경 사항은 [Changelog][active-model]을 참조해주세요.
 
 ### 삭제된 것들
 
@@ -623,7 +623,7 @@ Active Model
 Active Support
 --------------
 
-자세한 변경사항은 [Changelog][https://github.com/rails/rails/blob/4-2-stable/activesupport/CHANGELOG.md]를 참고해주세요.
+자세한 변경사항은 [Changelog][active-support]를 참고해주세요.
 
 ### 삭제된 것들
 
@@ -681,3 +681,11 @@ Active Support
 Rails를 견고하고 안정적인 프레임워크로 만들기 위해 많은 시간을 사용해주신 많은 개발자들에 대해서는 [Rails 기여자 목록](http://contributors.rubyonrails.org/)을 참고해주세요. 이 분들에게 경의를 표합니다.
 
 TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.
+
+[railties]:       https://github.com/rails/rails/blob/4-2-stable/railties/CHANGELOG.md
+[action-pack]:    https://github.com/rails/rails/blob/4-2-stable/actionpack/CHANGELOG.md
+[action-view]:    https://github.com/rails/rails/blob/4-2-stable/actionview/CHANGELOG.md
+[action-mailer]:  https://github.com/rails/rails/blob/4-2-stable/actionmailer/CHANGELOG.md
+[active-record]:  https://github.com/rails/rails/blob/4-2-stable/activerecord/CHANGELOG.md
+[active-model]:   https://github.com/rails/rails/blob/4-2-stable/activemodel/CHANGELOG.md
+[active-support]: https://github.com/rails/rails/blob/4-2-stable/activesupport/CHANGELOG.md
