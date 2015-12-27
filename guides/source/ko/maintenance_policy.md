@@ -1,56 +1,59 @@
-Maintenance Policy for Ruby on Rails
+
+Ruby on Rails Maintenance Policy
 ====================================
 
-Support of the Rails framework is divided into four groups: New features, bug
-fixes, security issues, and severe security issues. They are handled as
-follows, all versions in x.y.z format
+Rails 프레임워크의 지원은 신기능(New feature), 버그 수정(bug fixes), 보안 문제(security issues), 중대한 보안 문제(severe security issue) 라는 4개의 그룹으로 나누어져 있습니다. 이들은 다음과 같이 처리됩니다. 버전은 모두 `X.Y.Z` 형식을 따릅니다.
 
 --------------------------------------------------------------------------------
 
-New Features
+Rails의 버전명은 [semver](http://semver.org/)의 Semantic Versioning를 약간 변형한 것을 따릅니다.
+
+**패치 `Z`**
+
+이 패치에서는 버그 수정만을 포함합니다. API 변경이나 기능 추가는 이루어지지 않습니다. 단, 보안 문제 수정에 대해서는 필요하다면 이를 변경할 때도 있습니다.
+
+**마이너 `Y`**
+
+신기능을 추가합니다. 여기에는 API 변경을 포함할 수도 있습니다(Semver에서 말하는 메이저 버전에 해당). 중대한 변경을 하는 경우에는 사전에 마이너 릴리스 또는 메이저 릴리스에서 Deprecated로 안내합니다.
+
+**메이저 `X`**
+
+
+신기능을 추가합니다. 많은 경우, API 변경이 포함됩니다. Rails에서의 마이너 릴리스와 메이저 릴리스의 차이는 변경의 크기에 있으며, 일반적으로 특별한 경우를 위하여 예약되어 있습니다.
+
+신기능
 ------------
 
-New features are only added to the master branch and will not be made available
-in point releases.
+신기능은 master 브랜치에서만 추가됩니다. 포인트 릴리스(=메이져가 아닌 릴리스)에서는 신기능을 추가하지 않습니다.
 
-Bug Fixes
+버그 수정
 ---------
 
-Only the latest release series will receive bug fixes. When enough bugs are
-fixed and its deemed worthy to release a new gem, this is the branch it happens
-from.
+버그 수정은 최신 릴리스의 시리즈에서만 사용 가능합니다. 버그 수정이 충분히 이루어지고, 새로운 gem을 릴리스할 가치가 있다고 인정된 경우에만 브랜치를 새로 생성합니다.
 
-**Currently included series:** 4.0.z
+특별한 경우로서 코어 팀 멤버 중 한명이 지원할 대상 시리즈를 늘리는 것에 찬성하는 경우에는 지원 대상 시리즈가 추가될 수 있습니다.
 
-Security Issues
+**현재 지원 대상인 시리즈:** `4.2.Z`, `4.1.Z`(지원 담당: Rafael França).
+
+보안 문제
 ---------------
 
-The current release series and the next most recent one will receive patches
-and new versions in case of a security issue.
+현재의 릴리스 시리즈(역주: 복수르 릴리스를 표현하는 총칭), 그리고 다음 릴리스 시리즈에서는 보안 문제가 발생하는 경우, 패치와 새 버전이 적용됩니다.
 
-These releases are created by taking the last released version, applying the
-security patches, and releasing. Those patches are then applied to the end of
-the x-y-stable branch. For example, a theoretical 1.2.3 security release would
-be built from 1.2.2, and then added to the end of 1-2-stable. This means that
-security releases are easy to upgrade to if you're running the latest version
-of Rails.
+이 릴리스는 직전에 릴리스된 버전에 보안 패치를 적용하여 릴리스 됩니다. 이어서 패치는 x-y-stable(안정판) 브랜치의 마지막에 적용됩니다. 예를 들어 1.2.3이라는 보안 릴리스가 있었다고 하면, 이 릴리스는 1.2.2를 기반으로 1-2-stable의 마지막에 추가됩니다. 다시 말해 최신 Rails를 사용하고 있다면 보안 릴리스의 업데이트를 간단하게 수행할 수 있습니다.
 
-**Currently included series:** 4.0.z, 3.2.z
+**현재 지원 대상인 시리즈:** `4.2.Z`, `4.1.Z`.
 
-Severe Security Issues
+중대한 보안 문제
 ----------------------
 
-For severe security issues we will provide new versions as above, and also the
-last major release series will receive patches and new versions. The
-classification of the security issue is judged by the core team.
+중대한 보안 문제인 경우에는 위의 버전과 동일하게 새 버전을 제공하며 최신의 메이저 릴리스 시리즈에 대해서도 보안 패치와 새 버전을 제공합니다. 보안 문제가 어느정도 큰지에 대한 판단은 코어팀에 의해서 이루어지고 있습니다.
 
-**Currently included series:** 4.0.z, 3.2.z
+**현재 지원 대상인 시리즈:** `4.2.Z`, `4.1.Z`, `3.2.Z`.
 
-Unsupported Release Series
+지원 대상 외인 릴리스 시리즈
 --------------------------
 
-When a release series is no longer supported, it's your own responsibility to
-deal with bugs and security issues. We may provide backports of the fixes and
-publish them to git, however there will be no new versions released. If you are
-not comfortable maintaining your own versions, you should upgrade to a
-supported version.
+어떤 릴리스 시리즈가 지원 대상 외로 변경된 경우, 버그 수정과 보안 문제의 대응은 각자의 책임이 됩니다. 경우에 따라서는 수정을 위한 백포트를 git에 공개하는 경우도 있습니다만, 이후 새 버전이 릴리스되는 일은 없습니다. 애플리케이션에서 사용하고 있는 버전을 유지하는데에 어려움을 느끼는 경우에는 지원 대상 버전까지 업그레이드를 해주세요.
+
+TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.
