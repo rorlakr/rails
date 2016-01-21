@@ -91,13 +91,13 @@ end
 ### 트랜젝션 콜백 에러의 처리
 
 현재, Active Record에서는 `after_rollback`이나 `after_commit` 콜백에서 에러를 다루고 있으며, 예외가 발생한 경우에는 로그 출력만 발생합니다. 다음 버전부터는 이러한 에러를 잡아주지 않게 되므로 주의해주세요.
-후앞으로는 다른 Active Record 콜백과 동일한 에러 처리를 하게 됩니다.
+앞으로는 다른 Active Record 콜백과 동일한 에러 처리를 하게 됩니다.
 
 `after_rollback`콜백이나 `after_commit` 콜백을 정의하면 이 변경에 대한 Deprecated 안내가 출력됩니다. 이 변경 내용을 잘 이해하고, 이에 대한 대비가 되었다면 `config/application.rb`에 다음의 설정을 통해서 Deprecated 안내가 출력되지 않도록 변경할 수 있습니다.
 
     config.active_record.raise_in_transactional_callbacks = true
 
-자세한 설명은 [#14488](https://github.com/rails/rails/pull/14488)および[#16537](https://github.com/rails/rails/pull/16537)를 참조해주세요.
+자세한 설명은 [#14488](https://github.com/rails/rails/pull/14488) 또는 [#16537](https://github.com/rails/rails/pull/16537)를 참조해주세요.
 
 ### 테스트 케이스의 실행 순서
 
@@ -972,7 +972,7 @@ config.assets.digest = true
 # Rails.root.join("public/assets")의 기본값
 # config.assets.manifest = 해당하는 경로
 
-# 추가 어셋(application.js、application.css 과 모든 비JS/CSS가 추가되어 있음)을 사전 컴파일합니다
+# 추가 어셋(application.js, application.css 과 모든 비JS/CSS가 추가되어 있음)을 사전 컴파일합니다
 # config.assets.precompile += %w( search.js )
 
 # 애플리케이션에 대한 모든 접근을 강제적으로 SSL로 만들고, Strict-Transport-Security와 보안 쿠키를 사용합니다
