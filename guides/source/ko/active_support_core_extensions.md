@@ -2245,7 +2245,6 @@ NOTE: `active_support/core_ext/array/prepend_and_append.rb`에 정의되어 있�
 ### 옵션을 전개하기
 
 Ruby에서는 메소드에 주어진 마지막 인수가 해시인 경우, 그것이 `&block` 인수인 경우를 제외하고 해시의 중괄호를 생략할 수 있습니다.
-Rubyでは、メソッドに与えられた最後の引数がハッシュの場合、それが`&block`引数である場合を除いて、ハッシュの波括弧を省略できます。
 
 ```ruby
 User.exists?(email: params[:email])
