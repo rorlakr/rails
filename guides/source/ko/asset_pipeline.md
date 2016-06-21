@@ -204,7 +204,7 @@ config.assets.paths << Rails.root.join("lib", "videoplayer", "flash")
 
 Sprockets에서는 `index`라는 이름의 파일(그리고 관련된 확장자)를 특수한 목적으로 사용하고 있습니다.
 
-예를 들자면 많은 모듈이 있는 jQuery 라이브러리를 사요하고 있고, 그것이 `lib/assets/javascripts/library_name`에 저장되어 있다고 가정합시다. 이 `lib/assets/javascripts/library_name/index.js` 파일은 그 라이브러리 내의 모든 파일에서 이용할 수 있는 매니페스트로서 기능을 합니다. 이 파일에는 필요한 파일을 모두 순서대로 적거나, 또는 단순히 `require_tree`로 작성할 수 있습니다.
+예를 들자면 많은 모듈이 있는 jQuery 라이브러리를 사용하고 있고, 그것이 `lib/assets/javascripts/library_name`에 저장되어 있다고 가정합시다. 이 `lib/assets/javascripts/library_name/index.js` 파일은 그 라이브러리 내의 모든 파일에서 이용할 수 있는 매니페스트로서 기능을 합니다. 이 파일에는 필요한 파일을 모두 순서대로 적거나, 또는 단순히 `require_tree`로 작성할 수 있습니다.
 
 일반적으로 이 라이브러리는 애플리케이션 매니페스트에는 다음과 같이 작성하여 사용할 수 있습니다.
 
