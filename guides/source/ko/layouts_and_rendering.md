@@ -582,7 +582,7 @@ end
 
 ### `redirect_to` 사용하기
 
-HTTP 요청에 응답을 돌려주는 또다른 방법으로는 `redirect_to`를 사용하는 것입니다. 이전에 언급했듯 `render`는 응답을 구성할 경우에 어떤 뷰(또는 어셋)을 사용할지를 지정하는 메소드입니다. `redirect_to` 메소드는 이 부분에 있어서 `render` 메소드와 근본적으로 다릅니다. `redirect_to` 메소드는 다른 URL에 대해서 다시 요청을 전송하도록 브라우저에게 명령을 내립니다. 예를 들어 아래와 같이 사용하면, 애플리케이션에서 현재 어떤 페이지가 나타나 있더라도, 사진 목록을 볼 수 있는 페이지로 리다이렉트됩니다.
+HTTP 요청에 응답을 돌려주는 또다른 방법으로는 `redirect_to`를 사용하는 것입니다. 이전에 언급했듯 `render`는 응답을 구성할 경우에 어떤 뷰(또는 애셋)을 사용할지를 지정하는 메소드입니다. `redirect_to` 메소드는 이 부분에 있어서 `render` 메소드와 근본적으로 다릅니다. `redirect_to` 메소드는 다른 URL에 대해서 다시 요청을 전송하도록 브라우저에게 명령을 내립니다. 예를 들어 아래와 같이 사용하면, 애플리케이션에서 현재 어떤 페이지가 나타나 있더라도, 사진 목록을 볼 수 있는 페이지로 리다이렉트됩니다.
 
 ```ruby 
 redirect_to photos_url
@@ -711,9 +711,9 @@ Rails가 뷰에서 응답을 생성할 때에, 현재 레이아웃도 거기에 
 * `yield`와 `content_for`
 * Partials
 
-### 어셋 태그 헬퍼
+### 애셋 태그 헬퍼
 
-어셋 태그 헬퍼가 제공하는 메소드는 피드, JavaScript, 스타일시트, 이미지, 동영상과 음성의 링크를 위한 HTML 생성용입니다. Rails에서는 아래 6개의 어셋 태그 헬퍼를 사용할 수 있습니다.
+애셋 태그 헬퍼가 제공하는 메소드는 피드, JavaScript, 스타일시트, 이미지, 동영상과 음성의 링크를 위한 HTML 생성용입니다. Rails에서는 아래 6개의 애셋 태그 헬퍼를 사용할 수 있습니다.
 
 * `auto_discovery_link_tag`
 * `javascript_include_tag`
@@ -724,7 +724,7 @@ Rails가 뷰에서 응답을 생성할 때에, 현재 레이아웃도 거기에 
 
 이 태그들은 레이아웃 뿐 아니라 뷰에서도 사용할 수 있습니다. 이 중에서 `auto_discovery_link_tag`, `javascript_include_tag`, `stylesheet_link_tag`는 레이아웃의 `<head>` 부분에서 사용하는 것이 일반적입니다.
 
-WARNING: 이 어셋 태그 헬버들은 지정한 위치에 어셋이 존재하는지 _확인하지 않습니다_.
+WARNING: 이 애셋 태그 헬버들은 지정한 위치에 애셋이 존재하는지 _확인하지 않습니다_.
 
 #### `auto_discovery_link_tag`를 사용해서 피드를 링크하기
 
@@ -745,9 +745,9 @@ WARNING: 이 어셋 태그 헬버들은 지정한 위치에 어셋이 존재하�
     
 `javascript_include_tag` 헬퍼는 지정된 소스마다 `script` 태그를 생성합니다.
 
-Rails에서 [어셋 파이프라인](asset_pipeline.html)을 사용하는 경우, JavaScript의 링크는 이전 Rails의 `public/javascripts`가 아닌 `/assets/javascripts/`가 됩니다. 그 후, 이 링크는 어셋 파이프라인에 의해서 사용이 가능해집니다.
+Rails에서 [애셋 파이프라인](asset_pipeline.html)을 사용하는 경우, JavaScript의 링크는 이전 Rails의 `public/javascripts`가 아닌 `/assets/javascripts/`가 됩니다. 그 후, 이 링크는 애셋 파이프라인에 의해서 사용이 가능해집니다.
 
-Rails 애플리케이션 내부나, Rails 엔진 내부의 JavaScript 파일은 `app/assets`, `lib/assets`, `vendor/assets` 중 어딘가에 위치하고 있습니다. 이러한 위치들에 대한 자세한 설명은 어셋 파이프라인 가이드의 [어셋의 구성](asset_pipeline.html#어셋의_구성)을 참조해주세요.
+Rails 애플리케이션 내부나, Rails 엔진 내부의 JavaScript 파일은 `app/assets`, `lib/assets`, `vendor/assets` 중 어딘가에 위치하고 있습니다. 이러한 위치들에 대한 자세한 설명은 애셋 파이프라인 가이드의 [애셋의 구성](asset_pipeline.html#애셋의_구성)을 참조해주세요.
 
 취향에 따라서 상대경로나 URL을 지정할 수도 있습니다. 예를 들어서 `app/assets`, `lib/assets`, 또는 `vendor/assets`에 있는 `javascripts` 폴더에 있는 JavaScript 파일을 링크하고 싶은 경우에는 아래와 같이 쓸 수 있습니다.
 
@@ -761,7 +761,7 @@ Rails 애플리케이션 내부나, Rails 엔진 내부의 JavaScript 파일은 
 <script src='/assets/main.js'></script>
 ```
 
-이 어셋에 대한 요청은 Sprokets 잼이 처리합니다.
+이 애셋에 대한 요청은 Sprokets 잼이 처리합니다.
 
 복수의 파일을 링크하고 싶은 경우(ex: `app/assets/javascripts/main.js`와 `app/assets/javascripts/columns.js`를 동시에 쓰고 싶을 때), 아래와 같이 작성할 수 있습니다.
 
@@ -785,7 +785,7 @@ Rails 애플리케이션 내부나, Rails 엔진 내부의 JavaScript 파일은 
 
 `stylesheet_link_tag` 헬퍼는 넘겨진 소스마다 `<link>` 태그를 반환합니다.
 
-Rails에서 어셋 파이프라인을 사용하고 있는 경우 이 헬퍼는 `/assets/stylesheets/`에 대한 링크를 생성하며, 이 링크는 Sprokets 잼에 의해서 처리됩니다. 스타일 시트 파일은 `app/assets`, `lib/assets`, 또는 `vendor/assets` 중 한 곳에 둘 수 있습니다.
+Rails에서 애셋 파이프라인을 사용하고 있는 경우 이 헬퍼는 `/assets/stylesheets/`에 대한 링크를 생성하며, 이 링크는 Sprokets 잼에 의해서 처리됩니다. 스타일 시트 파일은 `app/assets`, `lib/assets`, 또는 `vendor/assets` 중 한 곳에 둘 수 있습니다.
 
 상대 경로나 URL을 사용할 수도 있습니다. 예를 들어, `app/assets`, `lib/assets`, 또는 `vendor/assets`에 존재하는 `stylesheets` 폴더의 스타일 시트를 링크하고 싶은 경우에는 아래와 같이 작성할 수 있습니다.
 

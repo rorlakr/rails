@@ -328,7 +328,7 @@ Rails API의 일부를 문서로 만들 때에는, 그것이 Rails 스택의 일
 #   # => <img alt="Icon" src="/assets/icon.png" />
 ```
 
-`#image_tag`는 기본으로 항상 `/images/icon.png`를 반환합니다만, 어셋 파이프라인 등을 포함하는 Rails 풀 스택으로 통하면 위와 같은 결과를 돌려주기도 합니다.
+`#image_tag`는 기본으로 항상 `/images/icon.png`를 반환합니다만, 애셋 파이프라인 등을 포함하는 Rails 풀 스택으로 통하면 위와 같은 결과를 돌려주기도 합니다.
 
 기본 Rails 스택을 사용하는 경우, 실제로 경험한 동작만을 고려하게 됩니다.
 
