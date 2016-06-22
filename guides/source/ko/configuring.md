@@ -57,7 +57,7 @@ Rails 전체에 걸친 설정을 하기 위해서는 `Rails::Railtie` 객체를 
     end
     ```
 
-* `config.asset_host`은 어셋을 저장할 호스트를 지정합니다. 이 설정은 어셋을 저장할 장소가 CDN(Contents Delivery Network)일 때나, 다른 도메인을 사용하여 브라우저에서 동시 실행 제한을 피하고 싶은 경우에도 유용합니다. 이 메소드는 `config.action_controller.asset_host`를 줄인 것입니다.
+* `config.asset_host`은 애셋을 저장할 호스트를 지정합니다. 이 설정은 애셋을 저장할 장소가 CDN(Contents Delivery Network)일 때나, 다른 도메인을 사용하여 브라우저에서 동시 실행 제한을 피하고 싶은 경우에도 유용합니다. 이 메소드는 `config.action_controller.asset_host`를 줄인 것입니다.
 
 * `config.autoload_once_paths`는 서버가 요청 받을 때마다 초기화되지 않는 상수들을 읽어오기 위한 경로들이 들어있는 배열을 받습니다. `config.cache_classes`가 false 인 경우에 유효하지 않으며, development 모드일 경우에는 기본적으로 false로 동작합니다. `config.cache_classes`가 true인 경우, 모든 `config.autoload_once_paths`는 단 한번만 자동으로 읽어와집니다. `config.autoload_once_paths`의 배열에 포함되는 요소는 다음에 설명할 `autoload_paths`에서도 완전히 동일한 방식으로 호출되어야 합니다. 기본값은 빈 배열입니다.
 
@@ -118,7 +118,7 @@ Rails 전체에 걸친 설정을 하기 위해서는 `Rails::Railtie` 객체를 
 
 `secrets.secret_key_base` 메소드는 변조 방지를 위해서 애플리케이션의 세션에 기존의 비밀키와 비교하기 위한 키를 지정할 때에 사용합니다. 애플리케이션은 `secrets.secret_key_base`를 사용하여 `config/secrets.yml` 등에 저장되어 있는 키를 사용해 초기화합니다.
 
-* `config.serve_static_assets`는 정적인 어셋을 다룰지 아닐지를 지정합니다. 기본값으로는 true로 지정되어 있습니다만, production 환경에서는 애플리케이션을 실행하는 Nginx나 Apache등의 서버가 정적인 어셋을 다룰 필요가 있으므로 비활성화됩니다. 기본의 설정과는 다르게 WEBrick을 사용해서 애플리케이션을 production 모드로 실행하거나(절대로 이렇게 사용하지 말아 주세요) 테스트를 하는 경우에는 true로 설정됩니다. 그렇지 않으면 페이지 캐시가 유효하지 않게 되며 public 폴더에 저장되어 있는 정적인 어셋 파일들에 대한 요청은 매번 Rails 애플리케이션을 통하여 처리됩니다.
+* `config.serve_static_assets`는 정적인 애셋을 다룰지 아닐지를 지정합니다. 기본값으로는 true로 지정되어 있습니다만, production 환경에서는 애플리케이션을 실행하는 Nginx나 Apache등의 서버가 정적인 애셋을 다룰 필요가 있으므로 비활성화됩니다. 기본의 설정과는 다르게 WEBrick을 사용해서 애플리케이션을 production 모드로 실행하거나(절대로 이렇게 사용하지 말아 주세요) 테스트를 하는 경우에는 true로 설정됩니다. 그렇지 않으면 페이지 캐시가 유효하지 않게 되며 public 폴더에 저장되어 있는 정적인 애셋 파일들에 대한 요청은 매번 Rails 애플리케이션을 통하여 처리됩니다.
 
 * `config.session_store`는 일반적으로 `config/initializers/session_store.rb`에서 정의되어 있으며, 세션을 저장할 클래스를 지정합니다. 지정 가능한 값은 `:cookie_store`(기본값), `:mem_cache_store`, `:disabled`입니다. `:disabled`를 지정하면, Rails에서 세션을 사용할 수 없게 됩니다. 커스텀 세션 저장소를 지정할 수도 있습니다.
 
@@ -130,35 +130,35 @@ Rails 전체에 걸친 설정을 하기 위해서는 `Rails::Railtie` 객체를 
 
 * `config.time_zone`은 애플리케이션의 기본 시간대를 설정하여 Active Record에서 인식할 수 있도록 해줍니다.
 
-### 어셋 설정하기
+### 애셋 설정하기
 
-* `config.assets.enabled`는 어셋 파이프라인을 사용할지 아닐지를 지정합니다. 기본값은 true입니다.
+* `config.assets.enabled`는 애셋 파이프라인을 사용할지 아닐지를 지정합니다. 기본값은 true입니다.
 
 * `config.assets.raise_runtime_errors`를 `true`로 지정하면, 런타임 에러 체크가 활성화됩니다. 이 옵션은 `production` 환경에서 사용하면 배포시에 생각치않은 동작을 발생시킬 가능성이 있으므로 development 환경(`config/environments/development.rb`)에서만 사용하기를 추천합니다.
 
-* `config.assets.compress`는 컴파일된 어셋을 압축할지 아닐지를 지정하는 플래그입니다. `config/environments/production.rb`에서는 명시적으로 true로 지정되어 있습니다.
+* `config.assets.compress`는 컴파일된 애셋을 압축할지 아닐지를 지정하는 플래그입니다. `config/environments/production.rb`에서는 명시적으로 true로 지정되어 있습니다.
 
 * `config.assets.css_compressor`는 CSS 압축시에 사용할 프로그램을 지정합니다. 이 옵션은 기본으로 `sass-rails`를 사용하도록 지정되어 있습니다. `:yui`라는 일견 특이해보이는 옵션도 지정할 수 있으며, 이 옵션은 `yui-compressor` gem을 의미합니다.
 
 * `config.assets.js_compressor`는 JavaScript 압축을 수행할 프로그램을 지정합니다. 지정 가능한 값으로는 `:closure`, `:uglifier`, `:yui`입니다. 각각 `closure-compiler`, `uglifier`, `yui-compressor` gem에 대응합니다.
 
-* `config.assets.paths`에는 어셋 검색 시에 사용할 경로를 지정합니다. 이 설정 옵션을 경로에 추가하면, 어셋을 검색할때에 찾을 경로 목록에 추가됩니다.
+* `config.assets.paths`에는 애셋 검색 시에 사용할 경로를 지정합니다. 이 설정 옵션을 경로에 추가하면, 애셋을 검색할때에 찾을 경로 목록에 추가됩니다.
 
-* `config.assets.precompile`은 `application.css`와 `application.js` 이외에 추가하고 싶은 어셋이 있는 경우에 지정합니다. 이것들은 `rake assets:precompile`을 실행할 때에 함께 컴파일 됩니다.
+* `config.assets.precompile`은 `application.css`와 `application.js` 이외에 추가하고 싶은 애셋이 있는 경우에 지정합니다. 이것들은 `rake assets:precompile`을 실행할 때에 함께 컴파일 됩니다.
 
-* `config.assets.prefix`는 어셋을 저장할 폴더를 지정합니다. 기본은 `/assets`입니다.
+* `config.assets.prefix`는 애셋을 저장할 폴더를 지정합니다. 기본은 `/assets`입니다.
 
-* `config.assets.digest`는 어셋 이름을 이용하는 MD5 핑거프린트를 사용할지 말지를 지정합니다. `production.rb`에서는 기본으로 `true`로 설정되어 있습니다.
+* `config.assets.digest`는 애셋 이름을 이용하는 MD5 핑거프린트를 사용할지 말지를 지정합니다. `production.rb`에서는 기본으로 `true`로 설정되어 있습니다.
 
-* `config.assets.debug`는 어셋의 연결 및 압축을 무효화할지를 지정합니다. `development.rb`에서는 기본으로 `true`로 지정됩니다.
+* `config.assets.debug`는 애셋의 연결 및 압축을 무효화할지를 지정합니다. `development.rb`에서는 기본으로 `true`로 지정됩니다.
 
 * `config.assets.cache_store`는 Sprockets에서 사용하는 캐시 저장소를 정의합니다. 기본으로는 Rails의 파일 저장소를 사용합니다.
 
-* `config.assets.version`는 MD5 해시 생성에 사용되는 옵션 문자열입니다. 이 값을 변경하면 모든 어셋 파일이 강제적으로 다시 컴파일 됩니다.
+* `config.assets.version`는 MD5 해시 생성에 사용되는 옵션 문자열입니다. 이 값을 변경하면 모든 애셋 파일이 강제적으로 다시 컴파일 됩니다.
 
 * `config.assets.compile`는 production 환경에서 동적인 Sprockets 컴파일을 할지 말지를 true/false로 지정합니다.
 
-* `config.assets.logger`는 로거를 인수로 받습니다. 이 로거는 Log4의 인터페이스나 Ruby의 `Logger` 클래스의 인터페이스를 따라야 합니다. 기본으로 `config.logger`와 동일한 설정이 사용됩니다. `config.assets.logger`를 false로 사용하면 어셋의 로그 출력을 하지 않게 됩니다.
+* `config.assets.logger`는 로거를 인수로 받습니다. 이 로거는 Log4의 인터페이스나 Ruby의 `Logger` 클래스의 인터페이스를 따라야 합니다. 기본으로 `config.logger`와 동일한 설정이 사용됩니다. `config.assets.logger`를 false로 사용하면 애셋의 로그 출력을 하지 않게 됩니다.
 
 ### 제너레이터 설정하기
 
@@ -178,12 +178,12 @@ end
 * `helper`는 헬퍼를 생성할지 안할지를 지정합니다. 기본값은 `true`입니다.
 * `integration_tool`는 사용할 통합 툴을 정의합니다. 기본값은 `nil`입니다.
 * `javascripts`는 생성 시 JavaScript 파일에 대한 훅을 활성화할지 아닐지를 지정합니다. 이 설정은 `scaffold` 제너레이터의 실행중에 사용됩니다. 기본값은 `true`입니다.
-* `javascript_engine`은 어셋 생성시에(coffee 등에서) 사용할 엔진을 지정합니다. 기본값은 `nil`입니다.
+* `javascript_engine`은 애셋 생성시에(coffee 등에서) 사용할 엔진을 지정합니다. 기본값은 `nil`입니다.
 * `orm`은 사용할 ORM(Object Relational Mapping)을 지정합니다. 기본값은 `false`이며, 이 경우 Active Record를 사용합니다.
 * `resource_controller`는 `rails generate resource`를 실행했을 때에 어떤 제너레이터를 사용하여 컨트롤러를 생성할지 지정합니다. 기본값은 `:controller`입니다.
 * `scaffold_controller`는 `resource_controller`와 동일하지 않습니다. `scaffold_controller`는 _scaffold_시에 어떤 제너레이터를 사용하여 컨트롤러를 생성할 지(`rails generate scaffold`를 실행했을 때)를 지정합니다. 기본값은 `:scaffold_controller`입니다.
 * `stylesheets`는 제너레이터에서 스타일시트 생성시에 훅을 사용할지 아닐지를 지정합니다. 이 설정은 `scaffold` 제너레이터 실행시에 사용됩니다만, 다른 제너레이터를 실행할 때에도 사용됩니다. 기본값은 `true`입니다.
-* `stylesheet_engine`는 어셋 생성시에 사용할, sass같은 스타일시트 엔진을 지정합니다. 기본값은 `:css`입니다.
+* `stylesheet_engine`는 애셋 생성시에 사용할, sass같은 스타일시트 엔진을 지정합니다. 기본값은 `:css`입니다.
 * `test_framework`는 사용할 테스트용 프레임워크를 지정합니다. 기본값은 `false`이며, 이 경우 Test::Unit이 사용됩니다.
 * `template_engine`은 뷰 템플릿 엔진(ERB나 Haml 등)을 지정합니다. 기본값은 `:erb`입니다.
 
@@ -192,7 +192,7 @@ end
 어떤 Rails 애플리케이션이든 그 뒤에는 몇개의 표준적인 미들웨어가 동작하고 있습니다. development 환경에서는 다음과 같은 순서대로 미들웨어를 사용합니다.
 
 * `ActionDispatch::SSL`는 모든 요청에게 HTTPS 프로토콜을 사용할 것을 강요합니다. 이것은 `config.force_ssl`를 `true`로 설정했을 경우에만 유효합니다. 넘길 옵션 값들은 `config.ssl_options`에서 설정할 수 있습니다.
-* `ActionDispatch::Static`는 정적 어셋을 처리합니다. `config.serve_static_assets`를 `false`로 하면 사용하지 않습니다.
+* `ActionDispatch::Static`는 정적 애셋을 처리합니다. `config.serve_static_assets`를 `false`로 하면 사용하지 않습니다.
 * `Rack::Lock`는 애플리케이션을 뮤텍스로 감싸서 1번에 하나의 스레드만 호출되도록 만듭니다. 이 미들웨어는 `config.cache_classes`가 `false`로 설정되어 있을 경우에만 유효합니다.
 * `ActiveSupport::Cache::Strategy::LocalCache`는 기본적인 메모리 백업 방식의 캐시로 기능합니다. 이 캐시는 스레드간에 안전하지 않으며, 단일 스레드용의 일시적인 메모리 캐시로서만 동작하도록 설계되었다는 점을 주의해주세요.
 * `Rack::Runtime`는 `X-Runtime` 헤더를 설정합니다. 이 헤더에는 요청을 처리하는데 얼마나 시간이 걸렸는지(초)가 포함됩니다.
@@ -301,7 +301,7 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
 
 `config.action_controller`에는 다수의 설정이 포함되어 있습니다.
 
-* `config.action_controller.asset_host`는 어셋을 저장할 호스트를 지정합니다. 이것은 어셋을 호스팅하는 장소로, 애플리케이션 서버 대신 CDN(Content Delivery Networks)을 사용하는 경우에 편리합니다.
+* `config.action_controller.asset_host`는 애셋을 저장할 호스트를 지정합니다. 이것은 애셋을 호스팅하는 장소로, 애플리케이션 서버 대신 CDN(Content Delivery Networks)을 사용하는 경우에 편리합니다.
 
 * `config.action_controller.perform_caching`은 애플리케이션에서 캐싱을 사용할지 안할지를 지정합니다. development 모드에서는 false, production 모드에서는 true로 설정합니다.
 
@@ -797,8 +797,8 @@ server {
 
 * 개발 환경
 * 테스트 환경
-* 정적 어셋 제공하기
-* 어셋 파이프라인
+* 정적 애셋 제공하기
+* 애셋 파이프라인
 
 Rails 환경 설정
 --------------------------
@@ -945,7 +945,7 @@ WARNING: initializer가 실행되는 순서는 논리적으로 모순이 발생�
 
 * `load_environment_config`는 현재 환경의 `config/environments`를 읽어옵니다.
 
-* `append_asset_paths` 애플리케이션과 거기에 추가되어 있는 railties에 포함되어 있는 어셋 경로를 찾고, `config.static_asset_paths`에서 지정되어 있는 폴더를 감시합니다.
+* `append_asset_paths` 애플리케이션과 거기에 추가되어 있는 railties에 포함되어 있는 애셋 경로를 찾고, `config.static_asset_paths`에서 지정되어 있는 폴더를 감시합니다.
 
 * `prepend_helpers_path`는 애플리케이션이나 railties, 엔진에 포함되는 `app/helpers` 폴더를 헬퍼의 참조 경로에 추가합니다.
 

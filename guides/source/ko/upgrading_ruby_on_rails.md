@@ -741,7 +741,7 @@ Rails 4.0에서는 Active Resource가 gem으로 추출되었습니다. 이 기�
 
 세션 cookies를 암호화하는 방법에 대해서는 [Pull Request #9978](https://github.com/rails/rails/pull/9978)를 참조해주세요.
 
-* Rails 4.0에서는 `ActionController::Base.asset_path` 옵션이 제거되었습니다. 대신에 어셋 파이프라인 기능을 사용해주세요.
+* Rails 4.0에서는 `ActionController::Base.asset_path` 옵션이 제거되었습니다. 대신에 애셋 파이프라인 기능을 사용해주세요.
 
 * Rails 4.0에서는 `ActionController::Base.page_cache_extension` 옵션이 Deprecated되었습니다. 대신에 `ActionController::Base.default_static_extension`를 사용해주세요.
 
@@ -808,7 +808,7 @@ config.middleware.insert_before(Rack::Lock, ActionDispatch::BestStandardsSupport
 
 환경 설정을 확인하고 `config.action_dispatch.best_standards_support`가 있는 경우에 제거해주세요.
 
-* Rails 4.0의 어셋 사전 컴파일에서는 `vendor/assets`와 `lib/assets`에 있는 비JS/CSS 어셋을 자동적으로 복사하지 않게 되었습니다. Rails 애플리케이션과 엔진의 개발자는 이러한 어셋을 직접 `app/assets`에 옮기고 `config.assets.precompile`를 지정해주세요.
+* Rails 4.0의 애셋 사전 컴파일에서는 `vendor/assets`와 `lib/assets`에 있는 비JS/CSS 애셋을 자동적으로 복사하지 않게 되었습니다. Rails 애플리케이션과 엔진의 개발자는 이러한 애셋을 직접 `app/assets`에 옮기고 `config.assets.precompile`를 지정해주세요.
 
 * Rails 4.0에서는 요청된 형식이 액션에서 사용할 수 없을 경우에 `ActionController::UnknownFormat`가 발생하게 되었습니다. 기본으로 이 예외는 406 Not Acceptable 응답으로 처리됩니다만, 이 동작을 재정의할 수도 있습니다. Rails 3에서는 항상 406 Not Acceptable가 반환됩니다. 재정의는 할 수 없습니다.
 
@@ -914,7 +914,7 @@ Rails 애플리케이션이 3.0보다 이전인 경우, 우선 3.0으로 업그�
 gem 'rails', '3.1.12'
 gem 'mysql2' 
 
-# 새로운 어셋 파이프라인으로 변경
+# 새로운 애셋 파이프라인으로 변경
 group :assets do
   gem 'sass-rails',   '~> 3.1.7'
   gem 'coffee-rails', '~> 3.1.1'
@@ -927,7 +927,7 @@ gem 'jquery-rails'
 
 ### config/application.rb
 
-어셋 파이프라인을 사용하기 위해서 다음을 변경하세요.
+애셋 파이프라인을 사용하기 위해서 다음을 변경하세요.
 
 ```ruby
 config.assets.enabled = true
@@ -945,34 +945,34 @@ config.assets.prefix = '/asset-files'
 
 RJS의 설정 `config.action_view.debug_rjs = true`을 삭제해주세요.
 
-어셋 파이프라인을 활성화하고 싶은 경우에는 다음 설정을 추가합니다.
+애셋 파이프라인을 활성화하고 싶은 경우에는 다음 설정을 추가합니다.
 
 ```ruby
-# 개발환경에서는 어셋을 압축하지 않습니다
+# 개발환경에서는 애셋을 압축하지 않습니다
 config.assets.compress = false
 
-# 어셋에서 가져온 라인을 전개합니다
+# 애셋에서 가져온 라인을 전개합니다
 config.assets.debug = true
 ```
 
 ### config/environments/production.rb
 
-아래의 변경사항은 대부분이 어셋 파이프라인을 위한 것입니다. 자세한 설명은 [어셋 파이프라인](asset_pipeline.html) 가이드를 참조해주세요.
+아래의 변경사항은 대부분이 애셋 파이프라인을 위한 것입니다. 자세한 설명은 [애셋 파이프라인](asset_pipeline.html) 가이드를 참조해주세요.
 
 ```ruby
 # JavaScript와 CSS를 압축합니다
 config.assets.compress = true
 
-# 사전 컴파일된 어셋이 발견되지 않는 경우 어셋 파이프라인으로 폴백하지 않습니다
+# 사전 컴파일된 애셋이 발견되지 않는 경우 애셋 파이프라인으로 폴백하지 않습니다
 config.assets.compile = false
 
-# 어셋 URL의 다이제스트를 생성합니다
+# 애셋 URL의 다이제스트를 생성합니다
 config.assets.digest = true
 
 # Rails.root.join("public/assets")의 기본값
 # config.assets.manifest = 해당하는 경로
 
-# 추가 어셋(application.js, application.css 과 모든 비JS/CSS가 추가되어 있음)을 사전 컴파일합니다
+# 추가 애셋(application.js, application.css 과 모든 비JS/CSS가 추가되어 있음)을 사전 컴파일합니다
 # config.assets.precompile += %w( search.js )
 
 # 애플리케이션에 대한 모든 접근을 강제적으로 SSL로 만들고, Strict-Transport-Security와 보안 쿠키를 사용합니다
@@ -984,7 +984,7 @@ config.assets.digest = true
 테스트 환겅에 다음을 추가하여 테스트 성능을 향상시킵니다.
 
 ```ruby
-# Cache-Control를 사용하는 테스트에서 정적인 어셋 서버를 구성하고, 성능을 향상시킵니다
+# Cache-Control를 사용하는 테스트에서 정적인 애셋 서버를 구성하고, 성능을 향상시킵니다
 config.serve_static_assets = true
 config.static_cache_control = 'public, max-age=3600'
 ```
@@ -1024,7 +1024,7 @@ AppName::Application.config.session_store :cookie_store, key: 'SOMETHINGNEW'
 $ bin/rake db:sessions:clear
 ```
 
-###  뷰의 어셋 헬퍼 참조로부터 :cache 옵션과 :concat 옵션을 삭제하기
+###  뷰의 애셋 헬퍼 참조로부터 :cache 옵션과 :concat 옵션을 삭제하기
 
 * Asset Pipeline의 :cache 옵션과 :concat 옵션이 삭제되었습니다. 뷰에서 이 옵션들을 제거해주세요.
 

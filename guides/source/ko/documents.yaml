@@ -108,7 +108,7 @@
     -
       name: Asset Pipeline
       url: asset_pipeline.html
-      description: 어셋 파이프라인에 대해서 설명합니다.
+      description: 애셋 파이프라인에 대해서 설명합니다.
     -
       name: Rails에서 JavaScript 사용하기
       url: working_with_javascript_in_rails.html

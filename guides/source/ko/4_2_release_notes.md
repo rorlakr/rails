@@ -413,7 +413,7 @@ Action Pack
 *   CSRF에 의한 실패 시 로그 출력을 무효화하는 옵션이 추가되었습니다.
     ([Pull Request](https://github.com/rails/rails/pull/14280))
 
-*   Rails가 정적인 어셋을 전송하도록 설정되어있는 경우, 브라우저가 gzip 압축을 지원하고 gzip파일이 서버에 존재한다면 어셋의 gzip이 사용되게 됩니다. 어셋 파이프라인은 압축가능한 모든 어셋에서 `.gz` 파일을 기본으로 생성하게 됩니다. gzip 압축된 파일을 전송하여서 어셋에 대한 요청을 고속화할 수 있습니다. Rails가 production 환경에서 어셋을 제공하는 경우 반드시 [CDN](http://guides.rubyonrails.org/asset_pipeline.html#cdns)을 사용해주세요.
+*   Rails가 정적인 애셋을 전송하도록 설정되어있는 경우, 브라우저가 gzip 압축을 지원하고 gzip파일이 서버에 존재한다면 애셋의 gzip이 사용되게 됩니다. 애셋 파이프라인은 압축가능한 모든 애셋에서 `.gz` 파일을 기본으로 생성하게 됩니다. gzip 압축된 파일을 전송하여서 애셋에 대한 요청을 고속화할 수 있습니다. Rails가 production 환경에서 애셋을 제공하는 경우 반드시 [CDN](http://guides.rubyonrails.org/asset_pipeline.html#cdns)을 사용해주세요.
     ([Pull Request](https://github.com/rails/rails/pull/16466))
 
 *   통합 테스트 중에 `process` 헬퍼를 호출했을 때, 경로에 '/'를 요구하도록 변경되었습니다. 이전에는 생략할 수 있었습니다만, 이것은 내부 구현의 사이드 이펙트이며, 의도된 기능이 아닙니다.
