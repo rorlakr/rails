@@ -1,5 +1,5 @@
-require 'active_support/core_ext/hash/keys'
-require 'active_support/core_ext/hash/reverse_merge'
+require "active_support/core_ext/hash/keys"
+require "active_support/core_ext/hash/reverse_merge"
 
 module ActiveSupport
   # Implements a hash where keys <tt>:foo</tt> and <tt>"foo"</tt> are considered
@@ -68,8 +68,10 @@ module ActiveSupport
       end
     end
 
-    def default(key = nil)
-      if key.is_a?(Symbol) && include?(key = key.to_s)
+    def default(*args)
+      arg_key = args.first
+
+      if include?(key = convert_key(arg_key))
         self[key]
       else
         super
@@ -159,6 +161,19 @@ module ActiveSupport
     alias_method :has_key?, :key?
     alias_method :member?, :key?
 
+    # Same as <tt>Hash#[]</tt> where the key passed as argument can be
+    # either a string or a symbol:
+    #
+    #   counters = ActiveSupport::HashWithIndifferentAccess.new
+    #   counters[:foo] = 1
+    #
+    #   counters['foo'] # => 1
+    #   counters[:foo]  # => 1
+    #   counters[:zoo]  # => nil
+    def [](key)
+      super(convert_key(key))
+    end
+
     # Same as <tt>Hash#fetch</tt> where the key passed as argument can be
     # either a string or a symbol:
     #
@@ -201,7 +216,7 @@ module ActiveSupport
     # modify the receiver but rather returns a new hash with indifferent
     # access with the result of the merge.
     def merge(hash, &block)
-      self.dup.update(hash, &block)
+      dup.update(hash, &block)
     end
 
     # Like +merge+ but the other way around: Merges the receiver into the

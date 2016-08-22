@@ -3,7 +3,7 @@ module ActionDispatch
     class Route # :nodoc:
       attr_reader :app, :path, :defaults, :name, :precedence
 
-      attr_reader :constraints
+      attr_reader :constraints, :internal
       alias :conditions :constraints
 
       module VerbMatchers
@@ -29,16 +29,15 @@ module ActionDispatch
 
         class All
           def self.call(_); true; end
-          def self.verb; ''; end
+          def self.verb; ""; end
         end
 
-        VERB_TO_CLASS = VERBS.each_with_object({ :all => All }) do |verb, hash|
+        VERB_TO_CLASS = VERBS.each_with_object(all: All) do |verb, hash|
           klass = const_get verb
           hash[verb]                 = klass
           hash[verb.downcase]        = klass
           hash[verb.downcase.to_sym] = klass
         end
-
       end
 
       def self.verb_matcher(verb)
@@ -55,7 +54,7 @@ module ActionDispatch
       ##
       # +path+ is a path constraint.
       # +constraints+ is a hash of constraints to be applied to this route.
-      def initialize(name, app, path, constraints, required_defaults, defaults, request_method_match, precedence)
+      def initialize(name, app, path, constraints, required_defaults, defaults, request_method_match, precedence, internal = false)
         @name        = name
         @app         = app
         @path        = path
@@ -70,6 +69,7 @@ module ActionDispatch
         @decorated_ast     = nil
         @precedence        = precedence
         @path_formatter    = @path.build_formatter
+        @internal          = internal
       end
 
       def ast
@@ -81,7 +81,7 @@ module ActionDispatch
       end
 
       def requirements # :nodoc:
-        # needed for rails `rake routes`
+        # needed for rails `rails routes`
         @defaults.merge(path.requirements).delete_if { |_,v|
           /.+?/ == v
         }
@@ -163,17 +163,17 @@ module ActionDispatch
       end
 
       def verb
-        verbs.join('|')
+        verbs.join("|")
       end
 
       private
-      def verbs
-        @request_method_match.map(&:verb)
-      end
+        def verbs
+          @request_method_match.map(&:verb)
+        end
 
-      def match_verb(request)
-        @request_method_match.any? { |m| m.call request }
-      end
+        def match_verb(request)
+          @request_method_match.any? { |m| m.call request }
+        end
     end
   end
 end

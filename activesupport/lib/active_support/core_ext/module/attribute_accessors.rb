@@ -1,4 +1,5 @@
-require 'active_support/core_ext/array/extract_options'
+require "active_support/core_ext/array/extract_options"
+require "active_support/core_ext/regexp"
 
 # Extends the module object with class/module and instance accessors for
 # class/module attributes, just like the native attr* accessors for instance
@@ -27,7 +28,7 @@ class Module
   # <tt>instance_reader: false</tt> or <tt>instance_accessor: false</tt>.
   #
   #   module HairColors
-  #     mattr_writer :hair_colors, instance_reader: false
+  #     mattr_reader :hair_colors, instance_reader: false
   #   end
   #
   #   class Person
@@ -40,7 +41,7 @@ class Module
   # Also, you can pass a block to set up the attribute with a default value.
   #
   #   module HairColors
-  #     cattr_reader :hair_colors do
+  #     mattr_reader :hair_colors do
   #       [:brown, :black, :blonde, :red]
   #     end
   #   end
@@ -49,11 +50,11 @@ class Module
   #     include HairColors
   #   end
   #
-  #   Person.hair_colors # => [:brown, :black, :blonde, :red]
+  #   Person.new.hair_colors # => [:brown, :black, :blonde, :red]
   def mattr_reader(*syms)
     options = syms.extract_options!
     syms.each do |sym|
-      raise NameError.new("invalid attribute name: #{sym}") unless sym =~ /\A[_A-Za-z]\w*\z/
+      raise NameError.new("invalid attribute name: #{sym}") unless /\A[_A-Za-z]\w*\z/.match?(sym)
       class_eval(<<-EOS, __FILE__, __LINE__ + 1)
         @@#{sym} = nil unless defined? @@#{sym}
 
@@ -105,7 +106,7 @@ class Module
   #
   # Also, you can pass a block to set up the attribute with a default value.
   #
-  #   class HairColors
+  #   module HairColors
   #     mattr_writer :hair_colors do
   #       [:brown, :black, :blonde, :red]
   #     end
@@ -119,7 +120,7 @@ class Module
   def mattr_writer(*syms)
     options = syms.extract_options!
     syms.each do |sym|
-      raise NameError.new("invalid attribute name: #{sym}") unless sym =~ /\A[_A-Za-z]\w*\z/
+      raise NameError.new("invalid attribute name: #{sym}") unless /\A[_A-Za-z]\w*\z/.match?(sym)
       class_eval(<<-EOS, __FILE__, __LINE__ + 1)
         @@#{sym} = nil unless defined? @@#{sym}
 
@@ -150,8 +151,8 @@ class Module
   #     include HairColors
   #   end
   #
-  #   Person.hair_colors = [:brown, :black, :blonde, :red]
-  #   Person.hair_colors     # => [:brown, :black, :blonde, :red]
+  #   HairColors.hair_colors = [:brown, :black, :blonde, :red]
+  #   HairColors.hair_colors # => [:brown, :black, :blonde, :red]
   #   Person.new.hair_colors # => [:brown, :black, :blonde, :red]
   #
   # If a subclass changes the value then that would also change the value for
@@ -161,8 +162,8 @@ class Module
   #   class Male < Person
   #   end
   #
-  #   Male.hair_colors << :blue
-  #   Person.hair_colors # => [:brown, :black, :blonde, :red, :blue]
+  #   Male.new.hair_colors << :blue
+  #   Person.new.hair_colors # => [:brown, :black, :blonde, :red, :blue]
   #
   # To opt out of the instance writer method, pass <tt>instance_writer: false</tt>.
   # To opt out of the instance reader method, pass <tt>instance_reader: false</tt>.

@@ -64,8 +64,8 @@ module I18n
       end
 
       app.reloaders << reloader
-      ActionDispatch::Reloader.to_prepare do
-        reloader.execute_if_updated
+      app.reloader.to_run do
+        reloader.execute_if_updated { require_unload_lock! }
         # TODO: remove the following line as soon as the return value of
         # callbacks is ignored, that is, returning `false` does not
         # display a deprecation warning or halts the callback chain.
@@ -84,12 +84,12 @@ module I18n
       include_fallbacks_module
 
       args = case fallbacks
-      when ActiveSupport::OrderedOptions
-        [*(fallbacks[:defaults] || []) << fallbacks[:map]].compact
-      when Hash, Array
-        Array.wrap(fallbacks)
+             when ActiveSupport::OrderedOptions
+               [*(fallbacks[:defaults] || []) << fallbacks[:map]].compact
+             when Hash, Array
+               Array.wrap(fallbacks)
       else # TrueClass
-        []
+               []
       end
 
       I18n.fallbacks = I18n::Locale::Fallbacks.new(*args)

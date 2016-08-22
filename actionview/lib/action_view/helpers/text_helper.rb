@@ -1,5 +1,5 @@
-require 'active_support/core_ext/string/filters'
-require 'active_support/core_ext/array/extract_options'
+require "active_support/core_ext/string/filters"
+require "active_support/core_ext/array/extract_options"
 
 module ActionView
   # = Action View Text Helpers
@@ -135,7 +135,7 @@ module ActionView
         else
           match = Array(phrases).map do |p|
             Regexp === p ? p.to_s : Regexp.escape(p)
-          end.join('|')
+          end.join("|")
 
           if block_given?
             text.gsub(/(#{match})(?![^<]*?>)/i) { |found| yield found }
@@ -204,12 +204,12 @@ module ActionView
 
       # Attempts to pluralize the +singular+ word unless +count+ is 1. If
       # +plural+ is supplied, it will use that when count is > 1, otherwise
-      # it will use the Inflector to determine the plural form.
+      # it will use the Inflector to determine the plural form for the given locale,
+      # which defaults to I18n.locale
       #
-      # If passed an optional +locale:+ parameter, the word will be pluralized
-      # using rules defined for that language (you must define your own
-      # inflection rules for languages other than English).  See
-      # ActiveSupport::Inflector.pluralize
+      # The word will be pluralized using rules defined for the locale
+      # (you must define your own inflection rules for languages other than English).
+      # See ActiveSupport::Inflector.pluralize
       #
       #   pluralize(1, 'person')
       #   # => 1 person
@@ -217,7 +217,7 @@ module ActionView
       #   pluralize(2, 'person')
       #   # => 2 people
       #
-      #   pluralize(3, 'person', 'users')
+      #   pluralize(3, 'person', plural: 'users')
       #   # => 3 users
       #
       #   pluralize(0, 'person')
@@ -225,7 +225,14 @@ module ActionView
       #
       #   pluralize(2, 'Person', locale: :de)
       #   # => 2 Personen
-      def pluralize(count, singular, plural = nil, locale: nil)
+      def pluralize(count, singular, deprecated_plural = nil, plural: nil, locale: I18n.locale)
+        if deprecated_plural
+          ActiveSupport::Deprecation.warn("Passing plural as a positional argument " \
+            "is deprecated and will be removed in Rails 5.1. Use e.g. " \
+            "pluralize(1, 'person', plural: 'people') instead.")
+          plural ||= deprecated_plural
+        end
+
         word = if (count == 1 || count =~ /^1(\.0+)?$/)
           singular
         else
@@ -262,10 +269,11 @@ module ActionView
       end
 
       # Returns +text+ transformed into HTML using simple formatting rules.
-      # Two or more consecutive newlines(<tt>\n\n</tt>) are considered as a
-      # paragraph and wrapped in <tt><p></tt> tags. One newline (<tt>\n</tt>) is
-      # considered as a linebreak and a <tt><br /></tt> tag is appended. This
-      # method does not remove the newlines from the +text+.
+      # Two or more consecutive newlines(<tt>\n\n</tt> or <tt>\r\n\r\n</tt>) are
+      # considered a paragraph and wrapped in <tt><p></tt> tags. One newline
+      # (<tt>\n</tt> or <tt>\r\n</tt>) is considered a linebreak and a
+      # <tt><br /></tt> tag is appended. This method does not remove the
+      # newlines from the +text+.
       #
       # You can pass any HTML attributes into <tt>html_options</tt>. These
       # will be added to all created paragraphs.
@@ -350,7 +358,7 @@ module ActionView
       #  <% end %>
       def cycle(first_value, *values)
         options = values.extract_options!
-        name = options.fetch(:name, 'default')
+        name = options.fetch(:name, "default")
 
         values.unshift(*first_value)
 
@@ -424,17 +432,17 @@ module ActionView
 
         private
 
-        def next_index
-          step_index(1)
-        end
+          def next_index
+            step_index(1)
+          end
 
-        def previous_index
-          step_index(-1)
-        end
+          def previous_index
+            step_index(-1)
+          end
 
-        def step_index(n)
-          (@index + n) % @values.size
-        end
+          def step_index(n)
+            (@index + n) % @values.size
+          end
       end
 
       private

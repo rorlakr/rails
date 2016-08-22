@@ -61,11 +61,11 @@ module ActiveRecord
         @query_cache.clear
       end
 
-      def select_all(arel, name = nil, binds = [])
+      def select_all(arel, name = nil, binds = [], preparable: nil)
         if @query_cache_enabled && !locked?(arel)
           arel, binds = binds_from_relation arel, binds
           sql = to_sql(arel, binds)
-          cache_sql(sql, binds) { super(sql, name, binds) }
+          cache_sql(sql, binds) { super(sql, name, binds, preparable: preparable) }
         else
           super
         end
@@ -73,23 +73,23 @@ module ActiveRecord
 
       private
 
-      def cache_sql(sql, binds)
-        result =
-          if @query_cache[sql].key?(binds)
-            ActiveSupport::Notifications.instrument("sql.active_record",
-              :sql => sql, :binds => binds, :name => "CACHE", :connection_id => object_id)
-            @query_cache[sql][binds]
-          else
-            @query_cache[sql][binds] = yield
-          end
-        result.dup
-      end
+        def cache_sql(sql, binds)
+          result =
+            if @query_cache[sql].key?(binds)
+              ActiveSupport::Notifications.instrument("sql.active_record",
+                sql: sql, binds: binds, name: "CACHE", connection_id: object_id)
+              @query_cache[sql][binds]
+            else
+              @query_cache[sql][binds] = yield
+            end
+          result.dup
+        end
 
       # If arel is locked this is a SELECT ... FOR UPDATE or somesuch. Such
       # queries should not be cached.
-      def locked?(arel)
-        arel.respond_to?(:locked) && arel.locked
-      end
+        def locked?(arel)
+          arel.respond_to?(:locked) && arel.locked
+        end
     end
   end
 end

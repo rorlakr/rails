@@ -1,4 +1,4 @@
-require 'abstract_unit'
+require "abstract_unit"
 
 module DateAndTimeBehavior
   def test_yesterday
@@ -299,6 +299,16 @@ module DateAndTimeBehavior
   def test_on_weekend_on_monday
     assert_not date_time_init(2015,1,5,0,0,0).on_weekend?
     assert_not date_time_init(2015,1,5,15,15,10).on_weekend?
+  end
+
+  def test_on_weekday_on_sunday
+    assert_not date_time_init(2015,1,4,0,0,0).on_weekday?
+    assert_not date_time_init(2015,1,4,15,15,10).on_weekday?
+  end
+
+  def test_on_weekday_on_monday
+    assert date_time_init(2015,1,5,0,0,0).on_weekday?
+    assert date_time_init(2015,1,5,15,15,10).on_weekday?
   end
 
   def with_bw_default(bw = :monday)

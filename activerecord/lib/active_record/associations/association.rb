@@ -1,4 +1,4 @@
-require 'active_support/core_ext/array/wrap'
+require "active_support/core_ext/array/wrap"
 
 module ActiveRecord
   module Associations
@@ -19,7 +19,7 @@ module ActiveRecord
       attr_reader :owner, :target, :reflection
       attr_accessor :inversed
 
-      delegate :options, :to => :reflection
+      delegate :options, to: :reflection
 
       def initialize(owner, reflection)
         reflection.check_validity!
@@ -217,7 +217,8 @@ module ActiveRecord
           unless record.is_a?(reflection.klass)
             fresh_class = reflection.class_name.safe_constantize
             unless fresh_class && record.is_a?(fresh_class)
-              message = "#{reflection.class_name}(##{reflection.klass.object_id}) expected, got #{record.class}(##{record.class.object_id})"
+              message = "#{reflection.class_name}(##{reflection.klass.object_id}) expected, "\
+                "got #{record.inspect} which is an instance of #{record.class}(##{record.class.object_id})"
               raise ActiveRecord::AssociationTypeMismatch, message
             end
           end
@@ -257,7 +258,7 @@ module ActiveRecord
 
         # Returns true if statement cache should be skipped on the association reader.
         def skip_statement_cache?
-          reflection.scope_chain.any?(&:any?) ||
+          reflection.has_scope? ||
             scope.eager_loading? ||
             klass.scope_attributes? ||
             reflection.source_reflection.active_record.default_scopes.any?

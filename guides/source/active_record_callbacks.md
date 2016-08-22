@@ -258,7 +258,7 @@ As you start registering new callbacks for your models, they will be queued for 
 
 The whole callback chain is wrapped in a transaction. If any _before_ callback method returns exactly `false` or raises an exception, the execution chain gets halted and a ROLLBACK is issued; _after_ callbacks can only accomplish that by raising an exception.
 
-WARNING. Any exception that is not `ActiveRecord::Rollback` will be re-raised by Rails after the callback chain is halted. Raising an exception other than `ActiveRecord::Rollback` may break code that does not expect methods like `save` and `update_attributes` (which normally try to return `true` or `false`) to raise an exception.
+WARNING. Any exception that is not `ActiveRecord::Rollback` or `ActiveRecord::RecordInvalid` will be re-raised by Rails after the callback chain is halted. Raising an exception other than `ActiveRecord::Rollback` or `ActiveRecord::RecordInvalid` may break code that does not expect methods like `save` and `update_attributes` (which normally try to return `true` or `false`) to raise an exception.
 
 Relational Callbacks
 --------------------
@@ -399,7 +399,7 @@ By using the `after_commit` callback we can account for this case.
 
 ```ruby
 class PictureFile < ApplicationRecord
-  after_commit :delete_picture_file_from_disk, on: [:destroy]
+  after_commit :delete_picture_file_from_disk, on: :destroy
 
   def delete_picture_file_from_disk
     if File.exist?(filepath)
@@ -409,7 +409,7 @@ class PictureFile < ApplicationRecord
 end
 ```
 
-NOTE: the `:on` option specifies when a callback will be fired. If you
+NOTE: The `:on` option specifies when a callback will be fired. If you
 don't supply the `:on` option the callback will fire for every action.
 
 Since using `after_commit` callback only on create, update or delete is

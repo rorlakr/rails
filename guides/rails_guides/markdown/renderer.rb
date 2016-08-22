@@ -16,7 +16,7 @@ HTML
       end
 
       def header(text, header_level)
-        # Always increase the heading level by, so we can use h1, h2 heading in the document
+        # Always increase the heading level by 1, so we can use h1, h2 heading in the document
         header_level += 1
 
         # added by Lucius from RORLAB
@@ -30,7 +30,7 @@ HTML
       def paragraph(text)
         if text =~ /^(TIP|IMPORTANT|CAUTION|WARNING|NOTE|INFO|TODO)[.:]/
           convert_notes(text)
-        elsif text.include?('DO NOT READ THIS FILE ON GITHUB')
+        elsif text.include?("DO NOT READ THIS FILE ON GITHUB")
         elsif text =~ /^\[<sup>(\d+)\]:<\/sup> (.+)$/
           linkback = %(<a href="#footnote-#{$1}-ref"><sup>#{$1}</sup></a>)
           %(<p class="footnote" id="footnote-#{$1}">#{linkback} #{$2}</p>)
@@ -71,14 +71,14 @@ HTML
 
         def brush_for(code_type)
           case code_type
-            when 'ruby', 'sql', 'plain'
-              code_type
-            when 'erb', 'html+erb'
-              'ruby; html-script: true'
-            when 'html'
-              'xml' # HTML is understood, but there are .xml rules in the CSS
+          when "ruby", "sql", "plain"
+            code_type
+          when "erb", "html+erb"
+            "ruby; html-script: true"
+          when "html"
+            "xml" # HTML is understood, but there are .xml rules in the CSS
             else
-              'plain'
+            "plain"
           end
         end
 
@@ -93,10 +93,10 @@ HTML
           # asterisk.
           body.gsub(/^(TIP|IMPORTANT|CAUTION|WARNING|NOTE|INFO|TODO)[.:](.*?)(\n(?=\n)|\Z)/m) do
             css_class = case $1
-                        when 'CAUTION', 'IMPORTANT'
-                          'warning'
-                        when 'TIP'
-                          'info'
+                        when "CAUTION", "IMPORTANT"
+                          "warning"
+                        when "TIP"
+                          "info"
                         else
                           $1.downcase
                         end

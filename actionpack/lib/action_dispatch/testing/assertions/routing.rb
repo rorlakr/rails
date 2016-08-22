@@ -1,7 +1,7 @@
-require 'uri'
-require 'active_support/core_ext/hash/indifferent_access'
-require 'active_support/core_ext/string/access'
-require 'action_controller/metal/exceptions'
+require "uri"
+require "active_support/core_ext/hash/indifferent_access"
+require "active_support/core_ext/string/access"
+require "action_controller/metal/exceptions"
 
 module ActionDispatch
   module Assertions
@@ -82,10 +82,11 @@ module ActionDispatch
             expected_path = uri.path.to_s.empty? ? "/" : uri.path
           end
         else
-          expected_path = "/#{expected_path}" unless expected_path.first == '/'
+          expected_path = "/#{expected_path}" unless expected_path.first == "/"
         end
         # Load routes.rb if it hasn't been loaded.
 
+        options = options.clone
         generated_path, query_string_keys = @routes.generate_extras(options, defaults)
         found_extras = options.reject { |k, _| ! query_string_keys.include? k }
 
@@ -116,7 +117,7 @@ module ActionDispatch
       #  # Tests a route, providing a defaults hash
       #  assert_routing 'controller/action/9', {id: "9", item: "square"}, {controller: "controller", action: "action"}, {}, {item: "square"}
       #
-      #  # Tests a route with a HTTP method
+      #  # Tests a route with an HTTP method
       #  assert_routing({ method: 'put', path: '/product/321' }, { controller: "product", action: "update", id: "321" })
       def assert_routing(path, options, defaults={}, extras={}, message=nil)
         assert_recognizes(options, path, extras, message)
@@ -126,7 +127,7 @@ module ActionDispatch
           options[:controller] = "/#{controller}"
         end
 
-        generate_options = options.dup.delete_if{ |k, _| defaults.key?(k) }
+        generate_options = options.dup.delete_if { |k, _| defaults.key?(k) }
         assert_generates(path.is_a?(Hash) ? path[:path] : path, generate_options, defaults, extras, message)
       end
 
@@ -183,7 +184,7 @@ module ActionDispatch
           end
 
           # Assume given controller
-          request = ActionController::TestRequest.create
+          request = ActionController::TestRequest.create @controller.class
 
           if path =~ %r{://}
             fail_on(URI::InvalidURIError, msg) do
@@ -201,7 +202,7 @@ module ActionDispatch
           request.request_method = method if method
 
           params = fail_on(ActionController::RoutingError, msg) do
-            @routes.recognize_path(path, { :method => method, :extras => extras })
+            @routes.recognize_path(path, method: method, extras: extras)
           end
           request.path_parameters = params.with_indifferent_access
 

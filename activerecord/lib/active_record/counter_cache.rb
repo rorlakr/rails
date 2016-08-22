@@ -26,7 +26,7 @@ module ActiveRecord
             has_many_association = has_many.find { |association| association.counter_cache_column && association.counter_cache_column.to_sym == counter_association.to_sym }
             counter_association = has_many_association.plural_name if has_many_association
           end
-          raise ArgumentError, "'#{self.name}' has no association called '#{counter_association}'" unless has_many_association
+          raise ArgumentError, "'#{name}' has no association called '#{counter_association}'" unless has_many_association
 
           if has_many_association.is_a? ActiveRecord::Reflection::ThroughReflection
             has_many_association = has_many_association.through_reflection
@@ -75,12 +75,12 @@ module ActiveRecord
       #   #  WHERE id IN (10, 15)
       def update_counters(id, counters)
         updates = counters.map do |counter_name, value|
-          operator = value < 0 ? '-' : '+'
+          operator = value < 0 ? "-" : "+"
           quoted_column = connection.quote_column_name(counter_name)
           "#{quoted_column} = COALESCE(#{quoted_column}, 0) #{operator} #{value.abs}"
         end
 
-        unscoped.where(primary_key => id).update_all updates.join(', ')
+        unscoped.where(primary_key => id).update_all updates.join(", ")
       end
 
       # Increment a numeric field by one, via a direct SQL update.
@@ -97,8 +97,8 @@ module ActiveRecord
       #
       # ==== Examples
       #
-      #   # Increment the post_count column for the record with an id of 5
-      #   DiscussionBoard.increment_counter(:post_count, 5)
+      #   # Increment the posts_count column for the record with an id of 5
+      #   DiscussionBoard.increment_counter(:posts_count, 5)
       def increment_counter(counter_name, id)
         update_counters(id, counter_name => 1)
       end
@@ -115,8 +115,8 @@ module ActiveRecord
       #
       # ==== Examples
       #
-      #   # Decrement the post_count column for the record with an id of 5
-      #   DiscussionBoard.decrement_counter(:post_count, 5)
+      #   # Decrement the posts_count column for the record with an id of 5
+      #   DiscussionBoard.decrement_counter(:posts_count, 5)
       def decrement_counter(counter_name, id)
         update_counters(id, counter_name => -1)
       end
@@ -159,6 +159,5 @@ module ActiveRecord
           yield association(name.to_sym) if reflection.belongs_to? && reflection.counter_cache_column
         end
       end
-
   end
 end

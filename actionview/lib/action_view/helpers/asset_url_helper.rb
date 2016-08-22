@@ -1,4 +1,5 @@
-require 'zlib'
+require "zlib"
+require "active_support/core_ext/regexp"
 
 module ActionView
   # = Action View Asset URL Helpers
@@ -131,10 +132,10 @@ module ActionView
         raise ArgumentError, "nil is not a valid asset source" if source.nil?
 
         source = source.to_s
-        return "" unless source.present?
-        return source if source =~ URI_REGEXP
+        return "" if source.blank?
+        return source if URI_REGEXP.match?(source)
 
-        tail, source = source[/([\?#].+)$/], source.sub(/([\?#].+)$/, ''.freeze)
+        tail, source = source[/([\?#].+)$/], source.sub(/([\?#].+)$/, "".freeze)
 
         if extname = compute_asset_extname(source, options)
           source = "#{source}#{extname}"
@@ -168,13 +169,13 @@ module ActionView
       #   asset_url "application.js", host: "http://cdn.example.com" # => http://cdn.example.com/assets/application.js
       #
       def asset_url(source, options = {})
-        path_to_asset(source, options.merge(:protocol => :request))
+        path_to_asset(source, options.merge(protocol: :request))
       end
       alias_method :url_to_asset, :asset_url # aliased to avoid conflicts with an asset_url named route
 
       ASSET_EXTENSIONS = {
-        javascript: '.js',
-        stylesheet: '.css'
+        javascript: ".js",
+        stylesheet: ".css"
       }
 
       # Compute extname to append to asset path. Returns nil if
@@ -187,12 +188,12 @@ module ActionView
 
       # Maps asset types to public directory.
       ASSET_PUBLIC_DIRECTORIES = {
-        audio:      '/audios',
-        font:       '/fonts',
-        image:      '/images',
-        javascript: '/javascripts',
-        stylesheet: '/stylesheets',
-        video:      '/videos'
+        audio:      "/audios",
+        font:       "/fonts",
+        image:      "/images",
+        javascript: "/javascripts",
+        stylesheet: "/stylesheets",
+        video:      "/videos"
       }
 
       # Computes asset path to public directory. Plugins and
@@ -213,19 +214,21 @@ module ActionView
         host = options[:host]
         host ||= config.asset_host if defined? config.asset_host
 
-        if host.respond_to?(:call)
-          arity = host.respond_to?(:arity) ? host.arity : host.method(:call).arity
-          args = [source]
-          args << request if request && (arity > 1 || arity < 0)
-          host = host.call(*args)
-        elsif host =~ /%d/
-          host = host % (Zlib.crc32(source) % 4)
+        if host
+          if host.respond_to?(:call)
+            arity = host.respond_to?(:arity) ? host.arity : host.method(:call).arity
+            args = [source]
+            args << request if request && (arity > 1 || arity < 0)
+            host = host.call(*args)
+          elsif host.include?("%d")
+            host = host % (Zlib.crc32(source) % 4)
+          end
         end
 
         host ||= request.base_url if request && options[:protocol] == :request
         return unless host
 
-        if host =~ URI_REGEXP
+        if URI_REGEXP.match?(host)
           host
         else
           protocol = options[:protocol] || config.default_asset_host_protocol || (request ? :request : :relative)
@@ -251,7 +254,7 @@ module ActionView
       #   javascript_path "http://www.example.com/js/xmlhr"    # => http://www.example.com/js/xmlhr
       #   javascript_path "http://www.example.com/js/xmlhr.js" # => http://www.example.com/js/xmlhr.js
       def javascript_path(source, options = {})
-        path_to_asset(source, {type: :javascript}.merge!(options))
+        path_to_asset(source, { type: :javascript }.merge!(options))
       end
       alias_method :path_to_javascript, :javascript_path # aliased to avoid conflicts with a javascript_path named route
 
@@ -263,7 +266,7 @@ module ActionView
       #   javascript_url "js/xmlhr.js", host: "http://stage.example.com" # => http://stage.example.com/assets/dir/xmlhr.js
       #
       def javascript_url(source, options = {})
-        url_to_asset(source, {type: :javascript}.merge!(options))
+        url_to_asset(source, { type: :javascript }.merge!(options))
       end
       alias_method :url_to_javascript, :javascript_url # aliased to avoid conflicts with a javascript_url named route
 
@@ -278,7 +281,7 @@ module ActionView
       #   stylesheet_path "http://www.example.com/css/style"       # => http://www.example.com/css/style
       #   stylesheet_path "http://www.example.com/css/style.css"   # => http://www.example.com/css/style.css
       def stylesheet_path(source, options = {})
-        path_to_asset(source, {type: :stylesheet}.merge!(options))
+        path_to_asset(source, { type: :stylesheet }.merge!(options))
       end
       alias_method :path_to_stylesheet, :stylesheet_path # aliased to avoid conflicts with a stylesheet_path named route
 
@@ -290,7 +293,7 @@ module ActionView
       #   stylesheet_url "css/style.css", host: "http://stage.example.com" # => http://stage.example.com/css/style.css
       #
       def stylesheet_url(source, options = {})
-        url_to_asset(source, {type: :stylesheet}.merge!(options))
+        url_to_asset(source, { type: :stylesheet }.merge!(options))
       end
       alias_method :url_to_stylesheet, :stylesheet_url # aliased to avoid conflicts with a stylesheet_url named route
 
@@ -308,7 +311,7 @@ module ActionView
       # The alias +path_to_image+ is provided to avoid that. Rails uses the alias internally, and
       # plugin authors are encouraged to do so.
       def image_path(source, options = {})
-        path_to_asset(source, {type: :image}.merge!(options))
+        path_to_asset(source, { type: :image }.merge!(options))
       end
       alias_method :path_to_image, :image_path # aliased to avoid conflicts with an image_path named route
 
@@ -320,7 +323,7 @@ module ActionView
       #   image_url "edit.png", host: "http://stage.example.com" # => http://stage.example.com/edit.png
       #
       def image_url(source, options = {})
-        url_to_asset(source, {type: :image}.merge!(options))
+        url_to_asset(source, { type: :image }.merge!(options))
       end
       alias_method :url_to_image, :image_url # aliased to avoid conflicts with an image_url named route
 
@@ -334,7 +337,7 @@ module ActionView
       #   video_path("/trailers/hd.avi")                              # => /trailers/hd.avi
       #   video_path("http://www.example.com/vid/hd.avi")             # => http://www.example.com/vid/hd.avi
       def video_path(source, options = {})
-        path_to_asset(source, {type: :video}.merge!(options))
+        path_to_asset(source, { type: :video }.merge!(options))
       end
       alias_method :path_to_video, :video_path # aliased to avoid conflicts with a video_path named route
 
@@ -346,7 +349,7 @@ module ActionView
       #   video_url "hd.avi", host: "http://stage.example.com" # => http://stage.example.com/hd.avi
       #
       def video_url(source, options = {})
-        url_to_asset(source, {type: :video}.merge!(options))
+        url_to_asset(source, { type: :video }.merge!(options))
       end
       alias_method :url_to_video, :video_url # aliased to avoid conflicts with an video_url named route
 
@@ -360,7 +363,7 @@ module ActionView
       #   audio_path("/sounds/horse.wav")                                # => /sounds/horse.wav
       #   audio_path("http://www.example.com/sounds/horse.wav")          # => http://www.example.com/sounds/horse.wav
       def audio_path(source, options = {})
-        path_to_asset(source, {type: :audio}.merge!(options))
+        path_to_asset(source, { type: :audio }.merge!(options))
       end
       alias_method :path_to_audio, :audio_path # aliased to avoid conflicts with an audio_path named route
 
@@ -372,7 +375,7 @@ module ActionView
       #   audio_url "horse.wav", host: "http://stage.example.com" # => http://stage.example.com/horse.wav
       #
       def audio_url(source, options = {})
-        url_to_asset(source, {type: :audio}.merge!(options))
+        url_to_asset(source, { type: :audio }.merge!(options))
       end
       alias_method :url_to_audio, :audio_url # aliased to avoid conflicts with an audio_url named route
 
@@ -385,7 +388,7 @@ module ActionView
       #   font_path("/dir/font.ttf")                                  # => /dir/font.ttf
       #   font_path("http://www.example.com/dir/font.ttf")            # => http://www.example.com/dir/font.ttf
       def font_path(source, options = {})
-        path_to_asset(source, {type: :font}.merge!(options))
+        path_to_asset(source, { type: :font }.merge!(options))
       end
       alias_method :path_to_font, :font_path # aliased to avoid conflicts with an font_path named route
 
@@ -397,7 +400,7 @@ module ActionView
       #   font_url "font.ttf", host: "http://stage.example.com" # => http://stage.example.com/font.ttf
       #
       def font_url(source, options = {})
-        url_to_asset(source, {type: :font}.merge!(options))
+        url_to_asset(source, { type: :font }.merge!(options))
       end
       alias_method :url_to_font, :font_url # aliased to avoid conflicts with an font_url named route
     end

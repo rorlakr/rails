@@ -3,7 +3,7 @@ require "rails"
 require "active_model/railtie"
 
 # For now, action_controller must always be present with
-# rails, so let's make sure that it gets required before
+# Rails, so let's make sure that it gets required before
 # here. This is needed for correctly setting up the middleware.
 # In the future, this might become an optional require.
 require "action_controller/railtie"
@@ -13,22 +13,15 @@ module ActiveRecord
   class Railtie < Rails::Railtie # :nodoc:
     config.active_record = ActiveSupport::OrderedOptions.new
 
-    config.app_generators.orm :active_record, :migration => true,
-                                              :timestamps => true
-
-    config.app_middleware.insert_after ::ActionDispatch::Callbacks,
-      ActiveRecord::QueryCache
-
-    config.app_middleware.insert_after ::ActionDispatch::Callbacks,
-      ActiveRecord::ConnectionAdapters::ConnectionManagement
+    config.app_generators.orm :active_record, migration: true,
+                                              timestamps: true
 
     config.action_dispatch.rescue_responses.merge!(
-      'ActiveRecord::RecordNotFound'   => :not_found,
-      'ActiveRecord::StaleObjectError' => :conflict,
-      'ActiveRecord::RecordInvalid'    => :unprocessable_entity,
-      'ActiveRecord::RecordNotSaved'   => :unprocessable_entity
+      "ActiveRecord::RecordNotFound"   => :not_found,
+      "ActiveRecord::StaleObjectError" => :conflict,
+      "ActiveRecord::RecordInvalid"    => :unprocessable_entity,
+      "ActiveRecord::RecordNotSaved"   => :unprocessable_entity
     )
-
 
     config.active_record.use_schema_cache_dump = true
     config.active_record.maintain_test_schema = true
@@ -40,9 +33,9 @@ module ActiveRecord
         task :load_config do
           ActiveRecord::Tasks::DatabaseTasks.database_configuration = Rails.application.config.database_configuration
 
-          if defined?(ENGINE_PATH) && engine = Rails::Engine.find(ENGINE_PATH)
-            if engine.paths['db/migrate'].existent
-              ActiveRecord::Tasks::DatabaseTasks.migrations_paths += engine.paths['db/migrate'].to_a
+          if defined?(ENGINE_ROOT) && engine = Rails::Engine.find(ENGINE_ROOT)
+            if engine.paths["db/migrate"].existent
+              ActiveRecord::Tasks::DatabaseTasks.migrations_paths += engine.paths["db/migrate"].to_a
             end
           end
         end
@@ -57,8 +50,10 @@ module ActiveRecord
     console do |app|
       require "active_record/railties/console_sandbox" if app.sandbox?
       require "active_record/base"
-      console = ActiveSupport::Logger.new(STDERR)
-      Rails.logger.extend ActiveSupport::Logger.broadcast console
+      unless ActiveSupport::Logger.logger_outputs_to?(Rails.logger, STDERR, STDOUT)
+        console = ActiveSupport::Logger.new(STDERR)
+        Rails.logger.extend ActiveSupport::Logger.broadcast console
+      end
     end
 
     runner do
@@ -106,7 +101,7 @@ module ActiveRecord
     initializer "active_record.warn_on_records_fetched_greater_than" do
       if config.active_record.warn_on_records_fetched_greater_than
         ActiveSupport.on_load(:active_record) do
-          require 'active_record/relation/record_fetch_warning'
+          require "active_record/relation/record_fetch_warning"
         end
       end
     end
@@ -150,16 +145,20 @@ end_warning
       end
     end
 
-    initializer "active_record.set_reloader_hooks" do |app|
-      hook = app.config.reload_classes_only_on_change ? :to_prepare : :to_cleanup
-
+    initializer "active_record.set_reloader_hooks" do
       ActiveSupport.on_load(:active_record) do
-        ActionDispatch::Reloader.send(hook) do
+        ActiveSupport::Reloader.before_class_unload do
           if ActiveRecord::Base.connected?
             ActiveRecord::Base.clear_cache!
             ActiveRecord::Base.clear_reloadable_connections!
           end
         end
+      end
+    end
+
+    initializer "active_record.set_executor_hooks" do
+      ActiveSupport.on_load(:active_record) do
+        ActiveRecord::QueryCache.install_executor_hooks
       end
     end
 

@@ -1,6 +1,6 @@
-require 'rack/session/abstract/id'
-require 'action_controller/metal/exceptions'
-require 'active_support/security_utils'
+require "rack/session/abstract/id"
+require "action_controller/metal/exceptions"
+require "active_support/security_utils"
 
 module ActionController #:nodoc:
   class InvalidAuthenticityToken < ActionControllerError #:nodoc:
@@ -81,6 +81,10 @@ module ActionController #:nodoc:
       config_accessor :forgery_protection_origin_check
       self.forgery_protection_origin_check = false
 
+      # Controls whether form-action/method specific CSRF tokens are used.
+      config_accessor :per_form_csrf_tokens
+      self.per_form_csrf_tokens = false
+
       helper_method :form_authenticity_token
       helper_method :protect_against_forgery?
     end
@@ -105,10 +109,10 @@ module ActionController #:nodoc:
       # * <tt>:only/:except</tt> - Only apply forgery protection to a subset of actions. For example <tt>only: [ :create, :create_all ]</tt>.
       # * <tt>:if/:unless</tt> - Turn off the forgery protection entirely depending on the passed Proc or method reference.
       # * <tt>:prepend</tt> - By default, the verification of the authentication token will be added at the position of the
-      #    protect_from_forgery call in your application. This means any callbacks added before are run first. This is useful
-      #    when you want your forgery protection to depend on other callbacks, like authentication methods (Oauth vs Cookie auth).
+      #   protect_from_forgery call in your application. This means any callbacks added before are run first. This is useful
+      #   when you want your forgery protection to depend on other callbacks, like authentication methods (Oauth vs Cookie auth).
       #
-      #    If you need to add verification to the beginning of the callback chain, use <tt>prepend: true</tt>.
+      #   If you need to add verification to the beginning of the callback chain, use <tt>prepend: true</tt>.
       # * <tt>:with</tt> - Set the method to handle unverified request.
       #
       # Valid unverified request handling methods are:
@@ -126,11 +130,11 @@ module ActionController #:nodoc:
 
       private
 
-      def protection_method_class(name)
-        ActionController::RequestForgeryProtection::ProtectionMethods.const_get(name.to_s.classify)
-      rescue NameError
-        raise ArgumentError, 'Invalid request forgery protection method, use :null_session, :exception, or :reset_session'
-      end
+        def protection_method_class(name)
+          ActionController::RequestForgeryProtection::ProtectionMethods.const_get(name.to_s.classify)
+        rescue NameError
+          raise ArgumentError, "Invalid request forgery protection method, use :null_session, :exception, or :reset_session"
+        end
     end
 
     module ProtectionMethods
@@ -150,26 +154,26 @@ module ActionController #:nodoc:
 
         protected
 
-        class NullSessionHash < Rack::Session::Abstract::SessionHash #:nodoc:
-          def initialize(req)
-            super(nil, req)
-            @data = {}
-            @loaded = true
+          class NullSessionHash < Rack::Session::Abstract::SessionHash #:nodoc:
+            def initialize(req)
+              super(nil, req)
+              @data = {}
+              @loaded = true
+            end
+
+            # no-op
+            def destroy; end
+
+            def exists?
+              true
+            end
           end
 
-          # no-op
-          def destroy; end
-
-          def exists?
-            true
+          class NullCookieJar < ActionDispatch::Cookies::CookieJar #:nodoc:
+            def write(*)
+              # nothing
+            end
           end
-        end
-
-        class NullCookieJar < ActionDispatch::Cookies::CookieJar #:nodoc:
-          def write(*)
-            # nothing
-          end
-        end
       end
 
       class ResetSession
@@ -209,7 +213,7 @@ module ActionController #:nodoc:
 
         if !verified_request?
           if logger && log_warning_on_csrf_failure
-            logger.warn "Can't verify CSRF token authenticity"
+            logger.warn "Can't verify CSRF token authenticity."
           end
           handle_unverified_request
         end
@@ -231,7 +235,9 @@ module ActionController #:nodoc:
       # we aren't serving an unauthorized cross-origin response.
       def verify_same_origin_request
         if marked_for_same_origin_verification? && non_xhr_javascript_response?
-          logger.warn CROSS_ORIGIN_JAVASCRIPT_WARNING if logger
+          if logger && log_warning_on_csrf_failure
+            logger.warn CROSS_ORIGIN_JAVASCRIPT_WARNING
+          end
           raise ActionController::InvalidCrossOriginRequest, CROSS_ORIGIN_JAVASCRIPT_WARNING
         end
       end
@@ -277,16 +283,25 @@ module ActionController #:nodoc:
       end
 
       # Sets the token value for the current session.
-      def form_authenticity_token
-        masked_authenticity_token(session)
+      def form_authenticity_token(form_options: {})
+        masked_authenticity_token(session, form_options: form_options)
       end
 
       # Creates a masked version of the authenticity token that varies
       # on each request. The masking is used to mitigate SSL attacks
       # like BREACH.
-      def masked_authenticity_token(session)
+      def masked_authenticity_token(session, form_options: {})
+        action, method = form_options.values_at(:action, :method)
+
+        raw_token = if per_form_csrf_tokens && action && method
+          action_path = normalize_action_path(action)
+          per_form_csrf_token(session, action_path, method)
+        else
+          real_csrf_token(session)
+        end
+
         one_time_pad = SecureRandom.random_bytes(AUTHENTICITY_TOKEN_LENGTH)
-        encrypted_csrf_token = xor_byte_strings(one_time_pad, real_csrf_token(session))
+        encrypted_csrf_token = xor_byte_strings(one_time_pad, raw_token)
         masked_token = one_time_pad + encrypted_csrf_token
         Base64.strict_encode64(masked_token)
       end
@@ -316,21 +331,39 @@ module ActionController #:nodoc:
           compare_with_real_token masked_token, session
 
         elsif masked_token.length == AUTHENTICITY_TOKEN_LENGTH * 2
-          # Split the token into the one-time pad and the encrypted
-          # value and decrypt it
-          one_time_pad = masked_token[0...AUTHENTICITY_TOKEN_LENGTH]
-          encrypted_csrf_token = masked_token[AUTHENTICITY_TOKEN_LENGTH..-1]
-          csrf_token = xor_byte_strings(one_time_pad, encrypted_csrf_token)
+          csrf_token = unmask_token(masked_token)
 
-          compare_with_real_token csrf_token, session
-
+          compare_with_real_token(csrf_token, session) ||
+            valid_per_form_csrf_token?(csrf_token, session)
         else
           false # Token is malformed
         end
       end
 
+      def unmask_token(masked_token)
+        # Split the token into the one-time pad and the encrypted
+        # value and decrypt it
+        one_time_pad = masked_token[0...AUTHENTICITY_TOKEN_LENGTH]
+        encrypted_csrf_token = masked_token[AUTHENTICITY_TOKEN_LENGTH..-1]
+        xor_byte_strings(one_time_pad, encrypted_csrf_token)
+      end
+
       def compare_with_real_token(token, session)
         ActiveSupport::SecurityUtils.secure_compare(token, real_csrf_token(session))
+      end
+
+      def valid_per_form_csrf_token?(token, session)
+        if per_form_csrf_tokens
+          correct_token = per_form_csrf_token(
+            session,
+            normalize_action_path(request.fullpath),
+            request.request_method
+          )
+
+          ActiveSupport::SecurityUtils.secure_compare(token, correct_token)
+        else
+          false
+        end
       end
 
       def real_csrf_token(session)
@@ -338,8 +371,18 @@ module ActionController #:nodoc:
         Base64.strict_decode64(session[:_csrf_token])
       end
 
+      def per_form_csrf_token(session, action_path, method)
+        OpenSSL::HMAC.digest(
+          OpenSSL::Digest::SHA256.new,
+          real_csrf_token(session),
+          [action_path, method.downcase].join("#")
+        )
+      end
+
       def xor_byte_strings(s1, s2)
-        s1.bytes.zip(s2.bytes).map { |(c1,c2)| c1 ^ c2 }.pack('c*')
+        s2_bytes = s2.bytes
+        s1.each_byte.with_index { |c1, i| s2_bytes[i] ^= c1 }
+        s2_bytes.pack("C*")
       end
 
       # The form's authenticity parameter. Override to provide your own.
@@ -361,6 +404,11 @@ module ActionController #:nodoc:
         else
           true
         end
+      end
+
+      def normalize_action_path(action_path)
+        uri = URI.parse(action_path)
+        uri.path.chomp("/")
       end
   end
 end

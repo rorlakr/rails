@@ -4,7 +4,7 @@
 
 * **Ensure the bug was not already reported** by searching on GitHub under [Issues](https://github.com/rails/rails/issues).
 
-* If unable to find an open issue addressing the problem, [open a new one](https://github.com/rails/rails/issues/new). Be sure to include a **title and clear description**, as much relevant information as possible, and a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
+* If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/rails/rails/issues/new). Be sure to include a **title and clear description**, as much relevant information as possible, and a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
 
 * If possible, use the relevant bug report templates to create the issue. Simply copy the content of the appropriate template into a .rb file, make the necessary changes to demonstrate the issue, and **paste the content into the issue description**:
   * [**Active Record** (models, database) issues](https://github.com/rails/rails/blob/master/guides/bug_report_templates/active_record_master.rb)
@@ -20,6 +20,10 @@
 * Ensure the PR description clearly describes the problem and solution. Include the relevant issue number if applicable.
 
 * Before submitting, please read the [Contributing to Ruby on Rails](http://edgeguides.rubyonrails.org/contributing_to_ruby_on_rails.html) guide to know more about coding conventions and benchmarks.
+
+#### **Did you fix whitespace, format code, or make a purely cosmetic patch?**
+
+Changes that are cosmetic in nature and do not add anything substantial to the stability, functionality, or testability of Rails will generally not be accepted (read more about [our rationales behind this decision](https://github.com/rails/rails/pull/13771#issuecomment-32746700)).
 
 #### **Do you intend to add a new feature or change an existing one?**
 

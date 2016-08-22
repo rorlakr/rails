@@ -4,44 +4,7 @@ module ActiveRecord
       module DatabaseStatements
         def explain(arel, binds = [])
           sql = "EXPLAIN #{to_sql(arel, binds)}"
-          ExplainPrettyPrinter.new.pp(exec_query(sql, 'EXPLAIN', binds))
-        end
-
-        class ExplainPrettyPrinter # :nodoc:
-          # Pretty prints the result of an EXPLAIN in a way that resembles the output of the
-          # PostgreSQL shell:
-          #
-          #                                     QUERY PLAN
-          #   ------------------------------------------------------------------------------
-          #    Nested Loop Left Join  (cost=0.00..37.24 rows=8 width=0)
-          #      Join Filter: (posts.user_id = users.id)
-          #      ->  Index Scan using users_pkey on users  (cost=0.00..8.27 rows=1 width=4)
-          #            Index Cond: (id = 1)
-          #      ->  Seq Scan on posts  (cost=0.00..28.88 rows=8 width=4)
-          #            Filter: (posts.user_id = 1)
-          #   (6 rows)
-          #
-          def pp(result)
-            header = result.columns.first
-            lines  = result.rows.map(&:first)
-
-            # We add 2 because there's one char of padding at both sides, note
-            # the extra hyphens in the example above.
-            width = [header, *lines].map(&:length).max + 2
-
-            pp = []
-
-            pp << header.center(width).rstrip
-            pp << '-' * width
-
-            pp += lines.map {|line| " #{line}"}
-
-            nrows = result.rows.length
-            rows_label = nrows == 1 ? 'row' : 'rows'
-            pp << "(#{nrows} #{rows_label})"
-
-            pp.join("\n") + "\n"
-          end
+          PostgreSQL::ExplainPrettyPrinter.new.pp(exec_query(sql, "EXPLAIN", binds))
         end
 
         def select_value(arel, name = nil, binds = [])
@@ -52,8 +15,8 @@ module ActiveRecord
           end
         end
 
-        def select_values(arel, name = nil)
-          arel, binds = binds_from_relation arel, []
+        def select_values(arel, name = nil, binds = [])
+          arel, binds = binds_from_relation arel, binds
           sql = to_sql(arel, binds)
           execute_and_clear(sql, name, binds) do |result|
             if result.nfields > 0
@@ -70,28 +33,6 @@ module ActiveRecord
           execute_and_clear(sql, name, binds) do |result|
             result.values
           end
-        end
-
-        # Executes an INSERT query and returns the new record's ID
-        def insert_sql(sql, name = nil, pk = nil, id_value = nil, sequence_name = nil)
-          unless pk
-            # Extract the table from the insert sql. Yuck.
-            table_ref = extract_table_ref_from_insert_sql(sql)
-            pk = primary_key(table_ref) if table_ref
-          end
-
-          if pk && use_insert_returning?
-            select_value("#{sql} RETURNING #{quote_column_name(pk)}")
-          elsif pk
-            super
-            last_insert_id_value(sequence_name || default_sequence_name(table_ref, pk))
-          else
-            super
-          end
-        end
-
-        def create
-          super.insert
         end
 
         # The internal PostgreSQL identifier of the money data type.
@@ -133,9 +74,9 @@ module ActiveRecord
               #  (2) $12.345.678,12
               case data
               when /^-?\D+[\d,]+\.\d{2}$/  # (1)
-                data.gsub!(/[^-\d.]/, '')
+                data.gsub!(/[^-\d.]/, "")
               when /^-?\D+[\d.]+,\d{2}$/  # (2)
-                data.gsub!(/[^-\d,]/, '').sub!(/,/, '.')
+                data.gsub!(/[^-\d,]/, "").sub!(/,/, ".")
               end
             end
           end
@@ -150,13 +91,15 @@ module ActiveRecord
 
         # Executes an SQL statement, returning a PGresult object on success
         # or raising a PGError exception otherwise.
+        # Note: the PGresult object is manually memory managed; if you don't
+        # need it specifically, you many want consider the exec_query wrapper.
         def execute(sql, name = nil)
           log(sql, name) do
             @connection.async_exec(sql)
           end
         end
 
-        def exec_query(sql, name = 'SQL', binds = [], prepare: false)
+        def exec_query(sql, name = "SQL", binds = [], prepare: false)
           execute_and_clear(sql, name, binds, prepare: prepare) do |result|
             types = {}
             fields = result.fields
@@ -169,42 +112,42 @@ module ActiveRecord
           end
         end
 
-        def exec_delete(sql, name = 'SQL', binds = [])
-          execute_and_clear(sql, name, binds) {|result| result.cmd_tuples }
+        def exec_delete(sql, name = nil, binds = [])
+          execute_and_clear(sql, name, binds) { |result| result.cmd_tuples }
         end
         alias :exec_update :exec_delete
 
-        def sql_for_insert(sql, pk, id_value, sequence_name, binds)
-          unless pk
+        def sql_for_insert(sql, pk, id_value, sequence_name, binds) # :nodoc:
+          if pk.nil?
             # Extract the table from the insert sql. Yuck.
             table_ref = extract_table_ref_from_insert_sql(sql)
             pk = primary_key(table_ref) if table_ref
           end
 
-          if pk && use_insert_returning?
+          if pk = suppress_composite_primary_key(pk)
             sql = "#{sql} RETURNING #{quote_column_name(pk)}"
           end
 
-          [sql, binds]
+          super
         end
+        protected :sql_for_insert
 
-        def exec_insert(sql, name, binds, pk = nil, sequence_name = nil)
-          val = exec_query(sql, name, binds)
-          if !use_insert_returning? && pk
+        def exec_insert(sql, name = nil, binds = [], pk = nil, sequence_name = nil)
+          if use_insert_returning? || pk == false
+            super
+          else
+            result = exec_query(sql, name, binds)
             unless sequence_name
               table_ref = extract_table_ref_from_insert_sql(sql)
-              sequence_name = default_sequence_name(table_ref, pk)
-              return val unless sequence_name
+              if table_ref
+                pk = primary_key(table_ref) if pk.nil?
+                pk = suppress_composite_primary_key(pk)
+                sequence_name = default_sequence_name(table_ref, pk)
+              end
+              return result unless sequence_name
             end
             last_insert_id_result(sequence_name)
-          else
-            val
           end
-        end
-
-        # Executes an UPDATE query and returns the number of affected tuples.
-        def update_sql(sql, name = nil)
-          super.cmd_tuples
         end
 
         # Begins a transaction.
@@ -226,6 +169,12 @@ module ActiveRecord
         def exec_rollback_db_transaction
           execute "ROLLBACK"
         end
+
+        private
+
+          def suppress_composite_primary_key(pk)
+            pk unless pk.is_a?(Array)
+          end
       end
     end
   end

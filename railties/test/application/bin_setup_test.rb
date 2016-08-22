@@ -1,4 +1,4 @@
-require 'isolation/abstract_unit'
+require "isolation/abstract_unit"
 
 module ApplicationTests
   class BinSetupTest < ActiveSupport::TestCase
@@ -14,28 +14,28 @@ module ApplicationTests
 
     def test_bin_setup
       Dir.chdir(app_path) do
-        app_file 'db/schema.rb', <<-RUBY
+        app_file "db/schema.rb", <<-RUBY
           ActiveRecord::Schema.define(version: 20140423102712) do
             create_table(:articles) {}
           end
         RUBY
 
         list_tables = lambda { `bin/rails runner 'p ActiveRecord::Base.connection.tables'`.strip }
-        File.write("log/my.log", "zomg!")
+        File.write("log/test.log", "zomg!")
 
-        assert_equal '[]', list_tables.call
-        assert_equal 5, File.size("log/my.log")
+        assert_equal "[]", list_tables.call
+        assert_equal 5, File.size("log/test.log")
         assert_not File.exist?("tmp/restart.txt")
         `bin/setup 2>&1`
-        assert_equal 0, File.size("log/my.log")
-        assert_equal '["articles", "schema_migrations"]', list_tables.call
+        assert_equal 0, File.size("log/test.log")
+        assert_equal '["articles", "schema_migrations", "ar_internal_metadata"]', list_tables.call
         assert File.exist?("tmp/restart.txt")
       end
     end
 
     def test_bin_setup_output
       Dir.chdir(app_path) do
-        app_file 'db/schema.rb', ""
+        app_file "db/schema.rb", ""
 
         output = `bin/setup 2>&1`
         assert_equal(<<-OUTPUT, output)
@@ -43,6 +43,8 @@ module ApplicationTests
 The Gemfile's dependencies are satisfied
 
 == Preparing database ==
+Created database 'db/development.sqlite3'
+Created database 'db/test.sqlite3'
 
 == Removing old logs and tempfiles ==
 

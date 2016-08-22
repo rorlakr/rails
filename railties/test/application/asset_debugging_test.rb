@@ -1,5 +1,5 @@
-require 'isolation/abstract_unit'
-require 'rack/test'
+require "isolation/abstract_unit"
+require "rack/test"
 
 module ApplicationTests
   class AssetDebuggingTest < ActiveSupport::TestCase
@@ -28,8 +28,6 @@ module ApplicationTests
       RUBY
 
       ENV["RAILS_ENV"] = "production"
-
-      boot_rails
     end
 
     def teardown
@@ -44,7 +42,7 @@ module ApplicationTests
     test "assets are concatenated when debug is off and compile is off either if debug_assets param is provided" do
       # config.assets.debug and config.assets.compile are false for production environment
       ENV["RAILS_ENV"] = "production"
-      output = Dir.chdir(app_path){ `bin/rake assets:precompile --trace 2>&1` }
+      output = Dir.chdir(app_path) { `bin/rails assets:precompile --trace 2>&1` }
       assert $?.success?, output
 
       # Load app env
@@ -53,7 +51,7 @@ module ApplicationTests
       class ::PostsController < ActionController::Base ; end
 
       # the debug_assets params isn't used if compile is off
-      get '/posts?debug_assets=true'
+      get "/posts?debug_assets=true"
       assert_match(/<script src="\/assets\/application-([0-z]+)\.js"><\/script>/, last_response.body)
       assert_no_match(/<script src="\/assets\/xmlhr-([0-z]+)\.js"><\/script>/, last_response.body)
     end
@@ -66,7 +64,7 @@ module ApplicationTests
 
       class ::PostsController < ActionController::Base ; end
 
-      get '/posts?debug_assets=true'
+      get "/posts?debug_assets=true"
       assert_match(/<script src="\/assets\/application(\.self)?-([0-z]+)\.js\?body=1"><\/script>/, last_response.body)
       assert_match(/<script src="\/assets\/xmlhr(\.self)?-([0-z]+)\.js\?body=1"><\/script>/, last_response.body)
     end

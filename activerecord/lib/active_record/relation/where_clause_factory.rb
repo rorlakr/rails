@@ -17,7 +17,7 @@ module ActiveRecord
           attributes = klass.send(:expand_hash_conditions_for_aggregates, attributes)
           attributes.stringify_keys!
 
-          attributes, binds = predicate_builder.create_binds(attributes)
+          attributes, binds = predicate_builder.create_binds(attributes, other.last || {})
 
           parts = predicate_builder.build_from_hash(attributes)
         when Arel::Nodes::Node
@@ -31,7 +31,7 @@ module ActiveRecord
 
       protected
 
-      attr_reader :klass, :predicate_builder
+        attr_reader :klass, :predicate_builder
     end
   end
 end

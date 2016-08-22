@@ -7,10 +7,10 @@ module ActiveModel
       test "simple values" do
         type = Type::Integer.new
         assert_equal 1, type.cast(1)
-        assert_equal 1, type.cast('1')
-        assert_equal 1, type.cast('1ignore')
-        assert_equal 0, type.cast('bad1')
-        assert_equal 0, type.cast('bad')
+        assert_equal 1, type.cast("1")
+        assert_equal 1, type.cast("1ignore")
+        assert_equal 0, type.cast("bad1")
+        assert_equal 0, type.cast("bad")
         assert_equal 1, type.cast(1.7)
         assert_equal 0, type.cast(false)
         assert_equal 1, type.cast(true)
@@ -20,7 +20,7 @@ module ActiveModel
       test "random objects cast to nil" do
         type = Type::Integer.new
         assert_nil type.cast([1,2])
-        assert_nil type.cast({1 => 2})
+        assert_nil type.cast(1 => 2)
         assert_nil type.cast(1..2)
       end
 
@@ -44,34 +44,34 @@ module ActiveModel
       test "changed?" do
         type = Type::Integer.new
 
-        assert type.changed?(5, 5, '5wibble')
-        assert_not type.changed?(5, 5, '5')
-        assert_not type.changed?(5, 5, '5.0')
-        assert_not type.changed?(-5, -5, '-5')
-        assert_not type.changed?(-5, -5, '-5.0')
+        assert type.changed?(5, 5, "5wibble")
+        assert_not type.changed?(5, 5, "5")
+        assert_not type.changed?(5, 5, "5.0")
+        assert_not type.changed?(-5, -5, "-5")
+        assert_not type.changed?(-5, -5, "-5.0")
         assert_not type.changed?(nil, nil, nil)
       end
 
       test "values below int min value are out of range" do
-        assert_raises(::RangeError) do
+        assert_raises(ActiveModel::RangeError) do
           Integer.new.serialize(-2147483649)
         end
       end
 
       test "values above int max value are out of range" do
-        assert_raises(::RangeError) do
+        assert_raises(ActiveModel::RangeError) do
           Integer.new.serialize(2147483648)
         end
       end
 
       test "very small numbers are out of range" do
-        assert_raises(::RangeError) do
+        assert_raises(ActiveModel::RangeError) do
           Integer.new.serialize(-9999999999999999999999999999999)
         end
       end
 
       test "very large numbers are out of range" do
-        assert_raises(::RangeError) do
+        assert_raises(ActiveModel::RangeError) do
           Integer.new.serialize(9999999999999999999999999999999)
         end
       end
@@ -96,10 +96,10 @@ module ActiveModel
 
         assert_equal(9223372036854775807, type.serialize(9223372036854775807))
         assert_equal(-9223372036854775808, type.serialize(-9223372036854775808))
-        assert_raises(::RangeError) do
+        assert_raises(ActiveModel::RangeError) do
           type.serialize(-9999999999999999999999999999999)
         end
-        assert_raises(::RangeError) do
+        assert_raises(ActiveModel::RangeError) do
           type.serialize(9999999999999999999999999999999)
         end
       end

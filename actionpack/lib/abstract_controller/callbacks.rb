@@ -9,7 +9,7 @@ module AbstractController
 
     included do
       define_callbacks :process_action,
-                       terminator: ->(controller, result_lambda) { result_lambda.call if result_lambda.is_a?(Proc); controller.response_body },
+                       terminator: ->(controller, result_lambda) { result_lambda.call if result_lambda.is_a?(Proc); controller.performed? },
                        skip_after_callbacks_if_terminated: true
     end
 
@@ -49,7 +49,7 @@ module AbstractController
       def _normalize_callback_option(options, from, to) # :nodoc:
         if from = options[from]
           _from = Array(from).map(&:to_s).to_set
-          from = proc {|c| _from.include? c.action_name }
+          from = proc { |c| _from.include? c.action_name }
           options[to] = Array(options[to]).unshift(from)
         end
       end
@@ -62,7 +62,7 @@ module AbstractController
       #   impossible to skip a callback defined using an anonymous proc
       #   using #skip_action_callback.
       def skip_action_callback(*names)
-        ActiveSupport::Deprecation.warn('`skip_action_callback` is deprecated and will be removed in Rails 5.1. Please use skip_before_action, skip_after_action or skip_around_action instead.')
+        ActiveSupport::Deprecation.warn("`skip_action_callback` is deprecated and will be removed in Rails 5.1. Please use skip_before_action, skip_after_action or skip_around_action instead.")
         skip_before_action(*names, raise: false)
         skip_after_action(*names, raise: false)
         skip_around_action(*names, raise: false)
@@ -194,7 +194,7 @@ module AbstractController
 
         define_method "prepend_#{callback}_action" do |*names, &blk|
           _insert_callbacks(names, blk) do |name, options|
-            set_callback(:process_action, callback, name, options.merge(:prepend => true))
+            set_callback(:process_action, callback, name, options.merge(prepend: true))
           end
         end
 

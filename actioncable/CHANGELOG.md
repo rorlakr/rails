@@ -1,8 +1,17 @@
-## Rails 5.0.0.beta1 (December 18, 2015) ##
+*   Protect against concurrent writes to a websocket connection from
+    multiple threads; the underlying OS write is not always threadsafe.
 
-*   No changes.
+    *Tinco Andringa*
+
+*   Add ActiveSupport::Notifications hook to Broadcaster#broadcast.
+
+    *Matthew Wear*
+
+*   Close hijacked socket when connection is shut down.
+
+    Fixes #25613.
+
+    *Tinco Andringa*
 
 
-*   Added to Rails!
-
-    *DHH*
+Please check [5-0-stable](https://github.com/rails/rails/blob/5-0-stable/actioncable/CHANGELOG.md) for previous changes.
