@@ -44,20 +44,8 @@
   $ cd sources/ko
   ```
 
-<<<<<<< HEAD
 2. 본인이 번역하기를 원하는 파일이나 수정이 필요한 파일을 찾아 에디터로 열고 작업을 한다. 
 3. 번역 작업 중간 중간에 html 파일로 확인하여 작성한 번역이 제대로 포맷되었는지 확인한다. 이 과정은 반드시 필요하다. 아래와 같이 명령을 실행하면 `rails-guides/guides/output/ko` 디렉토리로 `html` 파일이 생성/업데이트되는데, 본인이 작업한 파일명의 `.html` 확장자를 가진 파일을 브라우져로 열어 본다. 
-=======
-Active Record, Active Model, Action Pack, and Action View can each be used independently outside Rails.
-In addition to that, Rails also comes with Action Mailer ([README](actionmailer/README.rdoc)), a library
-to generate and send emails; Active Job ([README](activejob/README.md)), a
-framework for declaring jobs and making them run on a variety of queueing
-backends; Action Cable ([README](actioncable/README.md)), a framework to
-integrate WebSockets with a Rails application;
-and Active Support ([README](activesupport/README.rdoc)), a collection
-of utility classes and standard library extensions that are useful for Rails,
-and may also be used independently outside Rails.
->>>>>>> master
 
   ```bash
   $ cd rails-guides/guides
@@ -93,12 +81,7 @@ and may also be used independently outside Rails.
   gem 'guard-shell'
   ```
 
-<<<<<<< HEAD
 2. 이어서 번들 설치한다.
-=======
-4. Using a browser, go to `http://localhost:3000` and you'll see:
-"Yay! You’re on Rails!"
->>>>>>> master
 
   ```bash
   $ bundle install
