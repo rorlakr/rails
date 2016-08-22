@@ -1,5 +1,5 @@
-require 'isolation/abstract_unit'
-require 'env_helpers'
+require "isolation/abstract_unit"
+require "env_helpers"
 
 module ApplicationTests
   class RunnerTest < ActiveSupport::TestCase
@@ -8,7 +8,6 @@ module ApplicationTests
 
     def setup
       build_app
-      boot_rails
 
       # Lets create a model so we have something to play with
       app_file "app/models/user.rb", <<-MODEL
@@ -72,6 +71,18 @@ module ApplicationTests
 
     def test_default_environment
       assert_match "development", Dir.chdir(app_path) { `bin/rails runner "puts Rails.env"` }
+    end
+
+    def test_runner_detects_syntax_errors
+      output = Dir.chdir(app_path) { `bin/rails runner "puts 'hello world" 2>&1` }
+      assert_not $?.success?
+      assert_match "unterminated string meets end of file", output
+    end
+
+    def test_runner_detects_bad_script_name
+      output = Dir.chdir(app_path) { `bin/rails runner "iuiqwiourowe" 2>&1` }
+      assert_not $?.success?
+      assert_match "undefined local variable or method `iuiqwiourowe' for main:Object", output
     end
 
     def test_environment_with_rails_env

@@ -1,5 +1,5 @@
-require 'active_support/core_ext/module/anonymous'
-require 'active_support/core_ext/module/reachable'
+require "active_support/core_ext/module/anonymous"
+require "active_support/core_ext/module/reachable"
 
 class Class
   begin
@@ -25,8 +25,6 @@ class Class
   end
 
   # Returns an array with the direct children of +self+.
-  #
-  #   Integer.subclasses # => [Fixnum, Bignum]
   #
   #   class Foo; end
   #   class Bar < Foo; end

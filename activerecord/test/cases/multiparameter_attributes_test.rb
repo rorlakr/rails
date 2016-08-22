@@ -1,6 +1,6 @@
 require "cases/helper"
-require 'models/topic'
-require 'models/customer'
+require "models/topic"
+require "models/customer"
 
 class MultiParameterAttributeTest < ActiveRecord::TestCase
   fixtures :topics
@@ -11,15 +11,13 @@ class MultiParameterAttributeTest < ActiveRecord::TestCase
     topic.attributes = attributes
     # note that extra #to_date call allows test to pass for Oracle, which
     # treats dates/times the same
-    assert_date_from_db Date.new(2004, 6, 24), topic.last_read.to_date
+    assert_equal Date.new(2004, 6, 24), topic.last_read.to_date
   end
 
   def test_multiparameter_attributes_on_date_with_empty_year
     attributes = { "last_read(1i)" => "", "last_read(2i)" => "6", "last_read(3i)" => "24" }
     topic = Topic.find(1)
     topic.attributes = attributes
-    # note that extra #to_date call allows test to pass for Oracle, which
-    # treats dates/times the same
     assert_nil topic.last_read
   end
 
@@ -27,8 +25,6 @@ class MultiParameterAttributeTest < ActiveRecord::TestCase
     attributes = { "last_read(1i)" => "2004", "last_read(2i)" => "", "last_read(3i)" => "24" }
     topic = Topic.find(1)
     topic.attributes = attributes
-    # note that extra #to_date call allows test to pass for Oracle, which
-    # treats dates/times the same
     assert_nil topic.last_read
   end
 
@@ -36,8 +32,6 @@ class MultiParameterAttributeTest < ActiveRecord::TestCase
     attributes = { "last_read(1i)" => "2004", "last_read(2i)" => "6", "last_read(3i)" => "" }
     topic = Topic.find(1)
     topic.attributes = attributes
-    # note that extra #to_date call allows test to pass for Oracle, which
-    # treats dates/times the same
     assert_nil topic.last_read
   end
 
@@ -45,8 +39,6 @@ class MultiParameterAttributeTest < ActiveRecord::TestCase
     attributes = { "last_read(1i)" => "", "last_read(2i)" => "6", "last_read(3i)" => "" }
     topic = Topic.find(1)
     topic.attributes = attributes
-    # note that extra #to_date call allows test to pass for Oracle, which
-    # treats dates/times the same
     assert_nil topic.last_read
   end
 
@@ -54,8 +46,6 @@ class MultiParameterAttributeTest < ActiveRecord::TestCase
     attributes = { "last_read(1i)" => "2004", "last_read(2i)" => "", "last_read(3i)" => "" }
     topic = Topic.find(1)
     topic.attributes = attributes
-    # note that extra #to_date call allows test to pass for Oracle, which
-    # treats dates/times the same
     assert_nil topic.last_read
   end
 
@@ -63,8 +53,6 @@ class MultiParameterAttributeTest < ActiveRecord::TestCase
     attributes = { "last_read(1i)" => "", "last_read(2i)" => "", "last_read(3i)" => "24" }
     topic = Topic.find(1)
     topic.attributes = attributes
-    # note that extra #to_date call allows test to pass for Oracle, which
-    # treats dates/times the same
     assert_nil topic.last_read
   end
 
@@ -209,6 +197,20 @@ class MultiParameterAttributeTest < ActiveRecord::TestCase
       assert_equal Time.utc(2004, 6, 24, 23, 24, 0), topic.written_on
       assert_equal Time.utc(2004, 6, 24, 16, 24, 0), topic.written_on.time
       assert_equal Time.zone, topic.written_on.time_zone
+    end
+  ensure
+    Topic.reset_column_information
+  end
+
+  def test_multiparameter_attributes_on_time_with_time_zone_aware_attributes_and_invalid_time_params
+    with_timezone_config aware_attributes: true do
+      Topic.reset_column_information
+      attributes = {
+        "written_on(1i)" => "2004", "written_on(2i)" => "", "written_on(3i)" => ""
+      }
+      topic = Topic.find(1)
+      topic.attributes = attributes
+      assert_nil topic.written_on
     end
   ensure
     Topic.reset_column_information

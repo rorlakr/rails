@@ -1,5 +1,4 @@
 module ActiveModel
-
   module Validations
     class NumericalityValidator < EachValidator # :nodoc:
       CHECKS = { greater_than: :>, greater_than_or_equal_to: :>=,
@@ -39,6 +38,10 @@ module ActiveModel
           return
         end
 
+        unless raw_value.is_a?(Numeric)
+          value = parse_raw_value_as_a_number(raw_value)
+        end
+
         options.slice(*CHECKS.keys).each do |option, option_value|
           case option
           when :odd, :even
@@ -63,10 +66,13 @@ module ActiveModel
     protected
 
       def is_number?(raw_value)
-        parsed_value = Kernel.Float(raw_value) if raw_value !~ /\A0[xX]/
-        !parsed_value.nil?
+        !parse_raw_value_as_a_number(raw_value).nil?
       rescue ArgumentError, TypeError
         false
+      end
+
+      def parse_raw_value_as_a_number(raw_value)
+        Kernel.Float(raw_value) if raw_value !~ /\A0[xX]/
       end
 
       def is_integer?(raw_value)
@@ -92,10 +98,10 @@ module ActiveModel
 
       private
 
-      def record_attribute_changed_in_place?(record, attr_name)
-        record.respond_to?(:attribute_changed_in_place?) &&
-          record.attribute_changed_in_place?(attr_name.to_s)
-      end
+        def record_attribute_changed_in_place?(record, attr_name)
+          record.respond_to?(:attribute_changed_in_place?) &&
+            record.attribute_changed_in_place?(attr_name.to_s)
+        end
     end
 
     module HelperMethods
@@ -113,7 +119,7 @@ module ActiveModel
       # * <tt>:only_integer</tt> - Specifies whether the value has to be an
       #   integer, e.g. an integral value (default is +false+).
       # * <tt>:allow_nil</tt> - Skip validation if attribute is +nil+ (default is
-      #   +false+). Notice that for fixnum and float columns empty strings are
+      #   +false+). Notice that for Integer and Float columns empty strings are
       #   converted to +nil+.
       # * <tt>:greater_than</tt> - Specifies the value must be greater than the
       #   supplied value.

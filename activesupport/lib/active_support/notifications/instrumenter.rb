@@ -1,4 +1,4 @@
-require 'securerandom'
+require "securerandom"
 
 module ActiveSupport
   module Notifications
@@ -21,6 +21,7 @@ module ActiveSupport
           yield payload
         rescue Exception => e
           payload[:exception] = [e.class.name, e.message]
+          payload[:exception_object] = e
           raise e
         ensure
           finish_with_state listeners_state, name, payload
@@ -43,9 +44,9 @@ module ActiveSupport
 
       private
 
-      def unique_id
-        SecureRandom.hex(10)
-      end
+        def unique_id
+          SecureRandom.hex(10)
+        end
     end
 
     class Event

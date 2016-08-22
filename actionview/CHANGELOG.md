@@ -1,248 +1,98 @@
-## Rails 5.0.0.beta1 (December 18, 2015) ##
+*   Show cache hits and misses when rendering partials.
 
-*   No changes.
+    Partials using the `cache` helper will show whether a render hit or missed
+    the cache:
 
-
-*   `I18n.translate` helper will wrap the missing translation keys
-     in a <span> tag only if `debug_missing_translation` configuration
-     be true. Default value is `true`. For example in `application.rb`:
-
-       # in order to turn off missing key wrapping
-       config.action_view.debug_missing_translation = false
-
-     *Sameer Rahmani*
-
-*   Respect value of `:object` if `:object` is false when rendering.
-
-    Fixes #22260.
-
-    *Yuichiro Kaneko*
-
-*   Generate `week_field` input values using a 1-based index and not a 0-based index
-    as per the W3 spec: http://www.w3.org/TR/html-markup/datatypes.html#form.data.week
-
-    *Christoph Geschwind*
-
-*   Allow `host` option in `javascript_include_tag` and `stylesheet_link_tag` helpers
-
-    *Grzegorz Witek*
-
-*   Restrict `url_for :back` to valid, non-JavaScript URLs. GH#14444
-
-    *Damien Burke*
-
-*   Allow `date_select` helper selected option to accept hash like the default options.
-
-    *Lecky Lao*
-
-*   Collection input propagates input's `id` to the label's `for` attribute when
-    using html options as the last element of collection.
-
-    *Vasiliy Ermolovich*
-
-*   Add a `hidden_field` on the `collection_radio_buttons` to avoid raising a error
-    when the only input on the form is the `collection_radio_buttons`.
-
-    *Mauro George*
-
-*   `url_for` does not modify its arguments when generating polymorphic URLs.
-
-    *Bernerd Schaefer*
-
-*   `number_to_currency` and `number_with_delimiter` now accept a custom `delimiter_pattern` option
-    to handle placement of delimiter, to support currency formats like INR.
-
-    Example:
-
-        number_to_currency(1230000, delimiter_pattern: /(\d+?)(?=(\d\d)+(\d)(?!\d))/, unit: '₹', format: "%u %n")
-        # => '₹ 12,30,000.00'
-
-    *Vipul A M*
-
-*   Make `disable_with` the default behavior for submit tags. Disables the
-    button on submit to prevent double submits.
-
-    *Justin Schiff*
-
-*   Add a break_sequence option to word_wrap so you can specify a custom break.
-
-    *Mauricio Gomez*
-
-*   Add wildcard matching to explicit dependencies.
-
-    Turns:
-
-    ```erb
-    <% # Template Dependency: recordings/threads/events/subscribers_changed %>
-    <% # Template Dependency: recordings/threads/events/completed %>
-    <% # Template Dependency: recordings/threads/events/uncompleted %>
+    ```
+    Rendered messages/_message.html.erb in 1.2 ms [cache hit]
+    Rendered recordings/threads/_thread.html.erb in 1.5 ms [cache miss]
     ```
 
-    Into:
+    This removes the need for the old fragment cache logging:
 
-    ```erb
-    <% # Template Dependency: recordings/threads/events/* %>
+    ```
+    Read fragment views/v1/2914079/v1/2914079/recordings/70182313-20160225015037000000/d0bdf2974e1ef6d31685c3b392ad0b74 (0.6ms)
+    Rendered messages/_message.html.erb in 1.2 ms [cache hit]
+    Write fragment views/v1/2914079/v1/2914079/recordings/70182313-20160225015037000000/3b4e249ac9d168c617e32e84b99218b5 (1.1ms)
+    Rendered recordings/threads/_thread.html.erb in 1.5 ms [cache miss]
     ```
 
-    *Kasper Timm Hansen*
+    Though that full output can be reenabled with
+    `config.action_controller.enable_fragment_cache_logging = true`.
 
-*   Allow defining explicit collection caching using a `# Template Collection: ...`
-    directive inside templates.
+    *Stan Lo*
 
-    *Dov Murik*
+*   Changed partial rendering with a collection to allow collections which
+    implement `to_a`.
 
-*   Asset helpers raise `ArgumentError` when `nil` is passed as a source.
+    Extracting the collection option had an optimization to avoid unnecessary
+    queries of ActiveRecord Relations by calling `#to_ary` on the given
+    collection. Instances of `Enumerator` or `Enumerable` are valid
+    collections, but they do not implement `#to_ary`. By changing this to
+    `#to_a`, they will now be extracted and rendered as expected.
 
-    *Anton Kolomiychuk*
+    *Steven Harman*
 
-*   Always attach the template digest to the cache key for collection caching
-    even when `virtual_path` is not available from the view context.
-    Which could happen if the rendering was done directly in the controller
-    and not in a template.
-
-    Fixes #20535
-
-    *Roque Pinel*
-
-*   Improve detection of partial templates eligible for collection caching,
-    now allowing multi-line comments at the beginning of the template file.
-
-    *Dov Murik*
-
-*   Raise an ArgumentError when a false value for `include_blank` is passed to a
-    required select field (to comply with the HTML5 spec).
-
-    *Grey Baker*
-
-*   Do not put partial name to `local_assigns` when rendering without
-    an object or a collection.
-
-    *Henrik Nygren*
-
-*   Remove `:rescue_format` option for `translate` helper since it's no longer
-    supported by I18n.
-
-    *Bernard Potocki*
-
-*   `translate` should handle `raise` flag correctly in case of both main and default
-    translation is missing.
-
-    Fixes #19967
-
-    *Bernard Potocki*
-
-*   Load the `default_form_builder` from the controller on initialization, which overrides
-    the global config if it is present.
-
-    *Kevin McPhillips*
-
-*   Accept lambda as `child_index` option in `fields_for` method.
-
-    *Karol Galanciak*
-
-*   `translate` allows `default: [[]]` again for a default value of `[]`.
-
-    Fixes #19640.
-
-    *Adam Prescott*
-
-*   `translate` should accept nils as members of the `:default`
-    parameter without raising a translation missing error.
-
-    Fixes #19419
-
-    *Justin Coyne*
-
-*   `number_to_percentage` does not crash with `Float::NAN` or `Float::INFINITY`
-    as input when `precision: 0` is used.
-
-    Fixes #19227.
-
-    *Yves Senn*
-
-*   Fixed the translation helper method to accept different default values types
-    besides String.
-
-    *Ulisses Almeida*
-
-*   Collection rendering automatically caches and fetches multiple partials.
-
-    Collections rendered as:
+*   New syntax for tag helpers. Avoid positional parameters and support HTML5 by default.
+    Example usage of tag helpers before:
 
     ```ruby
-    <%= render @notifications %>
-    <%= render partial: 'notifications/notification', collection: @notifications, as: :notification %>
+    tag(:br, nil, true)
+    content_tag(:div, content_tag(:p, "Hello world!"), class: "strong")
+
+    <%= content_tag :div, class: "strong" do -%>
+      Hello world!
+    <% end -%>
     ```
 
-    will now read several partials from cache at once, if the template starts with a cache call:
+    Example usage of tag helpers after:
 
     ```ruby
-    # notifications/_notification.html.erb
-    <% cache notification do %>
-      <%# ... %>
+    tag.br
+    tag.div tag.p("Hello world!"), class: "strong"
+
+    <%= tag.div class: "strong" do %>
+      Hello world!
     <% end %>
     ```
 
-    *Kasper Timm Hansen*
+    *Marek Kirejczyk*, *Kasper Timm Hansen*
 
-*   Fixed a dependency tracker bug that caused template dependencies not
-    count layouts as dependencies for partials.
+*   Change `datetime_field` and `datetime_field_tag` to generate `datetime-local` fields.
 
-    *Juho Leinonen*
+    As a new specification of the HTML 5 the text field type `datetime` will no longer exist
+    and it is recommended to use `datetime-local`.
+    Ref: https://html.spec.whatwg.org/multipage/forms.html#local-date-and-time-state-(type=datetime-local)
 
-*   Extracted `ActionView::Helpers::RecordTagHelper` to external gem
-    (`record_tag_helper`) and added removal notices.
+    *Herminio Torres*
 
-    *Todd Bealmear*
+*   Raw template handler (which is also the default template handler in Rails 5) now outputs
+    HTML-safe strings.
 
-*   Allow to pass a string value to `size` option in `image_tag` and `video_tag`.
+    In Rails 5 the default template handler was changed to the raw template handler. Because
+    the ERB template handler escaped strings by default this broke some applications that
+    expected plain JS or HTML files to be rendered unescaped. This fixes the issue caused
+    by changing the default handler by changing the Raw template handler to output HTML-safe
+    strings.
 
-    This makes the behavior more consistent with `width` or `height` options.
+    *Eileen M. Uchitelle*
 
-    *Mehdi Lahmam*
+*   `select_tag`'s `include_blank` option for generation for blank option tag, now adds an empty space label,
+     when the value as well as content for option tag are empty, so that we conform with html specification.
+     Ref: https://www.w3.org/TR/html5/forms.html#the-option-element.
 
-*   Partial template name does no more have to be a valid Ruby identifier.
+    Generation of option before:
 
-    There used to be a naming rule that the partial name should start with
-    underscore, and should be followed by any combination of letters, numbers
-    and underscores.
-    But now we can give our partials any name starting with underscore, such as
-    _🍔.html.erb.
+    ```html
+    <option value=""></option>
+    ```
 
-    *Akira Matsuda*
+    Generation of option after:
 
-*   Change the default template handler from `ERB` to `Raw`.
+    ```html
+    <option value="" label=" "></option>
+    ```
 
-    Files without a template handler in their extension will be rendered using the raw
-    handler instead of ERB.
+    *Vipul A M*
 
-    *Rafael Mendonça França*
-
-*   Remove deprecated `AbstractController::Base::parent_prefixes`.
-
-    *Rafael Mendonça França*
-
-*   Default translations that have a lower precedence than a html safe default,
-    but are not themselves safe, should not be marked as html_safe.
-
-    *Justin Coyne*
-
-*   Make possible to use blocks with short version of `render "partial"` helper.
-
-    *Nikolay Shebanov*
-
-*   Add a `hidden_field` on the `file_field` to avoid raising an error when the only
-    input on the form is the `file_field`.
-
-    *Mauro George*
-
-*   Add an explicit error message, in `ActionView::PartialRenderer` for partial
-    `rendering`, when the value of option `as` has invalid characters.
-
-    *Angelo Capilleri*
-
-*   Allow entries without a link tag in `AtomFeedHelper`.
-
-    *Daniel Gomez de Souza*
-
-Please check [4-2-stable](https://github.com/rails/rails/blob/4-2-stable/actionview/CHANGELOG.md) for previous changes.
+Please check [5-0-stable](https://github.com/rails/rails/blob/5-0-stable/actionview/CHANGELOG.md) for previous changes.

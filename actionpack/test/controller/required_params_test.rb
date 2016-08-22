@@ -1,4 +1,4 @@
-require 'abstract_unit'
+require "abstract_unit"
 
 class BooksController < ActionController::Base
   def create
@@ -32,7 +32,6 @@ class ActionControllerRequiredParamsTest < ActionController::TestCase
 end
 
 class ParametersRequireTest < ActiveSupport::TestCase
-
   test "required parameters should accept and return false value" do
     assert_equal(false, ActionController::Parameters.new(person: false).require(:person))
   end
@@ -50,19 +49,32 @@ class ParametersRequireTest < ActiveSupport::TestCase
   end
 
   test "require array when all required params are present" do
-    safe_params = ActionController::Parameters.new(person: {first_name: 'Gaurish', title: 'Mjallo', city: 'Barcelona'})
+    safe_params = ActionController::Parameters.new(person: { first_name: "Gaurish", title: "Mjallo", city: "Barcelona" })
       .require(:person)
       .require([:first_name, :title])
 
     assert_kind_of Array, safe_params
-    assert_equal ['Gaurish', 'Mjallo'], safe_params
+    assert_equal ["Gaurish", "Mjallo"], safe_params
   end
 
   test "require array when a required param is missing" do
     assert_raises(ActionController::ParameterMissing) do
-      ActionController::Parameters.new(person: {first_name: 'Gaurish', title: nil})
+      ActionController::Parameters.new(person: { first_name: "Gaurish", title: nil })
         .require(:person)
         .require([:first_name, :title])
+    end
+  end
+
+  test "value params" do
+    params = ActionController::Parameters.new(foo: "bar", dog: "cinco")
+    assert_equal ["bar", "cinco"], params.values
+    assert params.has_value?("cinco")
+    assert params.value?("cinco")
+  end
+
+  test "Deprecated methods are deprecated" do
+    assert_deprecated do
+      ActionController::Parameters.new(foo: "bar").merge!(bar: "foo")
     end
   end
 end

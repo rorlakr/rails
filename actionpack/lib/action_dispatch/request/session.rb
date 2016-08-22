@@ -1,4 +1,4 @@
-require 'rack/session/abstract/id'
+require "rack/session/abstract/id"
 
 module ActionDispatch
   class Request
@@ -9,7 +9,7 @@ module ActionDispatch
 
       # Singleton object used to determine if an optional param wasn't specified
       Unspecified = Object.new
-      
+
       # Creates a session hash, merging the properties of the previous session if any
       def self.create(store, req, default_options)
         session_was = find req
@@ -109,7 +109,7 @@ module ActionDispatch
         @delegate.values
       end
 
-      # Writes given value to given key of the session.
+      # Writes given value to given key of the session.
       def []=(key, value)
         load_for_write!
         @delegate[key.to_s] = value
@@ -148,8 +148,8 @@ module ActionDispatch
         @delegate.delete key.to_s
       end
 
-      # Returns value of given key from the session, or raises +KeyError+
-      # if can't find given key in case of not setted dafault value.
+      # Returns value of the given key from the session, or raises +KeyError+
+      # if can't find the given key and no default value is set.
       # Returns default value if specified.
       #
       #   session.fetch(:foo)
@@ -198,28 +198,32 @@ module ActionDispatch
         @delegate.merge!(other)
       end
 
+      def each(&block)
+        to_hash.each(&block)
+      end
+
       private
 
-      def load_for_read!
-        load! if !loaded? && exists?
-      end
+        def load_for_read!
+          load! if !loaded? && exists?
+        end
 
-      def load_for_write!
-        load! unless loaded?
-      end
+        def load_for_write!
+          load! unless loaded?
+        end
 
-      def load!
-        id, session = @by.load_session @req
-        options[:id] = id
-        @delegate.replace(stringify_keys(session))
-        @loaded = true
-      end
+        def load!
+          id, session = @by.load_session @req
+          options[:id] = id
+          @delegate.replace(stringify_keys(session))
+          @loaded = true
+        end
 
-      def stringify_keys(other)
-        other.each_with_object({}) { |(key, value), hash|
-          hash[key.to_s] = value
-        }
-      end
+        def stringify_keys(other)
+          other.each_with_object({}) { |(key, value), hash|
+            hash[key.to_s] = value
+          }
+        end
     end
   end
 end

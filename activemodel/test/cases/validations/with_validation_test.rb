@@ -1,9 +1,8 @@
-require 'cases/helper'
+require "cases/helper"
 
-require 'models/topic'
+require "models/topic"
 
 class ValidatesWithTest < ActiveModel::TestCase
-
   def teardown
     Topic.clear_validators!
   end
@@ -98,7 +97,7 @@ class ValidatesWithTest < ActiveModel::TestCase
   test "passes all configuration options to the validator class" do
     topic = Topic.new
     validator = Minitest::Mock.new
-    validator.expect(:new, validator, [{foo: :bar, if: "1 == 1", class: Topic}])
+    validator.expect(:new, validator, [{ foo: :bar, if: "1 == 1", class: Topic }])
     validator.expect(:validate, nil, [topic])
     validator.expect(:is_a?, false, [Symbol])
     validator.expect(:is_a?, false, [String])
@@ -160,7 +159,7 @@ class ValidatesWithTest < ActiveModel::TestCase
 
     topic = Topic.new
     assert !topic.valid?
-    assert_equal ['is missing'], topic.errors[:title]
+    assert_equal ["is missing"], topic.errors[:title]
   end
 
   test "optionally pass in the attribute being validated when validating with an instance method" do
@@ -169,6 +168,6 @@ class ValidatesWithTest < ActiveModel::TestCase
     topic = Topic.new title: "foo"
     assert !topic.valid?
     assert topic.errors[:title].empty?
-    assert_equal ['is missing'], topic.errors[:content]
+    assert_equal ["is missing"], topic.errors[:content]
   end
 end

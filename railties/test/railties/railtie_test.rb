@@ -6,7 +6,6 @@ module RailtiesTest
 
     def setup
       build_app
-      boot_rails
       FileUtils.rm_rf("#{app_path}/config/environments")
       require "rails/all"
     end
@@ -80,6 +79,13 @@ module RailtiesTest
       assert_equal app_path, $before_configuration
     end
 
+    test "before_configuration callbacks run as soon as the application constant inherits from Rails::Application" do
+      $before_configuration = false
+      class Foo < Rails::Railtie ; config.before_configuration { $before_configuration = true } ; end
+      class Application < Rails::Application ; end
+      assert $before_configuration
+    end
+
     test "railtie can add after_initialize callbacks" do
       $after_initialize = false
       class Foo < Rails::Railtie ; config.after_initialize { $after_initialize = true } ; end
@@ -100,9 +106,9 @@ module RailtiesTest
       require "#{app_path}/config/environment"
 
       assert !$ran_block
-      require 'rake'
-      require 'rake/testtask'
-      require 'rdoc/task'
+      require "rake"
+      require "rake/testtask"
+      require "rdoc/task"
 
       Rails.application.load_tasks
       assert $ran_block
@@ -124,9 +130,9 @@ module RailtiesTest
       require "#{app_path}/config/environment"
 
       assert_equal [], $ran_block
-      require 'rake'
-      require 'rake/testtask'
-      require 'rdoc/task'
+      require "rake"
+      require "rake/testtask"
+      require "rdoc/task"
 
       Rails.application.load_tasks
       assert $ran_block.include?("my_tie")
@@ -197,8 +203,8 @@ module RailtiesTest
     test "we can change our environment if we want to" do
       begin
         original_env = Rails.env
-        Rails.env = 'foo'
-        assert_equal('foo', Rails.env)
+        Rails.env = "foo"
+        assert_equal("foo", Rails.env)
       ensure
         Rails.env = original_env
         assert_equal(original_env, Rails.env)

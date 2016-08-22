@@ -1,4 +1,4 @@
-require 'active_support/core_ext/object/deep_dup'
+require "active_support/core_ext/object/deep_dup"
 
 module ActiveRecord
   # Declare an enum attribute where the values map to integers in the database,
@@ -95,7 +95,7 @@ module ActiveRecord
 
   module Enum
     def self.extended(base) # :nodoc:
-      base.class_attribute(:defined_enums)
+      base.class_attribute(:defined_enums, instance_writer: false)
       base.defined_enums = {}
     end
 
@@ -105,9 +105,12 @@ module ActiveRecord
     end
 
     class EnumType < Type::Value # :nodoc:
-      def initialize(name, mapping)
+      delegate :type, to: :subtype
+
+      def initialize(name, mapping, subtype)
         @name = name
         @mapping = mapping
+        @subtype = subtype
       end
 
       def cast(value)
@@ -124,7 +127,7 @@ module ActiveRecord
 
       def deserialize(value)
         return if value.nil?
-        mapping.key(value.to_i)
+        mapping.key(subtype.deserialize(value))
       end
 
       def serialize(value)
@@ -139,7 +142,7 @@ module ActiveRecord
 
       protected
 
-      attr_reader :name, :mapping
+        attr_reader :name, :mapping, :subtype
     end
 
     def enum(definitions)
@@ -151,14 +154,17 @@ module ActiveRecord
         enum_values = ActiveSupport::HashWithIndifferentAccess.new
         name        = name.to_sym
 
-        # def self.statuses statuses end
+        # def self.statuses() statuses end
         detect_enum_conflict!(name, name.to_s.pluralize, true)
         klass.singleton_class.send(:define_method, name.to_s.pluralize) { enum_values }
 
         detect_enum_conflict!(name, name)
         detect_enum_conflict!(name, "#{name}=")
 
-        attribute name, EnumType.new(name, enum_values)
+        attr = attribute_alias?(name) ? attribute_alias(name) : name
+        decorate_attribute_type(attr, :enum) do |subtype|
+          EnumType.new(attr, enum_values, subtype)
+        end
 
         _enum_methods_module.module_eval do
           pairs = values.respond_to?(:each_pair) ? values.each_pair : values.each_with_index
@@ -179,15 +185,15 @@ module ActiveRecord
 
             # def active?() status == 0 end
             klass.send(:detect_enum_conflict!, name, "#{value_method_name}?")
-            define_method("#{value_method_name}?") { self[name] == value.to_s }
+            define_method("#{value_method_name}?") { self[attr] == value.to_s }
 
             # def active!() update! status: :active end
             klass.send(:detect_enum_conflict!, name, "#{value_method_name}!")
-            define_method("#{value_method_name}!") { update! name => value }
+            define_method("#{value_method_name}!") { update!(attr => value) }
 
             # scope :active, -> { where status: 0 }
             klass.send(:detect_enum_conflict!, name, value_method_name, true)
-            klass.scope value_method_name, -> { klass.where name => value }
+            klass.scope value_method_name, -> { where(attr => value) }
           end
         end
         defined_enums[name.to_s] = enum_values
@@ -210,18 +216,18 @@ module ActiveRecord
 
       def detect_enum_conflict!(enum_name, method_name, klass_method = false)
         if klass_method && dangerous_class_method?(method_name)
-          raise_conflict_error(enum_name, method_name, type: 'class')
+          raise_conflict_error(enum_name, method_name, type: "class")
         elsif !klass_method && dangerous_attribute_method?(method_name)
           raise_conflict_error(enum_name, method_name)
         elsif !klass_method && method_defined_within?(method_name, _enum_methods_module, Module)
-          raise_conflict_error(enum_name, method_name, source: 'another enum')
+          raise_conflict_error(enum_name, method_name, source: "another enum")
         end
       end
 
-      def raise_conflict_error(enum_name, method_name, type: 'instance', source: 'Active Record')
+      def raise_conflict_error(enum_name, method_name, type: "instance", source: "Active Record")
         raise ArgumentError, ENUM_CONFLICT_MESSAGE % {
           enum: enum_name,
-          klass: self.name,
+          klass: name,
           type: type,
           method: method_name,
           source: source

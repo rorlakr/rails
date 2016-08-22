@@ -25,7 +25,7 @@ Reporting an Issue
 
 Ruby on Rails uses [GitHub Issue Tracking](https://github.com/rails/rails/issues) to track issues (primarily bugs and contributions of new code). If you've found a bug in Ruby on Rails, this is the place to start. You'll need to create a (free) GitHub account in order to submit an issue, to comment on them or to create pull requests.
 
-NOTE: Bugs in the most recent released version of Ruby on Rails are likely to get the most attention. Also, the Rails core team is always interested in feedback from those who can take the time to test _edge Rails_ (the code for the version of Rails that is currently under development). Later in this guide you'll find out how to get edge Rails for testing.
+NOTE: Bugs in the most recent released version of Ruby on Rails are likely to get the most attention. Also, the Rails core team is always interested in feedback from those who can take the time to test _edge Rails_ (the code for the version of Rails that is currently under development). Later in this guide, you'll find out how to get edge Rails for testing.
 
 ### Creating a Bug Report
 
@@ -58,7 +58,7 @@ WARNING: Please do not report security vulnerabilities with public GitHub issue 
 Please don't put "feature request" items into GitHub Issues. If there's a new
 feature that you want to see added to Ruby on Rails, you'll need to write the
 code yourself - or convince someone else to partner with you to write the code.
-Later in this guide you'll find detailed instructions for proposing a patch to
+Later in this guide, you'll find detailed instructions for proposing a patch to
 Ruby on Rails. If you enter a wish list item in GitHub Issues with no code, you
 can expect it to be marked "invalid" as soon as it's reviewed.
 
@@ -105,7 +105,7 @@ $ git checkout -b testing_branch
 Then you can use their remote branch to update your codebase. For example, let's say the GitHub user JohnSmith has forked and pushed to a topic branch "orange" located at https://github.com/JohnSmith/rails.
 
 ```bash
-$ git remote add JohnSmith git://github.com/JohnSmith/rails.git
+$ git remote add JohnSmith https://github.com/JohnSmith/rails.git
 $ git pull JohnSmith orange
 ```
 
@@ -130,11 +130,11 @@ learn about Ruby on Rails, and the API, which serves as a reference.
 
 You can help improve the Rails guides by making them more coherent, consistent or readable, adding missing information, correcting factual errors, fixing typos, or bringing them up to date with the latest edge Rails.
 
-You can either open a pull request to [Rails](http://github.com/rails/rails) or
-ask the [Rails core team](http://rubyonrails.org/core) for commit access on
+You can either open a pull request to [Rails](https://github.com/rails/rails) or
+ask the [Rails core team](http://rubyonrails.org/community/#core) for commit access on
 docrails if you contribute regularly.
 Please do not open pull requests in docrails, if you'd like to get feedback on your
-change, ask for it in [Rails](http://github.com/rails/rails) instead.
+change, ask for it in [Rails](https://github.com/rails/rails) instead.
 
 Docrails is merged with master regularly, so you are effectively editing the Ruby on Rails documentation.
 
@@ -159,7 +159,7 @@ If you want to translate the Rails guides in your own language, follows these st
 * Copy the contents of *guides/source* into your own language directory and translate them.
 * Do NOT translate the HTML files, as they are automatically generated.
 
-To generate the guides in HTML format cd into the *guides* direcotry then run (eg. for it-IT):
+To generate the guides in HTML format cd into the *guides* directory then run (eg. for it-IT):
 
 ```bash
 $ bundle install
@@ -174,8 +174,8 @@ Translation efforts we know about (various versions):
 
 * **Italian**: [https://github.com/rixlabs/docrails](https://github.com/rixlabs/docrails)
 * **Spanish**: [http://wiki.github.com/gramos/docrails](http://wiki.github.com/gramos/docrails)
-* **Polish**: [http://github.com/apohllo/docrails/tree/master](http://github.com/apohllo/docrails/tree/master)
-* **French** : [http://github.com/railsfrance/docrails](http://github.com/railsfrance/docrails)
+* **Polish**: [https://github.com/apohllo/docrails/tree/master](https://github.com/apohllo/docrails/tree/master)
+* **French** : [https://github.com/railsfrance/docrails](https://github.com/railsfrance/docrails)
 * **Czech** : [https://github.com/rubyonrails-cz/docrails/tree/czech](https://github.com/rubyonrails-cz/docrails/tree/czech)
 * **Turkish** : [https://github.com/ujk/docrails/tree/master](https://github.com/ujk/docrails/tree/master)
 * **Korean** : [https://github.com/rorlakr/rails-guides](https://github.com/rorlakr/rails-guides)
@@ -189,7 +189,7 @@ Contributing to the Rails Code
 
 ### Setting Up a Development Environment
 
-To move on from submitting bugs to helping resolve existing issues or contributing your own code to Ruby on Rails, you _must_ be able to run its test suite. In this section of the guide you'll learn how to setup the tests on your own computer.
+To move on from submitting bugs to helping resolve existing issues or contributing your own code to Ruby on Rails, you _must_ be able to run its test suite. In this section of the guide, you'll learn how to setup the tests on your own computer.
 
 #### The Easy Way
 
@@ -204,7 +204,7 @@ In case you can't use the Rails development box, see [this other guide](developm
 To be able to contribute code, you need to clone the Rails repository:
 
 ```bash
-$ git clone git://github.com/rails/rails.git
+$ git clone https://github.com/rails/rails.git
 ```
 
 and create a dedicated branch:
@@ -299,9 +299,9 @@ Please see the benchmark/ips [README](https://github.com/evanphx/benchmark-ips/b
 ### Running Tests
 
 It is not customary in Rails to run the full test suite before pushing
-changes. The railties test suite in particular takes a long time, and even
-more if the source code is mounted in `/vagrant` as happens in the recommended
-workflow with the [rails-dev-box](https://github.com/rails/rails-dev-box).
+changes. The railties test suite in particular takes a long time, and takes an
+especially long time if the source code is mounted in `/vagrant` as happens in
+the recommended workflow with the [rails-dev-box](https://github.com/rails/rails-dev-box).
 
 As a compromise, test what your code obviously affects, and if the change is
 not in railties, run the whole test suite of the affected component. If all
@@ -357,7 +357,6 @@ $ bundle exec rake test:sqlite3
 You can now run the tests as you did for `sqlite3`. The tasks are respectively:
 
 ```bash
-test:mysql
 test:mysql2
 test:postgresql
 ```
@@ -368,7 +367,7 @@ Finally,
 $ bundle exec rake test
 ```
 
-will now run the four of them in turn.
+will now run the three of them in turn.
 
 You can also run any single test separately:
 
@@ -507,7 +506,7 @@ Navigate to the Rails [GitHub repository](https://github.com/rails/rails) and pr
 Add the new remote to your local repository on your local machine:
 
 ```bash
-$ git remote add mine git@github.com:<your user name>/rails.git
+$ git remote add mine https://github.com:<your user name>/rails.git
 ```
 
 Push to your remote:
@@ -521,7 +520,7 @@ You might have cloned your forked repository into your machine and might want to
 In the directory you cloned your fork:
 
 ```bash
-$ git remote add rails git://github.com/rails/rails.git
+$ git remote add rails https://github.com/rails/rails.git
 ```
 
 Download new commits and branches from the official repository:
@@ -663,7 +662,7 @@ Changes that are merged into master are intended for the next major release of R
 
 For simple fixes, the easiest way to backport your changes is to [extract a diff from your changes in master and apply them to the target branch](http://ariejan.net/2009/10/26/how-to-create-and-apply-a-patch-with-git).
 
-First make sure your changes are the only difference between your current branch and master:
+First, make sure your changes are the only difference between your current branch and master:
 
 ```bash
 $ git log master..HEAD

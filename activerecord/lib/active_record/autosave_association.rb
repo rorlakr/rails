@@ -22,7 +22,7 @@ module ActiveRecord
   #
   # == Validation
   #
-  # Children records are validated unless <tt>:validate</tt> is +false+.
+  # Child records are validated unless <tt>:validate</tt> is +false+.
   #
   # == Callbacks
   #
@@ -331,14 +331,29 @@ module ActiveRecord
         validation_context = self.validation_context unless [:create, :update].include?(self.validation_context)
         unless valid = record.valid?(validation_context)
           if reflection.options[:autosave]
+            indexed_attribute = !index.nil? && (reflection.options[:index_errors] || ActiveRecord::Base.index_nested_attribute_errors)
+
             record.errors.each do |attribute, message|
-              if index.nil? || (!reflection.options[:index_errors] && !ActiveRecord::Base.index_nested_attribute_errors)
-                attribute = "#{reflection.name}.#{attribute}"
-              else
+              if indexed_attribute
                 attribute = "#{reflection.name}[#{index}].#{attribute}"
+              else
+                attribute = "#{reflection.name}.#{attribute}"
               end
               errors[attribute] << message
               errors[attribute].uniq!
+            end
+
+            record.errors.details.each_key do |attribute|
+              if indexed_attribute
+                reflection_attribute = "#{reflection.name}[#{index}].#{attribute}"
+              else
+                reflection_attribute = "#{reflection.name}.#{attribute}"
+              end
+
+              record.errors.details[attribute].each do |error|
+                errors.details[reflection_attribute] << error
+                errors.details[reflection_attribute].uniq!
+              end
             end
           else
             errors.add(reflection.name)
@@ -385,7 +400,7 @@ module ActiveRecord
                   association.insert_record(record) unless reflection.nested?
                 end
               elsif autosave
-                saved = record.save(:validate => false)
+                saved = record.save(validate: false)
               end
 
               raise ActiveRecord::Rollback unless saved
@@ -422,7 +437,7 @@ module ActiveRecord
                 record[reflection.foreign_key] = key
               end
 
-              saved = record.save(:validate => !autosave)
+              saved = record.save(validate: !autosave)
               raise ActiveRecord::Rollback if !saved && autosave
               saved
             end
@@ -450,7 +465,7 @@ module ActiveRecord
             self[reflection.foreign_key] = nil
             record.destroy
           elsif autosave != false
-            saved = record.save(:validate => !autosave) if record.new_record? || (autosave && record.changed_for_autosave?)
+            saved = record.save(validate: !autosave) if record.new_record? || (autosave && record.changed_for_autosave?)
 
             if association.updated?
               association_id = record.send(reflection.options[:primary_key] || :id)

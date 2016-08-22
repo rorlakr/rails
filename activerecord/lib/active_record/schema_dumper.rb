@@ -1,4 +1,4 @@
-require 'stringio'
+require "stringio"
 
 module ActiveRecord
   # = Active Record Schema Dumper
@@ -15,6 +15,22 @@ module ActiveRecord
     # This setting is only used if ActiveRecord::Base.schema_format == :ruby
     cattr_accessor :ignore_tables
     @@ignore_tables = []
+
+    ##
+    # :singleton-method:
+    # Define whether column arguments are lined up in dump.
+    # Acceptable values are true or false.
+    # This setting is only used if ActiveRecord::Base.schema_format == :ruby
+    cattr_accessor :standardized_argument_widths
+    @@standardized_argument_widths = true
+
+    ##
+    # :singleton-method:
+    # Define whether columns types are lined up in dump.
+    # Acceptable values are true or false.
+    # This setting is only used if ActiveRecord::Base.schema_format == :ruby
+    cattr_accessor :standardized_type_widths
+    @@standardized_type_widths = true
 
     class << self
       def dump(connection=ActiveRecord::Base.connection, stream=STDOUT, config = ActiveRecord::Base)
@@ -49,10 +65,6 @@ module ActiveRecord
 
       def header(stream)
         define_params = @version ? "version: #{@version}" : ""
-
-        if stream.respond_to?(:external_encoding) && stream.external_encoding
-          stream.puts "# encoding: #{stream.external_encoding.name}"
-        end
 
         stream.puts <<HEADER
 # This file is auto-generated from the current state of the database. Instead
@@ -104,29 +116,21 @@ HEADER
       end
 
       def table(table, stream)
-        columns = @connection.columns(table).map do |column|
-          column.instance_variable_set(:@table_name, table)
-          column
-        end
+        columns = @connection.columns(table)
         begin
           tbl = StringIO.new
 
           # first dump primary key column
-          if @connection.respond_to?(:primary_keys)
-            pk = @connection.primary_keys(table)
-            pk = pk.first unless pk.size > 1
-          else
-            pk = @connection.primary_key(table)
-          end
+          pk = @connection.primary_key(table)
 
           tbl.print "  create_table #{remove_prefix_and_suffix(table).inspect}"
 
           case pk
           when String
-            tbl.print ", primary_key: #{pk.inspect}" unless pk == 'id'
+            tbl.print ", primary_key: #{pk.inspect}" unless pk == "id"
             pkcol = columns.detect { |c| c.name == pk }
             pkcolspec = @connection.column_spec_for_primary_key(pkcol)
-            if pkcolspec
+            if pkcolspec.present?
               pkcolspec.each do |key, value|
                 tbl.print ", #{key}: #{value}"
               end
@@ -139,7 +143,11 @@ HEADER
           tbl.print ", force: :cascade"
 
           table_options = @connection.table_options(table)
-          tbl.print ", options: #{table_options.inspect}" unless table_options.blank?
+          if table_options.present?
+            table_options.each do |key, value|
+              tbl.print ", #{key}: #{value.inspect}" if value.present?
+            end
+          end
 
           tbl.puts " do |t|"
 
@@ -154,31 +162,43 @@ HEADER
           keys = @connection.migration_keys
 
           # figure out the lengths for each column based on above keys
-          lengths = keys.map { |key|
-            column_specs.map { |spec|
-              spec[key] ? spec[key].length + 2 : 0
-            }.max
-          }
+          lengths = if standardized_argument_widths
+            keys.map { |key|
+              column_specs.map { |spec|
+                spec[key] ? spec[key].length + 2 : 0
+              }.max
+            }
+          else
+            [0] * keys.length
+          end
 
           # the string we're going to sprintf our values against, with standardized column widths
-          format_string = lengths.map{ |len| "%-#{len}s" }
-
-          # find the max length for the 'type' column, which is special
-          type_length = column_specs.map{ |column| column[:type].length }.max
+          format_string = if standardized_argument_widths
+            lengths.map { |len| "%-#{len}s" }
+          else
+            ["%s"] * keys.length
+          end
 
           # add column type definition to our format string
-          format_string.unshift "    t.%-#{type_length}s "
+          if standardized_type_widths
+            # find the max length for the 'type' column, which is special
+            type_length = column_specs.map { |column| column[:type].length }.max
 
-          format_string *= ''
+            format_string.unshift "    t.%-#{type_length}s "
+          else
+            format_string.unshift "    t.%s "
+          end
+
+          format_string *= ""
 
           column_specs.each do |colspec|
-            values = keys.zip(lengths).map{ |key, len| colspec.key?(key) ? colspec[key] + ", " : " " * len }
+            values = keys.zip(lengths).map { |key, len| colspec.key?(key) ? colspec[key] + ", " : " " * len }
             values.unshift colspec[:type]
-            tbl.print((format_string % values).gsub(/,\s*$/, ''))
+            tbl.print((format_string % values).gsub(/,\s*$/, ""))
             tbl.puts
           end
 
-          indexes(table, tbl)
+          indexes_in_create(table, tbl)
 
           tbl.puts "  end"
           tbl.puts
@@ -194,29 +214,45 @@ HEADER
         stream
       end
 
+      # Keep it for indexing materialized views
       def indexes(table, stream)
         if (indexes = @connection.indexes(table)).any?
           add_index_statements = indexes.map do |index|
-            statement_parts = [
-              "t.index #{index.columns.inspect}",
-              "name: #{index.name.inspect}",
-            ]
-            statement_parts << 'unique: true' if index.unique
-
-            index_lengths = (index.lengths || []).compact
-            statement_parts << "length: #{Hash[index.columns.zip(index.lengths)].inspect}" if index_lengths.any?
-
-            index_orders = index.orders || {}
-            statement_parts << "order: #{index.orders.inspect}" if index_orders.any?
-            statement_parts << "where: #{index.where.inspect}" if index.where
-            statement_parts << "using: #{index.using.inspect}" if index.using
-            statement_parts << "type: #{index.type.inspect}" if index.type
-
-            "    #{statement_parts.join(', ')}"
+            table_name = remove_prefix_and_suffix(index.table).inspect
+            "  add_index #{([table_name]+index_parts(index)).join(', ')}"
           end
 
           stream.puts add_index_statements.sort.join("\n")
+          stream.puts
         end
+      end
+
+      def indexes_in_create(table, stream)
+        if (indexes = @connection.indexes(table)).any?
+          index_statements = indexes.map do |index|
+            "    t.index #{index_parts(index).join(', ')}"
+          end
+          stream.puts index_statements.sort.join("\n")
+        end
+      end
+
+      def index_parts(index)
+        index_parts = [
+          index.columns.inspect,
+          "name: #{index.name.inspect}",
+        ]
+        index_parts << "unique: true" if index.unique
+
+        index_lengths = (index.lengths || []).compact
+        index_parts << "length: #{Hash[index.columns.zip(index.lengths)].inspect}" if index_lengths.any?
+
+        index_orders = index.orders || {}
+        index_parts << "order: #{index.orders.inspect}" if index_orders.any?
+        index_parts << "where: #{index.where.inspect}" if index.where
+        index_parts << "using: #{index.using.inspect}" if index.using
+        index_parts << "type: #{index.type.inspect}" if index.type
+        index_parts << "comment: #{index.comment.inspect}" if index.comment
+        index_parts
       end
 
       def foreign_keys(table, stream)
@@ -254,7 +290,7 @@ HEADER
       end
 
       def ignored?(table_name)
-        [ActiveRecord::Base.schema_migrations_table_name, ignore_tables].flatten.any? do |ignored|
+        [ActiveRecord::Base.schema_migrations_table_name, ActiveRecord::Base.internal_metadata_table_name, ignore_tables].flatten.any? do |ignored|
           ignored === remove_prefix_and_suffix(table_name)
         end
       end

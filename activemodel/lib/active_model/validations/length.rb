@@ -46,7 +46,7 @@ module ActiveModel
         keys = CHECKS.keys & options.keys
 
         if keys.empty?
-          raise ArgumentError, 'Range unspecified. Specify the :in, :within, :maximum, :minimum, or :is option.'
+          raise ArgumentError, "Range unspecified. Specify the :in, :within, :maximum, :minimum, or :is option."
         end
 
         keys.each do |key|
@@ -80,24 +80,23 @@ module ActiveModel
       end
 
       private
-      def tokenize(record, value)
-        tokenizer = options[:tokenizer]
-        if tokenizer && value.kind_of?(String)
-          if tokenizer.kind_of?(Proc)
-            tokenizer.call(value)
-          elsif record.respond_to?(tokenizer)
-            record.send(tokenizer, value)
-          end
-        end || value
-      end
+        def tokenize(record, value)
+          tokenizer = options[:tokenizer]
+          if tokenizer && value.kind_of?(String)
+            if tokenizer.kind_of?(Proc)
+              tokenizer.call(value)
+            elsif record.respond_to?(tokenizer)
+              record.send(tokenizer, value)
+            end
+          end || value
+        end
 
-      def skip_nil_check?(key)
-        key == :maximum && options[:allow_nil].nil? && options[:allow_blank].nil?
-      end
+        def skip_nil_check?(key)
+          key == :maximum && options[:allow_nil].nil? && options[:allow_blank].nil?
+        end
     end
 
     module HelperMethods
-
       # Validates that the specified attributes match the length restrictions
       # supplied. Only one constraint option can be used at a time apart from
       # +:minimum+ and +:maximum+ that can be combined together:
@@ -136,7 +135,7 @@ module ActiveModel
       # * <tt>:too_long</tt> - The error message if the attribute goes over the
       #   maximum (default is: "is too long (maximum is %{count} characters)").
       # * <tt>:too_short</tt> - The error message if the attribute goes under the
-      #   minimum (default is: "is too short (min is %{count} characters)").
+      #   minimum (default is: "is too short (minimum is %{count} characters)").
       # * <tt>:wrong_length</tt> - The error message if using the <tt>:is</tt>
       #   method and the attribute is the wrong size (default is: "is the wrong
       #   length (should be %{count} characters)").

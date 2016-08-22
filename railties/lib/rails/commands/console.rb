@@ -1,11 +1,19 @@
-require 'optparse'
-require 'irb'
-require 'irb/completion'
-require 'rails/commands/console_helper'
+require "optparse"
+require "irb"
+require "irb/completion"
+require "rails/commands/console_helper"
 
 module Rails
   class Console
     include ConsoleHelper
+
+    module BacktraceCleaner
+      def filter_backtrace(bt)
+        if result = super
+          Rails.backtrace_cleaner.filter([result]).first
+        end
+      end
+    end
 
     class << self
       def parse_arguments(arguments)
@@ -13,7 +21,7 @@ module Rails
 
         OptionParser.new do |opt|
           opt.banner = "Usage: rails console [environment] [options]"
-          opt.on('-s', '--sandbox', 'Rollback database modifications on exit.') { |v| options[:sandbox] = v }
+          opt.on("-s", "--sandbox", "Rollback database modifications on exit.") { |v| options[:sandbox] = v }
           opt.on("-e", "--environment=name", String,
                   "Specifies the environment to run this console under (test/development/production).",
                   "Default: development") { |v| options[:environment] = v.strip }
@@ -34,6 +42,10 @@ module Rails
       app.load_console
 
       @console = app.config.console || IRB
+
+      if @console == IRB
+        IRB::WorkSpace.prepend(BacktraceCleaner)
+      end
     end
 
     def sandbox?

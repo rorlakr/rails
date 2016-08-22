@@ -1,7 +1,6 @@
-require 'tzinfo'
-require 'concurrent/map'
-require 'active_support/core_ext/object/blank'
-require 'active_support/core_ext/object/try'
+require "tzinfo"
+require "concurrent/map"
+require "active_support/core_ext/object/blank"
 
 module ActiveSupport
   # The TimeZone class serves as a wrapper around TZInfo::Timezone instances.
@@ -181,10 +180,11 @@ module ActiveSupport
       "Samoa"                        => "Pacific/Apia"
     }
 
-    UTC_OFFSET_WITH_COLON = '%s%02d:%02d'
-    UTC_OFFSET_WITHOUT_COLON = UTC_OFFSET_WITH_COLON.tr(':', '')
+    UTC_OFFSET_WITH_COLON = "%s%02d:%02d"
+    UTC_OFFSET_WITHOUT_COLON = UTC_OFFSET_WITH_COLON.tr(":", "")
 
     @lazy_zones_map = Concurrent::Map.new
+    @country_zones  = Concurrent::Map.new
 
     class << self
       # Assumes self represents an offset from UTC in seconds (as returned from
@@ -193,7 +193,7 @@ module ActiveSupport
       #   ActiveSupport::TimeZone.seconds_to_utc_offset(-21_600) # => "-06:00"
       def seconds_to_utc_offset(seconds, colon = true)
         format = colon ? UTC_OFFSET_WITH_COLON : UTC_OFFSET_WITHOUT_COLON
-        sign = (seconds < 0 ? '-' : '+')
+        sign = (seconds < 0 ? "-" : "+")
         hours = seconds.abs / 3600
         minutes = (seconds.abs % 3600) / 60
         format % [sign, hours, minutes]
@@ -226,30 +226,41 @@ module ActiveSupport
       # Returns +nil+ if no such time zone is known to the system.
       def [](arg)
         case arg
-          when String
+        when String
           begin
             @lazy_zones_map[arg] ||= create(arg)
           rescue TZInfo::InvalidTimezoneIdentifier
             nil
           end
-          when Numeric, ActiveSupport::Duration
-            arg *= 3600 if arg.abs <= 13
-            all.find { |z| z.utc_offset == arg.to_i }
+        when Numeric, ActiveSupport::Duration
+          arg *= 3600 if arg.abs <= 13
+          all.find { |z| z.utc_offset == arg.to_i }
           else
-            raise ArgumentError, "invalid argument to TimeZone[]: #{arg.inspect}"
+          raise ArgumentError, "invalid argument to TimeZone[]: #{arg.inspect}"
         end
       end
 
       # A convenience method for returning a collection of TimeZone objects
       # for time zones in the USA.
       def us_zones
-        @us_zones ||= all.find_all { |z| z.name =~ /US|Arizona|Indiana|Hawaii|Alaska/ }
+        country_zones(:us)
+      end
+
+      # A convenience method for returning a collection of TimeZone objects
+      # for time zones in the country specified by its ISO 3166-1 Alpha2 code.
+      def country_zones(country_code)
+        code = country_code.to_s.upcase
+        @country_zones[code] ||=
+          TZInfo::Country.get(code).zone_identifiers.map do |tz_id|
+            name = MAPPING.key(tz_id)
+            name && self[name]
+          end.compact.sort!
       end
 
       private
         def zones_map
           @zones_map ||= begin
-            MAPPING.each_key {|place| self[place]} # load all the zones
+            MAPPING.each_key { |place| self[place] } # load all the zones
             @lazy_zones_map
           end
         end
@@ -267,7 +278,6 @@ module ActiveSupport
       @name = name
       @utc_offset = utc_offset
       @tzinfo = tzinfo || TimeZone.find_tzinfo(name)
-      @current_period = nil
     end
 
     # Returns the offset of this time zone from UTC in seconds.
@@ -275,8 +285,7 @@ module ActiveSupport
       if @utc_offset
         @utc_offset
       else
-        @current_period ||= tzinfo.current_period if tzinfo
-        @current_period.utc_offset if @current_period
+        tzinfo.current_period.utc_offset if tzinfo && tzinfo.current_period
       end
     end
 
@@ -428,16 +437,17 @@ module ActiveSupport
     end
 
     def init_with(coder) #:nodoc:
-      initialize(coder['name'])
+      initialize(coder["name"])
     end
 
     def encode_with(coder) #:nodoc:
       coder.tag ="!ruby/object:#{self.class}"
-      coder.map = { 'name' => tzinfo.name }
+      coder.map = { "name" => tzinfo.name }
     end
 
     private
       def parts_to_time(parts, now)
+        raise ArgumentError, "invalid date" if parts.nil?
         return if parts.empty?
 
         time = Time.new(

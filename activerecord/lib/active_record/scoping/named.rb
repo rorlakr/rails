@@ -1,6 +1,6 @@
-require 'active_support/core_ext/array'
-require 'active_support/core_ext/hash/except'
-require 'active_support/core_ext/kernel/singleton_class'
+require "active_support/core_ext/array"
+require "active_support/core_ext/hash/except"
+require "active_support/core_ext/kernel/singleton_class"
 
 module ActiveRecord
   # = Active Record \Named \Scopes
@@ -142,7 +142,7 @@ module ActiveRecord
         #   Article.featured.titles
         def scope(name, body, &block)
           unless body.respond_to?(:call)
-            raise ArgumentError, 'The scope body needs to be callable.'
+            raise ArgumentError, "The scope body needs to be callable."
           end
 
           if dangerous_class_method?(name)
@@ -151,6 +151,7 @@ module ActiveRecord
               "a class method with the same name."
           end
 
+          valid_scope_name?(name)
           extension = Module.new(&block) if block
 
           if body.respond_to?(:to_proc)
@@ -167,6 +168,15 @@ module ActiveRecord
 
               scope || all
             end
+          end
+        end
+
+      protected
+
+        def valid_scope_name?(name)
+          if respond_to?(name, true) && logger
+            logger.warn "Creating scope :#{name}. " \
+                        "Overwriting existing method #{self.name}.#{name}."
           end
         end
       end

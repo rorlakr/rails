@@ -1,4 +1,4 @@
-require 'active_support/json'
+require "active_support/json"
 
 module ActiveModel
   module Serializers
@@ -10,7 +10,7 @@ module ActiveModel
       included do
         extend ActiveModel::Naming
 
-        class_attribute :include_root_in_json
+        class_attribute :include_root_in_json, instance_writer: false
         self.include_root_in_json = false
       end
 

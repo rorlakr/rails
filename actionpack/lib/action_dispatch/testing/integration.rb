@@ -1,10 +1,12 @@
-require 'stringio'
-require 'uri'
-require 'active_support/core_ext/kernel/singleton_class'
-require 'active_support/core_ext/object/try'
-require 'active_support/core_ext/string/strip'
-require 'rack/test'
-require 'minitest'
+require "stringio"
+require "uri"
+require "active_support/core_ext/kernel/singleton_class"
+require "active_support/core_ext/object/try"
+require "active_support/core_ext/string/strip"
+require "rack/test"
+require "minitest"
+
+require "action_dispatch/testing/request_encoder"
 
 module ActionDispatch
   module Integration #:nodoc:
@@ -71,7 +73,7 @@ module ActionDispatch
       end
 
       # Performs an XMLHttpRequest request with the given parameters, mirroring
-      # a request from the Prototype library.
+      # an AJAX request made from JavaScript.
       #
       # The request_method is +:get+, +:post+, +:patch+, +:put+, +:delete+ or
       # +:head+; the parameters are +nil+, a hash, or a url-encoded or multipart
@@ -95,7 +97,7 @@ module ActionDispatch
 
         ActiveSupport::Deprecation.warn(<<-MSG.strip_heredoc)
           xhr and xml_http_request methods are deprecated in favor of
-          `get "/posts", xhr: true` and `post "/posts/1", xhr: true`
+          `get "/posts", xhr: true` and `post "/posts/1", xhr: true`.
         MSG
 
         process(request_method, path, params: params, headers: headers, xhr: true)
@@ -122,6 +124,7 @@ module ActionDispatch
       #     params: { ref_id: 14 },
       #     headers: { "X-Test-Header" => "testvalue" }
       def request_via_redirect(http_method, path, *args)
+        ActiveSupport::Deprecation.warn("`request_via_redirect` is deprecated and will be removed in Rails 5.1. Please use `follow_redirect!` manually after the request call for the same behavior.")
         process_with_kwargs(http_method, path, *args)
 
         follow_redirect! while redirect?
@@ -131,35 +134,35 @@ module ActionDispatch
       # Performs a GET request, following any subsequent redirect.
       # See +request_via_redirect+ for more information.
       def get_via_redirect(path, *args)
-        ActiveSupport::Deprecation.warn('`get_via_redirect` is deprecated and will be removed in Rails 5.1. Please use follow_redirect! manually after the request call for the same behavior.')
+        ActiveSupport::Deprecation.warn("`get_via_redirect` is deprecated and will be removed in Rails 5.1. Please use `follow_redirect!` manually after the request call for the same behavior.")
         request_via_redirect(:get, path, *args)
       end
 
       # Performs a POST request, following any subsequent redirect.
       # See +request_via_redirect+ for more information.
       def post_via_redirect(path, *args)
-        ActiveSupport::Deprecation.warn('`post_via_redirect` is deprecated and will be removed in Rails 5.1. Please use follow_redirect! manually after the request call for the same behavior.')
+        ActiveSupport::Deprecation.warn("`post_via_redirect` is deprecated and will be removed in Rails 5.1. Please use `follow_redirect!` manually after the request call for the same behavior.")
         request_via_redirect(:post, path, *args)
       end
 
       # Performs a PATCH request, following any subsequent redirect.
       # See +request_via_redirect+ for more information.
       def patch_via_redirect(path, *args)
-        ActiveSupport::Deprecation.warn('`patch_via_redirect` is deprecated and will be removed in Rails 5.1. Please use follow_redirect! manually after the request call for the same behavior.')
+        ActiveSupport::Deprecation.warn("`patch_via_redirect` is deprecated and will be removed in Rails 5.1. Please use `follow_redirect!` manually after the request call for the same behavior.")
         request_via_redirect(:patch, path, *args)
       end
 
       # Performs a PUT request, following any subsequent redirect.
       # See +request_via_redirect+ for more information.
       def put_via_redirect(path, *args)
-        ActiveSupport::Deprecation.warn('`put_via_redirect` is deprecated and will be removed in Rails 5.1. Please use follow_redirect! manually after the request call for the same behavior.')
+        ActiveSupport::Deprecation.warn("`put_via_redirect` is deprecated and will be removed in Rails 5.1. Please use `follow_redirect!` manually after the request call for the same behavior.")
         request_via_redirect(:put, path, *args)
       end
 
       # Performs a DELETE request, following any subsequent redirect.
       # See +request_via_redirect+ for more information.
       def delete_via_redirect(path, *args)
-        ActiveSupport::Deprecation.warn('`delete_via_redirect` is deprecated and will be removed in Rails 5.1. Please use follow_redirect! manually after the request call for the same behavior.')
+        ActiveSupport::Deprecation.warn("`delete_via_redirect` is deprecated and will be removed in Rails 5.1. Please use `follow_redirect!` manually after the request call for the same behavior.")
         request_via_redirect(:delete, path, *args)
       end
     end
@@ -179,11 +182,11 @@ module ActionDispatch
       include TestProcess, RequestHelpers, Assertions
 
       %w( status status_message headers body redirect? ).each do |method|
-        delegate method, :to => :response, :allow_nil => true
+        delegate method, to: :response, allow_nil: true
       end
 
       %w( path ).each do |method|
-        delegate method, :to => :request, :allow_nil => true
+        delegate method, to: :request, allow_nil: true
       end
 
       # The hostname used in the last request.
@@ -234,7 +237,7 @@ module ActionDispatch
             url_options.reverse_merge!(@app.routes.default_url_options)
           end
 
-          url_options.reverse_merge!(:host => host, :protocol => https? ? "https" : "http")
+          url_options.reverse_merge!(host: host, protocol: https? ? "https" : "http")
         end
       end
 
@@ -295,11 +298,11 @@ module ActionDispatch
             process(http_method, path, *args)
           else
             non_kwarg_request_warning if args.any?
-            process(http_method, path, { params: args[0], headers: args[1] })
+            process(http_method, path, params: args[0], headers: args[1])
           end
         end
 
-        REQUEST_KWARGS = %i(params headers env xhr)
+        REQUEST_KWARGS = %i(params headers env xhr as)
         def kwarg_request?(args)
           args[0].respond_to?(:keys) && args[0].keys.any? { |k| REQUEST_KWARGS.include?(k) }
         end
@@ -316,28 +319,40 @@ module ActionDispatch
               params: { id: 1 },
               headers: { 'X-Extra-Header' => '123' },
               env: { 'action_dispatch.custom' => 'custom' },
-              xhr: true
+              xhr: true,
+              as: :json
           MSG
         end
 
         # Performs the actual request.
-        def process(method, path, params: nil, headers: nil, env: nil, xhr: false)
-          if path =~ %r{://}
-            location = URI.parse(path)
-            https! URI::HTTPS === location if location.scheme
-            if url_host = location.host
-              default = Rack::Request::DEFAULT_PORTS[location.scheme]
-              url_host += ":#{location.port}" if default != location.port
-              host! url_host
-            end
-            path = location.query ? "#{location.path}?#{location.query}" : location.path
+        def process(method, path, params: nil, headers: nil, env: nil, xhr: false, as: nil)
+          request_encoder = RequestEncoder.encoder(as)
+          headers ||= {}
+
+          if method == :get && as == :json && params
+            headers["X-Http-Method-Override"] = "GET"
+            method = :post
           end
 
-          hostname, port = host.split(':')
+          if path =~ %r{://}
+            path = build_expanded_path(path, request_encoder) do |location|
+              https! URI::HTTPS === location if location.scheme
+
+              if url_host = location.host
+                default = Rack::Request::DEFAULT_PORTS[location.scheme]
+                url_host += ":#{location.port}" if default != location.port
+                host! url_host
+              end
+            end
+          elsif as
+            path = build_expanded_path(path, request_encoder)
+          end
+
+          hostname, port = host.split(":")
 
           request_env = {
             :method => method,
-            :params => params,
+            :params => request_encoder.encode_params(params),
 
             "SERVER_NAME"     => hostname,
             "SERVER_PORT"     => port || (https? ? "443" : "80"),
@@ -347,19 +362,21 @@ module ActionDispatch
             "REQUEST_URI"    => path,
             "HTTP_HOST"      => host,
             "REMOTE_ADDR"    => remote_addr,
-            "CONTENT_TYPE"   => "application/x-www-form-urlencoded",
+            "CONTENT_TYPE"   => request_encoder.content_type,
             "HTTP_ACCEPT"    => accept
           }
 
+          wrapped_headers = Http::Headers.from_hash({})
+          wrapped_headers.merge!(headers) if headers
+
           if xhr
-            headers ||= {}
-            headers['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
-            headers['HTTP_ACCEPT'] ||= [Mime[:js], Mime[:html], Mime[:xml], 'text/xml', '*/*'].join(', ')
+            wrapped_headers["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"
+            wrapped_headers["HTTP_ACCEPT"] ||= [Mime[:js], Mime[:html], Mime[:xml], "text/xml", "*/*"].join(", ")
           end
 
           # this modifies the passed request_env directly
-          if headers.present?
-            Http::Headers.from_hash(request_env).merge!(headers)
+          if wrapped_headers.present?
+            Http::Headers.from_hash(request_env).merge!(wrapped_headers)
           end
           if env.present?
             Http::Headers.from_hash(request_env).merge!(env)
@@ -386,6 +403,13 @@ module ActionDispatch
 
         def build_full_uri(path, env)
           "#{env['rack.url_scheme']}://#{env['SERVER_NAME']}:#{env['SERVER_PORT']}#{path}"
+        end
+
+        def build_expanded_path(path, request_encoder)
+          location = URI.parse(path)
+          yield location if block_given?
+          path = request_encoder.append_format_to location.path
+          location.query ? "#{path}?#{location.query}" : path
         end
     end
 
@@ -432,7 +456,7 @@ module ActionDispatch
          xml_http_request xhr get_via_redirect post_via_redirect).each do |method|
         define_method(method) do |*args|
           # reset the html_document variable, except for cookies/assigns calls
-          unless method == 'cookies' || method == 'assigns'
+          unless method == "cookies" || method == "assigns"
             @html_document = nil
           end
 
@@ -643,33 +667,93 @@ module ActionDispatch
   #       end
   #   end
   #
+  # See the {request helpers documentation}[rdoc-ref:ActionDispatch::Integration::RequestHelpers] for help on how to
+  # use +get+, etc.
+  #
+  # === Changing the request encoding
+  #
+  # You can also test your JSON API easily by setting what the request should
+  # be encoded as:
+  #
+  #   require "test_helper"
+  #
+  #   class ApiTest < ActionDispatch::IntegrationTest
+  #     test "creates articles" do
+  #       assert_difference -> { Article.count } do
+  #         post articles_path, params: { article: { title: "Ahoy!" } }, as: :json
+  #       end
+  #
+  #       assert_response :success
+  #       assert_equal({ id: Arcticle.last.id, title: "Ahoy!" }, response.parsed_body)
+  #     end
+  #   end
+  #
+  # The +as+ option sets the format to JSON, sets the content type to
+  # "application/json" and encodes the parameters as JSON.
+  #
+  # Calling +parsed_body+ on the response parses the response body based on the
+  # last response MIME type.
+  #
+  # For any custom MIME types you've registered, you can even add your own encoders with:
+  #
+  #   ActionDispatch::IntegrationTest.register_encoder :wibble,
+  #     param_encoder: -> params { params.to_wibble },
+  #     response_parser: -> body { body }
+  #
+  # Where +param_encoder+ defines how the params should be encoded and
+  # +response_parser+ defines how the response body should be parsed through
+  # +parsed_body+.
+  #
   # Consult the Rails Testing Guide for more.
 
   class IntegrationTest < ActiveSupport::TestCase
-    include Integration::Runner
-    include ActionController::TemplateAssertions
-    include ActionDispatch::Routing::UrlFor
-
-    @@app = nil
-
-    def self.app
-      @@app || ActionDispatch.test_app
+    module UrlOptions
+      extend ActiveSupport::Concern
+      def url_options
+        integration_session.url_options
+      end
     end
 
-    def self.app=(app)
-      @@app = app
+    module Behavior
+      extend ActiveSupport::Concern
+
+      include Integration::Runner
+      include ActionController::TemplateAssertions
+
+      included do
+        include ActionDispatch::Routing::UrlFor
+        include UrlOptions # don't let UrlFor override the url_options method
+        ActiveSupport.run_load_hooks(:action_dispatch_integration_test, self)
+        @@app = nil
+      end
+
+      module ClassMethods
+        def app
+          if defined?(@@app) && @@app
+            @@app
+          else
+            ActionDispatch.test_app
+          end
+        end
+
+        def app=(app)
+          @@app = app
+        end
+
+        def register_encoder(*args)
+          RequestEncoder.register_encoder(*args)
+        end
+      end
+
+      def app
+        super || self.class.app
+      end
+
+      def document_root_element
+        html_document.root
+      end
     end
 
-    def app
-      super || self.class.app
-    end
-
-    def url_options
-      integration_session.url_options
-    end
-
-    def document_root_element
-      html_document.root
-    end
+    include Behavior
   end
 end

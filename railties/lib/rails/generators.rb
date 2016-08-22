@@ -1,45 +1,45 @@
-activesupport_path = File.expand_path('../../../../activesupport/lib', __FILE__)
+activesupport_path = File.expand_path("../../../../activesupport/lib", __FILE__)
 $:.unshift(activesupport_path) if File.directory?(activesupport_path) && !$:.include?(activesupport_path)
 
-require 'thor/group'
+require "thor/group"
 
-require 'active_support'
-require 'active_support/core_ext/object/blank'
-require 'active_support/core_ext/kernel/singleton_class'
-require 'active_support/core_ext/array/extract_options'
-require 'active_support/core_ext/hash/deep_merge'
-require 'active_support/core_ext/module/attribute_accessors'
-require 'active_support/core_ext/string/inflections'
+require "active_support"
+require "active_support/core_ext/object/blank"
+require "active_support/core_ext/kernel/singleton_class"
+require "active_support/core_ext/array/extract_options"
+require "active_support/core_ext/hash/deep_merge"
+require "active_support/core_ext/module/attribute_accessors"
+require "active_support/core_ext/string/inflections"
 
 module Rails
   module Generators
-    autoload :Actions,         'rails/generators/actions'
-    autoload :ActiveModel,     'rails/generators/active_model'
-    autoload :Base,            'rails/generators/base'
-    autoload :Migration,       'rails/generators/migration'
-    autoload :NamedBase,       'rails/generators/named_base'
-    autoload :ResourceHelpers, 'rails/generators/resource_helpers'
-    autoload :TestCase,        'rails/generators/test_case'
+    autoload :Actions,         "rails/generators/actions"
+    autoload :ActiveModel,     "rails/generators/active_model"
+    autoload :Base,            "rails/generators/base"
+    autoload :Migration,       "rails/generators/migration"
+    autoload :NamedBase,       "rails/generators/named_base"
+    autoload :ResourceHelpers, "rails/generators/resource_helpers"
+    autoload :TestCase,        "rails/generators/test_case"
 
     mattr_accessor :namespace
 
     DEFAULT_ALIASES = {
       rails: {
-        actions: '-a',
-        orm: '-o',
-        javascripts: '-j',
-        javascript_engine: '-je',
-        resource_controller: '-c',
-        scaffold_controller: '-c',
-        stylesheets: '-y',
-        stylesheet_engine: '-se',
-        scaffold_stylesheet: '-ss',
-        template_engine: '-e',
-        test_framework: '-t'
+        actions: "-a",
+        orm: "-o",
+        javascripts: "-j",
+        javascript_engine: "-je",
+        resource_controller: "-c",
+        scaffold_controller: "-c",
+        stylesheets: "-y",
+        stylesheet_engine: "-se",
+        scaffold_stylesheet: "-ss",
+        template_engine: "-e",
+        test_framework: "-t"
       },
 
       test_unit: {
-        fixture_replacement: '-r',
+        fixture_replacement: "-r",
       }
     }
 
@@ -105,7 +105,7 @@ module Rails
 
     # Configure generators for API only applications. It basically hides
     # everything that is usually browser related, such as assets and session
-    # migration generators, and completely disable views, helpers and assets
+    # migration generators, and completely disable helpers and assets
     # so generators such as scaffold won't create them.
     def self.api_only!
       hide_namespaces "assets", "helper", "css", "js"
@@ -116,6 +116,10 @@ module Rails
         helper: false,
         template_engine: nil
       )
+
+      if ARGV.first == "mailer"
+        options[:rails].merge!(template_engine: :erb)
+      end
     end
 
     # Remove the color from output.
@@ -170,15 +174,15 @@ module Rails
     # It's used as the default entry point for generate, destroy and update
     # commands.
     def self.invoke(namespace, args=ARGV, config={})
-      names = namespace.to_s.split(':')
-      if klass = find_by_namespace(names.pop, names.any? && names.join(':'))
+      names = namespace.to_s.split(":")
+      if klass = find_by_namespace(names.pop, names.any? && names.join(":"))
         args << "--help" if args.empty? && klass.arguments.any?(&:required?)
         klass.start(args, config)
       else
         options     = sorted_groups.flat_map(&:last)
-        suggestions = options.sort_by {|suggested| levenshtein_distance(namespace.to_s, suggested) }.first(3)
+        suggestions = options.sort_by { |suggested| levenshtein_distance(namespace.to_s, suggested) }.first(3)
         msg =  "Could not find generator '#{namespace}'. "
-        msg << "Maybe you meant #{ suggestions.map {|s| "'#{s}'"}.to_sentence(last_word_connector: " or ", locale: :en) }\n"
+        msg << "Maybe you meant #{ suggestions.map { |s| "'#{s}'" }.to_sentence(last_word_connector: " or ", locale: :en) }\n"
         msg << "Run `rails generate --help` for more options."
         puts msg
       end
@@ -228,7 +232,7 @@ module Rails
     end
 
     # Show help message with available generators.
-    def self.help(command = 'generate')
+    def self.help(command = "generate")
       puts "Usage: rails #{command} GENERATOR [args] [options]"
       puts
       puts "General options:"
@@ -258,11 +262,11 @@ module Rails
       namespaces.sort!
       groups = Hash.new { |h,k| h[k] = [] }
       namespaces.each do |namespace|
-        base = namespace.split(':').first
+        base = namespace.split(":").first
         groups[base] << namespace
       end
       rails = groups.delete("rails")
-      rails.map! { |n| n.sub(/^rails:/, '') }
+      rails.map! { |n| n.sub(/^rails:/, "") }
       rails.delete("app")
       rails.delete("plugin")
 
@@ -275,7 +279,7 @@ module Rails
 
       # This code is based directly on the Text gem implementation
       # Returns a value representing the "cost" of transforming str1 into str2
-      def self.levenshtein_distance str1, str2
+      def self.levenshtein_distance(str1, str2)
         s = str1
         t = str2
         n = s.length

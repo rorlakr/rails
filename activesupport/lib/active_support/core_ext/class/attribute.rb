@@ -1,6 +1,6 @@
-require 'active_support/core_ext/kernel/singleton_class'
-require 'active_support/core_ext/module/remove_method'
-require 'active_support/core_ext/array/extract_options'
+require "active_support/core_ext/kernel/singleton_class"
+require "active_support/core_ext/module/remove_method"
+require "active_support/core_ext/array/extract_options"
 
 class Class
   # Declare a class-level attribute whose value is inheritable by subclasses.
@@ -27,7 +27,7 @@ class Class
   # This matches normal Ruby method inheritance: think of writing an attribute
   # on a subclass as overriding the reader method. However, you need to be aware
   # when using +class_attribute+ with mutable structures as +Array+ or +Hash+.
-  # In such cases, you don't want to do changes in places but use setters:
+  # In such cases, you don't want to do changes in place. Instead use setters:
   #
   #   Base.setting = []
   #   Base.setting                # => []

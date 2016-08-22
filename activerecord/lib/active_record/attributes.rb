@@ -1,4 +1,4 @@
-require 'active_record/attribute/user_provided_default'
+require "active_record/attribute/user_provided_default"
 
 module ActiveRecord
   # See ActiveRecord::Attributes::ClassMethods for documentation
@@ -34,10 +34,10 @@ module ActiveRecord
       # is not passed, the previous default value (if any) will be used.
       # Otherwise, the default will be +nil+.
       #
-      # +array+ (PG only) specifies that the type should be an array (see the
+      # +array+ (PostgreSQL only) specifies that the type should be an array (see the
       # examples below).
       #
-      # +range+ (PG only) specifies that the type should be a range (see the
+      # +range+ (PostgreSQL only) specifies that the type should be a range (see the
       # examples below).
       #
       # ==== Examples
@@ -67,12 +67,14 @@ module ActiveRecord
       #
       # A default can also be provided.
       #
+      #   # db/schema.rb
       #   create_table :store_listings, force: true do |t|
       #     t.string :my_string, default: "original default"
       #   end
       #
       #   StoreListing.new.my_string # => "original default"
       #
+      #   # app/models/store_listing.rb
       #   class StoreListing < ActiveRecord::Base
       #     attribute :my_string, :string, default: "new default"
       #   end
@@ -89,6 +91,7 @@ module ActiveRecord
       #
       # \Attributes do not need to be backed by a database column.
       #
+      #   # app/models/my_model.rb
       #   class MyModel < ActiveRecord::Base
       #     attribute :my_string, :string
       #     attribute :my_int_array, :integer, array: true
@@ -119,7 +122,7 @@ module ActiveRecord
       #
       #   class MoneyType < ActiveRecord::Type::Integer
       #     def cast(value)
-      #       if !value.kind_of(Numeric) && value.include?('$')
+      #       if !value.kind_of?(Numeric) && value.include?('$')
       #         price_in_dollars = value.gsub(/\$/, '').to_f
       #         super(price_in_dollars * 100)
       #       else
@@ -131,7 +134,7 @@ module ActiveRecord
       #   # config/initializers/types.rb
       #   ActiveRecord::Type.register(:money, MoneyType)
       #
-      #   # /app/models/store_listing.rb
+      #   # app/models/store_listing.rb
       #   class StoreListing < ActiveRecord::Base
       #     attribute :price_in_cents, :money
       #   end
@@ -154,7 +157,7 @@ module ActiveRecord
       #   end
       #
       #   class MoneyType < Type::Value
-      #     def initialize(currency_converter)
+      #     def initialize(currency_converter:)
       #       @currency_converter = currency_converter
       #     end
       #
@@ -167,11 +170,13 @@ module ActiveRecord
       #     end
       #   end
       #
+      #   # config/initializers/types.rb
       #   ActiveRecord::Type.register(:money, MoneyType)
       #
+      #   # app/models/product.rb
       #   class Product < ActiveRecord::Base
       #     currency_converter = ConversionRatesFromTheInternet.new
-      #     attribute :price_in_bitcoins, :money, currency_converter
+      #     attribute :price_in_bitcoins, :money, currency_converter: currency_converter
       #   end
       #
       #   Product.where(price_in_bitcoins: Money.new(5, "USD"))
@@ -237,24 +242,24 @@ module ActiveRecord
 
       private
 
-      NO_DEFAULT_PROVIDED = Object.new # :nodoc:
-      private_constant :NO_DEFAULT_PROVIDED
+        NO_DEFAULT_PROVIDED = Object.new # :nodoc:
+        private_constant :NO_DEFAULT_PROVIDED
 
-      def define_default_attribute(name, value, type, from_user:)
-        if value == NO_DEFAULT_PROVIDED
-          default_attribute = _default_attributes[name].with_type(type)
-        elsif from_user
-          default_attribute = Attribute::UserProvidedDefault.new(
-            name,
-            value,
-            type,
-            _default_attributes[name],
-          )
-        else
-          default_attribute = Attribute.from_database(name, value, type)
+        def define_default_attribute(name, value, type, from_user:)
+          if value == NO_DEFAULT_PROVIDED
+            default_attribute = _default_attributes[name].with_type(type)
+          elsif from_user
+            default_attribute = Attribute::UserProvidedDefault.new(
+              name,
+              value,
+              type,
+              _default_attributes.fetch(name.to_s) { nil },
+            )
+          else
+            default_attribute = Attribute.from_database(name, value, type)
+          end
+          _default_attributes[name] = default_attribute
         end
-        _default_attributes[name] = default_attribute
-      end
     end
   end
 end

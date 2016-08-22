@@ -1,5 +1,3 @@
-require 'action_view/base'
-
 module ActionView
   module ViewPaths
     extend ActiveSupport::Concern
@@ -10,8 +8,8 @@ module ActionView
       self._view_paths.freeze
     end
 
-    delegate :template_exists?, :view_paths, :formats, :formats=,
-             :locale, :locale=, :to => :lookup_context
+    delegate :template_exists?, :any_templates?, :view_paths, :formats, :formats=,
+             :locale, :locale=, to: :lookup_context
 
     module ClassMethods
       def _prefixes # :nodoc:
@@ -26,9 +24,9 @@ module ActionView
 
       # Override this method in your controller if you want to change paths prefixes for finding views.
       # Prefixes defined here will still be added to parents' <tt>._prefixes</tt>.
-      def local_prefixes
-        [controller_path]
-      end
+        def local_prefixes
+          [controller_path]
+        end
     end
 
     # The prefixes used in render "foo" shortcuts.
@@ -45,7 +43,7 @@ module ActionView
     end
 
     def details_for_lookup
-      { }
+      {}
     end
 
     def append_view_path(path)

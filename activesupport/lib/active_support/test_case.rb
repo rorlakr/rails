@@ -1,16 +1,15 @@
-gem 'minitest' # make sure we get the gem, not stdlib
-require 'minitest'
-require 'active_support/testing/tagged_logging'
-require 'active_support/testing/setup_and_teardown'
-require 'active_support/testing/assertions'
-require 'active_support/testing/deprecation'
-require 'active_support/testing/declarative'
-require 'active_support/testing/isolation'
-require 'active_support/testing/constant_lookup'
-require 'active_support/testing/time_helpers'
-require 'active_support/testing/file_fixtures'
-require 'active_support/testing/composite_filter'
-require 'active_support/core_ext/kernel/reporting'
+gem "minitest" # make sure we get the gem, not stdlib
+require "minitest"
+require "active_support/testing/tagged_logging"
+require "active_support/testing/setup_and_teardown"
+require "active_support/testing/assertions"
+require "active_support/testing/deprecation"
+require "active_support/testing/declarative"
+require "active_support/testing/isolation"
+require "active_support/testing/constant_lookup"
+require "active_support/testing/time_helpers"
+require "active_support/testing/file_fixtures"
+require "active_support/core_ext/kernel/reporting"
 
 module ActiveSupport
   class TestCase < ::Minitest::Test
@@ -38,15 +37,6 @@ module ActiveSupport
       # Defaults to +:random+.
       def test_order
         ActiveSupport.test_order ||= :random
-      end
-
-      def run(reporter, options = {})
-        if options[:patterns] && options[:patterns].any? { |p| p =~ /:\d+/ }
-          options[:filter] = \
-            Testing::CompositeFilter.new(self, options[:filter], options[:patterns])
-        end
-
-        super
       end
     end
 
@@ -76,12 +66,14 @@ module ActiveSupport
     alias :assert_not_respond_to :refute_respond_to
     alias :assert_not_same :refute_same
 
-    # Reveals the intention that the block should not raise any exception.
+    # Assertion that the block should not raise an exception.
+    #
+    # Passes if evaluated code in the yielded block raises no exception.
     #
     #   assert_nothing_raised do
-    #     ...
+    #     perform_service(param: 'no_exception')
     #   end
-    def assert_nothing_raised(*args)
+    def assert_nothing_raised
       yield
     end
   end

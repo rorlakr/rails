@@ -1,11 +1,14 @@
-require 'fileutils'
-require 'optparse'
-require 'action_dispatch'
-require 'rails'
+require "fileutils"
+require "optparse"
+require "action_dispatch"
+require "rails"
+require "rails/dev_caching"
 
 module Rails
   class Server < ::Rack::Server
     class Options
+      DEFAULT_PID_PATH = File.expand_path("tmp/pids/server.pid").freeze
+
       def parse!(args)
         args, options = args.dup, {}
 
@@ -18,31 +21,31 @@ module Rails
 
       private
 
-      def option_parser(options)
-        OptionParser.new do |opts|
-          opts.banner = "Usage: rails server [mongrel, thin etc] [options]"
-          opts.on("-p", "--port=port", Integer,
-                  "Runs Rails on the specified port.", "Default: 3000") { |v| options[:Port] = v }
-          opts.on("-b", "--binding=IP", String,
-                  "Binds Rails to the specified IP.", "Default: localhost") { |v| options[:Host] = v }
-          opts.on("-c", "--config=file", String,
-                  "Uses a custom rackup configuration.") { |v| options[:config] = v }
-          opts.on("-d", "--daemon", "Runs server as a Daemon.") { options[:daemonize] = true }
-          opts.on("-e", "--environment=name", String,
-                  "Specifies the environment to run this server under (test/development/production).",
-                  "Default: development") { |v| options[:environment] = v }
-          opts.on("-P", "--pid=pid", String,
-                  "Specifies the PID file.",
-                  "Default: tmp/pids/server.pid") { |v| options[:pid] = v }
-          opts.on("-C", "--[no-]dev-caching",
-                  "Specifies whether to perform caching in development.",
-                  "true or false") { |v| options[:caching] = v }
+        def option_parser(options)
+          OptionParser.new do |opts|
+            opts.banner = "Usage: rails server [mongrel, thin etc] [options]"
+            opts.on("-p", "--port=port", Integer,
+                    "Runs Rails on the specified port.", "Default: 3000") { |v| options[:Port] = v }
+            opts.on("-b", "--binding=IP", String,
+                    "Binds Rails to the specified IP.", "Default: localhost") { |v| options[:Host] = v }
+            opts.on("-c", "--config=file", String,
+                    "Uses a custom rackup configuration.") { |v| options[:config] = v }
+            opts.on("-d", "--daemon", "Runs server as a Daemon.") { options[:daemonize] = true }
+            opts.on("-e", "--environment=name", String,
+                    "Specifies the environment to run this server under (test/development/production).",
+                    "Default: development") { |v| options[:environment] = v }
+            opts.on("-P", "--pid=pid", String,
+                    "Specifies the PID file.",
+                    "Default: tmp/pids/server.pid") { |v| options[:pid] = v }
+            opts.on("-C", "--[no-]dev-caching",
+                    "Specifies whether to perform caching in development.",
+                    "true or false") { |v| options[:caching] = v }
 
-          opts.separator ""
+            opts.separator ""
 
-          opts.on("-h", "--help", "Shows this help message.") { puts opts; exit }
+            opts.on("-h", "--help", "Shows this help message.") { puts opts; exit }
+          end
         end
-      end
     end
 
     def initialize(*)
@@ -77,7 +80,7 @@ module Rails
     ensure
       # The '-h' option calls exit before @options is set.
       # If we call 'options' with it unset, we get double help banners.
-      puts 'Exiting' unless @options && options[:daemonize]
+      puts "Exiting" unless @options && options[:daemonize]
     end
 
     def middleware
@@ -85,25 +88,22 @@ module Rails
     end
 
     def default_options
-      super.merge({
-        Port:               ENV.fetch('PORT', 3000).to_i,
+      super.merge(
+        Port:               ENV.fetch("PORT", 3000).to_i,
+        Host:               ENV.fetch("HOST", "localhost").dup,
         DoNotReverseLookup: true,
-        environment:        (ENV['RAILS_ENV'] || ENV['RACK_ENV'] || "development").dup,
+        environment:        (ENV["RAILS_ENV"] || ENV["RACK_ENV"] || "development").dup,
         daemonize:          false,
-        caching:            false,
-        pid:                File.expand_path("tmp/pids/server.pid")
-      })
+        caching:            nil,
+        pid:                Options::DEFAULT_PID_PATH,
+        restart_cmd:        restart_command)
     end
 
     private
 
       def setup_dev_caching
-        return unless options[:environment] == "development"
-
-        if options[:caching] == false
-          delete_cache_file
-        elsif options[:caching]
-          create_cache_file
+        if options[:environment] == "development"
+          Rails::DevCaching.enable_by_argument(options[:caching])
         end
       end
 
@@ -112,32 +112,28 @@ module Rails
         puts "=> Booting #{ActiveSupport::Inflector.demodulize(server)}"
         puts "=> Rails #{Rails.version} application starting in #{Rails.env} on #{url}"
         puts "=> Run `rails server -h` for more startup options"
-
-        puts "=> Ctrl-C to shutdown server" unless options[:daemonize]
-      end
-
-      def create_cache_file
-        FileUtils.touch("tmp/caching-dev.txt")
-      end
-
-      def delete_cache_file
-        FileUtils.rm("tmp/caching-dev.txt") if File.exist?("tmp/caching-dev.txt")
       end
 
       def create_tmp_directories
         %w(cache pids sockets).each do |dir_to_make|
-          FileUtils.mkdir_p(File.join(Rails.root, 'tmp', dir_to_make))
+          FileUtils.mkdir_p(File.join(Rails.root, "tmp", dir_to_make))
         end
       end
 
       def log_to_stdout
         wrapped_app # touch the app so the logger is set up
 
-        console = ActiveSupport::Logger.new($stdout)
+        console = ActiveSupport::Logger.new(STDOUT)
         console.formatter = Rails.logger.formatter
         console.level = Rails.logger.level
 
-        Rails.logger.extend(ActiveSupport::Logger.broadcast(console))
+        unless ActiveSupport::Logger.logger_outputs_to?(Rails.logger, STDOUT)
+          Rails.logger.extend(ActiveSupport::Logger.broadcast(console))
+        end
+      end
+
+      def restart_command
+        "bin/rails server #{ARGV.join(' ')}"
       end
   end
 end

@@ -1,4 +1,4 @@
-require 'tsort'
+require "tsort"
 
 module Rails
   module Initializable
@@ -33,6 +33,10 @@ module Rails
       def bind(context)
         return self if @context
         Initializer.new(@name, context, @options, &block)
+      end
+
+      def context_class
+        @context.class
       end
     end
 

@@ -14,7 +14,7 @@ After reading this guide, you will know:
 
 --------------------------------------------------------------------------------
 
-In order to use the PostgreSQL adapter you need to have at least version 8.2
+In order to use the PostgreSQL adapter you need to have at least version 9.1
 installed. Older versions are not supported.
 
 To get started with PostgreSQL have a look at the
@@ -84,6 +84,7 @@ Book.where("array_length(ratings, 1) >= 3")
 ### Hstore
 
 * [type definition](http://www.postgresql.org/docs/current/static/hstore.html)
+* [functions and operators](http://www.postgresql.org/docs/current/static/hstore.html#AEN167712)
 
 NOTE: You need to enable the `hstore` extension to use hstore.
 
@@ -108,6 +109,9 @@ profile.settings # => {"color"=>"blue", "resolution"=>"800x600"}
 
 profile.settings = {"color" => "yellow", "resolution" => "1280x1024"}
 profile.save!
+
+Profile.where("settings->'color' = ?", "yellow")
+#=> #<ActiveRecord::Relation [#<Profile id: 1, settings: {"color"=>"yellow", "resolution"=>"1280x1024"}>]>
 ```
 
 ### JSON
@@ -431,7 +435,7 @@ create_table :documents do |t|
   t.string 'body'
 end
 
-execute "CREATE INDEX documents_idx ON documents USING gin(to_tsvector('english', title || ' ' || body));"
+add_index :documents, "to_tsvector('english', title || ' ' || body)", using: :gin, name: 'documents_idx'
 
 # app/models/document.rb
 class Document < ApplicationRecord
@@ -499,9 +503,9 @@ second = Article.create! title: "Brace yourself",
                          status: "draft",
                          published_at: 1.month.ago
 
-Article.count # => 1
-first.archive!
 Article.count # => 2
+first.archive!
+Article.count # => 1
 ```
 
 NOTE: This application only cares about non-archived `Articles`. A view also

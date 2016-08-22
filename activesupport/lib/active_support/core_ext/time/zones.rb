@@ -1,6 +1,6 @@
-require 'active_support/time_with_zone'
-require 'active_support/core_ext/time/acts_like'
-require 'active_support/core_ext/date_and_time/zones'
+require "active_support/time_with_zone"
+require "active_support/core_ext/time/acts_like"
+require "active_support/core_ext/date_and_time/zones"
 
 class Time
   include DateAndTime::Zones
@@ -40,7 +40,23 @@ class Time
       Thread.current[:time_zone] = find_zone!(time_zone)
     end
 
-    # Allows override of <tt>Time.zone</tt> locally inside supplied block; resets <tt>Time.zone</tt> to existing value when done.
+    # Allows override of <tt>Time.zone</tt> locally inside supplied block;
+    # resets <tt>Time.zone</tt> to existing value when done.
+    #
+    #   class ApplicationController < ActionController::Base
+    #     around_action :set_time_zone
+    #
+    #     private
+    #
+    #     def set_time_zone
+    #       Time.use_zone(current_user.timezone) { yield }
+    #     end
+    #   end
+    #
+    #  NOTE: This won't affect any <tt>ActiveSupport::TimeWithZone</tt>
+    #  objects that have already been created, e.g. any model timestamp
+    #  attributes that have been read before the block will remain in
+    #  the application's default timezone.
     def use_zone(time_zone)
       new_zone = find_zone!(time_zone)
       begin
