@@ -1,10 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
 <title><%= yield(:page_title) || 'Ruby on Rails Guides' %></title>
 <link rel="stylesheet" type="text/css" href="stylesheets/style.css" />
@@ -30,15 +29,12 @@
         More Ruby on Rails
       </span>
       <ul class="more-info-links s-hidden">
-        <li class="more-info"><a href="http://rubyonrails.org/">개요</a></li>
-        <li class="more-info"><a href="http://rubyonrails.org/download">다운로드</a></li>
-        <li class="more-info"><a href="http://rubyonrails.org/deploy">배포</a></li>
-        <li class="more-info"><a href="https://github.com/rails/rails">코드</a></li>
-        <li class="more-info"><a href="http://rubyonrails.org/screencasts">스크린캐스트</a></li>
-        <li class="more-info"><a href="http://rubyonrails.org/documentation">도큐먼트</a></li>
-        <li class="more-info"><a href="http://rubyonrails.org/ecosystem">생태계</a></li>
-        <li class="more-info"><a href="http://rubyonrails.org/community">커뮤니티</a></li>
         <li class="more-info"><a href="http://weblog.rubyonrails.org/">블로그</a></li>
+        <li class="more-info"><a href="http://guides.rubyonrails.org/">가이드</a></li>
+        <li class="more-info"><a href="http://api.rubyonrails.org/">API</a></li>
+        <li class="more-info"><a href="http://stackoverflow.com/questions/tagged/ruby-on-rails">질문하기</a></li>
+        <li class="more-info"><a href="https://github.com/rails/rails">기여하기</a></li>
+        <li class="more-info"><a href="https://github.com/rorlakr/rails-guides">번역 가이드 저장소</a></li>
       </ul>
     </div>
   </div>
@@ -48,7 +44,7 @@
       <ul class="nav">
         <li><a class="nav-item" href="index.html">홈</a></li>
         <li class="guides-index guides-index-large">
-          <a href="index.html" onclick="guideMenu(); return false;" id="guidesMenu" class="guides-index-item nav-item">가이드 인덱스</a>
+          <a href="index.html" id="guidesMenu" class="guides-index-item nav-item">가이드 인덱스</a>
           <div id="guides" class="clearfix" style="display: none;">
             <hr />
             <% ['L', 'R'].each do |position| %>
@@ -101,10 +97,10 @@
           이 가이드의 질을 향상시키기 위한 도움을 기다리고 있습니다.
         </p>
         <p>
-          수정이 필요한 오타나 에러를 발견하면 <%= link_to 'rails', 'https://github.com/rails/rails' %>을 클론한 후 직접 변경내용을 push하시기 바랍니다. 레일스의 해당 브랜치는 누구나가 작성 권한이 있습니다. 커밋한 내용에 대해서는 검토작업이 이루어질 것이지만 변경내용을 서밋한 이후에 진행됩니다. <%= link_to 'rails', 'https://github.com/rails/rails' %>은 정기적으로 master 브랜치와 클로스 머지됩니다. 
+          수정이 필요한 오타나 에러를 발견하면 기여해주세요. 이를 위해서 <%= link_to '기여 가이드', 'http://edgeguides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation' %>를 읽어주세요.
         </p>
         <p>
-          미완성된 내용이나 업데이트되지 않은 내용이 있을 수 있습니다. 누락된 문서를 추가해 주시기 바랍니다. 문서작성시 참고해야할 스타일과 규칙은 <%= link_to 'Ruby on Rails Guides Guidelines', 'ruby_on_rails_guides_guidelines.html' %>를 확인하시기 바랍니다.
+          미완성된 내용이나 업데이트되지 않은 내용이 있을 수 있습니다. 누락된 문서를 추가해 주시기 바랍니다. <%= link_to '최신 가이드','http://edgeguides.rubyonrails.org' %>나 마스터 브랜치를 참고하여 이미 고쳐지지 않았는지 확인하세요. 문서작성시 참고해야할 스타일과 규칙은 <%= link_to 'Ruby on Rails Guides Guidelines', 'ruby_on_rails_guides_guidelines.html' %>를 확인하시기 바랍니다.
         </p>
         <p>
           어떤 이유에서든지, 수정이 필요한 부분을 직접 변경할 수 없는 경우에는 <%= link_to 'open an issue', 'https://github.com/rails/rails/issues' %>로 접속하여 문제점을 제출해 주시기 바랍니다.
@@ -128,13 +124,11 @@
   <script type="text/javascript" src="javascripts/jquery.min.js"></script>
   <script type="text/javascript" src="javascripts/responsive-tables.js"></script>
   <script type="text/javascript" src="javascripts/guides.js"></script>
-  <script type="text/javascript" src="javascripts/syntaxhighlighter/shCore.js"></script>
-  <script type="text/javascript" src="javascripts/syntaxhighlighter/shBrushRuby.js"></script>
-  <script type="text/javascript" src="javascripts/syntaxhighlighter/shBrushXml.js"></script>
-  <script type="text/javascript" src="javascripts/syntaxhighlighter/shBrushSql.js"></script>
-  <script type="text/javascript" src="javascripts/syntaxhighlighter/shBrushPlain.js"></script>
+  <script type="text/javascript" src="javascripts/syntaxhighlighter.js"></script>
   <script type="text/javascript">
-    SyntaxHighlighter.all()
+    syntaxhighlighterConfig = {
+      autoLinks: false,
+    };
     $(guidesIndex.bind);
   </script>
   <script>
