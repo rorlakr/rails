@@ -19,7 +19,7 @@ Rails 5.0에서 주목할 점
 Rails 5.0로 업그레이드하기
 ----------------------
 
-기존 애플리케이션을 업그레이드한다면 그 전에 충분한 테스트 커버리지를 확보하는 것은 좋은 생각입니다. 애플리케이션이 Rails 4.2로 업그레이드되지 않았다면 우선 이를 우선하고, 애플리케이션이 정상적으로 동작하는지 충분히 확인한 뒤에 Rails 5.0을 올려주세요. 업그레이드 시의 주의점에 대해서는 [Ruby on Rails 업그레이드 가이드](upgrading_ruby_on_rails.html#rails-4-2에서-Rails-5-0로-업그레이드)를 참고해주세요.
+기존 애플리케이션을 업그레이드한다면 그 전에 충분한 테스트 커버리지를 확보하는 것이 좋습니다. 애플리케이션이 Rails 4.2로 업그레이드되지 않았다면 우선 이를 우선하고, 애플리케이션이 정상적으로 동작하는지 충분히 확인한 뒤에 Rails 5.0을 올려주세요. 업그레이드 시의 주의점에 대해서는 [Ruby on Rails 업그레이드 가이드](upgrading_ruby_on_rails.html#rails-4-2에서-Rails-5-0로-업그레이드)를 참고해주세요.
 
 
 주요 변경점
@@ -103,7 +103,7 @@ model.attributes #=> {field_without_db_column: [1, 2, 3]}
 **커스텀 타입 만들기:**
 
 독자적인 타입을 정의할 수 있으며, 이는 값의 타입으로 정의된 메소드에 응답하는 경우에 한해서만 가능합니다.
-`deserialize` 메소드나 `cast` 메소드는 작성한 타입 객체로 호출되어 데이터베이스나 컨트롤러로부터의 받은 실제 입력을 인수로 사용합니다.
+`deserialize` 메소드나 `cast` 메소드는 작성한 타입 객체로 호출되어 데이터베이스나 컨트롤러로부터의 받은 실제 입력을 인자로 사용합니다.
 이는 통화 변환처럼 직접 별도의 변환을 해야하는 경우에 유용합니다.
 
 **쿼리하기:**
@@ -152,7 +152,7 @@ Railties
 *   제거 예정이었던 `Rails::Rack::LogTailer`를 제거.
     ([commit](https://github.com/rails/rails/commit/c564dcb75c191ab3d21cc6f920998b0d6fbca623))
 
-*   제거 예정이었던 `RAILS_CACHE` 정수를 제거.
+*   제거 예정이었던 `RAILS_CACHE` 상수를 제거.
     ([commit](https://github.com/rails/rails/commit/b7f856ce488ef8f6bf4c12bb549f462cb7671c08))
 
 *   제거 예정이었던 `serve_static_assets` 설정을 제거.
@@ -297,7 +297,7 @@ Action Pack
 *   `RedirectBackError`를 피하기 위해 `fallback_location`를 반드시 넘겨야하는 `redirect_back`를 장려하기 위해 `redirect_to :back`가 제거 예정.
     ([Pull Request](https://github.com/rails/rails/pull/22506))
 
-*   `ActionDispatch::IntegrationTest`와 `ActionController::TestCase`에서 순서대로 들어오는 인수를 받는 방식을 제거 예정. 앞으로는 키워드 인수를 사용.
+*   `ActionDispatch::IntegrationTest`와 `ActionController::TestCase`에서 순서대로 들어오는 인자를 받는 방식을 제거 예정. 앞으로는 키워드 인자를 사용.
     ([Pull Request](https://github.com/rails/rails/pull/18323))
 
 *   경로 파라미터 `:controller`와 `:action`가 제거 예정.
@@ -315,7 +315,7 @@ Action Pack
 *   컨트롤러 액션의 외부에서 임의의 템플릿을 랜더링할 수 있는 `ActionController::Renderer`가 추가됨.
     ([Pull Request](https://github.com/rails/rails/pull/18546))
 
-*   `ActionController::TestCase`와 `ActionDispatch::Integration`의 HTTP 요청 메소드에 키워드 인수 구문이 통합됨.
+*   `ActionController::TestCase`와 `ActionDispatch::Integration`의 HTTP 요청 메소드에 키워드 인자 구문이 통합됨.
     ([Pull Request](https://github.com/rails/rails/pull/18323))
 
 *   만료 기한이 없는 응답을 응답을 캐싱하는 `http_cache_forever`가 액션컨트롤러에 추가됨.
@@ -531,7 +531,7 @@ Active Record
 *   PostgreSQL의 `:point` 타입이 제거 예정. 앞으로는 `Array`가 아닌 `Point` 객체를 반환하는 새 타입을 사용.
     ([Pull Request](https://github.com/rails/rails/pull/20448))
 
-*   true가 되는 인수를 관계용 메소드에 넘겨서 관계된 객체들을 강제적으로 새로고침하는 방법이 제거 예정.
+*   true가 되는 인자를 관계용 메소드에 넘겨서 관계된 객체들을 강제적으로 새로고침하는 방법이 제거 예정.
     ([Pull Request](https://github.com/rails/rails/pull/20888))
 
 *   관계 `restrict_dependent_destroy` 에러의 키를 제거 예정. 앞으로는 새로운 키 이름을 사용.
@@ -547,7 +547,7 @@ Active Record
 *   SQLite3 어댑터와 MySQL 어댑터의 `connection.tables`가 제거 예정.
     ([Pull Request](https://github.com/rails/rails/pull/21601))
 
-*   `#tables`에 인수를 넘기는 방식을 제거 예정.
+*   `#tables`에 인자를 넘기는 방식이 제거 예정.
     일부 어댑터(mysql2, sqlite3)의 `#tables` 메소드는 테이블과 뷰를 모두 반환하지만, 다른 어뎁터는 테이블만을 반환함.
     동작을 통일하기 위해서, 앞으로는 `#tables`는 테이블 만을 반환할 예정.
     ([Pull Request](https://github.com/rails/rails/pull/21601))
@@ -557,7 +557,7 @@ Active Record
     `#tables`의 동작을 통일하기 위해서, 앞으로 `#table_exists?`는 테이블만을 체크할 예정.
     ([Pull Request](https://github.com/rails/rails/pull/21601))
 
-*   `find_nth`에 `offset`을 인수로 넘기는 방식이 제거 예정. 앞으로 관계에서는 `offset` 메소드를 사용.
+*   `find_nth`에 `offset`을 인자로 넘기는 방식이 제거 예정. 앞으로 관계에서는 `offset` 메소드를 사용.
     ([Pull Request](https://github.com/rails/rails/pull/22053))
 
 *   `DatabaseStatements`의 `{insert|update|delete}_sql`가 제거 예정.
@@ -831,7 +831,7 @@ Active Support
 *   `ActiveSupport::Cache::LocaleCache#set_cache_value`가 제거 예정. 앞으로는 `write_cache_value`를 사용.
     ([Pull Request](https://github.com/rails/rails/pull/22215))
 
-*   `assert_nothing_raised`에 인수를 넘기는 방식이 제거 예정.
+*   `assert_nothing_raised`에 인자를 넘기는 방식이 제거 예정.
     ([Pull Request](https://github.com/rails/rails/pull/23789))
 
 *   `Module.local_constants`가 제거 예정. 앞으로는 `Module.constants(false)`를 사용.
@@ -884,7 +884,7 @@ Active Support
 *   `ActiveSupport::OrderedOptions`에 파괴적인 get 메소드가 추가. 값이 `.blank?`인 경우에는 `KeyError`가 발생.
     ([Pull Request](https://github.com/rails/rails/pull/20208))
 
-*   지정한 년도의 일수를 반환하는 `Time.days_in_year`가 추가. 인수가 없는 경우는 현재 년도를 사용.
+*   지정한 년도의 일수를 반환하는 `Time.days_in_year`가 추가. 인자가 없는 경우는 현재 년도를 사용.
     ([commit](https://github.com/rails/rails/commit/2f4f4d2cf1e4c5a442459fc250daf66186d110fa))
 
 *   파일의 이벤트 감시 기능이 추가. 애플리케이션의 소스 코드, 라우팅, 로케일 등의 변경을 비동기적으로 검출.
