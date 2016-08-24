@@ -318,7 +318,7 @@ Action Pack
 *   `ActionController::TestCase`와 `ActionDispatch::Integration`의 HTTP 요청 메소드에 키워드 인자 구문이 통합됨.
     ([Pull Request](https://github.com/rails/rails/pull/18323))
 
-*   만료 기한이 없는 응답을 응답을 캐싱하는 `http_cache_forever`가 액션컨트롤러에 추가됨.
+*   만료 기한이 없는 응답을 캐싱하는 `http_cache_forever`가 액션컨트롤러에 추가됨.
     ([Pull Request](https://github.com/rails/rails/pull/18394))
 
 *   요청의 variant에 알기 쉬운 지정 방식이 추가됨.
