@@ -1,26 +1,26 @@
-Action Cable 개요
+액션케이블 개요
 =====================
 
-이 가이드에서는 Action Cable의 구조와 웹소켓을 Rails 애플리케이션에 도입하여 실시간 기능을 구현하는 방법에 관해서 설명합니다.
+이 가이드에서는 액션케이블의 구조와 웹소켓을 레일스 애플리케이션에 도입하여 실시간 기능을 구현하는 방법에 관해서 설명합니다.
 
 이 가이드의 내용:
 
-* Action Cable 개요, 백엔드와 프론트엔드 통합하기
-* Action Cable 설정하기
+* 액션케이블 개요, 백엔드와 프론트엔드 통합하기
+* 액션케이블 설정하기
 * 채널 설정하기
-* Action Cable을 위한 배포 방법과 아키텍처 구성하기
+* 액션케이블을 위한 배포 방법과 아키텍처 구성하기
 
 --------------------------------------------------------------------------------
 
 들어가면서
 ------------
 
-Action Cable은 [WebSocket](https://en.wikipedia.org/wiki/WebSocket)과 Rails의 다른 부분들을 매끄럽게 통합합니다. Action Cable을 도입함으로써 Rails 애플리케이션의 고효율성과 확장성에 영향을 주는 일이 없이 일반 Rails 애플리케이션과 같은 스타일/방법으로 실시간 기능을 루비로 작성할 수 있습니다. 이는 클라이언트의 자바스크립트 프레임워크와 서버의 루비 프레임워크를 동시에 제공하는 풀스택 프레임워크입니다. 그러므로 Active Record 등의 ORM으로 작성된 모든 도메인 모델에 접근할 수 있습니다.
+액션케이블은 [웹소켓](https://en.wikipedia.org/wiki/WebSocket)과 레일스의 다른 부분들을 매끄럽게 통합합니다. 액션케이블을 도입함으로써 레일스 애플리케이션의 고효율성과 확장성에 영향을 주는 일이 없이 일반 레일스 애플리케이션과 같은 스타일/방법으로 실시간 기능을 루비로 작성할 수 있습니다. 이는 클라이언트의 자바스크립트 프레임워크와 서버의 루비 프레임워크를 동시에 제공하는 풀스택 프레임워크입니다. 그러므로 액티브레코드 등의 ORM으로 작성된 모든 도메인 모델에 접근할 수 있습니다.
 
 Pub/Sub에 대해서
 ---------------
 
-[Pub/Sub](https://ko.wikipedia.org/wiki/%EB%B0%9C%ED%96%89-%EA%B5%AC%EB%8F%85_%EB%AA%A8%EB%8D%B8)은 발행/구독이라고도 불리는 메시지 큐 패러다임입니다. 발신자는 수신자들이 누구인지 알지 못하는 상태로 수신자의 추상 클래스에 정보를 전송합니다. Action Cable에서는 이 방식을 사용하여 서버와 여러 클라이언트 간의 통신을 구현합니다.
+[Pub/Sub](https://ko.wikipedia.org/wiki/%EB%B0%9C%ED%96%89-%EA%B5%AC%EB%8F%85_%EB%AA%A8%EB%8D%B8)은 발행/구독이라고도 불리는 메시지 큐 패러다임입니다. 발신자는 수신자들이 누구인지 알지 못하는 상태로 수신자의 추상 클래스에 정보를 전송합니다. 액션케이블에서는 이 방식을 사용하여 서버와 여러 클라이언트 간의 통신을 구현합니다.
 
 ## 서버 컴포넌트
 
@@ -44,7 +44,7 @@ module ApplicationCable
 
     protected
       def find_verified_user
-        if current_user = User.find_by(id: 쿠키s.signed[:user_id])
+        if current_user = User.find_by(id: cookies.signed[:user_id])
           current_user
         else
           reject_unauthorized_connection
@@ -62,7 +62,7 @@ end
 
 ### 채널
 
-*채널*은 일반적인 MVC에서라면 컨트롤러가 하는 일과 비슷하게, 작업을 논리적인 단위로 캡슐화합니다. Rails는 기본으로 채널 간에 공유되는 로직을 둘 수 있는 `ApplicationCable::Channel`이라는 부모 클래스를 생성합니다.
+*채널*은 일반적인 MVC에서라면 컨트롤러가 하는 일과 비슷하게, 작업을 논리적인 단위로 캡슐화합니다. 레일스는 기본으로 채널 간에 공유되는 로직을 둘 수 있는 `ApplicationCable::Channel`이라는 부모 클래스를 생성합니다.
 
 #### 부모 채널 설정
 
@@ -107,7 +107,7 @@ end
 
 ### 커넥션
 
-소비자 쪽에서도 커넥션 인스턴스는 필요합니다. 이 커넥션은 Rails가 생성하는 다음의 자바스크립트 코드에 의해서 확립됩니다.
+소비자 쪽에서도 커넥션 인스턴스는 필요합니다. 이 커넥션은 레일스가 생성하는 다음의 자바스크립트 코드에 의해서 확립됩니다.
 
 #### 소비자 연결하기
 
@@ -186,7 +186,7 @@ CommentsChannel.broadcast_to(@post, @comment)
 
 브로드캐스트는 순수한 온라인 큐이며, 시간에 의존합니다. 스트리밍(한 채널에 대한 구독)하고 있지 않은 소비자는 나중에 접속할 경우 브로드캐스트를 얻을 수 없습니다.
 
-브로드캐스트는 Rails 애플리케이션의 다른 장소에서도 호출할 수 있습니다.
+브로드캐스트는 레일스 애플리케이션의 다른 장소에서도 호출할 수 있습니다.
 
 ```ruby
 WebNotificationsChannel.broadcast_to(
@@ -434,15 +434,15 @@ WebNotificationsChannel.broadcast_to(
 
 ### 더 자세한 예시
 
-Rails 애플리케이션에 액션 케이블을 설정하는 방법이나 채널을 추가하는 방법에 대해서는 [rails/actioncable-examples](https://github.com/rails/actioncable-examples)에서 전체 예시를 볼 수 있습니다.
+레일스 애플리케이션에 액션 케이블을 설정하는 방법이나 채널을 추가하는 방법에 대해서는 [rails/actioncable-examples](https://github.com/rails/actioncable-examples)에서 전체 예시를 볼 수 있습니다.
 
 ## 설정
 
-Action Cable에는 구독 어댑터와 허가된 요청 호스트라는 두 개의 필수 설정이 있습니다.
+액션케이블에는 구독 어댑터와 허가된 요청 호스트라는 두 개의 필수 설정이 있습니다.
 
 ### 구독 어댑터
 
-Action Cable은 `config/cable.yml` 설정 파일을 사용합니다. Rails 환경마다 어댑터와 URL을 하나씩 설정해야 합니다. 어댑터에 대해서는 [의존성](#의존성)를 참고해주세요.
+액션케이블은 `config/cable.yml` 설정 파일을 사용합니다. 레일스 환경마다 어댑터와 URL을 하나씩 설정해야 합니다. 어댑터에 대해서는 [의존성](#의존성)를 참고해주세요.
 
 ```yaml
 development:
@@ -458,7 +458,7 @@ production:
 
 ### 허가된 요청 호스트
 
-Action Cable은 허가되지 않은 곳으로부터의 요청을 받지 않습니다. 발송 가능 호스트 목록은 배열의 형태로 서버 설정에 넘깁니다. 각 호스트는 문자열을 사용하거나 정규 표현식 매칭을 사용할 수도 있습니다.
+액션케이블은 허가되지 않은 곳으로부터의 요청을 받지 않습니다. 발송 가능 호스트 목록은 배열의 형태로 서버 설정에 넘깁니다. 각 호스트는 문자열을 사용하거나 정규 표현식 매칭을 사용할 수도 있습니다.
 
 ```ruby
 config.action_cable.allowed_request_origins = ['http://rubyonrails.com', %r{http://ruby.*}]
@@ -470,7 +470,7 @@ config.action_cable.allowed_request_origins = ['http://rubyonrails.com', %r{http
 config.action_cable.disable_request_forgery_protection = true
 ```
 
-development 환경에서 실행 중일 때, Action Cable은 localhost:3000로부터의 요청을 모두 허가합니다.
+development 환경에서 실행 중일 때, 액션케이블은 localhost:3000로부터의 요청을 모두 허가합니다.
 
 ### 소비자 설정
 
@@ -492,33 +492,33 @@ config.action_cable.log_tags = [
 
 또한 서버가 제공하는 데이터베이스 커넥션의 갯수는 적어도 워커의 숫자보다 많아야합니다. 기본 워커 풀의 크기는 4이므로, 데이터베이스 커넥션도 4개를 준비해야 합니다. 이 값은 `config/database.yml`의 `pool`에서 변경할 수 있습니다.
 
-## Action Cable 전용 서버를 실행하기
+## 액션케이블 전용 서버를 실행하기
 
 ### 애플리케이션에서 실행하기
 
-Action Cable은 Rails 애플리케이션과 함께 실행할 수 있습니다. 예를 들어, `/websocket`에서 웹소켓 요청을 수신하는 경우에는 `config.action_cable.mount_path`로 경로를 지정할 수 있습니다.
+액션케이블은 레일스 애플리케이션과 함께 실행할 수 있습니다. 예를 들어, `/websocket`에서 웹소켓 요청을 수신하는 경우에는 `config.action_cable.mount_path`로 경로를 지정할 수 있습니다.
 
 ```ruby
 # config/application.rb
-class Application < Rails::Application
+class Application < 레일스::Application
   config.action_cable.mount_path = '/websocket'
 end 
 ```
 
-레이아웃에서 `action_cable_meta_tag`를 호출하면 `App.cable = ActionCable.createConsumer()`에서 Action Cable 서버에 접속할 수 있게 됩니다. `createConsumer`의 첫번째 인자에는 커스텀 경로가 지정됩니다(e.g. `App.cable = ActionCable.createConsumer("/websocket")`).
+레이아웃에서 `action_cable_meta_tag`를 호출하면 `App.cable = ActionCable.createConsumer()`에서 액션케이블 서버에 접속할 수 있게 됩니다. `createConsumer`의 첫번째 인자에는 커스텀 경로가 지정됩니다(e.g. `App.cable = ActionCable.createConsumer("/websocket")`).
 
-생성한 서버의 모든 인스턴스와 서버가 생성한 모든 워커 인스턴스에는 Action Cable의 새로운 인스턴스도 포함됩니다.
+생성한 서버의 모든 인스턴스와 서버가 생성한 모든 워커 인스턴스에는 액션케이블의 새로운 인스턴스도 포함됩니다.
 커넥션 간의 메시지 동기화는 Redis를 통해서 이루어집니다.
 
 ### 독립 서버에서 실행하기
 
-애플리케이션 서버와 Action Cable 서버를 나눌 수도 있습니다. Action Cable 서버는 Rack 애플리케이션입니다만, 독립된 애플리케이션이기도 합니다.
+애플리케이션 서버와 액션케이블 서버를 나눌 수도 있습니다. 액션케이블 서버는 Rack 애플리케이션입니다만, 독립된 애플리케이션이기도 합니다.
 추천하는 기본 설정은 다음과 같습니다.
 
 ```ruby
 # cable/config.ru
 require_relative '../config/environment'
-Rails.application.eager_load!
+레일스.application.eager_load!
 
 run ActionCable.server
 ```
@@ -530,7 +530,7 @@ run ActionCable.server
 bundle exec puma -p 28080 cable/config.ru
 ```
 
-28080 포트에서 Action Cable 서버가 실행됩니다.
+28080 포트에서 액션케이블 서버가 실행됩니다.
 
 ### 메모
 
@@ -538,15 +538,15 @@ bundle exec puma -p 28080 cable/config.ru
 
 ## 의존성
 
-Action Cable은 자신의 pubsub 내부의 프로세스에 구독 어댑터 인터페이스를 제공합니다.
-비동기, 인라인, PostgreSQL, Evented Redis, Non-evented Redis 등의 어댑터를 사용할 수 있습니다. 새 Rails 애플리케이션의 기본 어댑터는 비동기(`async`) 어댑터입니다.
+액션케이블은 자신의 pubsub 내부의 프로세스에 구독 어댑터 인터페이스를 제공합니다.
+비동기, 인라인, PostgreSQL, Evented Redis, Non-evented Redis 등의 어댑터를 사용할 수 있습니다. 새 레일스 애플리케이션의 기본 어댑터는 비동기(`async`) 어댑터입니다.
 
-Ruby 코드는 [websocket-driver](https://github.com/faye/websocket-driver-ruby), [nio4r](https://github.com/celluloid/nio4r), [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby) 위에서 구축되어 있습니다.
+루비 코드는 [websocket-driver](https://github.com/faye/websocket-driver-ruby), [nio4r](https://github.com/celluloid/nio4r), [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby) 위에서 구축되어 있습니다.
 
 ## 배포
 
-Action Cable을 지지하고 있는 것은 웹소켓과 스레드입니다. 프레임워크 내부의 흐름이나 사용자 지정의 채널 동작은 Ruby의 기본 스레드에 의해서 처리됩니다. 다시 말해 코드의 스레드 세이프를 유지하는 한, Rails의 정규 모델을 문제 없이 사용할 수 있다는 의미입니다.
+액션케이블을 지지하고 있는 것은 웹소켓과 스레드입니다. 프레임워크 내부의 흐름이나 사용자 지정의 채널 동작은 루비의 기본 스레드에 의해서 처리됩니다. 다시 말해 코드의 스레드 세이프를 유지하는 한, 레일스의 정규 모델을 문제 없이 사용할 수 있다는 의미입니다.
 
-Action Cable 서버에는 Rack 소캣을 탈취하는 API가 구현되어 있습니다. 이를 통해서, 애플리케이션 서버의 멀티스레드 여부와 관계없이 내부의 커넥션을 멀티 스레드 패턴으로 관리합니다.
+액션케이블 서버에는 Rack 소캣을 탈취하는 API가 구현되어 있습니다. 이를 통해서, 애플리케이션 서버의 멀티스레드 여부와 관계없이 내부의 커넥션을 멀티 스레드 패턴으로 관리합니다.
 
-따라서 Action Cable은 Unicorn, Puma, Passenger 등의 유명한 서버들과 문제없이 연동될 수 있습니다.
+따라서 액션케이블은 Unicorn, Puma, Passenger 등의 유명한 서버들과 문제없이 연동될 수 있습니다.
