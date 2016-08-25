@@ -500,7 +500,7 @@ config.action_cable.log_tags = [
 
 ```ruby
 # config/application.rb
-class Application < 레일스::Application
+class Application < Rails::Application
   config.action_cable.mount_path = '/websocket'
 end 
 ```
@@ -518,7 +518,7 @@ end
 ```ruby
 # cable/config.ru
 require_relative '../config/environment'
-레일스.application.eager_load!
+Rails.application.eager_load!
 
 run ActionCable.server
 ```
