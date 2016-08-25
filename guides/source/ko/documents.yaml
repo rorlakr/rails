@@ -102,9 +102,9 @@
       url: configuring.html
       description: Rails 애플리케이션의 기본적인 설정 방법에 대해서 설명합니다.
     -
-      name: 커맨드라인 툴과 Rake task
+      name: The Rails Command Line
       url: command_line.html
-      description: Rails가 제공하는 각종 커맨드라인 툴과 Rake task에 대해서 설명합니다.
+      description: Rails가 제공하는 각종 커맨드라인 도구에 대해서 설명합니다.
     -
       name: Asset Pipeline
       url: asset_pipeline.html
