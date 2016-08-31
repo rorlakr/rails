@@ -19,9 +19,10 @@ Rails 업그레이드 가이드
 
 Rails는 그 버전이 릴리스 된 시점의 최신 버전 Ruby에 의존합니다.
 
-* Rails 3 이상은 Ruby 1.8.7이후의 버전이 필수입니다. 이보다 오래된 Ruby 버전에 대한 지원은 공식적으로 중지되어 있습니다. 가능한 빠르게 업그레이드하시기를 바랍니다.
-* Rails 3.2.x는 Ruby 1.8.7가 지원하는 마지막 버전입니다.
+* Rails 5에서는 2.2.2이후의 버전이 필수입니다.
 * Rails 4에서는 Ruby 2.0가 권장됩니다. Ruby 1.9.3 이상이 필수입니다.
+* Rails 3.2.x는 Ruby 1.8.7가 지원하는 마지막 버전입니다.
+* Rails 3 이상은 Ruby 1.8.7이후의 버전이 필수입니다. 이보다 오래된 Ruby 버전에 대한 지원은 공식적으로 중지되어 있습니다. 가능한 빠르게 업그레이드하시기를 바랍니다.
 
 TIP: Ruby 1.8.7 p248과 p249에는 Rails를 망가뜨리는 마셜링 버그가 있습니다. Ruby Enterprise Edition에서는 1.8.7-2010.02 이후에 이 버그가 수정되었습니다. Ruby 1.9 계열을 사용하는 경우 Ruby 1.9.1는 이미 명백한 세그먼테이션 위반이 발생하므로 사용할 수 없습니다. 1.9.3을 사용해주세요.
 
@@ -44,7 +45,55 @@ Overwrite /myapp/config/application.rb? (enter "h" for help) [Ynaqdh]
 ...
 ```
 
-예상치 않은 변경이 발생한 경우, 반드시 차분을 확인해주세요.
+예상치 않은 변경이 없도록, 반드시 차분을 확인해주세요.
+
+Rails 4.2에서 Rails 5.0으로 업그레이드
+-------------------------------------
+
+### Active Record 모델은 기본값으로 ApplicationRecord에서 상속한다
+
+Rails 4.2에서는 Active Record 모델은 `ActiveRecord::Base`로부터 상속한다. Rails 5.0에서는, 모든 모델이 `ApplicationRecord`로부터 상속한다.
+
+새로 도입한 `ApplicationRecord` 클래스가 애플리케이션 안에 있는 모든 모델의 상위클래스(superclass)가 되어서 모든 콘트롤러의 상위클래스가 `ActionController::Base`가 아닌 `ApplicationController`인 것과 일관성을 갖게 되었다. 또한 한군데에서 전체 애플리케이션 모델에게 있는 행태를 달리 설정할 수 있다.
+
+Rails 4.2로부터 Rails 5.0으로 업그레이드하는 경우에는 `app/models/` 안에 `application_record.rb`을 만들어서 다음의 내용을 넣을 필요가 있다.
+
+```
+class ApplicationRecord < ActiveRecord::Base
+  self.abstract_class = true
+end
+```
+
+### 콜백 연쇄의 중단은 `throw(:abort)`에 의하여
+
+Rails 4.2에서는 Active Record 및 Active Model 안에서 'before'콜백이 `false`를 되돌리면, 전체 콜백 연쇄가 중단되었다. 다른 말로 하면, 따라오는 모든 'before'콜백과 그 안의 액션은 실행되지 않았다.
+
+Rails 5.0에서는 `false`를 되돌리는 것에 의하여는 이러한 부산물이 나오지 않고 대신에 연쇄를 중단하고 싶을 때는 반드시 명시적으로 `throw(:abort)` 를 내야 한다.
+
+Rails 4.2로부터 Rails 5.0으로 업그레이드하는 경우에는 이와 같은 콜백이 여전히 콜백 연쇄를 중단할 것이지만 도태경고(deprecation warning)이 나와서 다가올 변경을 알린다.
+
+준비가 되었으면 새로운 행태를 채택하여 이와 같은 경고를 받지 않도록 다음과 같은 설정을 추가할 수 있다. `config/application.rb` 파일에:
+
+    ActiveSupport.halt_callback_chains_on_return_false = false
+
+이 옵션은 Active Support 안의 다른 콜백에는 영향을 주지 않는다. 'before'콜백이 아닌 것은 리턴값으로 연쇄가 중단된 적이 없다.
+
+자세한 설명은 [#17227](https://github.com/rails/rails/pull/17227)을 참고해주세요.
+
+### ActiveJob job은 ApplicationJob에서 기본으로 상속한다.
+
+Rails 4.2에서는 ActiveJob이 `ActiveJob::Base`로부터 상속하고. Rails 5.0에서는 바뀌어서 `ApplicationJob`으로부터 상속한다.
+
+Rails 4.2로부터 Rails 5.0으로 업그레이드하는 경우에는 `app/jobs/`안에 `application_job.rb` 파일을 만들어서 다음의 내용을 넣을 필요가 있다.
+
+```
+class ApplicationJob < ActiveJob::Base
+end
+```
+
+그리고 나서 모든 job 클래스가 그로부터 상속하도록 한다.
+
+자세한 설명은 [#19034](https://github.com/rails/rails/pull/19034)을 참고해주세요.
 
 Rails 4.1에서 Rails 4.2로 업그레이드
 -------------------------------------
