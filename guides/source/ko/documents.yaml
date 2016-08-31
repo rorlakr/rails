@@ -178,6 +178,10 @@
       url: upgrading_ruby_on_rails.html
       description: 애플리케이션의 Ruby on Rails를 최신 버전으로 업그레이드 하는 방법에 대해서 설명합니다.
     -
+      name: Ruby on Rails 5.0 릴리스 노트
+      url: 5_0_release_notes.html
+      description: Rails 5.0의 릴리스 노트입니다.
+    -
       name: Ruby on Rails 4.2 릴리스 노트
       url: 4_2_release_notes.html
       description: Rails 4.2의 릴리스 노트입니다.
