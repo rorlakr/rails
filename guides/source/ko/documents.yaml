@@ -3,9 +3,9 @@
   name: 시작하기 전에
   documents:
     -
-      name: Rails 를 시작하기
+      name: 레일스 시작하기
       url: getting_started.html
-      description: Rails의 설치 방법과 첫 Rails 애플리케이션을 만들어보고 필요한 것들을 설명합니다.
+      description: 레일스의 설치 방법과 첫 레일스 애플리케이션을 만들어보고 필요한 것들을 설명합니다.
 -
   name: Model
   documents:
@@ -16,7 +16,7 @@
     -
       name: Active Record Migrations
       url: active_record_migrations.html
-      description: Active Record 의 마이그레이션 (migration) 을 사용하여, 어떻게 데이터베이스를 구조화된 방식으로 변경하는지 설명합니다.
+      description: Active Record 의 마이그레이션 (migration)을 사용하여, 어떻게 데이터베이스를 구조화된 방식으로 변경하는지 설명합니다.
     -
       name: Active Record Validations
       url: active_record_validations.html
@@ -34,10 +34,9 @@
       url: active_record_querying.html
       description: Active Record가 제공하는 모든 데이터베이스 쿼리 인터페이스에 대해서 설명합니다.
     -
-      name: Active Model 기초
+      name: Active Model
       url: active_model_basics.html
       description: Active Record를 사용하지 않고 모델 클래스를 다루는 방법에 대해서 설명합니다.
-      work_in_progress: true
 -
   name: View
   documents:
@@ -54,6 +53,28 @@
       name: Action View Form Helper
       url: form_helpers.html
       description: 내장되어있는 폼 헬퍼에 대해서 설명합니다.
+    -
+      name: "레일스에서 캐싱하기"
+      url: caching_with_rails.html
+      description: 캐시를 사용하여 레일스 애플리케이션을 빠르게 만드는 방법에 대해서 설명합니다.
+    -
+      name: Active Support Instrumentation
+      work_in_progress: true
+      url: active_support_instrumentation.html
+      description: 액티브서포트를 통해 레일스나 다른 루비 코드에서 이벤트를 계측하는 방법에 대해서 설명합니다.
+    -
+      name: 레일스 애플리케이션 프로파일링
+      work_in_progress: true
+      url: profiling.html
+      description: 성능을 향상시키기 위해 레일스 애플리케이션을 분석하는 방법에 대해서 설명합니다.
+    -
+      name: 레일스로 API 전용 애플리케이션 만들기
+      url: api_app.html
+      description: 레일스를 통해 효율적으로 JSON API 애플리케이션을 만드는 방법에 대해서 설명합니다.
+    -
+      name: Action Cable 살펴보기
+      url: action_cable_overview.html
+      description: 실시간 기능을 구현하기 위해 액션케이블이 어떻게 동작하는지, 웹소켓을 어떻게 사용하는지에 대해서 설명합니다.
 -
   name: Controller
   documents:
@@ -62,9 +83,9 @@
       url: action_controller_overview.html
       description: 컨트롤러의 동작과 애플리케이션에 들어온 요청을 처리할때 컨트롤러가 어떤 역할을 하는지 설명합니다. 세션, 필터, cookie, 데이터 스트리밍, 요청에 따라 발생하는 예외 처리 등에 대해서 다룹니다.
     -
-      name: Rails 라우팅
+      name: 레일스 라우팅
       url: routing.html
-      description: Rails의 라우팅 기능에 대해서 설명합니다. Rails 애플리케이션에서 이루어지는 라우팅에 대해서 이해하고 싶으신 경우에는 이 부분을 읽어주세요.
+      description: 레일스의 라우팅 기능에 대해서 설명합니다. 레일스 애플리케이션에서 이루어지는 라우팅에 대해서 이해하고 싶다면 이 부분을 읽어주세요.
 -
   name: 심화 주제
   documents:
@@ -73,76 +94,75 @@
       url: active_support_core_extensions.html
       description: Active Support에 정의되어 있는 Ruby 코어 확장 기능에 대한 문서입니다.
     -
-      name: Rails 국제화(i18n) API
+      name: 레일스 국제화(i18n) API
       url: i18n.html
-      description: Rails 애플리케이션에서 국제화를 지원하는 방법에 대해서 설명합니다. 이를 이용하면 애플리케이션을 서로 다른 언어로 번역할 수 있으며, 단수형/복수형에 대한 규칙을 변경하거나, 각 나라에 맞는 날짜 형식을 설정할 수 있습니다.
+      description: 레일스 애플리케이션에서 국제화를 지원하는 방법에 대해서 설명합니다. 이를 이용하면 애플리케이션을 서로 다른 언어로 번역할 수 있으며, 단수형/복수형에 대한 규칙을 변경하거나, 각 나라에 맞는 날짜 형식을 설정할 수 있습니다.
     -
-      name: Action Mailer 기초
+      name: Action Mailer
       url: action_mailer_basics.html
       description: Action Mailer를 사용해서 메일을 송수신하는 방법에 대해 설명합니다.
     -
-      name: Active Job 기초
+      name: Active Job
       url: active_job_basics.html
       description: 백그라운드에서 동작하는 잡(Job)을 만들고, 큐에 전송하고 실행하는데에 있어 필요한 모든 것을 설명합니다.
     -
-      name: Rails 테스팅 가이드
+      name: 레일스 애플리케이션 테스트하기
       url: testing.html
-      work_in_progress: true
-      description: Rails에서 유닛 테스트와 기능 테스트를 하는 방법에 대해서 전체적인 설명을 합니다. '테스트란 무엇인가'부터 테스트 API 까지 모든 토픽을 다룹니다.
+      description: 레일스에서 유닛 테스트와 기능 테스트를 하는 방법에 대해서 전체적인 설명을 합니다. '테스트란 무엇인가'부터 테스트 API 까지 모든 토픽을 다룹니다.
     -
-      name: Rails 보안 가이드
+      name: 레일스 보안 가이드
       url: security.html
-      description: Web 애플리케이션 전반에 걸친 보안 문제와, Rails에서 각 문제를 해결하는 방법에 대해서 설명합니다.
+      description: Web 애플리케이션 전반에 걸친 보안 문제와, 레일스에서 각 문제를 해결하는 방법에 대해서 설명합니다.
     -
-      name: Rails 애플리케이션 디버깅
+      name: 레일스 애플리케이션 디버깅
       url: debugging_rails_applications.html
-      description: Rails 애플리케이션을 디버깅하는 방법에 대해서 설명합니다. 다양한 디버깅 방법이나, 작성한 코드가 뒤에서는 어떤 식으로 동작하는지에 대해서도 설명합니다.
+      description: 레일스 애플리케이션을 디버깅하는 방법에 대해서 설명합니다. 다양한 디버깅 방법이나, 작성한 코드가 뒤에서는 어떤 식으로 동작하는지에 대해서도 설명합니다.
     -
-      name: Rails 애플리케이션 설정하기
+      name: 레일스 애플리케이션 설정하기
       url: configuring.html
-      description: Rails 애플리케이션의 기본적인 설정 방법에 대해서 설명합니다.
+      description: 레일스 애플리케이션의 기본적인 설정 방법에 대해서 설명합니다.
     -
-      name: The Rails Command Line
+      name: 레일스 커맨드 라인
       url: command_line.html
-      description: Rails가 제공하는 각종 커맨드라인 도구에 대해서 설명합니다.
+      description: 레일스가 제공하는 각종 커맨드라인 도구에 대해서 설명합니다.
     -
-      name: Asset Pipeline
+      name: 애셋 파이프라인
       url: asset_pipeline.html
       description: 애셋 파이프라인에 대해서 설명합니다.
     -
-      name: Rails에서 JavaScript 사용하기
+      name: 레일스에서 JavaScript 사용하기
       url: working_with_javascript_in_rails.html
-      description: Rails 내장 Ajax/JavaScript에 대해서 설명합니다.
+      description: 레일스 내장 Ajax/JavaScript에 대해서 설명합니다.
     -
-      name: Rails 엔진 입문
-      url: engines.html
-      description: 마운트 가능한 엔진 개발 방법에 대해서 설명합니다.
-      work_in_progress: true
-    -
-      name: Rails의 초기화  프로세스
+      name: 레일스의 초기화 프로세스
       work_in_progress: true
       url: initialization.html
-      description: Rails 4 내부의 초기화 프로세스에 대해서 설명합니다.
+      description: 레일스 내부의 초기화 프로세스에 대해서 설명합니다.
     -
       name: 상수 자동 읽기와 다시 읽기
       url: autoloading_and_reloading_constants.html
       description: 상수 자동 읽기와 다시 읽기가 어떻게 이루어지는지 설명합니다.
 -
-  name: Rails 확장하기
+  name: 레일스 확장하기
   documents:
     -
-      name: Rails 플러그인 입문
+      name: 레일스 플러그인 입문
       work_in_progress: true
       url: plugins.html
-      description: 플러그인을 만들어서 Rails의 기능을 확장하는 방법에 대해서 설명합니다.
+      description: 플러그인을 만들어서 레일스의 기능을 확장하는 방법에 대해서 설명합니다.
     -
       name: Rails와 Rack
       url: rails_on_rack.html
       description: Rails와 Rack이 어떤식으로 통합되어 있는지, 그리고 다른 Rack 컴포넌트와의 인터페이스에 대해서 설명합니다.
     -
-      name: Rails 제너레이터와 템플릿
+      name: 레일스 제너레이터와 템플릿
       url: generators.html
-      description: 새로운 제너레이터를 추가하거나 Rails의 내장 제너레이터에 새로운 요소(예를 들어, scaffold 제너레이터에 새로운 테스트 스텁 등)를 추가하는 방법에 대해서 설명합니다.
+      description: 새로운 제너레이터를 추가하거나 레일스의 내장 제너레이터에 새로운 요소(예를 들어, scaffold 제너레이터에 새로운 테스트 스텁 등)를 추가하는 방법에 대해서 설명합니다.
+    -
+      name: 레일스 엔진 입문
+      url: engines.html
+      description: 마운트 가능한 엔진 개발 방법에 대해서 설명합니다.
+      work_in_progress: true
 -
   name: Ruby on Rails 에 기여하기
   documents:
@@ -151,7 +171,7 @@
       url: contributing_to_ruby_on_rails.html
       description: Rails는 '어떤 다른 사람의 프레임워크'가 아닙니다. 현재도 계속되고 있는 Rails 프레임워크 개발에 기여하는 다양한 방법에 대해서 설명합니다.
     -
-      name: Rails 코어 개발 환경 구축 방법
+      name: 레일스 코어 개발 환경 구축 방법
       url: development_dependencies_install.html
       description: Ruby on Rails 자체의 개발 환경을 구축하는 방법에 대해서 설명합니다.
     -
@@ -160,7 +180,7 @@
       work_in_progress: true
       description: Ruby on Rails API 문서의 가이드라인에 대해 설명합니다.
     -
-      name: Rails 가이드의 가이드라인
+      name: 레일스 가이드의 가이드라인
       url: ruby_on_rails_guides_guidelines.html
       description: Ruby on Rails 가이드 작성 방법에 대한 가이드라인입니다.
 -
@@ -174,7 +194,7 @@
   name: 릴리스 노트
   documents:
     -
-      name: Rails 업그레이드 가이드
+      name: 레일스 업그레이드 가이드
       url: upgrading_ruby_on_rails.html
       description: 애플리케이션의 Ruby on Rails를 최신 버전으로 업그레이드 하는 방법에 대해서 설명합니다.
     -
