@@ -142,7 +142,7 @@ Rails의 메일러는 뷰 랜더링과 본질적으로 동일한 작업을 수�
 
 ```bash
 $ bin/rails generate scaffold user name email login
-$ bin/rake db:migrate
+$ bin/rails db:migrate
 ```
 
 사용자 모델을 생성했으므로 이어서 `app/controllers/users_controller.rb`를 편집하고, 새 사용자가 생성된 직후에 `UserMailer`의 `UserMailer.welcome_email`을 사용하여 그 사용자에게 메일이 전송되도록 합시다.

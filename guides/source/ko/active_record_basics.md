@@ -255,7 +255,7 @@ Active Record 콜백을 사용하는 것으로 모델의 라이프 사이클 중
 마이그레이션
 ----------
 
-Rails에는 데이터베이스 스키마를 관리하기 위한 도메인 특화 언어(DSL: Domain Specific Language)가 있으며, 마이그레이션(migration)이라고도 불립니다. 마이그레이션은 파일로 저장됩니다. `rake`를 통해 Active Record가 지원하는 다양한 데이터베이스에 대한 마이그레이션을 수행할 수 있습니다. 아래는 테이블을 생성하는 마이그레이션입니다.
+Rails에는 데이터베이스 스키마를 관리하기 위한 도메인 특화 언어(DSL: Domain Specific Language)가 있으며, 마이그레이션(migration)이라고도 불립니다. 마이그레이션은 파일로 저장됩니다. `bin/rails`를 통해 Active Record가 지원하는 다양한 데이터베이스에 대한 마이그레이션을 수행할 수 있습니다. 아래는 테이블을 생성하는 마이그레이션입니다.
 
 ```ruby
 class CreatePublications < ActiveRecord::Migration
@@ -275,7 +275,7 @@ class CreatePublications < ActiveRecord::Migration
 end
 ```
 
-Rails는 어떤 마이그레이션 파일이 데이터베이스에 반영되어있는지 파악하고 있어서, 그 정보를 활용해 롤백 기능도 제공하고 있습니다. 테이블을 실제로 생성하기 위해서는 `rake db:migrate`를 실행합니다. 롤백하기 위해서는 `rake db:rollback`을 실행하면 됩니다.
+Rails는 어떤 마이그레이션 파일이 데이터베이스에 반영되어있는지 파악하고 있어서, 그 정보를 활용해 롤백 기능도 제공하고 있습니다. 테이블을 실제로 생성하기 위해서는 `bin/rails db:migrate`를 실행합니다. 롤백하기 위해서는 `bin/rails db:rollback`을 실행하면 됩니다.
 
 위의 마이그레이션 코드는 데이터베이스에 의존하지 않는다는 점에 주목해주세요. MySQL, PostgreSQL, Oracle 등, 다수의 데이터베이스에 대해서 실행할 수 있습니다. 마이그레이션에 대한 자세한 설명은 [Active Record Migrations](migrations.html)을 참조해주세요.
 

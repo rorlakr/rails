@@ -460,19 +460,19 @@ NOTE: `config.assets.digest` 옵션은 가급적 변경하지 말아주세요. �
 
 ### 애셋을 전처리하기
 
-Rails에는 파이프라인에 애셋 매니페스트 파일을 수동으로 컴파일하기 위한 rake 태스크가 포함되어 있습니다.
+Rails에는 파이프라인에 애셋 매니페스트 파일을 수동으로 컴파일하기 위한 태스크가 포함되어 있습니다.
 
 컴파일 된 애셋은 `config.assets.prefix`에서 지정한 위치에 저장됩니다. 이 위치의 기본값은 `/assets` 폴더 입니다.
 
-배포시에 이 rake 태스크를 서버 상에서 실행하면, 컴파일된 애셋이 서버 상에 직접 생성됩니다. 로컬 환경에서 컴파일 하는 방법에 대해서는 다음 절을 참고해주세요.
+배포시에 이 태스크를 서버 상에서 실행하면, 컴파일된 애셋이 서버 상에 직접 생성됩니다. 로컬 환경에서 컴파일 하는 방법에 대해서는 다음 절을 참고해주세요.
 
-다음이 그 rake 태스크입니다.
+다음이 그 태스크입니다.
 
 ```bash
-$ RAILS_ENV=production bin/rake assets:precompile
+$ RAILS_ENV=production bin/rails assets:precompile
 ```
 
-Capistrano (v2.15.1 이후)에는 배포중에 이 rake 태스크를 사용하는 레시피가 포함되어 있습니다. `Capfile`에 다음을 추가합니다.
+Capistrano (v2.15.1 이후)에는 배포중에 이 태스크를 사용하는 레시피가 포함되어 있습니다. `Capfile`에 다음을 추가합니다.
 
 ```ruby
 load 'deploy/assets'
@@ -521,7 +521,7 @@ end
 
 NOTE: precompile 배열에 Sass나 CoffeeScript 파일등을 추가할 경우에도 반드시 `.js`, `.css`로 끝나는 파일명(다시 말해 컴파일이 끝난 시점의 파일명)으로 지정해주세요.
 
-이 rake 태스크는 `manifest-md5hash.json` 파일을 생성합니다. 이것은 모든 애셋과 그 핑거프린트 목록입니다. Rails 헬퍼는 이 정보를 사용해서 매핑 요청이 Sprockets에 돌아가는 것을 회피합니다. 일반적인 매니페스트 파일의 내용은 아래와 같습니다.
+이 태스크는 `manifest-md5hash.json` 파일을 생성합니다. 이것은 모든 애셋과 그 핑거프린트 목록입니다. Rails 헬퍼는 이 정보를 사용해서 매핑 요청이 Sprockets에 돌아가는 것을 회피합니다. 일반적인 매니페스트 파일의 내용은 아래와 같습니다.
 
 ```ruby
 {"files":{"application-723d1be6cc741a3aabb1cec24276d681.js":{"logical_path":"application.js","mtime":"2013-07-26T22:55:03-07:00","size":302506,
