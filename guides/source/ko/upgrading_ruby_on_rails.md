@@ -29,11 +29,11 @@ TIP: 루비 1.8.7 p248과 p249에는 레일스의 작동을 중단시키는 치�
 
 ### Rake 태스크
 
-Rails에는 `rails:update`라는 rake 태스크가 있습니다. Gemfile에 기재된 레일스의 버전을 변경한 뒤, 이 rake 태스크를 실행해주세요.
+Rails에는 `app:update`라는 태스크(4.2 버전 이하라면 `rake rails:update`)가 있습니다. Gemfile에 기재된 레일스의 버전을 변경한 뒤, 이 태스크를 실행해주세요.
 이를 통해서, 새로운 버전에 필요한 파일 생성이나, 기존의 파일을 변경하는 것을 인터랙티브하게 진행할 수 있습니다.
 
 ```bash
-$ rake rails:update
+$ bin/rails app:update
    identical  config/boot.rb
        exist  config
     conflict  config/routes.rb
@@ -51,11 +51,11 @@ Overwrite /myapp/config/application.rb? (enter "h" for help) [Ynaqdh]
 레일스 4.2에서 레일스 5.0으로 업그레이드
 -------------------------------------
 
-### 액티브레코드 모델은 기본값으로 ApplicationRecord에서 상속한다
+### 액티브레코드 모델은 기본값으로 ApplicationRecord에서 상속
 
-레일스 4.2에서는 액티브레코드 모델은 `ActiveRecord::Base`로부터 상속한다. 레일스 5.0에서는, 모든 모델이 `ApplicationRecord`로부터 상속한다.
+레일스 4.2에서는 액티브레코드 모델은 `ActiveRecord::Base`로부터 상속한다. 레일스 5.0에서는 모든 모델이 `ApplicationRecord`로부터 상속한다.
 
-새로 도입한 `ApplicationRecord` 클래스가 애플리케이션 안에 있는 모든 모델의 상위클래스(superclass)가 되어서 모든 콘트롤러의 상위클래스가 `ActionController::Base`가 아닌 `ApplicationController`인 것과 일관성을 갖게 되었다. 또한 한군데에서 전체 애플리케이션 모델에게 있는 행태를 달리 설정할 수 있다.
+새로 도입한 `ApplicationRecord` 클래스가 애플리케이션 안에 있는 모든 모델의 상위클래스(superclass)가 되어서 모든 콘트롤러의 상위클래스가 `ActionController::Base`가 아닌 `ApplicationController`인 것과 일관성을 갖게 되었다. 또한 한군데에서 전체 애플리케이션 모델의 동작을 설정할 수 있다.
 
 레일스 4.2로부터 레일스 5.0으로 업그레이드하는 경우에는 `app/models/` 안에 `application_record.rb`을 만들어서 다음의 내용을 넣을 필요가 있다.
 

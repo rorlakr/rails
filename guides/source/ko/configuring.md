@@ -49,7 +49,7 @@ config.active_record.schema_format = :ruby
 
 Rails 전체에 걸친 설정을 하기 위해서는 `Rails::Railtie` 객체를 호출하던가, `Rails::Engine`나 `Rails::Application`의 자식 클래스를 호출합니다.
 
-* `config.after_initialize` 에는 블럭도 넘길 수 있습니다. 이 블럭은 Rails에 의한 애플리케이션 초기화가 종료된 _직후_에 실행됩니다. 애플리케이션 초기화 작업에는 프레임워크 자체의 초기화, 엔진의 초기화, 그리고 `config/initializers`에 기술되어 있는 모든 애플리케이션 initializer의 실행도 포함됩니다. 여기서 넘기는 블럭은 rake Task로서 _실행된다_는 점을 주의해주세요. 이 블록은 다른 initializer에 의해서 정의되는 값을 설정할 때에 편리합니다.
+* `config.after_initialize` 에는 블럭도 넘길 수 있습니다. 이 블럭은 Rails에 의한 애플리케이션 초기화가 종료된 _직후_에 실행됩니다. 애플리케이션 초기화 작업에는 프레임워크 자체의 초기화, 엔진의 초기화, 그리고 `config/initializers`에 기술되어 있는 모든 애플리케이션 initializer의 실행도 포함됩니다. 여기서 넘기는 블럭은 태스크로서 _실행된다_는 점을 주의해주세요. 이 블록은 다른 initializer에 의해서 정의되는 값을 설정할 때에 편리합니다.
 
     ```ruby
     config.after_initialize do
@@ -144,7 +144,7 @@ Rails 전체에 걸친 설정을 하기 위해서는 `Rails::Railtie` 객체를 
 
 * `config.assets.paths`에는 애셋 검색 시에 사용할 경로를 지정합니다. 이 설정 옵션을 경로에 추가하면, 애셋을 검색할때에 찾을 경로 목록에 추가됩니다.
 
-* `config.assets.precompile`은 `application.css`와 `application.js` 이외에 추가하고 싶은 애셋이 있는 경우에 지정합니다. 이것들은 `rake assets:precompile`을 실행할 때에 함께 컴파일 됩니다.
+* `config.assets.precompile`은 `application.css`와 `application.js` 이외에 추가하고 싶은 애셋이 있는 경우에 지정합니다. 이것들은 `bin/rails assets:precompile`을 실행할 때에 함께 컴파일 됩니다.
 
 * `config.assets.prefix`는 애셋을 저장할 폴더를 지정합니다. 기본은 `/assets`입니다.
 

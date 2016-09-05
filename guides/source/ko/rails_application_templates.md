@@ -23,11 +23,11 @@ $ rails new blog -m ~/template.rb
 $ rails new blog -m http://example.com/template.rb
 ```
 
-rake 태스크 `rails:template`를 사용해서, 기존의 Rails 애플리케이션에도 이 템플릿을 적용할 수 있습니다. 템플릿의 위치는 LOCATION 환경 변수를 사용해서 넘길 필요가 있습니다. 여기에서도 파일은 로컬 경로 또는 URL, 어느쪽이든 사용해도 좋습니다.
+`app:template`를 사용해서, 기존의 Rails 애플리케이션에도 이 템플릿을 적용할 수 있습니다. 템플릿의 위치는 LOCATION 환경 변수를 사용해서 넘길 필요가 있습니다. 여기에서도 파일은 로컬 경로 또는 URL, 어느쪽이든 사용해도 좋습니다.
 
 ```bash
-$ bin/rake rails:template LOCATION=~/template.rb
-$ bin/rake rails:template LOCATION=http://example.com/template.rb
+$ bin/rails app:template LOCATION=~/template.rb
+$ bin/rails app:template LOCATION=http://example.com/template.rb
 ```
 
 템플릿 API
@@ -219,7 +219,7 @@ CODE
 템플릿에서 사용자 입력을 바탕으로 처리를 변경하고 싶을 때에 사용합니다. 예를 들어, 지정된 경우에만 Rails를 freeze하고 싶은 경우에는 다음과 같이 작성할 수 있습니다.
 
 ```ruby
-rake("rails:freeze:gems") if yes?("Freeze rails gems?")
+rake("app:freeze:gems") if yes?("Freeze rails gems?")
 # no?(question)는 yes?의 반대 동작
 ```
 

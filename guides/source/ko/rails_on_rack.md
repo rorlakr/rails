@@ -110,7 +110,7 @@ NOTE: `ActionDispatch::MiddlewareStack`는 `Rack::Builder`의 Rails 버전입니
 Rails에는 미들웨어 스택을 확인하기 위한 Rake 태스크가 있습니다.
 
 ```bash
-$ bin/rake middleware
+$ bin/rails middleware
 ```
 
 막 생성한 Rails 애플리케이션에서는 다음과 같이 출력될 겁니다.
@@ -192,7 +192,7 @@ config.middleware.delete "Rack::Lock"
 미들웨어 스택을 확인하면 `Rack::Lock`가 없어졌다는 것을 확인할 수 있습니다.
 
 ```bash
-$ bin/rake middleware
+$ bin/rails middleware
 (in /Users/lifo/Rails/blog)
 use ActionDispatch::Static
 use #<ActiveSupport::Cache::Strategy::LocalCache::Middleware:0x00000001c304c8>
