@@ -33,16 +33,16 @@ NOTE: 이 가이드에서는 폼 헬퍼와 그 인수에 대한 모든 것을 �
 이 코드처럼 인수 없이 호출하게 되면 `<form>` 태그를 생성합니다. 이 폼의 목적지는 현재 페이지로, HTTP POST가 사용됩니다. 예를 들어, 현재 페이지가 `/home/index`인 경우 아래와 같은 HTML이 생성됩니다(읽기 쉽게끔 개행을 추가 했습니다).
 
 ```html
-<form accept-charset="UTF-8" action="/home/index" method="post">
-  <div style="margin:0;padding:0">
-    <input name="utf8" type="hidden" value="&#x2713;" />
-    <input name="authenticity_token" type="hidden" value="f755bb0ed134b76c432144748a6d4b7a7ddf2b71" />
-  </div>
+<form accept-charset="UTF-8" action="/" method="post">
+  <input name="utf8" type="hidden" value="&#x2713;" />
+  <input name="authenticity_token" type="hidden" value="J7CBxfHalt49OSHp27hblqK20c9PgwJ108nDHX/8Cts=" />
   Form contents
 </form>
 ```
 
-이 폼을 잘 보면 이상한 부분이 있다는 것을 눈치채셨나요? `div` 태그 내부에 2개의 hidden input이 있습니다. 이 div는 생략할 수 없습니다. 이것이 없으면 폼이 정상적으로 전송할 수 없습니다. 처음의 `utf8` hidden input은 브라우저에게 폼에서 해당하는 문자 인코딩을 사용할 것을 강제합니다. 이것은 액션이 "GET"과 "POST"의 어느쪽이라도 모두 생성됩니다. 두번째의 hidden input인 `authenticity_token`는 **cross-site fequest forgery protection**를 위한 보안기능입니다. 이 요소는 GET을 사용하지 않는 모든 폼에서 생성됩니다(보안 기능이 활성화 되어있는 경우). 자세한 설명은 [보안 가이드](security.html#Cross_Site_Request_Forgery_csrf)를 참조해주세요.
+이 폼을 잘 보면 이상한 부분이 있다는 것을 눈치채셨나요? `div` 태그 내부에 2개의 hidden input이 있습니다. 이 div는 생략할 수 없으며, 없으면 폼이 정상적으로 전송할 수 없습니다. 처음의 `utf8` hidden input은 브라우저에게 폼에서 해당하는 문자 인코딩을 사용할 것을 강제합니다. 이것은 액션이 "GET"과 "POST"의 어느쪽이라도 모두 생성됩니다.
+
+두번째의 hidden input인 `authenticity_token`는 **cross-site fequest forgery protection**를 위한 보안기능입니다. 이 요소는 GET을 사용하지 않는 모든 폼에서 생성됩니다(보안 기능이 활성화 되어있는 경우). 자세한 설명은 [보안 가이드](security.html#cross-site-request-forgery-csrf)를 참조해주세요.
 
 
 ### 일반적인 검색 폼
@@ -67,7 +67,8 @@ NOTE: 이 가이드에서는 폼 헬퍼와 그 인수에 대한 모든 것을 �
 이 코드로부터 아래의 HTML이 생성됩니다.
 
 ```html
-<form accept-charset="UTF-8" action="/search" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+<form accept-charset="UTF-8" action="/search" method="get">
+  <input name="utf8" type="hidden" value="&#x2713;" />
   <label for="q">Search for:</label>
   <input id="q" name="q" type="text" />
   <input name="commit" type="submit" value="Search" />
@@ -161,7 +162,6 @@ NOTE: 체크 박스와 라디오 버튼에는 반드시 label 태그를 함께 �
 <%= search_field(:user, :name) %>
 <%= telephone_field(:user, :phone) %>
 <%= date_field(:user, :born_on) %>
-<%= datetime_field(:user, :meeting_time) %>
 <%= datetime_local_field(:user, :graduation_day) %>
 <%= month_field(:user, :birthday_month) %>
 <%= week_field(:user, :birthday_week) %>
@@ -182,7 +182,6 @@ NOTE: 체크 박스와 라디오 버튼에는 반드시 label 태그를 함께 �
 <input id="user_name" name="user[name]" type="search" />
 <input id="user_phone" name="user[phone]" type="tel" />
 <input id="user_born_on" name="user[born_on]" type="date" />
-<input id="user_meeting_time" name="user[meeting_time]" type="datetime" />
 <input id="user_graduation_day" name="user[graduation_day]" type="datetime-local" />
 <input id="user_birthday_month" name="user[birthday_month]" type="month" />
 <input id="user_birthday_week" name="user[birthday_week]" type="week" />
@@ -264,7 +263,12 @@ end
 </form>
 ```
 
-`form_for`에 넘기는 이름은 `params`를 사용해서 넘어온 폼의 정보값이 들어있는 키 이름에 영향을 줍니다. 예를 들어, 이 이름이 `article`이라면 모든 input 태그는 `article[속성명]`이라는 폼 name 속성을 가지게 됩니다. 따라서 `create` 액션에서는 `:title` 키와 `:body` 키를 가지는 하나의 해시가 `params[:article]`에 포함됩니다. input의 name 속성의 중요성에 대해서는 [파라미터의 명명 규칙 이해하기](#파라미터의 명명 규칙 이해하기)를 참조해주세요.
+`form_for`에 넘기는 이름은 `params`를 사용해서 넘어온 폼의 정보값이 들어있는
+키 이름에 영향을 줍니다. 예를 들어, 이 이름이 `article`이라면 모든 input 태그는
+`article[속성명]`이라는 폼 name 속성을 가지게 됩니다. 따라서 `create`
+액션에서는 `:title` 키와 `:body` 키를 가지는 하나의 해시가 `params[:article]`에
+포함됩니다. input의 name 속성의 중요성에 대해서는
+[파라미터의 명명 규칙 이해하기](#파라미터의-명명-규칙-이해하기)를 참조해주세요.
 
 폼 빌더 변수에 대해서 호출되는 헬퍼 메소드는 모델 객체의 헬퍼 메소드와 같습니다. 단, 폼의 경우는 대상이 되는 객체가 이미 폼 빌더에 의해서 관리되고 있기 때문에, 어떤 객체에 대해서 생성할지 지정할 필요가 없다는 점이 다릅니다.
 
@@ -336,8 +340,7 @@ form_for [:admin, @article]
 form_for [:admin, :management, @article]
 ```
 
-Rails의 라우팅 시스템의 자세한 설명과 관련된 규칙에 대해서는 [Rails 라우팅](routing.html)을 참조해주세요.
-
+Rails의 라우팅 시스템의 자세한 설명과 관련된 규칙에 대해서는 [라우팅 가이드](routing.html)을 참조해주세요.
 
 ### 폼에서의 PATCH, PUT, DELETE 메소드 동작
 
@@ -430,9 +433,14 @@ WARNING: `:include_blank`나 `:prompt`가 지정되어 있지 않을 때, 선택
 해시를 사용하여 임의의 값을 추가할 수도 있습니다.
 
 ```html+erb
-<%= options_for_select([['Lisbon', 1, {'data-size' => '2.8 million'}], ['Madrid', 2, {'data-size' => '3.2 million'}]], 2) %>
+<%= options_for_select(
+  [
+    ['Lisbon', 1, { 'data-size' => '2.8 million' }],
+    ['Madrid', 2, { 'data-size' => '3.2 million' }]
+  ], 2
+) %>
 
-이 코드로부터는 아래와 같은 결과를 얻을 수 있습니다.
+output:
 
 <option value="1" data-size="2.8 million">Lisbon</option>
 <option value="2" selected="selected" data-size="3.2 million">Madrid</option>
@@ -547,7 +555,8 @@ Date.civil(params[:start_date][:year].to_i, params[:start_date][:month].to_i, pa
 
 ### 모델 객체 헬퍼
 
-`select_date` 헬퍼는 Active Record 객체를 변경/생성하는 폼에서는 사용하기 어렵게 되어있습니다. Active Record는 `param` 해시에 포함되는 요소가 각각 1개의 속성에 대응될 것을 전제로 하고 있기 때문입니다. 날짜/시각용의 모델 객체 헬퍼는 특별한 이름을 사용해서 값을 전송합니다. Active Record는 이 특별한 이름을 발견하면 다른 파라미터를 위한 값이라고 추측하고, 컬럼의 종류에 맞는 생성자가 있을 것이라고 생각합니다. 예를 들어,
+`select_date` 헬퍼는 Active Record 객체를 변경/생성하는 폼에서는 사용하기 어렵게 되어있습니다. Active Record는 `param` 해시에 포함되는 요소가 각각 1개의 속성에 대응될 것을 전제로 하고 있기 때문입니다.
+날짜/시각용의 모델 객체 헬퍼는 특별한 이름을 사용해서 값을 전송합니다. Active Record는 이 특별한 이름을 발견하면 다른 파라미터를 위한 값이라고 추측하고, 컬럼의 종류에 맞는 생성자가 있을 것이라고 생각합니다. 예를 들어,
 
 ```erb
 <%= date_select :person, :birth_date %>
@@ -624,7 +633,7 @@ end
 ```
 
 파일이 업로드된 이후에도 해야할 일이 잔뜩 있습니다. 파일을 어디에 저장(웹서버, Amazon S3 등)할지,
-모델과의 관계 설정, 이미지라면 크기 변경이나 섬네일 생성 작업 등이 필요합니다. 이러한 처리들은 이 가이드의 설명 범위를 벗어나므로 다루지 않습니다만, 이러한 처리를 도와주기 위한 라이브러리가 있다는 정도는 알아두면 좋을 겁니다. 그 중에서도 [CarrierWave](https://github.com/jnicklas/carrierwave)와 [Paperclip](http://www.thoughtbot.com/projects/paperclip)이 유명합니다.
+모델과의 관계 설정, 이미지라면 크기 변경이나 섬네일 생성 작업 등이 필요합니다. 이러한 처리들은 이 가이드의 설명 범위를 벗어나므로 다루지 않습니다만, 이러한 처리를 도와주기 위한 라이브러리가 있다는 정도는 알아두면 좋을 겁니다. 그 중에서도 [CarrierWave](https://github.com/jnicklas/carrierwave)와 [Paperclip](https://github.com/thoughtbot/paperclip)이 유명합니다.
 
 NOTE: 사용자가 파일을 선택하지 않고 업로드를 하게 되면 빈 문자열이 파라미터로 넘어오게 됩니다.
 
@@ -663,6 +672,13 @@ end
 
 이 클래스를 자주 사용한다면 `labeled_form_for` 헬퍼를 정의하고 `builder: LabellingFormBuilder` 옵션을 포함하도록 해두면 편할 겁니다.
 
+```ruby
+def labeled_form_for(record, options = {}, &block)
+  options.merge! builder: LabellingFormBuilder
+  form_for record, options, &block
+end
+```
+
 여기서 사용되는 폼 빌더는 아래의 코드가 실행된 순간의 동작도 결정합니다.
 
 ```erb
@@ -677,13 +693,6 @@ end
 지금까지 설명했듯 폼에서 전송받은 값들은 `params` 해시에 바로 저장되든가, 다른 해시의 내부에 저장됩니다. 예를 들어 Person 모델의 표준적인 `create` 액션은 `params[:person]`에 전송받은 모든 값들을 해시의 형태로 저장합니다. `params` 해시에 배열이나 해시의 배열을 포함할 수도 있습니다.
 
 원칙적으로 HTML 폼은 어떤 형태의 구조화라도 상관하지 않습니다. 폼이 생성하는 것은 모두 이름과 이에 맞는 값의 쌍이며, 이것들은 단순한 문자열입니다. 이 데이터들을 애플리케이션 쪽에서 참조할 때에 배열이나 해시의 형태인 것은 Rails에서 사용하고 있는 파라미터 명명 규칙 덕분입니다.
-
-TIP: Rack의 파라미터 파서를 콘솔에서 직접 호출해서 이 절의 예제를 좀 더 쉽게 해볼 수 있습니다. 예를 들어, 다음처럼 쓸 수 있습니다.
-
-```ruby
-Rack::Utils.parse_query "name=fred&phone=0123456789"
-# => {"name"=>"fred", "phone"=>"0123456789"}
-```
 
 ### 기본 구조
 
@@ -804,7 +813,7 @@ Rails의 일반적인 규칙 중에는 최종적인 입력값은 `fields_for`나
 외부 리소스로 임의의 데이터를 전송하고 싶은 경우에도 Rails의 폼 헬퍼를 사용해서 폼을 생성하는 것이 편리합니다. 다만 이 때, 외부 리소스에 대해서 `authenticity_token`를 지정해야하는 경우에는 어떻게 해야할까요? 이것은 `form_tag`에 `authenticity_token: 'your_external_token'`를 주는 것으로 간단하게 설정할 수 있습니다.
 
 ```erb
-<%= form_tag 'http://farfar.away/form', authenticity_token: 'external_token') do %>
+<%= form_tag 'http://farfar.away/form', authenticity_token: 'external_token' do %>
   Form contents
 <% end %>
 ```
@@ -812,7 +821,7 @@ Rails의 일반적인 규칙 중에는 최종적인 입력값은 `fields_for`나
 결제 게이트웨이 등의 외부 리소스로 데이터를 전송해야하는 경우, 폼에서 사용가능한 필드는 외부 API에 따라 제한을 받습니다. 그런 경우처럼 `authenticity_token`를 위한 숨김 필드를 생성하지 않으려면 `:authenticity_token`을 `false`로 지정하면 됩니다.
 
 ```erb
-<%= form_tag 'http://farfar.away/form', authenticity_token: false) do %>
+<%= form_tag 'http://farfar.away/form', authenticity_token: false do %>
   Form contents
 <% end %>
 ```
@@ -876,6 +885,7 @@ end
   </ul>
 <% end %>
 ```
+
 
 폼에서 중첩된 속성이 사용되면, `fields_for` 헬퍼는 그 관계로 연결된 모든 요소를 하나씩 출력합니다. 특히 Person에 주소가 등록되어 있지 않은 경우에는 아무것도 출력하지 않습니다. 필드의 세트가 적어도 하나 출력되도록 컨트롤러에서 1개 이상의 공백 문자를 사용하는 것은 자주 사용되는 패턴입니다. 아래의 예제에서는 Person 폼을 새로 생성할 경우에 2개의 주소 필드가 표시되도록 합니다.
 
@@ -980,5 +990,3 @@ end
 ### 동적으로 필드 추가하기
 
 필드들을 미리 생성하지 않고 [새로운 주소를 추가] 버튼을 눌렀을 경우에만 이 필드를 생성할 수 있도록 하고 싶을 때가 있습니다. 안타깝게도 Rails에서는 이를 위한 방법이 지원되지 않습니다. 필드를 직접 생성하는 경우에는, 관련된 배열의 키가 중복되지 않도록 해야한다는 점을 주의해주세요. JavaScript에서 현재 시각을 사용해 유일한 식별자를 생성하는 것이 자주 사용되는 방법입니다.
-
-TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.

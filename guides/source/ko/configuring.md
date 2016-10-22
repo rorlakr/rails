@@ -59,21 +59,21 @@ Rails 전체에 걸친 설정을 하기 위해서는 `Rails::Railtie` 객체를 
 
 * `config.asset_host`은 애셋을 저장할 호스트를 지정합니다. 이 설정은 애셋을 저장할 장소가 CDN(Contents Delivery Network)일 때나, 다른 도메인을 사용하여 브라우저에서 동시 실행 제한을 피하고 싶은 경우에도 유용합니다. 이 메소드는 `config.action_controller.asset_host`를 줄인 것입니다.
 
-* `config.autoload_once_paths`는 서버가 요청 받을 때마다 초기화되지 않는 상수들을 읽어오기 위한 경로들이 들어있는 배열을 받습니다. `config.cache_classes`가 false 인 경우에 유효하지 않으며, development 모드일 경우에는 기본적으로 false로 동작합니다. `config.cache_classes`가 true인 경우, 모든 `config.autoload_once_paths`는 단 한번만 자동으로 읽어와집니다. `config.autoload_once_paths`의 배열에 포함되는 요소는 다음에 설명할 `autoload_paths`에서도 완전히 동일한 방식으로 호출되어야 합니다. 기본값은 빈 배열입니다.
+* `config.autoload_once_paths`는 서버가 요청 받을 때마다 초기화되지 않는 상수들을 읽어오기 위한 경로들이 들어있는 배열을 받습니다. `config.cache_classes`가 `false` 인 경우에 유효하지 않으며, development 모드일 경우에는 기본적으로 `false`로 동작합니다. 그렇지 않으면 모든 자동 로딩은 단 한번만 발생합니다. 기본값은 빈 배열입니다.
 
-* `config.autoload_paths`는 Rails가 상수를 자동으로 읽어올 때에 사용할 경로를 포함하는 배열을 인수로 받습니다. `config.autoload_paths`의 기본 값은 `app` 에 존재하는 모든 폴더 입니다(역주: Rails3부터는 autoload_path의 기본값이 빈 배열로 설정되어 있습니다).
+* `config.autoload_paths`는 Rails가 상수를 자동으로 읽어올 때에 사용할 경로를 포함하는 배열을 인수로 받습니다. `config.autoload_paths`의 기본 값은 `app` 에 존재하는 모든 폴더입니다.
 
-* `config.cache_classes`는 애플리케이션의 클래스나 모듈을 요청할 때에 다시 읽어올지(=캐싱되어 있는지 아닌지)를 결정합니다. `config.cache_classes`의 기본값은 development 모드에서는 false이므로 코드의 변경사항이 바로 반영되며, test와 production 모드에서는 true로 설정되어, 동작하는 속도를 빠르게 만듭니다.
+* `config.cache_classes`는 애플리케이션의 클래스나 모듈을 요청할 때에 다시 읽어올지(=캐싱되어 있는지 아닌지)를 결정합니다. `config.cache_classes`의 기본값은 개발 환경에서는 `false`이며, 테스트, 실제 환경에서는 `true`입니다.
 
 * `config.action_view.cache_template_loading`는 요청마다 뷰 템플릿을 다시 읽어올지 아닐지를 결정합니다. 기본값은 `config.cashe_classes`와 같습니다.
 
 * `config.beginning_of_week`는 애플리케이션에서의 일주일의 첫번째 날을 지정합니다. 인수로는 요일을 가리키는 올바른 심볼을 넘겨주세요(`:monday` 등).
 
-* `config.cache_store`는 Rails에서의 캐시 처리에 사용할 캐시 저장소를 결정합니다. 지정 가능한 옵션으로는 `:memory_store`, `:file_store`, `:mem_cache_store`, `:null_store`중 하나이며, 또는 캐시 API를 구현하고 있는 객체입니다. `tmp/cache` 폴더가 존재하는 경우 기본값으로 `:file_store`로 설정되며, 그 이외의 경우에는 `:memory_store`로 설정됩니다.
+* `config.cache_store`는 Rails에서의 캐시 처리에 사용할 캐시 저장소를 결정합니다. 지정 가능한 옵션으로는 `:memory_store`, `:file_store`, `:mem_cache_store`, `:null_store`중 하나이며, 또는 캐시 API를 구현하고 있는 객체입니다. 기본값은 `:file_store`입니다.
 
-* `config.colorize_logging`는 출력할 로그 정보에 ANSI 색상 정보를 추가할지 말지를 결정합니다. 기본은 true입니다.
+* `config.colorize_logging`는 출력할 로그 정보에 ANSI 색상 정보를 추가할지 말지를 결정합니다. 기본은 `true`입니다.
 
-* `config.consider_all_requests_local`는 플래그입니다. 이 플래그가 true인 경우, 어떤 에러가 발생한 경우에도 상세한 디버그 정보가 HTTP 응답으로 출력되며, `/rails/info/properties`안의 애플리케이션 실행시의 컨텍스트가 `Rails::Info` 컨트롤러에 의해서 출력됩니다. 이 플래그는 development 모드와 test 모드에서는 true, production 모드에서는 false로 설정됩니다. 좀 더 세밀하게 제어하고 싶은 경우에는 이 플래그를 false로 지정한 후, 컨트롤러에서 `local_request?` 메소드를 구현하고, 에러가 발생했을 경우에 어떤 디버그 정보를 출력할지를 지정해주세요.
+* `config.consider_all_requests_local`는 플래그입니다. 이 플래그가 `true`인 경우, 어떤 에러가 발생한 경우에도 상세한 디버그 정보가 HTTP 응답으로 출력되며, `/rails/info/properties`안의 애플리케이션 실행시의 컨텍스트가 `Rails::Info` 컨트롤러에 의해서 출력됩니다. 이 플래그는 development 모드와 test 모드에서는 `true`, production 모드에서는 `false`로 설정됩니다. 좀 더 세밀하게 제어하고 싶은 경우에는 이 플래그를 `false`로 지정한 후, 컨트롤러에서 `local_request?` 메소드를 구현하고, 에러가 발생했을 경우에 어떤 디버그 정보를 출력할지를 지정해주세요.
 
 * `config.console`를 사용하면 콘솔에서 `rails console`를 실행했을 때에 사용될 클래스를 커스터마이즈 할 수 있습니다. 이 메소드는 `console` 블럭과 함께 사용할 때가 편리합니다.
 
@@ -86,79 +86,98 @@ Rails 전체에 걸친 설정을 하기 위해서는 `Rails::Railtie` 객체를 
     end
     ```
 
-* `config.dependency_loading`를 false로 설정하면 상수의 자동 불러오기 설정이 꺼집니다. 이 옵션이 유효한 경우는 `config.cache_classes`가 true인 경우 뿐입니다(`config.cache_classes`는 production 모드에서 기본으로 true입니다). `config.threadsafe!`를 사용하면 이 플래그는 false가 됩니다.
+* `config.eager_load`를 `true`로 설정하면 `config.eager_load_namespaces`에 등록되어 있는 사전에 불러오기로 정의되어 있는 네임스페이스를 모두 불러 옵니다. 여기에는 애플리케이션, 엔진, Rails 프레임워크를 포함하는 모든 등록된 네임스페이스가 포함됩니다.
 
-* `config.eager_load`를 true로 설정하면 `config.eager_load_namespaces`에 등록되어 있는 사전에 불러오기로 정의되어 있는 네임스페이스를 모두 불러 옵니다. 여기에는 애플리케이션, 엔진, Rails 프레임워크를 포함하는 모든 등록된 네임스페이스가 포함됩니다.
-
-* `config.eager_load_namespaces`를 사용하여 등록한 이름은 `config.eager_load`가 true일 때에 불러와집니다. 등록된 네임스페이스는 반드시 `eager_load!` 메소드에 반응해야합니다.
+* `config.eager_load_namespaces`를 사용하여 등록한 이름은 `config.eager_load`가 `true`일 때에 불러와집니다. 등록된 네임스페이스는 반드시 `eager_load!` 메소드에 반응해야합니다.
 
 * `config.eager_load_paths`는 경로의 배열을 인수로 받습니다. Rails는 cache_classes가 활성화 되어 있을 경우에 이 경로들을 미리 읽어오게(eager load)됩니다. 기본값으로 애플리케이션의 app 폴더에 존재하는 모든 폴더들이 여기에 포함됩니다.
+
+* `config.enable_dependency_loading`: 참일때, 애플리케이션이 eager load를 사용하고 `config.cache_classes`이 참이라 하더라도 자동로딩을 활성화합니다. 기본값은 `false`입니다.
 
 * `config.encoding`은 애플리케이션 전체에서 적용할 인코딩을 지정합니다. 기본 값은 UTF-8입니다.
 
 * `config.exceptions_app`는 예외가 발생한 경우에 ShowException 미들웨어에 의해서 호출되는 애플리케이션 예외를 지정합니다. 기본값은 `ActionDispatch::PublicExceptions.new(Rails.public_path)`입니다.
 
-* `config.file_watcher`는 `config.reload_classes_only_on_change`가 true인 경우에 파일 시스템 상에서 파일 갱신이 있는지를 확인할 때 사용할 클래스를 지정합니다. 이 클래스는 `ActiveSupport::FileUpdateChecker` API에 따를 필요가 있습니다.
+* `config.debug_exception_response_format`은 개발 모드에서 에러가 발생했을 때 응답에서 사용할 양식을 지정합니다. 기본값은 API 전용일때 `:api`, 그 이외에는 `:default`입니다.
 
-* `config.filter_parameters`는 비밀번호나 신용카드번호 등, 로그에 출력하고 싶지 않은 파라미터 값을 필터링으로 제외하기 위해서 사용합니다. 비밀번호를 제외하는 애플리케이션 필터를 추가하기 위해서는 `config/initializers/filter_parameter_logging.rb`에 `config.filter_parameters+=[:password]`를 추가합니다.
+* `config.file_watcher`는 `config.reload_classes_only_on_change`가 `true`인 경우에 파일 시스템 상에서 파일 갱신이 있는지를 확인할 때 사용할 클래스를 지정합니다. Rails는 `ActiveSupport::FileUpdateChecker`를 기본 값으로 사용하며, 그리고 `ActiveSupport::EventedFileUpdateChecker`([listen](https://github.com/guard/listen) 젬에 의존합니다)도 기본으로 제공합니다. 별도의 클래스를 사용하는 경우에는 `ActiveSupport::FileUpdateChecker`의 API에 따를 필요가 있습니다.
 
-* `config.force_ssl`는 `ActionDispatch::SSL` 미들웨어를 사용해서 모든 요청을 HTTPS 프로토콜로 처리하도록 강제합니다.
+* `config.filter_parameters`는 비밀번호나 신용카드번호 등 로그에 출력하고 싶지 않은 파라미터 값을 필터링으로 제외하기 위해서 사용합니다. Rails는 기본으로 비밀번호를 제외시키기 위해 `config/initializers/filter_parameter_logging.rb`에 `Rails.application.config.filter_parameters += [:password]`를 추가합니다. 파라미터 필터는 부분 일치 정규 표현식을 사용합니다.
 
-* `config.log_formatter`는 Rails 로거의 형식을 정의합니다. 이 옵션의 기본값은 `ActiveSupport::Logger::SimpleFormatter`의 인스턴스를 사용합니다. 단, production 모드에서만 `Logger::Formatter`를 기본으로 사용합니다.
+* `config.force_ssl`는 `ActionDispatch::SSL` 미들웨어를 사용해서 모든 요청을 HTTPS 프로토콜로 처리하도록 하며, `config.action_mailer.default_url_options`의 값을 `{ protocol: 'https' }`로 만듭니다. 이는 `config.ssl_options`를 통해 변경할 수 있습니다. 자세한 설명은 [ActionDispatch::SSL 문서](http://edgeapi.rubyonrails.org/classes/ActionDispatch/SSL.html)를 참고하세요.
 
-* `config.log_level`은 Rails에서 로그 출력을 얼마나 자세하게 내보낼지를 지정합니다. 기본값은 `:debug`로 지정되어 있으며, production 모드에서만 기본값으로 `:info`를 사용합니다.
+* `config.log_formatter`는 Rails 로거의 형식을 정의합니다. 이 옵션의 기본값은 `ActiveSupport::Logger::SimpleFormatter`의 인스턴스입니다. `config.logger`를 따로 설정한다면, `ActiveSupport::TaggedLogging`로 감싸지기 전에 로거에 포매터를 직접 넘겨주어야 합니다. Rails는 이 작업은 대신해주지 않습니다.
 
-* `config.log_tags`는 `request` 객체가 응답하는 메소드의 목록을 인수로 받습니다. 이것은 로그에 디버깅 정보를 태그로 붙일때 편리합니다. 예를 들자면, 서브도메인이나 요청 id를 지정하여 production 모드인 애플리케이션을 디버깅할 때 유용합니다.
+* `config.log_level`은 Rails에서 로그 출력을 얼마나 자세하게 내보낼지를 지정합니다. 기본값은 `:debug`입니다. 사용 가능한 로그 레벨로는 `:debug`,
+`:info`, `:warn`, `:error`, `:fatal`, `:unknown`이 있습니다.
 
-* `config.logger`는 사용할 로거를 지정합니다. 지정되는 로거는 Log4r 또는 Ruby의 기본 `Logger` 클래스의 인스턴스와 동일한 인터페이스를 가지고 있어야 합니다. 기본값으로는 `ActiveSupport::Logger`의 인스턴스가 지정되어 있습니다.
+* `config.log_tags`는 `request` 객체가 응답하는 메소드의 목록을 인수로 받습니다. 이것은 로그에 디버깅 정보를 태그로 붙일때 편리합니다. 예를 들자면, 서브도메인이나 요청 id를 지정하여 실제 환경에서 디버깅할 때 유용합니다.
 
+* `config.logger`는 `Rails.logger`로, 그리고 `ActiveRecord::Base.logger`와 같은 Rails 로깅에서 사용될 로거를 지정합니다. 기본값은 `log/`폴더에 로그를 출력하는 `ActiveSupport::Logger`의 인스턴스를 감싸고 있는 `ActiveSupport::TaggedLogging`의 인스턴스입니다. 별도의 로거를 사용할 수도 있으며, 이 경우에는 모든 기능을 사용하려면 다음의 가이드라인을지켜주세요.
+  * 포매터를 지원하려면 `config.log_formatter`에 포매터를 직접 넘겨야합니다.
+  * 태깅된 로그를 지원하려면 로그 인스턴스는 ActiveSupport::TaggedLogging`로 감싸져 있어야 합니다.
+  * 출력 무시하기를 지원하려면 로거는 반드시 `LoggerSilence`와 `ActiveSupport::LoggerThreadSafeLevel` 모듈을 포함해야 합니다. `ActiveSupport::Logger` 클래스는 이미 이 모듈들을 포함하고 있습니다.
+
+    ```ruby
+    class MyLogger < ::Logger
+      include ActiveSupport::LoggerThreadSafeLevel
+      include LoggerSilence
+    end
+
+    mylogger           = MyLogger.new(STDOUT)
+    mylogger.formatter = config.log_formatter
+    config.logger      = ActiveSupport::TaggedLogging.new(mylogger)
+    ```
+ 
 * `config.middleware`는 애플리케이션에서 사용할 미들웨어를 커스터마이즈할 수 있습니다. 자세한 설명은 [미들웨어 설정하기](#미들웨어-설정하기)를 참조해주세요.
 
-* `config.reload_classes_only_on_change`는 감시하고 있는 파일이 변경되었을 경우에만 클래스를 다시 불러올지 아닐지를 지정합니다. 기본으로는 autoload_path에 지정되어있는 모든 파일이 감시 대상이며, 기본값으로는 true로 설정되어 있습니다. `config.cache_classes`가 on인 경우에는 이 옵션이 무시됩니다.
+* `config.reload_classes_only_on_change`는 감시하고 있는 파일이 변경되었을 경우에만 클래스를 다시 불러올지 아닐지를 지정합니다. 기본으로는 autoload_path에 지정되어있는 모든 파일이 감시 대상이며, 기본값으로는 `true`로 설정되어 있습니다. `config.cache_classes`가 `true`인 경우에는 이 옵션이 무시됩니다.
 
-`secrets.secret_key_base` 메소드는 변조 방지를 위해서 애플리케이션의 세션에 기존의 비밀키와 비교하기 위한 키를 지정할 때에 사용합니다. 애플리케이션은 `secrets.secret_key_base`를 사용하여 `config/secrets.yml` 등에 저장되어 있는 키를 사용해 초기화합니다.
+* `secrets.secret_key_base`는 변조 방지를 위해서 애플리케이션의 세션에 기존의 비밀키와 비교하기 위한 키를 지정할 때에 사용합니다. 애플리케이션은 `secrets.secret_key_base`를 사용하여 `config/secrets.yml` 등에 저장되어 있는 키를 사용해 초기화합니다.
 
-* `config.serve_static_assets`는 정적인 애셋을 다룰지 아닐지를 지정합니다. 기본값으로는 true로 지정되어 있습니다만, production 환경에서는 애플리케이션을 실행하는 Nginx나 Apache등의 서버가 정적인 애셋을 다룰 필요가 있으므로 비활성화됩니다. 기본의 설정과는 다르게 WEBrick을 사용해서 애플리케이션을 production 모드로 실행하거나(절대로 이렇게 사용하지 말아 주세요) 테스트를 하는 경우에는 true로 설정됩니다. 그렇지 않으면 페이지 캐시가 유효하지 않게 되며 public 폴더에 저장되어 있는 정적인 애셋 파일들에 대한 요청은 매번 Rails 애플리케이션을 통하여 처리됩니다.
+* `config.public_file_server.enabled`는 public 폴더에서 정적인 파일을 제공할지 여부를 지정합니다. 이 옵션의 기본값은 `true`이지만, 실제 환경에서는 서버 소프트웨어(e.g. NGINX나 Apache)가 정적인 애셋을 대신 다루는 경우가 많기 때문에 `false`로 설정됩니다. 애플리케이션을 WEBrick를 사용해서 실행(이는 권장되지 않습니다)하거나 테스트를 하는 경우에는 이 옵션을 `true`로 지정해야 합니다. 그렇지 않으면 페이지 캐싱을 사용할 수 없으며, public 폴더 밑에 있는 파일들의 요청을 처리할 수 없게 됩니다.
 
-* `config.session_store`는 일반적으로 `config/initializers/session_store.rb`에서 정의되어 있으며, 세션을 저장할 클래스를 지정합니다. 지정 가능한 값은 `:cookie_store`(기본값), `:mem_cache_store`, `:disabled`입니다. `:disabled`를 지정하면, Rails에서 세션을 사용할 수 없게 됩니다. 커스텀 세션 저장소를 지정할 수도 있습니다.
+* `config.session_store`는 세션을 저장할 클래스를 지정합니다. 지정 가능한 값은 `:cookie_store`(기본값), `:mem_cache_store`, `:disabled`입니다. `:disabled`를 지정하면, Rails에서 세션을 사용할 수 없게 됩니다. 쿠키 저장소에서 세션 키의 기본값은 애플리케이션의 이름입니다. 커스텀 세션 저장소를 지정할 수도 있습니다.
 
     ```ruby
     config.session_store :my_custom_store
     ```
 
-커스텀 스토어는 `ActionDispatch::Session::MyCustomStore`로 정의할 필요가 있습니다.
+    이 저장소는 `ActionDispatch::Session::MyCustomStore`로 정의됩니다.
 
 * `config.time_zone`은 애플리케이션의 기본 시간대를 설정하여 Active Record에서 인식할 수 있도록 해줍니다.
 
 ### 애셋 설정하기
 
-* `config.assets.enabled`는 애셋 파이프라인을 사용할지 아닐지를 지정합니다. 기본값은 true입니다.
+* `config.assets.enabled`는 애셋 파이프라인을 사용할지 아닐지를 지정합니다. 기본값은 `true`입니다.
 
 * `config.assets.raise_runtime_errors`를 `true`로 지정하면, 런타임 에러 체크가 활성화됩니다. 이 옵션은 `production` 환경에서 사용하면 배포시에 생각치않은 동작을 발생시킬 가능성이 있으므로 development 환경(`config/environments/development.rb`)에서만 사용하기를 추천합니다.
-
-* `config.assets.compress`는 컴파일된 애셋을 압축할지 아닐지를 지정하는 플래그입니다. `config/environments/production.rb`에서는 명시적으로 true로 지정되어 있습니다.
 
 * `config.assets.css_compressor`는 CSS 압축시에 사용할 프로그램을 지정합니다. 이 옵션은 기본으로 `sass-rails`를 사용하도록 지정되어 있습니다. `:yui`라는 일견 특이해보이는 옵션도 지정할 수 있으며, 이 옵션은 `yui-compressor` gem을 의미합니다.
 
 * `config.assets.js_compressor`는 JavaScript 압축을 수행할 프로그램을 지정합니다. 지정 가능한 값으로는 `:closure`, `:uglifier`, `:yui`입니다. 각각 `closure-compiler`, `uglifier`, `yui-compressor` gem에 대응합니다.
 
+* `config.assets.gzip`는 gzip으로 압축된 애셋을 압축되지 않은 애셋과 함께 제공할지 여부를 지정합니다. 기본값은 `true`입니다.
+
 * `config.assets.paths`에는 애셋 검색 시에 사용할 경로를 지정합니다. 이 설정 옵션을 경로에 추가하면, 애셋을 검색할때에 찾을 경로 목록에 추가됩니다.
 
 * `config.assets.precompile`은 `application.css`와 `application.js` 이외에 추가하고 싶은 애셋이 있는 경우에 지정합니다. 이것들은 `bin/rails assets:precompile`을 실행할 때에 함께 컴파일 됩니다.
 
+* `config.assets.unknown_asset_fallback`는 sprockets-rails의 버전이 3.2.0 이상일 경우 애셋 파이프라인이 필요한 애셋을 발견하지 못했을 때 어떤 동작을 할지를 지정합니다. 기본값은 `true`입니다.
+
 * `config.assets.prefix`는 애셋을 저장할 폴더를 지정합니다. 기본은 `/assets`입니다.
 
-* `config.assets.digest`는 애셋 이름을 이용하는 MD5 핑거프린트를 사용할지 말지를 지정합니다. `production.rb`에서는 기본으로 `true`로 설정되어 있습니다.
+* `config.assets.manifest`는 애셋 처리의 manifest 파일의 전체 경로를 지정합니다. 기본값은 public 밑의 `config.assets.prefix` 폴더에 `manifest-<random>.json`입니다.
 
-* `config.assets.debug`는 애셋의 연결 및 압축을 무효화할지를 지정합니다. `development.rb`에서는 기본으로 `true`로 지정됩니다.
+* `config.assets.digest`는 애셋 이름을 이용하는 MD5 핑거프린트를 사용할지 말지를 지정합니다. 기본값은 `true`입니다.
 
-* `config.assets.cache_store`는 Sprockets에서 사용하는 캐시 저장소를 정의합니다. 기본으로는 Rails의 파일 저장소를 사용합니다.
-
-* `config.assets.version`는 MD5 해시 생성에 사용되는 옵션 문자열입니다. 이 값을 변경하면 모든 애셋 파일이 강제적으로 다시 컴파일 됩니다.
+* `config.assets.debug`는 애셋의 연결 및 압축을 무효화할지를 지정합니다. `development.rb`에서는 기본값은 `true`입니다.
 
 * `config.assets.compile`는 production 환경에서 동적인 Sprockets 컴파일을 할지 말지를 true/false로 지정합니다.
 
-* `config.assets.logger`는 로거를 인수로 받습니다. 이 로거는 Log4의 인터페이스나 Ruby의 `Logger` 클래스의 인터페이스를 따라야 합니다. 기본으로 `config.logger`와 동일한 설정이 사용됩니다. `config.assets.logger`를 false로 사용하면 애셋의 로그 출력을 하지 않게 됩니다.
+* `config.assets.logger`는 로거를 인수로 받습니다. 이 로거는 Log4r의 인터페이스나 Ruby의 `Logger` 클래스의 인터페이스를 따라야 합니다. 기본으로 `config.logger`와 동일한 설정이 사용됩니다. `config.assets.logger`를 `false`로 사용하면 애셋의 로그 출력을 하지 않게 됩니다.
+
+* `config.assets.quiet`는 애셋 요청에 대한 로깅을 비활성화합니다. `development.rb`에서 `true`로 지정되어 있습니다.
 
 ### 제너레이터 설정하기
 
@@ -181,19 +200,21 @@ end
 * `javascript_engine`은 애셋 생성시에(coffee 등에서) 사용할 엔진을 지정합니다. 기본값은 `nil`입니다.
 * `orm`은 사용할 ORM(Object Relational Mapping)을 지정합니다. 기본값은 `false`이며, 이 경우 Active Record를 사용합니다.
 * `resource_controller`는 `rails generate resource`를 실행했을 때에 어떤 제너레이터를 사용하여 컨트롤러를 생성할지 지정합니다. 기본값은 `:controller`입니다.
+* `resource_route`는 리소스에 대한 라우팅을 자동으로 생성할지를 지정합니다. 기본값은 `true`입니다.
 * `scaffold_controller`는 `resource_controller`와 동일하지 않습니다. `scaffold_controller`는 _scaffold_시에 어떤 제너레이터를 사용하여 컨트롤러를 생성할 지(`rails generate scaffold`를 실행했을 때)를 지정합니다. 기본값은 `:scaffold_controller`입니다.
 * `stylesheets`는 제너레이터에서 스타일시트 생성시에 훅을 사용할지 아닐지를 지정합니다. 이 설정은 `scaffold` 제너레이터 실행시에 사용됩니다만, 다른 제너레이터를 실행할 때에도 사용됩니다. 기본값은 `true`입니다.
 * `stylesheet_engine`는 애셋 생성시에 사용할, sass같은 스타일시트 엔진을 지정합니다. 기본값은 `:css`입니다.
-* `test_framework`는 사용할 테스트용 프레임워크를 지정합니다. 기본값은 `false`이며, 이 경우 Test::Unit이 사용됩니다.
+* `scaffold_stylesheet`는 scaffold시에 `scaffold.css`를 생성할지 지정합니다. 기본값은 `true`입니다.
+* `test_framework`는 사용할 테스트용 프레임워크를 지정합니다. 기본값은 `false`이며, 이 경우 Minitest가 사용됩니다.
 * `template_engine`은 뷰 템플릿 엔진(ERB나 Haml 등)을 지정합니다. 기본값은 `:erb`입니다.
 
 ### 미들웨어 설정하기
 
 어떤 Rails 애플리케이션이든 그 뒤에는 몇개의 표준적인 미들웨어가 동작하고 있습니다. development 환경에서는 다음과 같은 순서대로 미들웨어를 사용합니다.
 
-* `ActionDispatch::SSL`는 모든 요청에게 HTTPS 프로토콜을 사용할 것을 강요합니다. 이것은 `config.force_ssl`를 `true`로 설정했을 경우에만 유효합니다. 넘길 옵션 값들은 `config.ssl_options`에서 설정할 수 있습니다.
-* `ActionDispatch::Static`는 정적 애셋을 처리합니다. `config.serve_static_assets`를 `false`로 하면 사용하지 않습니다.
-* `Rack::Lock`는 애플리케이션을 뮤텍스로 감싸서 1번에 하나의 스레드만 호출되도록 만듭니다. 이 미들웨어는 `config.cache_classes`가 `false`로 설정되어 있을 경우에만 유효합니다.
+* `ActionDispatch::SSL`는 모든 요청에게 HTTPS 프로토콜을 강제로 적용합니다. 이것은 `config.force_ssl`를 `true`로 설정했을 경우에만 유효합니다. 넘길 옵션 값들은 `config.ssl_options`에서 설정할 수 있습니다.
+* `ActionDispatch::Static`는 정적 애셋을 처리합니다. `config.public_file_server.enabled`이 `false`라면 사용되지 않습니다. `index`라는 이름이 아닌 디렉토리 인덱스 파일을 제공하고 싶다면 `config.public_file_server.index_name`를 지정해주세요. 예를 들어 폴더 요청에 대해서 `index.html` 대신에 `main.html` 파일을 사용하고 싶다면, `config.public_file_server.index_name`를 `"main"`라고 지정하면 됩니다.
+* `ActionDispatch::Executor`는 스레드 안전한 코드 리로딩을 허용합니다. `config.allow_concurrency`가 `false`라면 비활성화되며, `Rack::Lock`을 로드하게 됩니다. `Rack::Lock`는 애플리케이션을 뮤택스로 감싸서 싱글 스레드에서만 호출되도록 만듭니다.
 * `ActiveSupport::Cache::Strategy::LocalCache`는 기본적인 메모리 백업 방식의 캐시로 기능합니다. 이 캐시는 스레드간에 안전하지 않으며, 단일 스레드용의 일시적인 메모리 캐시로서만 동작하도록 설계되었다는 점을 주의해주세요.
 * `Rack::Runtime`는 `X-Runtime` 헤더를 설정합니다. 이 헤더에는 요청을 처리하는데 얼마나 시간이 걸렸는지(초)가 포함됩니다.
 * `Rails::Rack::Logger`는 요청 처리가 시작되었음을 로그에 알립니다. 요청이 끝나면 모든 로그를 파일에 출력합니다.
@@ -202,14 +223,11 @@ end
 * `ActionDispatch::RemoteIp`는 IP 스푸핑 공격이 있었던 것은 아닌지 확인하고, 요청 해더에서 올바른 `client_ip`를 가져옵니다. 이 설정은 `config.action_dispatch.ip_spoofing_check` 옵션과 `config.action_dispatch.trusted_proxies` 옵션에서 변경 가능합니다.
 * `Rack::Sendfile`은 body가 하나의 파일로부터 생성된 응답을 가로채서 서버에 설정되어 있는 X-Sendfile 헤더로 변경하고 전송합니다. 이 동작은 `config.action_dispatch.x_sendfile_header`에서 변경가능합니다.
 * `ActionDispatch::Callbacks`은 요청에 응답하기 전에 정의되어 있는 콜백을 실행합니다.
-* `ActiveRecord::ConnectionAdapters::ConnectionManagement`는 `rack.test`의 값이 `true`인 경우가 아니라면, 요청마다 살아있는 커넥션을 종료시킵니다.
-* `ActiveRecord::QueryCache`는 요청에 따라 생성된 모든 SELECT 쿼리를 캐싱합니다. INSERT 또는 UPDATE가 발생하면 캐시가 비워집니다.
 * `ActionDispatch::Cookies`는 요청에 대응하는 cookie를 저장합니다.
 * `ActionDispatch::Session::CookieStore`는 세션을 cookie에 저장하는 역할을 담당합니다. `config.action_controller.session_store`의 값이 변경되면 다른 미들웨어를 사용할 수 있습니다. 여기에 넘기는 옵션은 `config.action_controller.session_options`에서 변경할 수 있습니다.
 * `ActionDispatch::Flash`는 `flash` 값을 지정합니다. 이는 `config.action_controller.session_store`에 값이 설정되어 있을 때에만 유효합니다.
-* `ActionDispatch::ParamsParser`는 요청으로부터 파라미터를 추출하여 `params`에 저장합니다.
 * `Rack::MethodOverride`는 `params[:_method]`가 설정되어 있는 경우에 메소드를 재정의합니다. 이는 HTTP에서 PATCH, PUT, DELETE 메소드를 덮어쓰기 위한 미들웨어입니다.
-* `ActionDispatch::Head`는 HEAD 요청을 GET 요청으로 변환하여 HEAT 요청이 정상적으로 동작하도록 해줍니다.
+* `Rack::Head`는 HEAD 요청을 GET 요청으로 변환하여 HEAT 요청이 정상적으로 동작하도록 해줍니다.
 
 `config.middleware.use` 메소드를 사용하면, 위에서 언급한 것 이외의 미들웨어를 추가할 수 있습니다.
 
@@ -220,13 +238,19 @@ config.middleware.use Magical::Unicorns
 이를 통해 `Magical::Unicorns` 미들웨어가 실행 스택의 가장 마지막에 추가됩니다. 특정 미들웨어의 앞에 다른 미들웨어를 추가하고 싶은 경우에는 `insert_before`를 사용하세요.
 
 ```ruby
-config.middleware.insert_before ActionDispatch::Head, Magical::Unicorns
+config.middleware.insert_before Rack::Head, Magical::Unicorns
 ```
 
-어떤 미들웨어의 뒤에 다른 미들웨어를 추가하고 싶은 경우에는 `insert_after`를 사용하세요.
+또는 인덱스를 지정하여 특정 위치에 미들웨어를 추가할 수도 있습니다. 예를 들어, `Magical::Unicorns`를 미들웨어 스택의 맨 위에 추가하고 싶다면, 다음과 같이 지정하세요.
 
 ```ruby
-config.middleware.insert_after ActionDispatch::Head, Magical::Unicorns
+config.middleware.insert_before 0, Magical::Unicorns
+```
+
+`insert_after`를 사용하여 특정 미들웨어의 뒤에 추가할 수도 있습니다.
+
+```ruby
+config.middleware.insert_after Rack::Head, Magical::Unicorns
 ```
 
 아예 다른 것으로 바꿀수도 있습니다.
@@ -238,7 +262,7 @@ config.middleware.swap ActionController::Failsafe, Lifo::Failsafe
 마찬가지로 미들웨어를 스택에서 제거할 수도 있습니다.
 
 ```ruby
-config.middleware.delete "Rack::MethodOverride"
+config.middleware.delete Rack::MethodOverride
 ```
 
 ### i18n 설정하기
@@ -253,15 +277,37 @@ config.middleware.delete "Rack::MethodOverride"
 
 * `config.i18n.load_path`는 로케일 파일의 검색 경로를 지정합니다. 기본값은 `config/locales/*.{yml,rb}`입니다.
 
+* `config.i18n.fallbacks`는 해당하는 번역이 존재하지 않을 때의 동작을 지정합니다. 3개의 예제를 살펴봅시다.
+
+  * `true`를 설정하면 기본 로케일을 사용합니다.
+
+    ```ruby
+    config.i18n.fallbacks = true
+    ```
+
+  * 아니면 사용할 로케일의 목록을 넘겨줄 수도 있습니다.
+
+    ```ruby
+    config.i18n.fallbacks = [:tr, :en]
+    ```
+
+  * 마지막으로 로케일에 따라 다른 목록을 사용할 수도 있습니다. 예를 들어, `:az`와 `:de`일 때에는 `:tr`을, `:da`일 경우에는 `:en`을 사용해봅시다.
+
+    ```ruby
+    config.i18n.fallbacks = { az: :tr, da: [:de, :en] }
+    # 또는
+    config.i18n.fallbacks.map = { az: :tr, da: [:de, :en] }
+    ```
+
 ### Active Record 설정하기
 
 `config.active_record`에는 많은 옵션이 포함되어 있습니다.
 
 * `config.active_record.logger`는 Log4r의 인터페이스 또는 Ruby Logger 클래스를 따르는 로거를 인수로 받습니다. 이 로거는 이후 생성되는 모든 새로운 데이터베이스 커넥션에서 사용됩니다. Active Record 모델 클래스 또는 모델 인스턴스에 대해서 `logger` 메소드를 호출하면 이 로거를 받아올 수 있습니다. 로그 출력을 무효화하기 위해서는 `nil`로 설정합니다.
 
-* `config.active_record.primary_key_prefix_type`는 기본키 컬럼의 명명법을 변경할 때에 사용합니다. Rails에서는 기본키 컬럼의 이름의 기본값으로  `id`를 사용합니다(또한 `id`을 사용하고 싶은 경우에는 별도로 설정할 필요가 없습니다). `id` 이외로는 다음의 두가지를 선택할 수 있습니다.
-** `:table_name`를 지정하면, 예를 들어, Customer 클래스의 기본키는 `customerid`가 됩니다.
-** `:table_name_with_underscore`를 지정하면, 예를 들어, Customer 클래스의 기본키는 `customer_id`가 됩니다.
+* `config.active_record.primary_key_prefix_type`는 기본키 컬럼의 명명법을 변경할 때에 사용합니다. Rails에서는 기본키 컬럼의 이름의 기본값으로 `id`를 사용합니다(또한 `id`을 사용하고 싶은 경우에는 별도로 설정할 필요가 없습니다). `id` 이외로는 다음의 두가지를 선택할 수 있습니다.
+    * `:table_name`를 지정하면, 예를 들어, Customer 클래스의 기본키는 `customerid`가 됩니다.
+    * `:table_name_with_underscore`를 지정하면, 예를 들어, Customer 클래스의 기본키는 `customer_id`가 됩니다.
 
 * `config.active_record.table_name_prefix`는 테이블 이름의 앞에 전역으로 추가할 문자열을 지정할 수 있습니다. 예를 들어, `northwest_`를 지정하면 Customer 클래스는 `northwest_customers` 테이블을 검색합니다. 기본값은 빈 문자열입니다.
 
@@ -269,15 +315,17 @@ config.middleware.delete "Rack::MethodOverride"
 
 * `config.active_record.schema_migrations_table_name`는 스키마 마이그레이션 테이블의 이름으로 사용할 문자열을 지정할 수 있습니다.
 
-* `config.active_record.pluralize_table_names`는 Rails가 찾는 데이터베이스 테이블 이름을 단수형으로 할지, 복수형으로 할지를 지정할 수 있습니다. true로 지정하면, Customer 클래스가 사용하는 테이블 이름은 복수형인 `customers`가 됩니다(기본값). false로 설정하면 Customer 클래스가 사용하는 테이블 이름은 단수형인 `customer`가 됩니다.
+* `config.active_record.pluralize_table_names`는 Rails가 찾는 데이터베이스 테이블 이름을 단수형으로 할지, 복수형으로 할지를 지정할 수 있습니다. `true`로 지정하면, Customer 클래스가 사용하는 테이블 이름은 복수형인 `customers`가 됩니다(기본값). `false`로 설정하면 Customer 클래스가 사용하는 테이블 이름은 단수형인 `customer`가 됩니다.
 
 * `config.active_record.default_timezone`은 데이터베이스로부터 날짜/시각을 가져왔을때 시간대를 `Time.local`(`:local`을 지정했을 경우)와 `Time.utc`(`:utc`를 지정했을 경우)중 어느 것을 쓸지 지정합니다. 기본값은 `:utc`입니다.
 
 * `config.active_record.schema_format`은 데이터베이스 스키마를 파일로 내보낼 때에 사용할 형식을 지정합니다. 기본값은 `:ruby`로 데이터베이스에 의존하지 않고, 마이그레이션에 의존합니다. `:sql`로 지정하면 SQL문으로 내보냅니다만, 이 경우 잠재적으로 데이터베이스에 의존할 가능성이 있습니다.
 
-* `config.active_record.timestamped_migrations`는 마이그레이션 파일의 이름에 시리얼 번호와 타임스탬프 중 어느것을 사용할지를 지정합니다. 기본값은 true로 타임스탬프가 사용됩니다. 개발자가 여러 명인 경우에는 타임스탬프를 추천합니다.
+* `config.active_record.error_on_ignored_order`는 배치 쿼리를 실행하는 중에 쿼리의 정럴 순서를 무시하게 되었을 때 에러를 던질지 여부를 지정합니다. `true`일 경우 에러를 던지며, `false`일 경우에 경고를 출력합니다. 기본값은 `false`입니다.
 
-* `config.active_record.lock_optimistically`는 Active Record에서 낙관적 잠금을 사용할지를 지정합니다. 기본값은 true(사용함)입니다.
+* `config.active_record.timestamped_migrations`는 마이그레이션 파일의 이름에 시리얼 번호와 타임스탬프 중 어느것을 사용할지를 지정합니다. 기본값은 `true`로 타임스탬프가 사용됩니다. 개발자가 여러 명인 경우에는 타임스탬프를 추천합니다.
+
+* `config.active_record.lock_optimistically`는 Active Record에서 낙관적 잠금을 사용할지를 지정합니다. 기본값은 `true`입니다.
 
 * `config.active_record.cache_timestamp_format`는 캐시 키에 포함되는 타임스탬프 값의 형식을 지정합니다. 기본값은 `:number`입니다.
 
@@ -287,11 +335,20 @@ config.middleware.delete "Rack::MethodOverride"
 
 * `config.active_record.maintain_test_schema`는 테스트 실행시에 Active Record가 테스트용 데이터베이스 스키마를 `db/schema.rb`(또는 `db/structure.sql`)에 기초해 최신 상태를 사용할지 아닐지를 지정합니다. 기본값은 `true`입니다.
 
-* `config.active_record.dump_schema_after_migration`는 마이그레이션 실행시에 스키마 덤프(`db/schema.rb`또는 `db/structure.sql`)를 할지 안할지를 지정합니다. 이 옵션은 Rails가 생성하는 `config/environments/production.rb`에서는 false로 설정되어 있습니다. 이 옵션이 지정되어 있지 않은 경우에는 기본값으로 true를 사용합니다.
+* `config.active_record.dump_schema_after_migration`는 마이그레이션 실행시에 스키마 덤프(`db/schema.rb`또는 `db/structure.sql`)를 할지 안할지를 지정합니다. 이 옵션은 Rails가 생성하는 `config/environments/production.rb`에서는 `false`로 설정되어 있습니다. 이 옵션이 지정되어 있지 않은 경우에는 기본값으로 `true`를 사용합니다.
+
+* `config.active_record.dump_schemas`는 db:structure:dump를 호출했을 때에 어떤 데이터 스키머를 덤프할지를 결정합니다.
+  `:schema_search_path`(기본값)은 schema_search_path에 지정된 모든 스키마를 덤프하며, `:all`는 schema_search_path나 쉼표로 구분된 스키마들의 문자열 무시하고 모든 스키마를 덤프합니다.
+
+* `config.active_record.belongs_to_required_by_default`는 `belongs_to` 관계의 존재 검증을 기본으로 수행할지 아닐지를 지정하는 boolean값입니다.
+
+* `config.active_record.warn_on_records_fetched_greater_than`은 쿼리 결과의 크기에 따른 경고를 설정할 수 있게 해줍니다. 쿼리의 결과로 반환된 레코드 셋이 지정된 기준점을 넘어서면 경고가 출력됩니다. 이는 메모리 문제를 야기시킬 수 있는 쿼리를 특정할 때에 사용될 수 있습니다.
+
+* `config.active_record.index_nested_attribute_errors`는 중첩된 has_many 관계에서 에러가 발생한 경우 에러와 함께 인덱스를 표시하도록 합니다. 기본값은 `false`입니다.
 
 MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
 
-* `ActiveRecord::ConnectionAdapters::MysqlAdapter.emulate_booleans`는 Active Record가 MySQL 데이터베이스의 모든 `tinyint(1)` 형식의 컬럼을 기본으로 boolean으로 취급할지 아닐지를 지정합니다. 기본값은 true입니다.
+* `ActiveRecord::ConnectionAdapters::Mysql2Adapter.emulate_booleans`는 Active Record가 MySQL 데이터베이스의 모든 `tinyint(1)` 형식의 컬럼을 기본으로 boolean으로 취급할지 아닐지를 지정합니다. 기본값은 `true`입니다.
 
 스키마 덤퍼(Schema Dumper)는 아래의 옵션을 추가합니다.
 
@@ -303,17 +360,21 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
 
 * `config.action_controller.asset_host`는 애셋을 저장할 호스트를 지정합니다. 이것은 애셋을 호스팅하는 장소로, 애플리케이션 서버 대신 CDN(Content Delivery Networks)을 사용하는 경우에 편리합니다.
 
-* `config.action_controller.perform_caching`은 애플리케이션에서 캐싱을 사용할지 안할지를 지정합니다. development 모드에서는 false, production 모드에서는 true로 설정합니다.
+* `config.action_controller.perform_caching`은 애플리케이션에서 캐싱을 사용할지 안할지를 지정합니다. development 모드에서는 `false`, production 모드에서는 `true`로 설정합니다.
 
 * `config.action_controller.default_static_extension`은 캐시된 페이지에 부여할 확장자를 지정합니다. 기본값은 `.html`입니다.
 
-* `config.action_controller.default_charset`은 모든 화면 출력에서 사용할 기본 문자셋을 지정합니다. 기본값은 "utf-8"입니다.
+* `config.action_controller.include_all_helpers`는 모든 뷰 헬퍼를 어디서든 사용할 수 있도록 할지, 대응하는 컨트롤러에서만 사용할 수 있도록 할지를 지정합니다 만약 `false`라면 `UsersHelper`는 `UsersController`에서 랜더링하는 뷰에서만 사용할 수 있습니다. `true`라면 `UsersHelper`의 메소드는 어디에서든 사용할 수 있습니다. 모든 뷰 헬퍼는 각각의 컨트롤러에서만 사용가능한 것이 기본 동작(명시적으로 `true`나 `false`가 지정되지 않았을 경우)입니다.
 
 * `config.action_controller.logger`는 Log4r 인터페이스나 기본 Ruby Logger 클래스에 따르는 로거를 인수로 받습니다. 이 로거는 Action Controller로부터 정보를 내보내기 위해서 사용합니다. 로그 출력을 하지 않고싶은 경우에는 `nil`로 설정하세요.
 
 * `config.action_controller.request_forgery_protection_token`는 RequestForgery 대책을 위한 파라미터 이름을 지정합니다. `protect_from_forgery`를 호출하면 기본값으로 `:authenticity_token`가 설정됩니다.
 
 * `config.action_controller.allow_forgery_protection`은 CSRF 보호 기능을 켤지를 지정합니다. test 모드의 기본값은 `false`이며, 그 이외에는 `true`로 설정됩니다.
+
+* `config.action_controller.forgery_protection_origin_check`는 HTTP `Origin` 헤더를 추가로 확인할지를 지정합니다.
+
+* `config.action_controller.per_form_csrf_tokens`는 CSRF 토큰을 생성된 메소드/액션에서만 유효하게 만들지를 지정합니다.
 
 * `config.action_controller.relative_url_root`는 [하위 폴더에 배포하기](configuring.html#하위-폴더에-배포하기-상대url경로-사용하기)를 할 것이라고 Rails에게 알리기 위해서 사용합니다. 기본값은 `ENV['RAILS_RELATIVE_URL_ROOT']`입니다.
 
@@ -323,6 +384,21 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
 
 * `config.action_controller.always_permitted_parameters`는 파라미터 필터링시에 사용할 화이트 리스트을 지정합니다. 기본값은 `['controller', 'action']`입니다.
 
+* `config.action_controller.enable_fragment_cache_logging`는 조각 캐시 읽기과 쓰기에 대한 출력을 좀 더 자세하게 할 지를 결정합니다.
+
+    ```
+    Read fragment views/v1/2914079/v1/2914079/recordings/70182313-20160225015037000000/d0bdf2974e1ef6d31685c3b392ad0b74 (0.6ms)
+    Rendered messages/_message.html.erb in 1.2 ms [cache hit]
+    Write fragment views/v1/2914079/v1/2914079/recordings/70182313-20160225015037000000/3b4e249ac9d168c617e32e84b99218b5 (1.1ms)
+    Rendered recordings/threads/_thread.html.erb in 1.5 ms [cache miss]
+    ```
+
+  기본값은 `false`이며 다음과 같은 출력을 내보냅니다.
+
+    ```
+    Rendered messages/_message.html.erb in 1.2 ms [cache hit]
+    Rendered recordings/threads/_thread.html.erb in 1.5 ms [cache miss]
+    ```
 ### Action Dispatch 설정하기
 
 * `config.action_dispatch.session_store`는 세션 데이터 저장소의 이름을 지정합니다. 기본값은 `:cookie_store`입니다. 그 외에도 `:active_record_store`, `:mem_cache_store`, 또는 커스텀 클래스 이름을 사용할 수 있습니다.
@@ -337,7 +413,13 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
     }
     ```
 
+* `config.action_dispatch.default_charset`는 모든 랜더링에서 사용할 기본 문자열 형식을 지정합니다. 기본값은 `nil`입니다.
+
 * `config.action_dispatch.tld_length`는 애플리케이션에서 사용하는 탑 레벨 도메인(TLD)의 길이를 지정합니다. 기본값은 `1`입니다.
+
+* `config.action_dispatch.ignore_accept_header`는 요청에 포함된 accept 헤더를 무시할지 여부를 지정합니다. 기본값은 `false`입니다.
+
+* `config.action_dispatch.x_sendfile_header`는 서버 전용 X-Sendfile 헤더를 지정합니다. 이는 서버로부터의 파일 전송을 빠르게 만들 때 유용합니다. 예를 들어 Apache를 위해서는 'X-Sendfile'을 지정할 수 있습니다.
 
 * `config.action_dispatch.http_auth_salt`는 HTTP Auth의 salt값(역주: 해시의 안전성을 강화하기 위해서 추가되는 임의의 값)을 설정합니다. 기본값은 `'http authentication'`입니다.
 
@@ -351,25 +433,27 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
 
 * `config.action_dispatch.rescue_responses`는 각 예외에 대해서 어떤 HTTP 상태 코드를 돌려주어야 하는지를 정의합니다. 에러와 상태 코드를 키/값 쌍으로 가지는 해시를 사용할 수 있으며, 기본값은 다음과 같습니다.
 
-    ```ruby
-    config.action_dispatch.rescue_responses = {
-      'ActionController::RoutingError'              => :not_found,
-      'AbstractController::ActionNotFound'          => :not_found,
-      'ActionController::MethodNotAllowed'          => :method_not_allowed,
-      'ActionController::UnknownHttpMethod'         => :method_not_allowed,
-      'ActionController::NotImplemented'            => :not_implemented,
-      'ActionController::UnknownFormat'             => :not_acceptable,
-      'ActionController::InvalidAuthenticityToken'  => :unprocessable_entity,
-      'ActionController::InvalidCrossOriginRequest' => :unprocessable_entity,
-      'ActionDispatch::ParamsParser::ParseError'    => :bad_request,
-      'ActionController::BadRequest'                => :bad_request,
-      'ActionController::ParameterMissing'          => :bad_request,
-      'ActiveRecord::RecordNotFound'                => :not_found,
-      'ActiveRecord::StaleObjectError'              => :conflict,
-      'ActiveRecord::RecordInvalid'                 => :unprocessable_entity,
-      'ActiveRecord::RecordNotSaved'                => :unprocessable_entity
-    }
-    ```
+  ```ruby
+  config.action_dispatch.rescue_responses = {
+    'ActionController::RoutingError'               => :not_found,
+    'AbstractController::ActionNotFound'           => :not_found,
+    'ActionController::MethodNotAllowed'           => :method_not_allowed,
+    'ActionController::UnknownHttpMethod'          => :method_not_allowed,
+    'ActionController::NotImplemented'             => :not_implemented,
+    'ActionController::UnknownFormat'              => :not_acceptable,
+    'ActionController::InvalidAuthenticityToken'   => :unprocessable_entity,
+    'ActionController::InvalidCrossOriginRequest'  => :unprocessable_entity,
+    'ActionDispatch::Http::Parameters::ParseError' => :bad_request,
+    'ActionController::BadRequest'                 => :bad_request,
+    'ActionController::ParameterMissing'           => :bad_request,
+    'Rack::QueryParser::ParameterTypeError'        => :bad_request,
+    'Rack::QueryParser::InvalidParameterError'     => :bad_request,
+    'ActiveRecord::RecordNotFound'                 => :not_found,
+    'ActiveRecord::StaleObjectError'               => :conflict,
+    'ActiveRecord::RecordInvalid'                  => :unprocessable_entity,
+    'ActiveRecord::RecordNotSaved'                 => :unprocessable_entity
+  }
+  ```
 
 여기에 명시되지 않은 모든 예외는 500 Internal Server Error로 처리됩니다.
 
@@ -395,19 +479,44 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
 
 * `config.action_view.logger`는 Log4r 또는 기본 Ruby Logger 클래스의 인터페이스를 따르는 로거를 인수로 사용합니다. 이 로거는 Action View로부터 생성된 정보를 로그에 출력할 때에 사용됩니다. 로그 출력을 하고 싶지 않은 경우에는 `nil`을 사용하세요.
 
-* `config.action_view.erb_trim_mode`는 ERB에서 사용할 트림 모드를 지정합니다. 기본은 `'-'`로, `<%= -%>` 또는 `<%= =%>`의 경우 어미에 띄어쓰기 문자를 제거하고 개행합니다. 자세한 설명은 [Erubis 문서](http://www.kuwata-lab.com/erubis/users-guide.06.html#topics-trimspaces)를 참ㅗ하세요.
+* `config.action_view.erb_trim_mode`는 ERB에서 사용할 트림 모드를 지정합니다. 기본은 `'-'`로, `<%= -%>` 또는 `<%= =%>`의 경우 어미에 띄어쓰기 문자를 제거하고 개행합니다. 자세한 설명은 [Erubis 문서](http://www.kuwata-lab.com/erubis/users-guide.06.html#topics-trimspaces)를 참고하세요.
 
 * `config.action_view.embed_authenticity_token_in_remote_forms`는 폼에서 `:remote => true`를 사용한 경우에 `authenticity_token`의 기본 동작을 정의합니다. 기본값은 `false`이며, 이 경우 리모트 폼에는 `authenticity_token`가 포함되지 않습니다. 이는 폼에서 Fragment 캐시를 사용하고 있는 경우에 편리합니다. 리모트 폼은 `meta` 태그로부터 인증을 받으므로, JavaScript가 동작하지 않는 브라우저를 지원해야하는 것이 아니라면, 폼 안에 삽입할 필요는 없습니다. 그러한 경우에는 `:authenticity_token => true`를 폼 옵션으로 넘기거나, 이 옵션을 `true`로 설정해주세요.
 
-* `config.action_view.prefix_partial_path_with_controller_namespace`는 네임스페이스화된 컨트롤러로부터 출력된 템플릿에 어떤 하위 폴더의 파셜(부분 템플릿)을 탐색할지 말지를 지정합니다. 예를 들어, `Admin::PostsController`라는 컨트롤러가 있고 아래와 같은 템플릿을 랜더링한다고 해봅시다.
+  ```ruby
+  config.action_dispatch.rescue_responses = {
+    'ActionController::RoutingError'               => :not_found,
+    'AbstractController::ActionNotFound'           => :not_found,
+    'ActionController::MethodNotAllowed'           => :method_not_allowed,
+    'ActionController::UnknownHttpMethod'          => :method_not_allowed,
+    'ActionController::NotImplemented'             => :not_implemented,
+    'ActionController::UnknownFormat'              => :not_acceptable,
+    'ActionController::InvalidAuthenticityToken'   => :unprocessable_entity,
+    'ActionController::InvalidCrossOriginRequest'  => :unprocessable_entity,
+    'ActionDispatch::Http::Parameters::ParseError' => :bad_request,
+    'ActionController::BadRequest'                 => :bad_request,
+    'ActionController::ParameterMissing'           => :bad_request,
+    'Rack::QueryParser::ParameterTypeError'        => :bad_request,
+    'Rack::QueryParser::InvalidParameterError'     => :bad_request,
+    'ActiveRecord::RecordNotFound'                 => :not_found,
+    'ActiveRecord::StaleObjectError'               => :conflict,
+    'ActiveRecord::RecordInvalid'                  => :unprocessable_entity,
+    'ActiveRecord::RecordNotSaved'                 => :unprocessable_entity
+  }
+  ```
+* `config.action_view.prefix_partial_path_with_controller_namespace`는 네임스페이스화된 컨트롤러로부터 출력된 템플릿에 어떤 하위 폴더의 파셜(부분 템플릿)을 탐색할지 말지를 지정합니다. 예를 들어, `Admin::ArticlesController`라는 컨트롤러가 있고 아래와 같은 템플릿을 랜더링한다고 해봅시다.
 
     ```erb
-    <%= render @post %>
+    <%= render @article %>
     ```
 
-이 설정의 기본값은 `true`이며, `/admin/posts/_post.erb`에 있는 파셜을 사용하게 됩니다. 만약 `false`로 변경하게 되면 `/posts/_post.erb`를 사용하여 랜더링합니다. 이 동작은 `PostsController` 등에 네임스페이스화되지 않은 컨트롤러를 랜더링할 때와 동일한 것입니다.
+이 설정의 기본값은 `true`이며, `/admin/articles/_article.erb`에 있는 파셜을 사용하게 됩니다. 만약 `false`로 변경하게 되면 `/articles/_article.erb`를 사용하여 랜더링합니다. 이 동작은 `ArticlesController` 등에 네임스페이스화되지 않은 컨트롤러를 랜더링할 때와 동일한 것입니다.
 
 * `config.action_view.raise_on_missing_translations`은, i18n에서 번역이 존재하지 않은 경우에 에러를 발생시킬지 아닐지를 지정합니다.
+
+* `config.action_view.automatically_disable_submit_tag`는 submit_tag가 클릭하면 자동으로 비활성화될지를 지정하며, 기본값은 `true`입니다.
+
+* `config.action_view.debug_missing_translation`는 찾을 수 없는 번역 키를 `<span>` 태그로 감쌀지 아닐지를 지정합니다. 기본값은 `true`입니다.
 
 ### Action Mailer 설정하기
 
@@ -422,6 +531,9 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
     * `:user_name` - 메일 서버에서 인증이 요구되는 경우, 여기서 사용자 이름을 설정합니다.
     * `:password` - 메일 서버에서 인증이 요구되는 경우, 여기서 비밀번호를 설정합니다.
     * `:authentication` - 메일 서버에서 인증이 요구되는 경우, 여기서 그 종류를 지정합니다. `:plain`, `:login`, `:cram_md5` 중 하나를 사용할 수 있습니다.
+    * `:enable_starttls_auto` - STARTTLS이 SMTP 서버에서 사용중인지를 탐지하고, 이를 사용합니다. 기본값은 `true`입니다.
+    * `:openssl_verify_mode` - TLS를 사용할 때 OpenSSL이 어떻게 인증서를 확인할지를 지정할 수 있습니다. 이는 자기 서명하거나 와일드카드 인증서를 검증해야할 때에 유용합니다. `:none`나 `:peer`와 같은 OpenSSL 검증 상수를 사용하거나 직접 `OpenSSL::SSL::VERIFY_NONE`나 `OpenSSL::SSL::VERIFY_PEER`를 사용할 수 있습니다.
+    * `:ssl/:tls` - SMPT 연결이 SMTP/TLS(SMTPS: TLS로 SMTP를 사용하기)를 사용하도록 활성화합니다.
 
 * `config.action_mailer.sendmail_settings`를 통해 `:sendmail` 방식에 대해서 세밀하게 설정을 할 수 있습니다. 해시를 인수로 받으며, 아래의 옵션을 포함할 수 있습니다.
     * `:location` - sendmail 실행 파일의 위치. 기본값은 `/usr/sbin/sendmail`입니다.
@@ -442,7 +554,7 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
     parts_order:  ["text/plain", "text/enriched", "text/html"]
     ```
 
-  해시를 하나 지정해서 옵션을 추가할 수도 있습니다.
+    해시를 하나 지정해서 옵션을 추가할 수도 있습니다.
 
     ```ruby
     config.action_mailer.default_options = {
@@ -474,17 +586,25 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
     config.action_mailer.show_previews = false
     ```
 
+* `config.action_mailer.deliver_later_queue_name`은 메일러가 사용할 큐 이름을 지정합니다. 기본값은 `mailer`입니다.
+
+* `config.action_mailer.perform_caching`은 메일러 템플릿에서 조각 캐싱을 사용할지 여부를 지정합니다. 기본값은 `false`입니다.
+
 ### Active Support 설정하기
 
 Active Support에도 몇가지 설정이 있습니다.
 
 * `config.active_support.bare`는 Rails를 실행할 때에 `active_support/all`를 불러올지 말지를 지정합니다. 기본값은 `nil`이며, 이 경우 `active_support/all`를 읽어옵니다.
 
+* `config.active_support.test_order`는 테스트를 실행할 순서를 지정합니다. `:random`과 `:sorted`를 사용할 수 있으며, 기본값은 `:random`입니다.
+
 * `config.active_support.escape_html_entities_in_json`는 JSON 직렬화에 포함되는 HTML 코드를 이스케이프할지를 지정합니다. 기본값은 `false`입니다.
 
 * `config.active_support.use_standard_json_time_format`는 ISO 8601 형식에 따른 날짜의 직렬화를 처리할지 말지를 지정합니다. 기본값은 `true`입니다.
 
 * `config.active_support.time_precision`는 JSON 인코딩된 시간값의 정밀도를 지정합니다. 기본값은 `3`입니다.
+
+* `ActiveSupport.halt_callback_chains_on_return_false`는 Active Record와 Active Model 콜백 체인이 `before` 콜백에서 `false`를 반환하는 경우에 종료될 지를 지정합니다. `false`로 지정하면, 콜백 체인은 `throw(:abort)`를 명시적으로 호출한 경우에만 종료됩니다. `true`로 지정하면 콜백 체인은 `false`를 호출하는 경우에도 종료되며, 제거 예정 경고를 출력합니다(Rails 5 이전의 동작). 졔거 예정 경고 기간에는 `true`가 기본값입니다. 새 Rails 5 애플리케이션은 `new_framework_defaults.rb`라는 initializer 팡리을 생성하며, 여기에는 `false`로 지정되어 있습니다. 이 파일은 `rails app:update`를 실행한 경우에는 추가되지 *않습니다*. 그러므로 `false`를 반환하는 것은 Rails 5로 업그레이드한 경우에는 여전히 동작하며, 코드를 변경할 수 있도록 제거 예정 경고를 출력합니다.
 
 * `ActiveSupport::Logger.silencer`를 `false`로 지정하면, 블럭 내에서 로그 출력을 제어하는 기능이 비활성화됩니다. 기본값은 `true`입니다.
 
@@ -496,6 +616,63 @@ Active Support에도 몇가지 설정이 있습니다.
 
 * `ActiveSupport::Deprecation.silenced`는 Deprecated 메시지를 표시할지 말지를 지정합니다.
 
+### Active Job 설정하기
+
+`config.active_job`는 아래의 설정을 제공합니다.
+
+* `config.active_job.queue_adapter`는 백엔드 큐로 사용할 어댑터를 지정합니다. 기본 어댑터는 `:async`입니다. 내장된 어댑터의 최신 목록을 확인하려면 [ActiveJob::QueueAdapters API 문서](http://api.rubyonrails.org/classes/ActiveJob/QueueAdapters.html)를 참고하세요.
+
+    ```ruby
+    # Be sure to have the adapter's gem in your Gemfile
+    # and follow the adapter's specific installation
+    # and deployment instructions.
+    config.active_job.queue_adapter = :sidekiq
+    ```
+
+* `config.active_job.default_queue_name`는 기본 큐의 이름을 지정합니다. 기본값은 `"default"`입니다.
+
+    ```ruby
+    config.active_job.default_queue_name = :medium_priority
+    ```
+
+* `config.active_job.queue_name_prefix`는 옵션으로 사용하며 공백이 될 수 없는, 모든 잡에서 사용될 접두사를 지정할 수 있습니다. 기본값은 공백이며 사용되지 않습니다.
+
+    다음 설정은 실제 환경에서 잡을 `production_high_priority` 큐에 추가합니다.
+
+    ```ruby
+    config.active_job.queue_name_prefix = Rails.env
+    ```
+
+    ```ruby
+    class GuestsCleanupJob < ActiveJob::Base
+      queue_as :high_priority
+      #....
+    end
+    ```
+
+* `config.active_job.queue_name_delimiter`의 기본값은 `'_'`입니다. `queue_name_prefix`가 설정되면 `queue_name_prefix`는 접두사와 기본 큐 이름을 연결합니다.
+
+    다음 설정은 잡을 video_server.low_priority` 큐에 추가합니다.
+
+    ```ruby
+    # delimiter를 사용하려면 접두사를 지정해야 합니다.
+    config.active_job.queue_name_prefix = 'video_server'
+    config.active_job.queue_name_delimiter = '.'
+    ```
+
+    ```ruby
+    class EncoderJob < ActiveJob::Base
+      queue_as :low_priority
+      #....
+    end
+    ```
+
+* `config.active_job.logger`는 Log4r이나 기본 Ruby Logger 클래스의 인터페이스를 사용하는 로거를 받으며, Active Job의 로그 정보를 출력할 때에 사용됩니다. 이 로거는 Active Job 클래스나 인스턴스에서 `logger`를 호출하여 가져올 수 있습니다. 로깅을 사용하지 않으려면 `nil`로 설정하세요.
+
+### Action Cable 설정하기
+
+* `config.action_cable.url`는 Action Cable 서버를 제공할 URL 문자열을 받습니다. 주 애플리케이션과 분리된 환경에서 운영하는 경우에 사용하세요.
+* `config.action_cable.mount_path`는 Action Cable을 주 서버 프로세스에서 제공할 때 어느 경로에서 제공할지를 지정합니다. 기본값은 `/cable`입니다. Rails 서버에서 Action Cable를 제공하지 않는다면 nil로 설정하면 됩니다.
 
 ### 데이터베이스 설정하기
 
@@ -640,9 +817,9 @@ development:
 
 NOTE: Railsdp서 데이터 저장용으로 SQLite3 데이터베이스를 채용하고 있는 이유는 설정 없이도 쉽게 사용할 수 있기 때문입니다. Rails에서는 SQLite 대신에 MySQL이나 PostgrreSQL 등을 사용할 수도 있습니다. 또한, 데이터베이스 접속용으로 많은 플러그인이 존재합니다. production 환경에서 어떤 데이터베이스를 사용하는 경우, 그를 위한 어뎁터는 대부분 금방 찾을 수 있습니다.
 
-#### MySQL 데이터베이스 설정하기
+#### MySQL이나 MariaDB 설정하기
 
-Rails同梱のSQLite3に代えてMySQLを採用した場合、`config/database.yml`の記述方法を少し変更します。developmentセクションの記述は以下のようになります。
+기본으로 제공되는 SQLite3 대신에 MySQL이나 MariaDB를 사용하고 싶다면, `config/database.yml`은 조금 다른 모습이 됩니다. 개발 환경의 설정은 이렇습니다.
 
 ```yaml
 development:
@@ -655,7 +832,7 @@ development:
   socket: /tmp/mysql.sock
 ```
 
-開発環境のコンピュータにMySQLがインストールされており、ユーザー名root、パスワードなしで接続できるのであれば、上の設定で接続できるようになるはずです。接続できない場合は、`development`セクションのユーザー名またはパスワードを適切なものに変更してください。
+만약 개발용 데이터베이스의 root 사용자의 비밀번호가 없다면 이 설정은 동작해야 합니다. 그렇지 않다면 사용자 이름과 비밀번호를 적절한 값으로 변경해주세요.
 
 #### PostgreSQL 데이터베이스 설정하기
 
@@ -697,7 +874,7 @@ development:
   database: db/development.sqlite3
 ```
 
-#### JRuby 플랫폼에서 MySQL 데이터베이스 설정하기
+#### JRuby 플랫폼에서 MySQL이나 MariaDB 데이터베이스 설정하기
 
 JRuby 환경에서 MySQL을 사용하는 경우 `config/database.yml`의 작성방법이 조금 다릅니다. development는 다음과 같이 작성합니다.
 
@@ -789,16 +966,7 @@ server {
 }
 ```
 
-반드시 최신 정보는 NGINX 문서를 참조하여주세요.
-
-#### 하위 폴더에 배포하는 경우의 검토사항
-
-실제 환경에서 Rails를 하위 폴더에 배호가게 되면 Rails의 많은 부분에 영향이 발생합니다.
-
-* 개발 환경
-* 테스트 환경
-* 정적 애셋 제공하기
-* 애셋 파이프라인
+반드시 최신 정보는 [NGINX 문서](http://nginx.org/en/docs/)를 참조하여주세요.
 
 Rails 환경 설정
 --------------------------
@@ -891,7 +1059,7 @@ WARNING: initializer가 실행되는 순서는 논리적으로 모순이 발생�
 
 * `set_clear_dependencies_hook`은 `active_record.set_dispatch_hooks`에 대한 훅을 제공합니다. 이 initializer보다 먼저 실행됩니다. 이 initializer는 `cache_classes`가 `false`인 경우에만 실행됩니다. 그리고 이 initializer는 `ActionDispatch::Callbacks.after`를 사용하여 객체 공간으로부터 요청에서 참조된 상수를 제거하여 이후 요청에서 다시 로드하도록 만듭니다.
 
-* `initialize_dependency_mechanism`는 `config.cache_classes`이 true인 경우 `ActiveSupport::Dependencies.mechanism`에 의존성을 (`load`가 아닌) `require`로 설정합니다.
+* `initialize_dependency_mechanism`는 `config.cache_classes`이 `true`인 경우 `ActiveSupport::Dependencies.mechanism`에 의존성을 (`load`가 아닌) `require`로 설정합니다.
 
 * `bootstrap_hook`은 모든 정의된 `before_initialize` 블럭을 실행합니다.
 
@@ -903,21 +1071,31 @@ WARNING: initializer가 실행되는 순서는 논리적으로 모순이 발생�
 
 * `active_support.initialize_beginning_of_week`는 `config.beginning_of_week`의 값을 기반으로 애플리케이션의 기본 주의 시작요일을 설정합니다. 기본값은 `:monday`입니다.
 
+* `active_support.set_configs`: `config.active_support`의 설정값을 `ActiveSupport`에 메소드 이름을 전송하여 값을 넘겨서 Active Support를 설정합니다.
+
 * `action_dispatch.configure`는 `ActionDispatch::Http::URL.tld_length`를 `config.action_dispatch.tld_length`의 값(탑 레벨 도메인의 길이)으로 설정합니다.
 
 * `action_view.set_configs`는 `config.action_view`의 설정값을 `ActionView::Base`에 메소드 이름을 전송하여 값을 넘겨서 Action View를 설정합니다.
 
-* `action_controller.logger`는 `Rails.logger`에 대한 설정이 없는 경우에 `ActionController::Base.logger`를 설정합니다.
+* `action_controller.assets_config`는 명시적으로 설정되지 않으면 `config.actions_controller.assets_dir`를 public 폴더로 지정합니다.
 
-* `action_controller.initialize_framework_caches`는 `Rails.cache`에 대한 설정이 없는 경우에 `ActionController::Base.cache_store`를 설정합니다.
+* `action_controller.set_helpers_path`는 Action Controller의 `helpers_path`를 애플리케이션의 `helpers_path`로 설정합니다.
+
+* `action_controller.parameters_config`는 `ActionController::Parameters`를 위해 Strong parameter 옵션을 설정합니다.
 
 * `action_controller.set_configs`는 `config.action_controller`의 설정값을 `ActionController::Base`에 메소드 이름을 전송하여 값을 넘겨서 Action Controller를 설정합니다.
 
 * `action_controller.compile_config_methods`는 지정한 설정용 메소드를 초기화하고, 좀 더 빠르게 접근할 수 있게 해줍니다.
 
-* `active_record.initialize_timezone`는 `ActiveRecord::Base.time_zone_aware_attributes`를 true로 설정하고 `ActiveRecord::Base.default_timezone`을 UTC로 설정합니다. 속성을 데이터베이스로부터 가져온 경우, 그 속성은 `Time.zone`에서 지정한 시간대로 변환됩니다.
+* `active_record.initialize_timezone`는 `ActiveRecord::Base.time_zone_aware_attributes`를 `true`로 설정하고 `ActiveRecord::Base.default_timezone`을 UTC로 설정합니다. 속성을 데이터베이스로부터 가져온 경우, 그 속성은 `Time.zone`에서 지정한 시간대로 변환됩니다.
 
 * `active_record.logger`가 설정되어 있지 않은 경우에 `ActiveRecord::Base.logger`를 `Rails.logger`를 설정합니다.
+
+* `active_record.migration_error`는 실행되지 않은 마이그레이션이 있는지 확인하는 미들웨어를 설정합니다.
+
+* `active_record.check_schema_cache_dump`는 스키마 캐시 덤프가 설정되어 있고, 사용할 수 있다면 이를 불러옵니다.
+
+* `active_record.warn_on_records_fetched_greater_than`는 쿼리가 대량의 레코드를 반환할 때 출력할 경고를 활성화합니다.
 
 * `active_record.set_configs`는 `config.active_record`의 설정값을 `ActiveRecord::Base`에 메소드 이름을 전송하여 값을 넘겨서 Action Record를 설정합니다.
 
@@ -925,11 +1103,17 @@ WARNING: initializer가 실행되는 순서는 논리적으로 모순이 발생�
 
 * `active_record.log_runtime`는 요청에서 Active Record를 호출하는 시간을 로거에 전달하는 역할을 하는 `ActiveRecord::Railties::ControllerRuntime`를 포함합니다.
 
-* `active_record.set_dispatch_hooks`는 `config.cache_classes`가 `false`로 설정되어 있는 경우, 다시 읽어올 수 있는 데이터베이스 접속을 모두 초기화시킵니다.
+* `active_record.set_reloader_hooks`는 `config.cache_classes`가 `false`로 설정되어 있는 경우, 다시 읽어올 수 있는 데이터베이스 접속을 모두 초기화시킵니다.
+
+* `active_record.add_watchable_files`는 `schema.rb`와 `structure.sql` 파일을 감시 목록에 추가합니다.
+
+* `active_job.logger`는 `ActiveJob::Base.logger`가 설정되어 있지 않다면 `Rails.logger`로 설정합니다.
+
+* `active_job.set_configs`는 `config.active_job`의 설정값을 `ActiveJob::Base`에 메소드 이름을 전송하여 값을 넘기고 Active Job을 설정합니다.
 
 * `action_mailer.logger`는 설정이 되어 있지 않은 경우에 `ActionMailer::Base.logger`를 `Rails.logger`로 설정합니다.
 
-* `action_mailer.set_configs`는 `config.action_mailer`의 설정값을 `ActiveMailer::Base`에 메소드 이름을 전송하여 값을 넘겨서 Action Mailer를 설정합니다. 설정을 사용해서 Action Mailer를 설정합니다.
+* `action_mailer.set_configs`는 `config.action_mailer`의 설정값을 `ActiveMailer::Base`에 메소드 이름을 전송하여 값을 넘겨서 Action Mailer를 설정합니다.
 
 * `action_mailer.compile_config_methods`는 지정된 설정용 메소드를 초기화하고, 좀 더 빠르게 사용할 수 있도록 만듭니다.
 
@@ -944,8 +1128,6 @@ WARNING: initializer가 실행되는 순서는 논리적으로 모순이 발생�
 * `add_view_paths`는 애플리케이션이나 railties나 엔진에 있는 `app/views`에 대한 경로를 뷰 파일의 참조 경로에 추가합니다.
 
 * `load_environment_config`는 현재 환경의 `config/environments`를 읽어옵니다.
-
-* `append_asset_paths` 애플리케이션과 거기에 추가되어 있는 railties에 포함되어 있는 애셋 경로를 찾고, `config.static_asset_paths`에서 지정되어 있는 폴더를 감시합니다.
 
 * `prepend_helpers_path`는 애플리케이션이나 railties, 엔진에 포함되는 `app/helpers` 폴더를 헬퍼의 참조 경로에 추가합니다.
 
@@ -963,13 +1145,13 @@ WARNING: initializer가 실행되는 순서는 논리적으로 모순이 발생�
 
 * `build_middleware_stack`는 애플리케이션의 미들웨어 스택을 구성하고, 요청에 대한 Rack 환경 객체를 인수로 받는 `call` 메소드를 가지는 객체를 반환합니다.
 
-* `eager_load!`는 `config.eager_load`가 true인 경우 `config.before_eager_load` 훅을 실행하고, 이어서 `eager_load!`를 호출하여 모든 `config.eager_load_namespaces`가 불러옵니다.
+* `eager_load!`는 `config.eager_load`가 `true`인 경우 `config.before_eager_load` 훅을 실행하고, 이어서 `eager_load!`를 호출하여 모든 `config.eager_load_namespaces`가 불러옵니다.
 
 * `finisher_hook`은 애플리케이션 초기화 프로세스가 완료된 이후에 실행되는 훅을 제공하며, 애플리케이션이나 railties, 엔진의 `config.after_initialize` 블록을 모두 실행합니다.
 
 * `set_routes_reloader`는 `ActionDispatch::Callbacks.to_prepare`을 사용하여 라우팅을 다시 읽어오기 위한 Action Dispatch를 구성합니다.
 
-* `disable_dependency_loading`는 `config.eager_load`가 true인 경우에 자동 의존성 로딩(automatic dependency loading)이 무효화됩니다.
+* `disable_dependency_loading`는 `config.eager_load`가 `true`인 경우에 자동 의존성 로딩(automatic dependency loading)이 무효화됩니다.
 
 데이터베이스 커넥션 풀
 ----------------
@@ -991,11 +1173,89 @@ development:
 이용가능한 숫자보다 많은 커넥션을 사용하려고 시도하면 Active Record는 이를 막고 풀이 넘겨주는 커넥션을 기다립니다. 커넥션을 얻을 수 없는 경우에는 아래와 같은 타임 아웃 에러를 던집니다.
 
 ```ruby
-ActiveRecord::ConnectionTimeoutError - could not obtain a database connection within 5 seconds. The max pool size is currently 5; consider increasing it:
+ActiveRecord::ConnectionTimeoutError - could not obtain a database connection within 5.000 seconds (waited 5.000 seconds)
 ```
 
 이 에러가 발생하는 경우에는 `database.yml`의 `pool` 옵션에 설정되어 있는 숫자를 더 큰 숫자로 변경하여 접속 풀의 크기를 키워 문제의 해결을 노려볼 수 있습니다.
 
 NOTE: 애플리케이션을 멀티 스레드 환경에서 실행하고 있는 경우에는 많은 스레드가 동시에 접속할 가능성이 있습니다. 현 시점의 요청에 걸린 부하에 따라서 제한된 요청 가능 숫자를 여러 스레드가 경쟁적으로 요구할 가능성이 있습니다.
 
-TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.
+커스텀 설정
+------------------
+
+Rails 설정 객체에서 `config.x` 이름 공간이나 `config`를 직접 사용하여 애플리케이션의 설정을 할 수 있습니다. 중첩된 설정을 정의하는 경우에는 `config.x` 형식을 사용해주세요(ex: `config.x.nested.nested.hi`). 또는 그냥 값이 필요한 경우에는 `config`를 사용하세요(ex: `config.hello`).
+
+  ```ruby
+  config.x.payment_processing.schedule = :daily
+  config.x.payment_processing.retries  = 3
+  config.super_debugger = true
+  ```
+
+이 설정 방식의 장점은 설정 객체를 통해서 이 정보들에 접근할 수 있다는 점입니다.
+
+  ```ruby
+  Rails.configuration.x.payment_processing.schedule # => :daily
+  Rails.configuration.x.payment_processing.retries  # => 3
+  Rails.configuration.x.payment_processing.not_set  # => nil
+  Rails.configuration.super_debugger                # => true
+  ```
+
+`Rails::Application.config_for`를 사용하여 설정 파일 전체를 불러올 수도 있습니다.
+
+  ```ruby
+  # config/payment.yml:
+  production:
+    environment: production
+    merchant_id: production_merchant_id
+    public_key:  production_public_key
+    private_key: production_private_key
+  development:
+    environment: sandbox
+    merchant_id: development_merchant_id
+    public_key:  development_public_key
+    private_key: development_private_key
+
+  # config/application.rb
+  module MyApp
+    class Application < Rails::Application
+      config.payment = config_for(:payment)
+    end
+  end
+  ```
+
+  ```ruby
+  Rails.configuration.payment['merchant_id'] # => production_merchant_id or development_merchant_id
+  ```
+
+검색 엔진 색인
+----------------------
+
+때때로 애플리케이션의 몇몇 페이지들을 Google, Bing, Yahoo, Duck Duck Go와 같은 검색 엔진에서 보이지 않았으면 할 때가 있습니다. 이러한 사이트들의 로봇은 `http://your-site.com/robots.txt`를 확인하여 어떤 페이지에 대한 색인이 허가되어 있는지를 확인합니다.
+
+Rails는 이 파일을 `/public`에 생성합니다. 기본값은 검색 엔진이 애플리케이션의 모든 페이지를 색인할 수 있도록 허가합닏. 만약 애플리케이션의 모든 페이지 색인을 막고 싶다면 다음을 사용하세요.
+
+```
+User-agent: *
+Disallow: /
+```
+
+특정 페이지만을 막고 싶은 경우에는 좀 더 복잡한 문법을 사용해야 합니다. [공식 문서](http://www.robotstxt.org/robotstxt.html)에서 이를 배워보세요.
+
+파일 시스템 변경 감시
+-----------------------
+
+Rails에 [listen 젬](https://github.com/guard/listen)이 로드되어 있다면 `config.cache_classes`이 `false`인 경우에 파일 시스템 감시를 위해 이를 사용할 수 있습니다.
+
+```ruby
+group :development do
+  gem 'listen', '>= 3.0.5', '< 3.2'
+end
+```
+
+그렇지 않다면 모든 요청마다 Rails가 애플리케이션 트리를 돌며 변경사항이 없는지 확인합니다.
+
+Linux나 Mac OS X는 추가로 젬을 필요로 하지 않습니다만, [*BSD](https://github.com/guard/listen#on-bsd)이거나 [윈도우](https://github.com/guard/listen#on-windows)인 경우에는 필요합니다.
+
+[몇몇 설정에서는 지원되지 않는](https://github.com/guard/listen#issues--limitations) 점을 기억하세요.
+
+

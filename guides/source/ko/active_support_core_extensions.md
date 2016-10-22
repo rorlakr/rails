@@ -1,9 +1,11 @@
 Active Support 코어 확장 기능
 ==============================
 
-Active Support는 Ruby on Rails의 구성 요소중 하나로, Ruby의 확장 기능, 유틸리티, 그 외의 작업 등을 담당하고 있습니다.
+Active Support는 Ruby on Rails의 구성 요소중 하나로, Ruby의 확장 기능,
+유틸리티, 그 외의 작업 등을 담당하고 있습니다.
 
-Active Support는 언어 레벨에서 다양한 기능을 추가해주며, Rails 애플리케이션의 개발과 Ruby on Rails 자체의 개발을 지원하기 위한 목적으로 만들어졌습니다.
+Active Support는 언어 레벨에서 다양한 기능을 추가해주며, Rails 애플리케이션의
+개발과 Ruby on Rails 자체의 개발을 지원하기 위한 목적으로 만들어졌습니다.
 
 이 가이드의 내용:
 
@@ -19,7 +21,11 @@ Active Support는 언어 레벨에서 다양한 기능을 추가해주며, Rails
 
 ### 독립적인 Active Support
 
-흔적을 최대한 남기지 않기 위해서, Active Support는 기본적으로 아무것도 읽어들이지 않습니다. Active Support는 자잘하게 분할되어 필요한 확장 기능만 불러올 수 있도록 되어 있습니다. 또한 연관되어 있는 확장기능(상황에 따라서는 모든 확장 기능)도 동시에 불러올 때에 사용할 수 있는 엔트리 포인트도 포함하고 있습니다.
+흔적을 최대한 남기지 않기 위해서, Active Support는 기본적으로 아무것도
+읽어들이지 않습니다. Active Support는 자잘하게 분할되어 필요한 확장 기능만
+불러올 수 있도록 되어 있습니다. 또한 연관되어 있는 확장기능(상황에 따라서는
+모든 확장 기능)도 동시에 불러올 때에 사용할 수 있는 엔트리 포인트도 포함하고
+있습니다.
 
 따라서 아래와 같은 require문을 실행하더라도,
 
@@ -27,13 +33,16 @@ Active Support는 언어 레벨에서 다양한 기능을 추가해주며, Rails
 require 'active_support'
 ```
 
-객체는 `blank?`에 응답하지 않습니다(역주: `black?`는 Active Support가 추가해주는 메소드 중 하나임). 이 정의가 어떤 식으로 로드되는지 확인해봅시다.
+객체는 `blank?`에 응답하지 않습니다. 이 정의가 어떤 식으로 로드되는지 확인해봅시다.
 
 #### 필요한 정의만을 선택
 
-`blank?` 메소드를 사용하는 가장 '가벼운' 방법은 그 메소드가 정의되어있는 파일만을 선택해서 불러오는 것입니다.
+`blank?` 메소드를 사용하는 가장 '가벼운' 방법은 그 메소드가 정의되어 있는
+파일만을 선택해서 불러오는 것입니다.
 
-이 가이드에서는 코어 확장 기능으로 정의되어있는 모든 메소드에 대해서 그 정의 파일이 어디에 위치해 있는지를 적어두었습니다. 예를 들어 `blank?`의 경우, 아래와 같은 메모가 되어 있습니다.
+이 가이드에서는 코어 확장 기능으로 정의되어있는 모든 메소드에 대해서 그 정의
+파일이 어디에 위치해 있는지를 적어두었습니다. 예를 들어 `blank?`의 경우,
+아래와 같은 메모가 되어 있습니다.
 
 NOTE: `active_support/core_ext/object/blank.rb`에 정의되어 있습니다.
 
@@ -44,13 +53,17 @@ require 'active_support'
 require 'active_support/core_ext/object/blank'
 ```
 
-Active Support는 무척 조심스러워서, 어떤 파일을 선택했을 경우 정말로 필요한 파일들만을 동시에 불러옵니다(의존 관계가 있는 경우).
+Active Support는 무척 조심스러워서, 어떤 파일을 선택했을 경우 정말로 필요한
+파일들만을 동시에 불러옵니다(의존 관계가 있는 경우).
 
 #### 코어 확장 기능을 그룹화하여 불러오기
 
-다음 단계로 `Object`에 대한 모든 확장 기능을 불러와봅시다. 경험적으로 `SomeClass`라는 클래스가 있다면 `active_support/core_ext/some_class`라는 경로를 지정하면 한번에 읽어올 수 있습니다.
+다음 단계로 `Object`에 대한 모든 확장 기능을 불러와봅시다. 경험적으로
+`SomeClass`라는 클래스가 있다면 `active_support/core_ext/some_class`라는
+경로를 지정하면 한번에 읽어올 수 있습니다.
 
-따라서, (`blank?`를 포함하여)`Object`에 대한 모든 확장기능을 불러오기 위해서는 다음과 같이 작성하면 됩니다.
+따라서, (`blank?`를 포함하여)`Object`에 대한 모든 확장기능을 불러오기 위해서는
+다음과 같이 작성하면 됩니다.
 
 ```ruby
 require 'active_support'
@@ -68,17 +81,24 @@ require 'active_support/core_ext'
 
 #### 모든 Active Support를 읽어오기
 
-마지막으로 사용가능한 Active Support를 모두 불러오고 싶다면 이렇게 할 수 있습니다.
+마지막으로 사용가능한 Active Support를 모두 불러오고 싶다면 이렇게 할 수
+있습니다.
 
 ```ruby
 require 'active_support/all'
 ```
 
-단, 이 코드를 실행하더라도 Active Support 전체가 메모리 상에 로드되는 것은 아닙니다. 일부는 `autoload`로 설정되어서, 실제로 사용하기 전까지는 로드되지 않습니다.
+단, 이 코드를 실행하더라도 Active Support 전체가 메모리 상에 로드되는 것은
+아닙니다. 일부는 `autoload`로 설정되어서, 실제로 사용하기 전까지는 로드되지
+않습니다.
 
 ### Ruby on Rails 애플리케이션에서 Active Support를 사용하기
 
-Ruby on Rails 애플리케이션에서는 기본적으로 모든 Active Support를 불러옵니다. `active_support.bare`를 true로 설정했을 때는 예외입니다. 이 옵션을 true로 설정하면 프레임워크 자체가 필요로 할 때까지 애플리케이션은 확장 기능을 불러오지 않습니다. 또한 불러올 확장 기능은 위에서 이야기했듯이 각 부분별로 그때그때 선택됩니다.
+Ruby on Rails 애플리케이션에서는 기본적으로 모든 Active Support를 불러옵니다.
+`active_support.bare`를 true로 설정했을 때는 예외입니다. 이 옵션을 true로
+설정하면 프레임워크 자체가 필요로 할 때까지 애플리케이션은 확장 기능을
+불러오지 않습니다. 또한 불러올 확장 기능은 위에서 이야기했듯이 각 부분별로
+그때그때 선택됩니다.
 
 모든 객체에서 사용할 수 있는 확장 기능
 -------------------------
@@ -95,11 +115,15 @@ Rails 애플리케이션은 아래의 값을 공백(blank)라고 판단합니다
 
 * 그 외, `empty?` 메소드에 true를 돌려주는 모든 객체를 비어있다고 생각합니다.
 
-INFO: 문자열을 판정하기위해, Unicode에 대응하는 문자 클래스인 `[:space:]`를 사용합니다. 그러므로 예를 들어 U+2029(단락 구분자)역시 공백 문자로 판정됩니다.
+INFO: 문자열을 판정하기위해, Unicode에 대응하는 문자 클래스인 `[:space:]`를
+사용합니다. 그러므로 예를 들어 U+2029(단락 구분자)역시 공백 문자로 판정됩니다.
 
-WARNING: 숫자에 대해서는 공백인지 아닌지 판단할 수 없습니다. 특히 0이나 0.0은 **공백이 아니므로** 주의해주세요.
+WARNING: 숫자에 대해서는 공백인지 아닌지 판단할 수 없습니다. 특히 0이나 0.0은
+**공백이 아니므로** 주의해주세요.
 
-예를 들어 `ActionController::HttpAuthentication::Token::ControllerMethods`에 있는 아래의 메소드에서는 `blank?`를 사용해서 토큰이 존재하고 있는지를 확인합니다.
+예를 들어 `ActionController::HttpAuthentication::Token::ControllerMethods`에
+있는 아래의 메소드에서는 `blank?`를 사용해서 토큰이 존재하고 있는지를
+확인합니다.
 
 ```ruby
 def authenticate(controller, &login_procedure)
@@ -110,7 +134,8 @@ def authenticate(controller, &login_procedure)
 end
 ```
 
-`present?` 메소드는 `!blank?` 메소드와 동등합니다. 아래의 예시는 `ActionDispatch::Http::Cache::Response`에서 인용했습니다.
+`present?` 메소드는 `!blank?` 메소드와 동등합니다. 아래의 예시는
+`ActionDispatch::Http::Cache::Response`에서 인용했습니다.
 
 ```ruby
 def set_conditional_cache_control!
@@ -123,7 +148,8 @@ NOTE: `active_support/core_ext/object/blank.rb`에 정의되어 있습니다.
 
 ### `presence`
 
-`presence` 메소드는 `present?`가 true인 경우에는 자기 자신의 리시버를 반환하고, false인 경우에는 `nil`을 반환합니다. 이 메소드는 아래와 같은 경우에 편리합니다.
+`presence` 메소드는 `present?`가 true인 경우에는 자기 자신의 리시버를 반환하고,
+false인 경우에는 `nil`을 반환합니다. 이 메소드는 아래와 같은 경우에 편리합니다.
 
 ```ruby
 host = config[:host].presence || 'localhost'
@@ -227,7 +253,9 @@ end
 @number.try(:next)
 ```
 
-`ActiveRecord::ConnectionAdapters::AbstractAdapter`에 있는 다른 예시를 소개합니다. 여기에서는 `@logger`가 `nil`일 경우가 있습니다. 이 코드에서는 `try`를 사용하는 것으로 불필요한 체크를 하는 수고를 덜 수 있습니다.
+`ActiveRecord::ConnectionAdapters::AbstractAdapter`에 있는 다른 예시를
+소개합니다. 여기에서는 `@logger`가 `nil`일 경우가 있습니다. 이 코드에서는
+`try`를 사용하는 것으로 불필요한 체크를 하는 수고를 덜 수 있습니다.
 
 ```ruby
 def log_info(sql, name, ms)
@@ -238,10 +266,19 @@ def log_info(sql, name, ms)
 end
 ```
 
-`try` 메소드는 인수 대신 블록과 함께 호출할 수도 있습니다. 이 경우 객체가 `nil`이 아닌 경우에만 블록이 실행됩니다.
+`try` 메소드는 인수 대신 블록과 함께 호출할 수도 있습니다. 이 경우 객체가
+`nil`이 아닌 경우에만 블록이 실행됩니다.
 
 ```ruby
 @person.try { |p| "#{p.first_name} #{p.last_name}" }
+```
+
+`try`는 얕은 에러를 사용하므로 nil을 반환합니다. 만약 작성 미스에 따른 문제를
+피하고 싶다면 `try!`를 사용하세요.
+
+```ruby
+@number.try(:nest)  # => nil
+@number.try!(:nest) # NoMethodError: undefined method `nest' for 1:Integer
 ```
 
 NOTE: `active_support/core_ext/object/try.rb`에 정의되어 있습니다.
@@ -269,14 +306,19 @@ NOTE: `active_support/core_ext/kernel/singleton_class.rb`에 정의되어 있습
 
 ### `acts_like?(duck)`
 
-`acts_like?` 메소드는, 일부 클래스가 다른 클래스와 같은 방식으로 동작하는지에 대해서 어떤 관례에 따라서 확인합니다. `String` 클래스와 동일한 인터페이스를 제공하는 클래스가 있고, 그 중에서 아래의 메소드를 정의했다고 가정해 봅시다.
+`acts_like?` 메소드는, 일부 클래스가 다른 클래스와 같은 방식으로 동작하는
+지에 대해서 어떤 관례에 따라서 확인합니다. `String` 클래스와 동일한
+인터페이스를 제공하는 클래스가 있고, 그 중에서 아래의 메소드를 정의했다고
+가정해 봅시다.
 
 ```ruby
 def acts_like_string?
 end
 ```
 
-이 메소드는 단순한 지표이며, 메소드 자체가 돌려주는 값과 관련은 없습니다. 이에 의해서 클라이언트 코드에서는 이래와 같은 덕 타이핑(duck typing) 체크를 할 수 있게 됩니다.
+이 메소드는 단순한 지표이며, 메소드 자체가 돌려주는 값과 관련은 없습니다.
+이에 의해서 클라이언트 코드에서는 이래와 같은 덕 타이핑(duck typing) 체크를
+할 수 있게 됩니다.
 
 ```ruby
 some_klass.acts_like?(:string)
@@ -288,7 +330,9 @@ NOTE: `active_support/core_ext/object/acts_like.rb`에 정의되어 있습니다
 
 ### `to_param`
 
-Rails의 모든 객체들에 `to_param` 메소드를 사용할 수 있습니다. 이것은 객체를 값으로 표현한 것을 반환한다는 의미입니다. 반환된 값은 쿼리 문자열이나 URL의 일부로 사용할 수 있습니다.
+Rails의 모든 객체들에 `to_param` 메소드를 사용할 수 있습니다. 이것은 객체를
+값으로 표현한 것을 반환한다는 의미입니다. 반환된 값은 쿼리 문자열이나 URL의
+일부로 사용할 수 있습니다.
 
 기본으로 `to_param` 메소드는 `to_s` 메소드를 호출하게 됩니다.
 
@@ -304,7 +348,9 @@ Rails의 모든 객체들에 `to_param` 메소드를 사용할 수 있습니다.
 
 이 메소드는 Rails의 많은 클래스에서 재정의됩니다.
 
-예를 들어 `nil`, `true`, `false`의 경우는 자기 자신을 반환합니다. `Array#to_param`를 실행하면 `to_param`이 배열 내의 각 요소에 대해서 실행되며, 결과가 "/"로 join됩니다.
+예를 들어 `nil`, `true`, `false`의 경우는 자기 자신을 반환합니다.
+`Array#to_param`를 실행하면 `to_param`이 배열 내의 각 요소에 대해서 실행되며,
+결과가 "/"로 join됩니다.
 
 ```ruby
 [0, true, String].to_param # => "0/true/String"
@@ -332,7 +378,9 @@ NOTE: `active_support/core_ext/object/to_param.rb`에 정의되어 있습니다.
 
 ### `to_query`
 
-이 메소드는 이스케이프 되지 않은 `key`를 받으면, 그 키를 `to_param`이 돌려주는 값을 대응시키는 쿼리 문자열의 일부를 생성합니다. 단 해시는 예외입니다(뒤에서 설명). 예를 들자면 다음과 같은 경우,
+이 메소드는 이스케이프 되지 않은 `key`를 받으면, 그 키를 `to_param`이 돌려주는
+값을 대응시키는 쿼리 문자열의 일부를 생성합니다. 단 해시는 예외입니다(뒤에서
+설명). 예를 들자면 다음과 같은 경우,
 
 ```ruby
 class User
@@ -357,7 +405,8 @@ account.to_query('company[name]')
 
 따라서 이 결과값은 그대로 쿼리 문자열로 사용할 수 있습니다.
 
-배열에 `to_query` 메소드를 사용한 경우 `to_query`를 배열의 각 요소에 호출하여 `_key_[]`를 키로 추가하고, 그 값들을 "&"로 연결한 결과를 반환합니다.
+배열에 `to_query` 메소드를 사용한 경우 `to_query`를 배열의 각 요소에 호출하여
+`key[]`를 키로 추가하고, 그 값들을 "&"로 연결한 결과를 반환합니다.
 
 ```ruby
 [3.4, -45.6].to_query('sample')
@@ -636,8 +685,6 @@ module ActiveSupport
     mattr_accessor :load_once_paths
     mattr_accessor :autoloaded_constants
     mattr_accessor :explicitly_unloadable_constants
-    mattr_accessor :logger
-    mattr_accessor :log_activity
     mattr_accessor :constant_watch_stack
     mattr_accessor :constant_watch_stack_mutex
   end
@@ -712,76 +759,6 @@ M.parents       # => [X::Y, X, Object]
 ```
 
 NOTE: `active_support/core_ext/module/introspection.rb`에 정의되어 있습니다.
-
-### 상수
-
-`local_constants` 메소드는 리시버 모듈에 정의된 상수를 반환합니다.
-
-```ruby
-module X
-  X1 = 1
-  X2 = 2
-  module Y
-    Y1 = :y1
-    X1 = :overrides_X1_above
-  end
-end
-
-X.local_constants    # => [:X1, :X2, :Y]
-X::Y.local_constants # => [:Y1, :X1]
-```
-
-상수명은 심볼로 돌아옵니다.
-
-NOTE: `active_support/core_ext/module/introspection.rb`에 정의되어 있습니다.
-
-#### 정규 상수명
-
-표준 메소드인 `const_defined?`, `const_get`, `const_set`에서는 순수한 상수명만을 사용할 수 있습니다. Active Support는 이 API를 확장하여 전체 경로에 가까운(qualified) 상수명을 넘길 수 있게 해줍니다.
-
-이 메소드들은 `qualified_const_defined?`, `qualified_const_get`, `qualified_const_set`입니다. 넘긴 인수는 리시버를 기준으로 경로를 포함한 상수 명일 것이라는 전제를 가집니다.
-
-```ruby
-Object.qualified_const_defined?("Math::PI")       # => true
-Object.qualified_const_get("Math::PI")            # => 3.141592653589793
-Object.qualified_const_set("Math::Phi", 1.618034) # => 1.618034
-```
-
-경로를 포함하지 않는 순수한 정수명도 사용할 수 있습니다.
-
-```ruby
-Math.qualified_const_get("E") # => 2.718281828459045
-```
-
-이러한 메소드들은 내장된 메소드와 무척 닮아있습니다. 특히 `qualified_constant_defined?` 메소드는 옵션으로 리시버의 부모에서도 해당하는 상수를 검색할 것인지를 지정하는 두번째 인수를 받을 수 있습니다. 이 플래그는 주어진 모든 상수에 대해서 메소드로 경로를 따라 내려가며 적용됩니다.
-
-아래의 예시를 확인해주세요.
-
-```ruby
-module M
-  X = 1
-end
-
-module N
-  class C
-    include M
-  end
-end
-```
-
-`qualified_const_defined?`는 다음과 같이 동작합니다.
-
-```ruby
-N.qualified_const_defined?("C::X", false) # => false
-N.qualified_const_defined?("C::X", true)  # => true
-N.qualified_const_defined?("C::X")        # => true
-```
-
-마지막 예제에서 볼 수 있듯, `const_defined?` 메소드와 마찬가지로 두번째 인수는 기본으로 true로 설정되어 있습니다.
-
-내장 메소드와 호환성을 위해 상대 경로 이외에는 사용할 수 없습니다. `::Math::PI`와 같은 절대 경로를 사용한 상수명을 사용하면 `NameError`가 발생합니다.
-
-NOTE: `active_support/core_ext/module/qualified_const.rb`에 정의되어 있습니다.
 
 ### 도달 가능
 
@@ -1030,7 +1007,8 @@ class A
   class_attribute :x, instance_reader: false
 end
 
-A.new.x = 1 # NoMethodError
+A.new.x = 1
+A.new.x # NoMethodError
 ```
 
 편의를 위해서 `class_attribute`는 인스턴스의 reader가 돌려주는 값을 '이중부정'하는 인스턴스 존재 확인 메소드도 정의합니다. 위의 예제로 설명하자면, `x?`가 바로 그것입니다.
@@ -1678,19 +1656,6 @@ NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니�
 "Admin::Hotel::ReservationUtils".deconstantize # => "Admin::Hotel"
 ```
 
-다음의 Active Record 예시에서는 `Module#qualified_const_set`에서 이 메소드를 사용하고 있습니다.
-
-```ruby
-def qualified_const_set(path, value)
-  QualifiedConstUtils.raise_if_absolute(path)
-
-  const_name = path.demodulize
-  mod_name = path.deconstantize
-  mod = mod_name.empty? ? self : qualified_const_get(mod_name)
-  mod.const_set(const_name, value)
-end
-```
-
 NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
 #### `parameterize`
@@ -1736,7 +1701,8 @@ NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니�
 "highrise_production.companies".classify # => "Company"
 ```
 
-`classify`가 돌려주는 클래스 이름은 문자열입니다. 얻은 문자열에 대해서 `constantize`를 호출하는 것으로 실제 클래스 객체를 얻을 수 있습니다.
+`classify`가 돌려주는 클래스 이름은 문자열입니다. 얻은 문자열에 대해서
+`constantize`를 호출하는 것으로 실제 클래스 객체를 얻을 수 있습니다.
 
 NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
 
@@ -1745,7 +1711,7 @@ NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니�
 `constantize` 메소드는 리시버의 값을 참조하여 실제 객체를 반환합니다.
 
 ```ruby
-"Fixnum".constantize # => Fixnum
+"Integer".constantize # => Integer
 
 module M
   X = 1
@@ -1997,12 +1963,14 @@ NOTE: `active_support/core_ext/numeric/bytes.rb`에 정의되어 있습니다.
 사람에게 가독성이 좋은 바이트 형식으로 변환할 수 있습니다.
 
 ```ruby
-123.to_s(:human_size)            # => 123 Bytes
-1234.to_s(:human_size)           # => 1.21 KB
-12345.to_s(:human_size)          # => 12.1 KB
-1234567.to_s(:human_size)        # => 1.18 MB
-1234567890.to_s(:human_size)     # => 1.15 GB
-1234567890123.to_s(:human_size)  # => 1.12 TB
+123.to_s(:human_size)                  # => 123 Bytes
+1234.to_s(:human_size)                 # => 1.21 KB
+12345.to_s(:human_size)                # => 12.1 KB
+1234567.to_s(:human_size)              # => 1.18 MB
+1234567890.to_s(:human_size)           # => 1.15 GB
+1234567890123.to_s(:human_size)        # => 1.12 TB
+1234567890123456.to_s(:human_size)     # => 1.1 PB
+1234567890123456789.to_s(:human_size)  # => 1.07 EB
 ```
 
 사람에게 가독성이 좋은 숫자 단위를 사용할 수 있습니다.
@@ -2110,7 +2078,7 @@ BigDecimal.new(5.00, 6).to_formatted_s("e")  # => "0.5E1"
 ```ruby
 [[1, 2], [2, 3], [3, 4]].sum    # => [1, 2, 2, 3, 3, 4]
 %w(foo bar baz).sum             # => "foobarbaz"
-{a: 1, b: 2, c: 3}.sum # => [:b, 2, :c, 3, :a, 1]
+{a: 1, b: 2, c: 3}.sum          # => [:b, 2, :c, 3, :a, 1]
 ```
 
 빈 컬렉션은 기본으로 0을 반환합니다만, 이 동작은 바꿀 수 있습니다.
@@ -2209,7 +2177,9 @@ Active Support에는 배열에 여러가지 API를 추가하며, 이는 배열�
 [].from(0)           # => []
 ```
 
-`second`, `third`, `fourth`, `fifth`는 대응하는 요소를 반환합니다(`first`는 원래 내장되어 있는 메소드입니다). 재미를 위해 지금은 `forty_two`도 사용할 수 있습니다(역주: [Rails 2.2 이후](https://github.com/rails/rails/commit/9d8cc60ec3845fa3e6f9292a65b119fe4f619f7e)로 사용 가능합니다. '42'에 대해서는 Wikipedia의 [이 문서](https://ko.wikipedia.org/wiki/%EC%9D%80%ED%95%98%EC%88%98%EB%A5%BC_%EC%97%AC%ED%96%89%ED%95%98%EB%8A%94_%ED%9E%88%EC%B9%98%ED%95%98%EC%9D%B4%EC%BB%A4%EB%A5%BC_%EC%9C%84%ED%95%9C_%EC%95%88%EB%82%B4%EC%84%9C_(%EC%86%8C%EC%84%A4))의 줄거리를 참조해주세요.).
+`second`, `third`, `fourth`, `fifth`, `second_to_last`, `third_to_last`는
+ 대응하는 요소를 반환합니다(`first`, `last`는 원래 내장되어 있는 메소드입니다).
+재미를 위해 지금은 `forty_two`도 사용할 수 있습니다(역주: [Rails 2.2 이후](https://github.com/rails/rails/commit/9d8cc60ec3845fa3e6f9292a65b119fe4f619f7e)로 사용 가능합니다. '42'에 대해서는 Wikipedia의 [이 문서](https://ko.wikipedia.org/wiki/%EC%9D%80%ED%95%98%EC%88%98%EB%A5%BC_%EC%97%AC%ED%96%89%ED%95%98%EB%8A%94_%ED%9E%88%EC%B9%98%ED%95%98%EC%9D%B4%EC%BB%A4%EB%A5%BC_%EC%9C%84%ED%95%9C_%EC%95%88%EB%82%B4%EC%84%9C_(%EC%86%8C%EC%84%A4))의 줄거리를 참조해주세요.).
 
 ```ruby
 %w(a b c d).third # => c
@@ -2602,8 +2572,7 @@ NOTE: `active_support/core_ext/array/grouping.rb`에 정의되어 있습니다.
 ```ruby
 XML_TYPE_NAMES = {
   "Symbol"     => "symbol",
-  "Fixnum"     => "integer",
-  "Bignum"     => "integer",
+  "Integer"     => "integer",
   "BigDecimal" => "decimal",
   "Float"      => "float",
   "TrueClass"  => "boolean",
@@ -2722,7 +2691,7 @@ NOTE: `active_support/core_ext/hash/except.rb`에 정의되어 있습니다.
 
 ```ruby
 {nil => nil, 1 => 1, a: :a}.transform_keys { |key| key.to_s.upcase }
-# => {"" => nil, "A" => :a, "1" => 1}
+# => {"" => nil, "1" => 1, "A" => :a}
 ```
 
 키가 중복되는 경우에는 그중 하나의 값이 우선됩니다. 우선되는 값은 같은 해시가 주어진 경우라도 같은 결과를 준다고 보장하지 않습니다.
@@ -2764,7 +2733,7 @@ NOTE: `active_support/core_ext/hash/keys.rb`에 정의되어 있습니다.
 
 ```ruby
 {nil => nil, 1 => 1, a: :a}.stringify_keys
-# => {"" => nil, "a" => :a, "1" => 1}
+# => {"" => nil, "1" => 1, "a" => :a}
 ```
 
 키가 중복되는 경우, 한 쪽의 값이 우선됩니다. 우선되는 값은 같은 해시가 주어진 경우에도 항상 같다고 보장하지 않습니다.
@@ -2806,7 +2775,7 @@ NOTE: `active_support/core_ext/hash/keys.rb`에 정의되어 있습니다.
 
 ```ruby
 {nil => nil, 1 => 1, "a" => "a"}.symbolize_keys
-# => {1=>1, nil=>nil, :a=>"a"}
+# => {nil=>nil, 1=>1, :a=>"a"}
 ```
 
 WARNING: 이 예제에서는 3개의 키중 마지막 하나만 심볼로 변환되지 않았다는 점에 주목하세요. 숫자와 nil은 심볼로 변환할 수 없습니다.
@@ -2884,7 +2853,7 @@ Ruby에는 문자열이나 배열을 나누어 일부를 꺼내는 내장 메소
 
 ```ruby
 {a: 1, b: 2, c: 3}.slice(:a, :c)
-# => {:c=>3, :a=>1}
+# => {:a=>1, :c=>3}
 
 {a: 1, b: 2, c: 3}.slice(:b, :X)
 # => {:b=>2} # 존재하지 않는 키는 무시
@@ -2978,6 +2947,25 @@ end
 
 NOTE: `active_support/core_ext/regexp.rb`에 정의되어 있습니다.
 
+### `match?`
+
+Rails는 `Regexp#match?`를 Ruby 2.4에 앞서 구현했습니다.
+
+```ruby
+/oo/.match?('foo')    # => true
+/oo/.match?('bar')    # => false
+/oo/.match?('foo', 1) # => true
+```
+
+백포트는 동일한 인터페이스를 가지고 있으며, `$1`과 같은 값들을 설정하지
+않는다는 차이점이 있습니다만, 성능적인 차이는 없습니다. 이는 Ruby 2.4에
+적응하기 유리한 코드를 작성할 수 있도록 돕기 위함입니다. 예를 들어 Rails는
+내부적으로 이를 이미 사용하고 있습니다.
+
+Active Support는 `Regexp#match?`가 존재하지 않는 경우에만 정의하며, 따라서
+Ruby 2.4 이후의 코드를 사용하는 경우 본래의 코드를 사용하여 성능 향상을
+얻을 수 있도록 하고 있습니다.
+
 `Range` 확장
 ---------------------
 
@@ -3040,13 +3028,29 @@ NOTE: `active_support/core_ext/range/overlaps.rb`에 정의되어 있습니다.
 
 NOTE: 다음 메소드들은 모두 같은 파일 `active_support/core_ext/date/calculations.rb`에 위치하고 있습니다.
 
-INFO: 다음 계산 방법들 중의 일부에서는 1582년 10월을 극단적인 예외로서 사용하고 있습니다. 이 달에는 율리우스 력으로부터 그레고리 력으로 변경이 이루어져서 10월 5일부터 10월 14일까지가 존재하지 않습니다. 이 가이드에서는 이 특수한 달에 대해서 길게 이야기하지 않습니다만, 메소드가 이 달에서도 기대대로 동작한다는 점을 설명해두고 싶습니다. 구체적인 예시로는 `Date.new(1582, 10, 4).tomorrow`를 실행하면 `Date.new(1582, 10, 15)`가 반환됩니다. 기대대로 동작한다는 것은 Active Support의 `test/core_ext/date_ext_test.rb`용의 테스트 코드에서 확인하실 수 있습니다.
+INFO: 다음 계산 방법들 중의 일부에서는 1582년 10월을 극단적인 예외로서
+사용하고 있습니다. 이 달에는 율리우스 력으로부터 그레고리 력으로 변경이
+이루어져서 10월 5일부터 10월 14일까지가 존재하지 않습니다. 이 가이드에서는
+이 특수한 달에 대해서 길게 이야기하지 않습니다만, 메소드가 이 달에서도
+기대대로 동작한다는 점을 설명해두고 싶습니다. 구체적인 예시로는
+`Date.new(1582, 10, 4).tomorrow`를 실행하면 `Date.new(1582, 10, 15)`가
+반환됩니다. 기대대로 동작한다는 것은 Active Support의
+`test/core_ext/date_ext_test.rb`용의 테스트 코드에서 확인하실 수 있습니다.
 
 #### `Date.current`
 
-Active Support에서는 `Date.current`를 정의하고 현재의 시간대에 맞는 '오늘'을 돌려줍니다. 이 메소드는 `Date.today`와 유사합니다만, 사용자가 정의한 시간대이 있는 경우에 그것을 고려한다는 점이 다릅니다. Active Support에서는 `Date.yesterday` 메소드와 `Date.tomorrow`도 정의하고 있습니다. 인스턴스에서는 `past?`, `today?`, `future?`를 사용할 수 있으며, 이들은 모두 `Date.current`를 기준으로 계산됩니다.
+Active Support에서는 `Date.current`를 정의하고 현재의 시간대에 맞는 '오늘'을
+돌려줍니다. 이 메소드는 `Date.today`와 유사합니다만, 사용자가 정의한 시간대에
+있는 경우에 그것을 고려한다는 점이 다릅니다. Active Support에서는
+`Date.yesterday` 메소드와 `Date.tomorrow`도 정의하고 있습니다. 인스턴스에서는
+`past?`, `today?`, `future?`, `on_weekday?`, `on_weekend?`를 사용할 수 있으며,
+이들은 모두 `Date.current`를 기준으로 계산됩니다.
 
-사용자가 정의한 시간대를 사용하는 메소드를 통해 날짜를 비교하고 싶은 경우 `Date.today` 대신 `Date.current`를 반드시 사용해주세요. 이후에 사용자가 정의한 시간대와 시스템의 시간대를 비교해야하는 상황이 있을 수도 있습니다. 시스템의 시간대에서는 `Date.today`가 사용됩니다. 다시 말해서 `Date.today`가 `Date.yesterday`와 같은 상황도 존재할 수 있습니다.
+사용자가 정의한 시간대를 사용하는 메소드를 통해 날짜를 비교하고 싶은 경우
+`Date.today` 대신 `Date.current`를 반드시 사용해주세요. 이후에 사용자가 정의한
+시간대와 시스템의 시간대를 비교해야하는 상황이 있을 수도 있습니다. 시스템의
+시간대에서는 `Date.today`가 사용됩니다. 다시 말해서 `Date.today`가
+`Date.yesterday`와 같은 상황도 존재할 수 있습니다.
 
 #### 이름이 있는 날짜
 
@@ -3429,6 +3433,8 @@ years_ago
 years_since
 prev_year (last_year)
 next_year
+on_weekday?
+on_weekend?
 ```
 
 이하의 메소드는 모두 재정의되기 때문에 이들을 사용하기 위해서 `active_support/core_ext/date/calculations.rb`를 불러올 필요는 **없습니다**.
@@ -3615,9 +3621,12 @@ years_ago
 years_since
 prev_year (last_year)
 next_year
+on_weekday?
+on_weekend?
 ```
 
-이들은 동일하게 동작하며, 관련된 문서를 참조하시고, 다음과 같은 차이점에 대해서도 기억해주세요.
+이들은 동일하게 동작하며, 관련된 문서를 참조하시고, 다음과 같은 차이점에
+대해서도 기억해주세요.
 
 * `change` 메소드에 추가로 `:usec` 옵션을 사용할 수 있습니다.
 * `Time`은 섬머타임(DST)을 이해합니다. 아래와 같은 DST처리도 올바르게 됩니다.

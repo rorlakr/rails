@@ -89,6 +89,14 @@ end
 add_source "http://code.whytheluckystiff.net"
 ```
 
+블록을 넘기면 블록에 들어있는 젬 목록이 해당 소스 그룹에 포함됩니다.
+
+```ruby
+add_source "http://gems.github.com/" do
+  gem "rspec-rails"
+end
+```
+
 ### environment/application(data=nil, options={}, &block)
 
 `config/application.rb` 파일의 `Application` 클래스에 지정된 라인을 추가합니다.
@@ -168,18 +176,24 @@ generate(:scaffold, "person", "name:string", "address:text", "age:number")
 run "rm README.rdoc"
 ```
 
-### rake(command, options = {})
+### rails_command(command, options = {})
 
-Rails 애플리케이션에 있는 rake 태스크를 지정하여 실행합니다. 예를 들어, 데이터베이스의 마이그레이션을 실행하려면 다음과 같이 작성하면 됩니다.
+Rails 애플리케이션에 있는 태스크를 실행합니다. 예를 들어, 데이터베이스의 마이그레이션을 실행하려면 다음과 같이 작성하면 됩니다.
 
 ```ruby
-rake "db:migrate"
+rails_command "db:migrate"
 ```
 
-Rails의 환경을 지정하여 rake 태스크를 실행할 수도 있습니다.
+Rails의 환경을 지정하여 태스크를 실행할 수도 있습니다.
 
 ```ruby
-rake "db:migrate", env: 'production'
+rails_command "db:migrate", env: 'production'
+```
+
+슈퍼 유저 권한으로 태스크를 실행할 수도 있습니다.
+
+```ruby
+rails_command "log:clear", sudo: true
 ```
 
 ### route(routing_code)
@@ -259,5 +273,3 @@ def source_paths
   [File.expand_path(File.dirname(__FILE__))]
 end
 ```
-
-TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.

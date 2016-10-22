@@ -37,7 +37,7 @@ INFO: 아직 Rails를 설치하지 않은 경우에는 `gem install rails`를 �
 ```bash
 $ rails new commandsapp
     create
-    create README.rdoc
+    create README.md
     create Rakefile
     create config.ru
     create .gitignore
@@ -208,7 +208,7 @@ Description:
     Create rails files for model generator.
 ```
 
-NOTE: 사용가능한 필드 타입(field types)에 대해서는 [API 문서](http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_column)에 있는 `SchemaStatements` 모듈의 add_column 메소드를 참조해주세요.
+NOTE: 사용가능한 필드 타입(field types)에 대해서는 [API 문서](http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_column)에 있는 `SchemaStatements` 모듈의 add_column 메소드를 참조해주세요. `index` 파라미터는 컬럼에 대응하는 인덱스를 생성합니다.
 
 여기에서는 직접 모델을 만드는 대신에(모델을 생성하는 방법은 나중에 설명하겠습니다), scaffold를 생성해봅시다. Rails에서의 **scaffold**란 모델, 모델을 위한 마이그레이션, 모델을 조작하기 위한 컨트롤러, 모델을 조작, 표시하기 위한 뷰, 이 모두를 위한 테스트 코드를 포함한 것을 가리킵니다.
 
@@ -443,7 +443,7 @@ Database schema version   20110805173523
 
 ### `db`
 
-Rake의 `db:`라는 네임스페이스에 속해있는 태스크 중에서 가장 많이 사용되는 것은 `migrate`와 `create`입니다. 마이그레이션에 대한 태스크(`up`, `down`, `redo`, `reset`)은 모두 한번씩 실험해보는 것을 추천합니다. `bin/rails db:version`을 사용하면 데이터베이스의 버전을 알 수 있으므로 문제가 생겼을 때에 도움이 됩니다.
+`db:`라는 bin/rails의 네임스페이스에 속해있는 태스크 중에서 가장 많이 사용되는 것은 `migrate`와 `create`입니다. 마이그레이션에 대한 태스크(`up`, `down`, `redo`, `reset`)은 모두 한번씩 실험해보는 것을 추천합니다. `bin/rails db:version`을 사용하면 데이터베이스의 버전을 알 수 있으므로 문제가 생겼을 때에 도움이 됩니다.
 
 마이그레이션에 대해서는 [마이그레이션](active_record_migrations.html)에서 좀 더 자세하게 다루고 있습니다.
 
@@ -492,7 +492,7 @@ app/models/article.rb:
 
 NOTE: 특정 어노테이션만을 출력할 때나, 독자적인 어노테이션을 출력하는 경우에는 FIXME나 BUG같은 각 어노테이션의 이름은 출력되지 않습니다.
 
-`bin/rails notes` 태스크는 기본으로 `app`, `config`, `lib`, `bin`, `test` 폴더를 대상으로 합니다. 다른 폴더도 탐색하고 싶은 경우에는 `config.annotations.register_directories` 옵션을 사용하여 설정할 수 있습니다.
+`rails notes` 태스크는 기본으로 `app`, `config`, `lib`, `bin`, `test` 폴더를 대상으로 합니다. 다른 폴더도 탐색하고 싶은 경우에는 `config.annotations.register_directories` 옵션을 사용하여 설정할 수 있습니다.
 
 ```ruby
 config.annotations.register_directories("spec", "vendor")
@@ -512,7 +512,7 @@ spec/models/user_spec.rb:
 
 ### `routes`
 
-`bin/rails routes`를 사용하면 정의되어있는 모든 라우팅을 출력할 수 있습니다. 이것은 라우팅에서 생긴 문제를 해결해야하거나, 애플리케이션의 라우팅 전체를 이해해야 할 때에 도움이 됩니다.
+`rails routes`를 사용하면 정의되어있는 모든 라우팅을 출력할 수 있습니다. 이것은 라우팅에서 생긴 문제를 해결해야하거나, 애플리케이션의 라우팅 전체를 이해해야 할 때에 도움이 됩니다.
 
 ### `test`
 

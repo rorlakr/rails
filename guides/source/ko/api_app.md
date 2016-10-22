@@ -1,204 +1,150 @@
-**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
-
-
-Using Rails for API-only Applications
+API 전용 레일스 애플리케이션 만들기
 =====================================
 
-In this guide you will learn:
+이 가이드의 내용:
 
-* What Rails provides for API-only applications
-* How to configure Rails to start without any browser features
-* How to decide which middleware you will want to include
-* How to decide which modules to use in your controller
+* 레일스가 API 전용 애플리케이션을 위해 제공하는 기능
+* 브라우저 관련 기능을 제외하고 레일스를 실행하기
+* 미들웨어 선택하기
+* 컨트롤러에서 사용할 모듈 선택하기
 
 --------------------------------------------------------------------------------
 
-What is an API Application?
+API 애플리케이션에 대해
 ---------------------------
 
-Traditionally, when people said that they used Rails as an "API", they meant
-providing a programmatically accessible API alongside their web application.
-For example, GitHub provides [an API](http://developer.github.com) that you
-can use from your own custom clients.
+지금까지 레일스로 API를 사용한다고 하면 프로그램이 사용할 수 있는 API를
+웹 애플리케이션에 추가하는 방식을 의미했습니다.
+예를 들어 GitHub이 제공하는 [API](http://developer.github.com)를 직접 만든
+클라이언트에서 사용할 수 있습니다.
 
-With the advent of client-side frameworks, more developers are using Rails to
-build a back-end that is shared between their web application and other native
-applications.
+클라이언트 프레임워크의 등장에 따라, 다른 웹 애플리케이션과 네이티브
+애플리케이션에서 레일스로 만든 백엔드 서버를 사용하는 경우가 늘었습니다.
 
-For example, Twitter uses its [public API](https://dev.twitter.com) in its web
-application, which is built as a static site that consumes JSON resources.
+Twitter는 자사 웹 애플리케이션에서 [공개 API](https://dev.twitter.com)를
+사용하고 있습니다.
+이 웹 애플리케이션은 JSON 리소스만을 사용하는 정적인 사이트입니다.
 
-Instead of using Rails to generate HTML that communicates with the server
-through forms and links, many developers are treating their web application as
-just an API client delivered as HTML with JavaScript that consumes a JSON API.
+많은 개발자가 레일스를 폼이나 링크를 통하는 서버 간의 통신을 위해 HTML을
+생성하는 대신, 웹 애플리케이션을 단순한 API 클라이언트로 정의하고, JSON API를
+사용하는 HTML과 자바스크립트를 제공하는 방식으로 다루게 되었습니다.
 
-This guide covers building a Rails application that serves JSON resources to an
-API client, including client-side frameworks.
+여기에서는 클라이언트 프레임워크의 설명을 포함해, JSON 리소스를
+API 클라이언트에 제공하는 레일스 애플리케이션을 구축하는 방법에 관해서
+설명합니다.
 
-Why Use Rails for JSON APIs?
+JSON API에 레일스를 사용하는 이유
 ----------------------------
 
-The first question a lot of people have when thinking about building a JSON API
-using Rails is: "isn't using Rails to spit out some JSON overkill? Shouldn't I
-just use something like Sinatra?".
+레일스로 JSON API를 만드는 것에 대해서 많은 개발자가 가장 먼저 떠올리는
+질문은 이렇습니다.
+"레일스로 JSON을 제공하는건 너무 거창하지 않나요? 그냥 Sinatra로 만들면
+어떤가요?"
 
-For very simple APIs, this may be true. However, even in very HTML-heavy
-applications, most of an application's logic lives outside of the view
-layer.
+단순한 API 서버라면 아마도 그럴 겁니다. 하지만 HTML의 비중이 매우 큰
+애플리케이션이라도, 로직 대부분은 뷰의 바깥에 존재합니다.
 
-The reason most people use Rails is that it provides a set of defaults that
-allows developers to get up and running quickly, without having to make a lot of trivial
-decisions.
+많은 개발자가 레일스를 채용하는 이유는 세세한 설정을 고민하지 않고,
+빠르게 애플리케이션을 제공할 수 있기 때문입니다.
 
-Let's take a look at some of the things that Rails provides out of the box that are
-still applicable to API applications.
+API 애플리케이션 개발에 도움이 되는 레일스의 기능을 몇 가지 소개합니다.
 
-Handled at the middleware layer:
+미들웨어에서 제공하는 기능 목록
 
-- Reloading: Rails applications support transparent reloading. This works even if
-  your application gets big and restarting the server for every request becomes
-  non-viable.
-- Development Mode: Rails applications come with smart defaults for development,
-  making development pleasant without compromising production-time performance.
-- Test Mode: Ditto development mode.
-- Logging: Rails applications log every request, with a level of verbosity
-  appropriate for the current mode. Rails logs in development include information
-  about the request environment, database queries, and basic performance
-  information.
-- Security: Rails detects and thwarts [IP spoofing
-  attacks](http://en.wikipedia.org/wiki/IP_address_spoofing) and handles
-  cryptographic signatures in a [timing
-  attack](http://en.wikipedia.org/wiki/Timing_attack) aware way. Don't know what
-  an IP spoofing attack or a timing attack is? Exactly.
-- Parameter Parsing: Want to specify your parameters as JSON instead of as a
-  URL-encoded String? No problem. Rails will decode the JSON for you and make
-  it available in `params`. Want to use nested URL-encoded parameters? That
-  works too.
-- Conditional GETs: Rails handles conditional `GET` (`ETag` and `Last-Modified`)
-  processing request headers and returning the correct response headers and status
-  code. All you need to do is use the
-  [`stale?`](http://api.rubyonrails.org/classes/ActionController/ConditionalGet.html#method-i-stale-3F)
-  check in your controller, and Rails will handle all of the HTTP details for you.
-- HEAD requests: Rails will transparently convert `HEAD` requests into `GET` ones,
-  and return just the headers on the way out. This makes `HEAD` work reliably in
-  all Rails APIs.
+- 리로딩: 레일스 애플리케이션은 '투명한 리로딩'을 지원합니다. 예를 들어 애플리케이션이 커져 요청마다 서버를 재기동하는 방법을 사용할 수 없더라도 투명한 리로딩이 가능합니다.
+- 개발 모드: 레일스 애플리케이션의 개발 모드에는 기본값이 이미 설정되어 있으므로 실제 환경의 성능에 대한 걱정 없이 즐겁게 작업을 진행할 수 있습니다.
+- 테스트 모드: 개발 모드와 같습니다.
+- 로그 출력: 레일스 애플리케이션은 요청마다 로그를 출력합니다. 또한 현재 모드에 따라서 로그의 레벨이 조정됩니다. 개발 모드의 로그에는 요청 환경, 데이터베이스 질의, 간단한 성능 정보 등이 출력됩니다.
+- 보안: [IP 스푸핑 공격](https://en.wikipedia.org/wiki/IP_address_spoofing)을 검출, 방어합니다. 또한 [타이밍 공격](http://en.wikipedia.org/wiki/Timing_attack)에 대응할 수 있는 암호화 서명을 다룹니다.
+- 매개변수 분석: URL 인코딩이나 문자열 대신 JSON으로 매개변수를 지정할 수 있습니다. JSON은 레일스에서 해석되어 `params`를 통해 접근할 수 있습니다. 물론 중첩된 URL 인코딩 매개변수도 다룰 수 있습니다.
+- 조건부 GET: 레일스에서는 `ETag`나 `Last-Modified`를 사용한 조건부 GET을 사용합니다. 이는 요청 헤더를 처리하고, 올바른 응답 헤더와 상태 코드를 돌려줍니다. 컨트롤러에 [`stale?`](http://api.rubyonrails.org/classes/ActionController/ConditionalGet.html#method-i-stale-3F)을 추가하면 HTTP의 구체적인 동작은 레일스가 처리합니다.
+- HEAD 요청: 레일스에서는 `HEAD` 요청을 투명하게 `GET` 요청으로 변환하고, 헤더만을 반환합니다. 이를 통해서 모든 레일스 API에서 `HEAD` 요청을 사용할 수 있습니다.
 
-While you could obviously build these up in terms of existing Rack middleware,
-this list demonstrates that the default Rails middleware stack provides a lot
-of value, even if you're "just generating JSON".
+Rack 미들웨어의 이런 기능들을 직접 구현할 수도 있습니다만, 레일스의 기본 미들웨어를 "JSON 생성용"으로
+쓰더라도 많은 이점을 얻을 수 있습니다.
 
-Handled at the Action Pack layer:
+액션 팩에서 제공하는 기능
 
-- Resourceful Routing: If you're building a RESTful JSON API, you want to be
-  using the Rails router. Clean and conventional mapping from HTTP to controllers
-  means not having to spend time thinking about how to model your API in terms
-  of HTTP.
-- URL Generation: The flip side of routing is URL generation. A good API based
-  on HTTP includes URLs (see [the GitHub Gist API](http://developer.github.com/v3/gists/)
-  for an example).
-- Header and Redirection Responses: `head :no_content` and
-  `redirect_to user_url(current_user)` come in handy. Sure, you could manually
-  add the response headers, but why?
-- Caching: Rails provides page, action and fragment caching. Fragment caching
-  is especially helpful when building up a nested JSON object.
-- Basic, Digest, and Token Authentication: Rails comes with out-of-the-box support
-  for three kinds of HTTP authentication.
-- Instrumentation: Rails has an instrumentation API that triggers registered
-  handlers for a variety of events, such as action processing, sending a file or
-  data, redirection, and database queries. The payload of each event comes with
-  relevant information (for the action processing event, the payload includes
-  the controller, action, parameters, request format, request method and the
-  request's full path).
-- Generators: It is often handy to generate a resource and get your model,
-  controller, test stubs, and routes created for you in a single command for
-  further tweaking. Same for migrations and others.
-- Plugins: Many third-party libraries come with support for Rails that reduce
-  or eliminate the cost of setting up and gluing together the library and the
-  web framework. This includes things like overriding default generators, adding
-  Rake tasks, and honoring Rails choices (like the logger and cache back-end).
+- 리소스 기반 라우팅: RESTful JSON API를 개발한다면 레일스의 라우터도 사용하고 싶을 것입니다. HTTP로부터 컨트롤러로 명확하게 연결할 수 있으므로 HTTP에 대해서 API를 어떻게 구성할지 고민할 필요가 없습니다.
+- URL 생성: 라우팅은 URL을 생성할 때에도 편리합니다. 잘 구성된 HTTP 기반의 API에는 URL도 포함됩니다([GitHub Gist API](http://developer.github.com/v3/gists/)가 좋은 예시입니다).
+- 헤더 응답이나 리다이렉션 응답: `head :no_content`나 `redirect_to user_url(current_user)` 등을 사용할 수 있습니다. 헤더 응답을 직접 생성하지 않아도 됩니다.
+- 캐시: 레일스는 페이지 캐싱, 액션 캐싱, 조각 캐싱을 사용할 수 있습니다. 특히 조각 캐싱은 중첩된 JSON 객체를 만들 때 유용합니다.
+- 기본 인증, 다이제스트 인증, 토큰 인증: 3종류의 HTTP 인증을 간단하게 도입할 수 있습니다.
+- 계측(Instrumentation): 레일스의 계측 API는 등록한 다양한 이벤트 핸들러를 실행합니다. 액션 처리, 파일이나 데이터 전송, 리다이렉트, 데이터베이스 질의 등을 다룹니다. 각 이벤트의 페이로드에 다양한 정보가 포함되어 있습니다. 예를 들어 이벤트를 처리하는 액션의 경우, 페이로드에는 컨트롤러, 액션, 매개변수, 요청 형식, 요청 경로등이 포함됩니다.
+- 제너레이터: 명령 하나로 리소스를 간단하게 생성하고, API에 맞는 모델, 컨트롤러, 테스트 스텁, 라우팅을 바로 사용할 수 있습니다. 마이그레이션 등의 작업도 명령으로 실행할 수 있습니다.
+- 플러그인: 수많은 서드파티 라이브러리를 사용할 수 있습니다. 라이브러리 설정이나 웹 프레임워크 등의 연동도 간단하므로, 비용을 줄일 수 있습니다. 플러그인을 통해 기존 제너레이터를 덮어쓰거나 Rake 태스크를 추가, 또는 레일스의 동작을 변경할 수도 있습니다(로거나 캐시 백엔드 등).
 
-Of course, the Rails boot process also glues together all registered components.
-For example, the Rails boot process is what uses your `config/database.yml` file
-when configuring Active Record.
+물론 레일스의 실행 프로세스에서는 등록된 컴포넌트를 모두 읽어서 연동합니다. 예를 들어 실행할 때에 `config/database.yml` 파일을 통하여 액티브 레코드를 설정합니다.
 
-**The short version is**: you may not have thought about which parts of Rails
-are still applicable even if you remove the view layer, but the answer turns out
-to be most of it.
+**한줄 요약**: 레일스에서 뷰와 관련된 동작을 제외하면 어떤 기능을 사용할 수 있을까요? 기능 대부분을 사용할 수 있습니다.
 
-The Basic Configuration
+기본 설정
 -----------------------
 
-If you're building a Rails application that will be an API server first and
-foremost, you can start with a more limited subset of Rails and add in features
-as needed.
+레일스 애플리케이션을 API 서버로 구축하고 싶다면, 기능을 제한한 레일스 하위 셋을 사용하여 필요한 기능을
+추가하는 것이 좋을 겁니다.
 
-### Creating a new application
+### 애플리케이션을 새로 생성하기
 
-You can generate a new api Rails app:
+API 레일스 애플리케이션을 생성하려면 다음의 명령을 사용합니다.
 
 ```bash
 $ rails new my_api --api
 ```
 
-This will do three main things for you:
+이 명령은 다음 3개의 동작을 실행합니다.
 
-- Configure your application to start with a more limited set of middleware
-  than normal. Specifically, it will not include any middleware primarily useful
-  for browser applications (like cookies support) by default.
-- Make `ApplicationController` inherit from `ActionController::API` instead of
-  `ActionController::Base`. As with middleware, this will leave out any Action
-  Controller modules that provide functionalities primarily used by browser
-  applications.
-- Configure the generators to skip generating views, helpers and assets when
-  you generate a new resource.
+- 사용하는 미들웨어를 기존보다 적게끔 설정합니다. 특히 브라우저용 애플리케이션에서 유용한 미들웨어(쿠키 등의 지원)를 완전히 사용할 수 없게 됩니다.
+- `ApplicationController`을 `ActionController::Base`가 아닌 `ActionController::API`에서 상속받습니다. 미들웨어와 마찬가지로 액션 컨트롤러 모듈에서 브라우저용 애플리케이션에서만 사용되는 부분을 모두 제외합니다.
+- 제너레이터가 뷰, 헬퍼, 어셋을 생성하지 않도록 합니다.
 
-### Changing an existing application
+### 기존의 애플리케이션을 변경하기
 
-If you want to take an existing application and make it an API one, read the
-following steps.
+기존의 애플리케이션을 API 전용으로 만들려면 다음 순서를 따라주세요.
 
-In `config/application.rb` add the following line at the top of the `Application`
-class definition:
+`config/application.rb`의 `Application` 클래스에 다음을 추가합니다.
 
 ```ruby
 config.api_only = true
 ```
 
-In `config/environments/development.rb`, set `config.debug_exception_response_format`
-to configure the format used in responses when errors occur in development mode.
+`config/environments/development.rb`에서
+`config.debug_exception_response_format`을 통해 개발 모드에서 에러가 발생할
+경우에 응답에서 사용할 형식을 지정하세요.
 
-To render an HTML page with debugging information, use the value `:default`.
+`:default`는 HTML 페이지로 디버깅 정보를 제공합니다.
 
 ```ruby
 config.debug_exception_response_format = :default
 ```
 
-To render debugging information preserving the response format, use the value `:api`.
+`:api`는 응답 형식을 유지한 채로 디버깅 정보를 제공합니다.
 
 ```ruby
 config.debug_exception_response_format = :api
 ```
 
-By default, `config.debug_exception_response_format` is set to `:api`, when `config.api_only` is set to true.
+`config.api_only`를 true로 설정하면 `config.debug_exception_response_format`의
+기본값이 `:api`로 설정됩니다.
 
-Finally, inside `app/controllers/application_controller.rb`, instead of:
+마지막으로 `app/controllers/application_controller.rb`를,
 
 ```ruby
 class ApplicationController < ActionController::Base
-end
+end 
 ```
 
-do:
+다음과 같이 변경합니다.
 
 ```ruby
 class ApplicationController < ActionController::API
-end
+end 
 ```
 
-Choosing Middleware
+미들웨어 선택하기
 --------------------
 
-An API application comes with the following middleware by default:
+API 애플리케이션에서는 기본으로 다음의 미들웨어를 사용합니다.
 
 - `Rack::Sendfile`
 - `ActionDispatch::Static`
@@ -217,26 +163,25 @@ An API application comes with the following middleware by default:
 - `Rack::ConditionalGet`
 - `Rack::ETag`
 
-See the [internal middleware](rails_on_rack.html#internal-middleware-stack)
-section of the Rack guide for further information on them.
+자세한 설명은 Rack 가이드의 [내부 미들웨어](rails_on_rack.html#미들웨어-스택의-내용)에서 확인하세요.
 
-Other plugins, including Active Record, may add additional middleware. In
-general, these middleware are agnostic to the type of application you are
-building, and make sense in an API-only Rails application.
+미들웨어는 액티브 레코드 등의 플러그인에 의해서 추가되는 경우도 있습니다.
+일반적으로 구축할 애플리케이션의 종류와 미들웨어는 관련이 없습니다만,
+API 전용 레일스 애플리케이션에서는 의미가 있습니다.
 
-You can get a list of all middleware in your application via:
+애플리케이션의 모든 미들웨어를 확인하려면 다음 명령을 실행하세요.
 
 ```bash
 $ rails middleware
 ```
 
-### Using the Cache Middleware
+### 캐시 미들웨어를 사용하기
 
-By default, Rails will add a middleware that provides a cache store based on
-the configuration of your application (memcache by default). This means that
-the built-in HTTP cache will rely on it.
+레일스는 애플리케이션의 설정에 따라 캐시 저장소(기본값은 memcache)를 제공하는
+미들웨어를 추가합니다. 다시 말해, 레일스에 포함된 HTTP 캐시는 이 캐시 저장소에
+의존합니다.
 
-For instance, using the `stale?` method:
+예를 들자면, 다음과 같이 `stale?` 메소드를 호출한다고 가정합시다.
 
 ```ruby
 def show
@@ -248,14 +193,13 @@ def show
 end
 ```
 
-The call to `stale?` will compare the `If-Modified-Since` header in the request
-with `@post.updated_at`. If the header is newer than the last modified, this
-action will return a "304 Not Modified" response. Otherwise, it will render the
-response and include a `Last-Modified` header in it.
+`stale?` 호출은 `@post.updated_at`과 요청에 있는 `If-Modified-Since` 헤더를
+비교합니다. 헤더가 마지막 변경 시점보다 새로운 경우 "304 Not Modified"를
+반환하거나 `Last-Modified` 헤더를 포함하여 응답을 랜더링합니다.
 
-Normally, this mechanism is used on a per-client basis. The cache middleware
-allows us to share this caching mechanism across clients. We can enable
-cross-client caching in the call to `stale?`:
+일반적으로 이 동작은 클라이언트마다 이루어집니다만, 캐시 미들웨어가 있다면
+클라이언트 간에 이 캐시를 공유할 수도 있습니다. 클라이언트 캐시 공유는
+`stale?` 호출 시점에 지정할 수 있습니다.
 
 ```ruby
 def show
@@ -263,56 +207,51 @@ def show
 
   if stale?(last_modified: @post.updated_at, public: true)
     render json: @post
-  end
+  end 
 end
 ```
 
-This means that the cache middleware will store off the `Last-Modified` value
-for a URL in the Rails cache, and add an `If-Modified-Since` header to any
-subsequent inbound requests for the same URL.
+캐시 미들웨어는 URL에 대응하는 `Last-Modified` 값을 레일스 캐시에 저장하고
+이후 같은 URL 요청을 수신할 경우 `If-Modified-Since` 헤더를 추가합니다.
 
-Think of it as page caching using HTTP semantics.
+이는 HTTP를 사용하는 페이지 캐싱이라고 생각할 수도 있을 겁니다.
 
-### Using Rack::Sendfile
+### Rack::Sendfile 사용하기
 
-When you use the `send_file` method inside a Rails controller, it sets the
-`X-Sendfile` header. `Rack::Sendfile` is responsible for actually sending the
-file.
+레일스 컨트롤러에서 `send_file` 메소드가 실행되면 `X-Sendfile` 헤더가
+추가됩니다.
+`Rack::Sendfile`은 실제 파일 전송을 책임집니다.
 
-If your front-end server supports accelerated file sending, `Rack::Sendfile`
-will offload the actual file sending work to the front-end server.
+빠른 파일 전송(accelerated file sending)을 지원하는 프론트엔드 서버는
+`Rack::Sendfile` 대신에 실제 파일을 전송합니다.
 
-You can configure the name of the header that your front-end server uses for
-this purpose using `config.action_dispatch.x_sendfile_header` in the appropriate
-environment's configuration file.
+프론트엔드 서버에서 파일 전송에 사용하는 헤더의 이름은 해당하는 환경 설정
+파일의 `config.action_dispatch.x_sendfile_header`에서 지정할 수 있습니다.
 
-You can learn more about how to use `Rack::Sendfile` with popular
-front-ends in [the Rack::Sendfile
-documentation](http://rubydoc.info/github/rack/rack/master/Rack/Sendfile).
+[Rack::Sendfile 문서](http://rubydoc.info/github/rack/rack/master/Rack/Sendfile)에서
+인기있는 프론트엔드와 함께 `Rack::Sendfile`을 사용하는 방법을 확인하세요.
 
-Here are some values for this header for some popular servers, once these servers are configured to support
-accelerated file sending:
+빠른 파일 전송을 사용하려면 헤더에 다음과 같은 값을 설정하세요.
 
 ```ruby
-# Apache and lighttpd
+# Apache, lighttpd
 config.action_dispatch.x_sendfile_header = "X-Sendfile"
 
 # Nginx
 config.action_dispatch.x_sendfile_header = "X-Accel-Redirect"
 ```
 
-Make sure to configure your server to support these options following the
-instructions in the `Rack::Sendfile` documentation.
+이 옵션을 사용하려면 `Rack::Sendfile` 문서를 따라서 서버를 설정해주세요.
 
-### Using ActionDispatch::Request
+### ActionDispatch::Request 사용하기
 
-`ActionDispatch::Request#params` will take parameters from the client in the JSON
-format and make them available in your controller inside `params`.
+`ActionDispatch::Request#params`는 클라이언트로부터 매개변수를 JSON 형식으로 받아 컨트롤러의
+`params`로 접근할 수 있게 해줍니다.
 
-To use this, your client will need to make a request with JSON-encoded parameters
-and specify the `Content-Type` as `application/json`.
+이 기능을 사용하려면 JSON으로 인코딩된 매개변수를 클라이언트에서 보내고, 이 때 `Content-Type`가
+`application/json`이어야 합니다.
 
-Here's an example in jQuery:
+jQuery 예제는 다음과 같습니다.
 
 ```javascript
 jQuery.ajax({
@@ -325,71 +264,62 @@ jQuery.ajax({
 });
 ```
 
-`ActionDispatch::Request` will see the `Content-Type` and your parameters
-will be:
+`ActionDispatch::Request`에서는 이 `Content-Type`으로 다음 인자를 받습니다.
 
 ```ruby
 { :person => { :firstName => "Yehuda", :lastName => "Katz" } }
 ```
 
-### Other Middleware
+### 그 이외의 미들웨어
 
-Rails ships with a number of other middleware that you might want to use in an
-API application, especially if one of your API clients is the browser:
+레일스에서는 이외에도 API 애플리케이션을 위한 여러 미들웨어를 사용할 수 있습니다. 특히 브라우저가
+API 클라이언트가 되는 경우에 다음의 미들웨어들이 유용합니다.
 
 - `Rack::MethodOverride`
 - `ActionDispatch::Cookies`
 - `ActionDispatch::Flash`
-- For session management
+- 세션 관리용
     * `ActionDispatch::Session::CacheStore`
     * `ActionDispatch::Session::CookieStore`
     * `ActionDispatch::Session::MemCacheStore`
 
-Any of these middleware can be added via:
+이 미들웨어들은 다음과 같이 추가할 수 있습니다.
 
 ```ruby
 config.middleware.use Rack::MethodOverride
 ```
 
-### Removing Middleware
+### 미들웨어 제거하기
 
-If you don't want to use a middleware that is included by default in the API-only
-middleware set, you can remove it with:
+API 전용 미들웨어에 포함하고 싶지 않은 미들웨어는 다음과 같이 삭제할 수 있습니다.
 
 ```ruby
 config.middleware.delete ::Rack::Sendfile
 ```
 
-Keep in mind that removing these middleware will remove support for certain
-features in Action Controller.
+이 미들웨어를 삭제하면 액션 컨트롤러의 일부 기능을 사용할 수 없게 되므로 조심하세요.
 
-Choosing Controller Modules
+컨트롤러에서 사용할 모듈 선택하기
 ---------------------------
 
-An API application (using `ActionController::API`) comes with the following
-controller modules by default:
+API 애플리케이션(`ActionController::API`를 사용)에는 다음과 같은 컨트롤러 모듈이 포함됩니다.
 
-- `ActionController::UrlFor`: Makes `url_for` and similar helpers available.
-- `ActionController::Redirecting`: Support for `redirect_to`.
-- `AbstractController::Rendering` and `ActionController::ApiRendering`: Basic support for rendering.
-- `ActionController::Renderers::All`: Support for `render :json` and friends.
-- `ActionController::ConditionalGet`: Support for `stale?`.
-- `ActionController::BasicImplicitRender`: Makes sure to return an empty response, if there isn't an explicit one.
-- `ActionController::StrongParameters`: Support for parameters white-listing in combination with Active Model mass assignment.
-- `ActionController::ForceSSL`: Support for `force_ssl`.
-- `ActionController::DataStreaming`: Support for `send_file` and `send_data`.
-- `AbstractController::Callbacks`: Support for `before_action` and
-  similar helpers.
-- `ActionController::Rescue`: Support for `rescue_from`.
-- `ActionController::Instrumentation`: Support for the instrumentation
-  hooks defined by Action Controller (see [the instrumentation
-  guide](active_support_instrumentation.html#action-controller) for
-more information regarding this).
-- `ActionController::ParamsWrapper`: Wraps the parameters hash into a nested hash, 
-  so that you don't have to specify root elements sending POST requests for instance.
+- `ActionController::UrlFor`: `url_for` 등의 헬퍼 제공
+- `ActionController::Redirecting`: `redirect_to` 제공
+- `AbstractController::Rendering`와 `ActionController::ApiRendering`: 기본적인 랜더링을 제공
+- `ActionController::Renderers::All`: `render :json` 등을 제공
+- `ActionController::ConditionalGet`: `stale?`을 제공
+- `ActionController::BasicImplicitRender`: 명시적인 응답이 없으면 빈 응답을 반환
+- `ActionController::StrongParameters`: 매개변수를 위한 화이트리스트를 제공(액티브 모델의 대량 할당과 함께 동작)
+- `ActionController::ForceSSL`: `force_ssl`을 제공
+- `ActionController::DataStreaming`: `send_file`이나 `send_data`를 제공
+- `AbstractController::Callbacks`: `before_action` 등의 헬퍼를 제공
+- `ActionController::Rescue`: `rescue_from`을 제공
+- `ActionController::Instrumentation`: 액션 컨트롤러에서 정의하는 계측 훅을 제공([계측 가이드](active_support_instrumentation.html#action-controller)를 참조)
+- `ActionController::ParamsWrapper`: 매개변수 해시를 감싸서 중첩된 해시로 만듦. 이를 통해서 POST 요청을 전송하는 경우에도 최상위 요소를 지정하지 않도록 해줌
 
-Other plugins may add additional modules. You can get a list of all modules
-included into `ActionController::API` in the rails console:
+다른 플러그인을 통해 모듈이 추가되는 경우도 있습니다.
+`ActionController::API`의 모든 모듈 목록은 다음 명령으로 확인할 수 있습니다.
 
 ```bash
 $ bin/rails c
@@ -403,22 +333,19 @@ $ bin/rails c
     ActionView::ViewPaths]
 ```
 
-### Adding Other Modules
+### 그 외의 모듈 추가하기
 
-All Action Controller modules know about their dependent modules, so you can feel
-free to include any modules into your controllers, and all dependencies will be
-included and set up as well.
+액션 컨트롤러의 어떤 모듈도 자신이 의존하는 모듈을 파악하고 있으므로 자유롭게
+컨트롤러에 모듈을 추가할 수 있습니다.
 
-Some common modules you might want to add:
+자주 사용되는 것은 다음과 같습니다.
 
-- `AbstractController::Translation`: Support for the `l` and `t` localization
-  and translation methods.
-- `ActionController::HttpAuthentication::Basic` (or `Digest` or `Token`): Support
-  for basic, digest or token HTTP authentication.
-- `ActionView::Layouts`: Support for layouts when rendering.
-- `ActionController::MimeResponds`: Support for `respond_to`.
-- `ActionController::Cookies`: Support for `cookies`, which includes
-  support for signed and encrypted cookies. This requires the cookies middleware.
+- `AbstractController::Translation`: 지역화용 `l`과 번역용 `t` 메소드를 제공
+- `ActionController::HttpAuthentication::Basic`(그리고 `Digest`, `Token`): HTTP의 기본 인증, 다이제스트 인증, 토큰 인증을 제공
+- `ActionView::Layouts`: 레이아웃을 제공
+- `ActionController::MimeResponds`: `respond_to`을 제공
+- `ActionController::Cookies`: 서명과 암호화를 포함한 `cookies`를 제공. 쿠키 미들웨어가 필요.
 
-The best place to add a module is in your `ApplicationController`, but you can
-also add modules to individual controllers.
+모듈은 `ApplicationController`에 추가하는 것이 가장 좋습니다만, 각각의
+컨트롤러에 추가해도 괜찮습니다.
+

@@ -294,7 +294,7 @@ development:
       url: http://localhost:3001
       namespace: my_app_development
 
-    # config/production.rb
+    # config/environments/production.rb
     Rails.application.configure do
       config.middleware.use ExceptionNotifier, config_for(:exception_notification)
     end
@@ -673,7 +673,7 @@ Active Support
 *   `Concern#class_methods`가 도입되었습니다. `Kernel#concern`와 동일하게 `module ClassMethods`를 대신하는 것이며, `module Foo; extend ActiveSupport::Concern; end`와 같은 코드를 피하기 위한 것입니다.
     ([Commit](https://github.com/rails/rails/commit/b16c36e688970df2f96f793a759365b248b582ad))
 
-*   자동 로딩이나 리로딩에 대한 [새로운 가이드](constant_autoloading_and_reloading.html)가 추가되었습니다.
+*   자동 로딩이나 리로딩에 대한 [새로운 가이드](autoloading_and_reloading_constants.html)가 추가되었습니다.
 
 크레딧 표기
 -------

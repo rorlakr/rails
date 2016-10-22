@@ -30,7 +30,7 @@ Rails와 Rack
 
 `Rails.application`은 Rails 애플리케이션을 Rack 애플리케이션으로 구현한 것입니다. Rack에 준거한 웹서버로, Rails 애플리케이션을 제공하기 위해서는 `Rails.application`객체를 사용해야합니다.
 
-### `rails server` 명령
+### `rails server`
 
 `rails server` 명령은 `Rack::Server`의 객체를 생성하고, 웹 서버를 실행합니다.
 
@@ -55,34 +55,13 @@ class Server < ::Rack::Server
 end
 ```
 
-또한 아래와 같이, 미들웨어를 불러옵니다.
-
-```ruby
-def middleware
-  middlewares = []
-  middlewares << [Rails::Rack::Debugger] if options[:debugger]
-  middlewares << [::Rack::ContentLength]
-  Hash.new(middlewares)
-end
-```
-
-`Rails::Rack::Debugger`는 주로 development 환경에서 유용합니다. 불러온 미들웨어의 역할은 다음과 같습니다.
-
-| 미들웨어              | 역할                                                                           |
-| ----------------------- | --------------------------------------------------------------------------------- |
-| `Rails::Rack::Debugger` | 디버거를 실행한다                                                                   |
-| `Rack::ContentLength`   | 응답의 (바이트) 길이를 계산하고, HTTP Content-Length 헤더에 값을 저장한다 |
-
-### `rackup` 명령
+### `rackup`
 
 Rails의 `rails server` 명령 대신에 `rackup` 명령을 사용할 때에는 아래의 내용을 `config.ru`를 작성해서 Rails 애플리케이션의 최상위 폴더에 저장합니다.
 
 ```ruby
 # Rails.root/config.ru
-require ::File.expand_path('../config/environment', __FILE__)
-
-use Rails::Rack::Debugger
-use Rack::ContentLength
+require_relative 'config/environment'
 run Rails.application
 ```
 
@@ -97,6 +76,10 @@ $ rackup config.ru
 ```bash
 $ rackup --help
 ```
+
+### 개발과 자동 로딩
+
+미들웨어는 한번 불러오고나면 변경되더라도 다시 불러와지지 않습니다. 변경사항을 반영하고 싶은 경우에는 애플리케이션을 재기동해야 합니다.
 
 Action Dispatcher의 미들웨어 스택
 ----------------------------------
@@ -115,27 +98,25 @@ $ bin/rails middleware
 
 막 생성한 Rails 애플리케이션에서는 다음과 같이 출력될 겁니다.
 
-  ```ruby
+```ruby
 use Rack::Sendfile
 use ActionDispatch::Static
-use Rack::Lock
-use #<ActiveSupport::Cache::Strategy::LocalCache::Middleware:0x000000029a0838>
+use ActionDispatch::Executor
+use ActiveSupport::Cache::Strategy::LocalCache::Middleware
 use Rack::Runtime
 use Rack::MethodOverride
 use ActionDispatch::RequestId
 use Rails::Rack::Logger
 use ActionDispatch::ShowExceptions
+use WebConsole::Middleware
 use ActionDispatch::DebugExceptions
 use ActionDispatch::RemoteIp
 use ActionDispatch::Reloader
 use ActionDispatch::Callbacks
 use ActiveRecord::Migration::CheckPending
-use ActiveRecord::ConnectionAdapters::ConnectionManagement
-use ActiveRecord::QueryCache
 use ActionDispatch::Cookies
 use ActionDispatch::Session::CookieStore
 use ActionDispatch::Flash
-use ActionDispatch::ParamsParser
 use Rack::Head
 use Rack::ConditionalGet
 use Rack::ETag
@@ -164,9 +145,9 @@ run Rails.application.routes
 # Rack::BounceFavicon를 가장 마지막에 추가한다
 config.middleware.use Rack::BounceFavicon
 
-# ActiveRecord::QueryCache의 뒤에 Lifo::Cache를 추가한다
+# ActiveRecord::Executor의 뒤에 Lifo::Cache를 추가한다
 # 그리고 Lifo::Cache에 { page_cache: false }를 넘긴다
-config.middleware.insert_after ActiveRecord::QueryCache, Lifo::Cache, page_cache: false
+config.middleware.insert_after ActionDispatch::Executor, Lifo::Cache, page_cache: false
 ```
 
 #### 미들웨어를 교체하기
@@ -186,10 +167,10 @@ config.middleware.swap ActionDispatch::ShowExceptions, Lifo::ShowExceptions
 
 ```ruby
 # config/application.rb
-config.middleware.delete "Rack::Lock"
+config.middleware.delete Rack::Runtime
 ```
 
-미들웨어 스택을 확인하면 `Rack::Lock`가 없어졌다는 것을 확인할 수 있습니다.
+미들웨어 스택을 확인하면 `Rack::Runtime`가 없어졌다는 것을 확인할 수 있습니다.
 
 ```bash
 $ bin/rails middleware
@@ -232,6 +213,10 @@ Action Controller의 기능의 대부분은 미들웨어로서 구현되어 있�
 **`Rack::Lock`**
 
 * `env["rack.multithread"]`를 `false`로 설정하여 애플리케이션을 Mutex로 감쌉니다.
+
+**`ActionDispatch::Executor`**
+
+* 개발 중에 스레드 안전한 코드 리로딩을 위해서 사용됩니다.
 
 **`ActiveSupport::Cache::Strategy::LocalCache::Middleware`**
 
@@ -277,14 +262,6 @@ Action Controller의 기능의 대부분은 미들웨어로서 구현되어 있�
 
 * 적용되지 않은 마이그레이션이 있는지 확인합니다. 미실행된 것이 있으면 `ActiveRecord::PendingMigrationError`를 발생시킵니다.
 
-**`ActiveRecord::ConnectionAdapters::ConnectionManagement`**
-
-* 요청을 처리할 때마다 데이터베이스 커넥션을 커넥션 풀에 반환합니다. `env['rack.test']`가 `true`가 아닌 경우에만 반환을 합니다.
-
-**`ActiveRecord::QueryCache`**
-
-* Active Record의 쿼리 캐시 기능을 활성화합니다.
-
 **`ActionDispatch::Cookies`**
 
 * 쿠키 기능을 제공합니다.
@@ -296,10 +273,6 @@ Action Controller의 기능의 대부분은 미들웨어로서 구현되어 있�
 **`ActionDispatch::Flash`**
 
 * flash 기능을 제공합니다(flash란 연속된 요청간에 값을 공유하는 기능입니다). 이것은 `config.action_controller.session_store`에 값이 설정되어 있을 경우에만 유효합니다.
-
-**`ActionDispatch::ParamsParser`**
-
-* 요청에 포함된 파라미터를 분석해서 `params`에 넣어줍니다.
 
 **`Rack::Head`**
 
@@ -322,11 +295,7 @@ TIP: 이러한 미들웨어는 모두 Rack의 미들웨어 스택에서도 사�
 
 * [Rack 공식 사이트](http://rack.github.io)
 * [Rack 입문](http://chneukirchen.org/blog/archive/2007/02/introducing-rack.html)
-* [Ruby on Rack #1 - Hello Rack!](http://m.onkey.org/ruby-on-rack-1-hello-rack)
-* [Ruby on Rack #2 - The Builder](http://m.onkey.org/ruby-on-rack-2-the-builder)
 
 ### 미들웨어를 이해하기
 
 * [Railscast on Rack Middlewares](http://railscasts.com/episodes/151-rack-middleware)
-
-TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.

@@ -14,7 +14,26 @@
 
 ### 테스트의 커버리지
 
-업그레이드 후에 애플리케이션이 정상적으로 동작한다는 것을 확인할 방법으로 좋은 테스트 커버리지를 업그레이드 전에 확보해두는 것이 최선입니다. 애플리케이션을 한번에 확인할 수 있는 자동 테스트가 없다면, 변경점을 모두 손으로 확인해야하므로 막대한 시간이 걸리게 됩니다. 레일스와 같은 애플리케이션의 경우, 이것은 애플리케이션의 수많은 기능을 모두 확인하지 않으면 안된다는 의미입니다. 업그레이드를 하는 경우에는 테스트 커버리지를 충분히 확보해두길 바랍니다.
+업그레이드 후에 애플리케이션이 정상적으로 동작합니다는 것을 확인할 방법으로 좋은 테스트 커버리지를 업그레이드 전에 확보해두는 것이 최선입니다. 애플리케이션을 한번에 확인할 수 있는 자동 테스트가 없다면, 변경점을 모두 손으로 확인해야하므로 막대한 시간이 걸리게 됩니다. 레일스와 같은 애플리케이션의 경우, 이것은 애플리케이션의 수많은 기능을 모두 확인하지 않으면 안된다는 의미입니다. 업그레이드를 하는 경우에는 테스트 커버리지를 충분히 확보해두길 바랍니다.
+
+### 업그레이드 절차
+
+Rails의 버전을 올릴 때에는 천천히, 제거 예정 경고를 확인하기 위해서 마이너 버전을 하나씩 올리는 것이 좋습니다. Rails 버전은 Major.Minor.Patch 형식으로 되어 있습니다. Major와 Minor 버전은 공개 API에 대한 변경이 될 수 있으므로 애플리케이션에 에러를 야기할 수 있습니다. Patch 버전은 버그 수정을 포함하며 공개 API를 변경하지 않습니다.
+
+절차는 다음을 따라주세요.
+
+1. 테스트를 작성하고 성공하는 지 확인하세요.
+2. 현재 버전의 가장 마지막 patch 버전을 적용하세요.
+3. 테스트를 수정하고, 제거 예정인 기능에 대해 알맞는 대응을 해주세요.
+4. 다음 minor 버전의 마지막 patch 버전을 적용하세요. 
+
+목표로 하는 Rails 버전에 도달할 때까지 이 절차를 반복하세요. 버전을 올릴
+때마다 Gemfile에 명시된 Rails 버전을 변경하고(그리고 다른 젬의 버전도 말이죠),
+`bundle update`를 실행하세요. 그리고 나서 아래에서 언급할 설정 파일을 변경하는
+업데이트 태스크를 실행한 뒤, 테스트를 실행하세요.
+
+[여기](https://rubygems.org/gems/rails/versions)에서 릴리스된 모든 Rails 버전
+목록을 확인할 수 있습니다.
 
 ### 루비 버전
 
@@ -27,13 +46,13 @@
 
 TIP: 루비 1.8.7 p248과 p249에는 레일스의 작동을 중단시키는 치명적인 마셜링 버그가 있습니다. 루비 Enterprise Edition에서는 1.8.7-2010.02 이후에 이 버그가 수정되었습니다. 루비 1.9 계열을 사용하는 경우 루비 1.9.1는 이미 명백한 세그먼테이션 위반이 발생하므로 사용할 수 없습니다. 1.9.3을 사용해주세요.
 
-### Rake 태스크
+### Update 태스크
 
 Rails에는 `app:update`라는 태스크(4.2 버전 이하라면 `rake rails:update`)가 있습니다. Gemfile에 기재된 레일스의 버전을 변경한 뒤, 이 태스크를 실행해주세요.
 이를 통해서, 새로운 버전에 필요한 파일 생성이나, 기존의 파일을 변경하는 것을 인터랙티브하게 진행할 수 있습니다.
 
 ```bash
-$ bin/rails app:update
+$ rails app:update
    identical  config/boot.rb
        exist  config
     conflict  config/routes.rb
@@ -51,13 +70,20 @@ Overwrite /myapp/config/application.rb? (enter "h" for help) [Ynaqdh]
 레일스 4.2에서 레일스 5.0으로 업그레이드
 -------------------------------------
 
+Rails 5.0에서 변경된 점에 대한 더 자세한 설명은 [릴리스 노트](5_0_release_notes.html)를 참고하세요.
+
+### Ruby 2.2.2+ 가 필요합니다.
+
+Ruby on Rails 5.0부터는 Ruby 2.2.2 이상만을 지원합니다.
+지금 사용하고 있는 Ruby 버전이 2.2.2 이상인지 확인하고 진행해주세요.
+
 ### 액티브레코드 모델은 기본값으로 ApplicationRecord에서 상속
 
-레일스 4.2에서는 액티브레코드 모델은 `ActiveRecord::Base`로부터 상속한다. 레일스 5.0에서는 모든 모델이 `ApplicationRecord`로부터 상속한다.
+레일스 4.2에서는 액티브레코드 모델은 `ActiveRecord::Base`로부터 상속합니다. 레일스 5.0에서는 모든 모델이 `ApplicationRecord`로부터 상속합니다.
 
-새로 도입한 `ApplicationRecord` 클래스가 애플리케이션 안에 있는 모든 모델의 상위클래스(superclass)가 되어서 모든 콘트롤러의 상위클래스가 `ActionController::Base`가 아닌 `ApplicationController`인 것과 일관성을 갖게 되었다. 또한 한군데에서 전체 애플리케이션 모델의 동작을 설정할 수 있다.
+새로 도입한 `ApplicationRecord` 클래스가 애플리케이션 안에 있는 모든 모델의 상위클래스(superclass)가 되어서 모든 컨트롤러의 상위 클래스가 `ActionController::Base`가 아닌 `ApplicationController`인 것과 일관성을 갖게 되었습니다. 또한 한군데에서 전체 애플리케이션 모델의 동작을 설정할 수 있습니다.
 
-레일스 4.2로부터 레일스 5.0으로 업그레이드하는 경우에는 `app/models/` 안에 `application_record.rb`을 만들어서 다음의 내용을 넣을 필요가 있다.
+레일스 4.2로부터 레일스 5.0으로 업그레이드하는 경우에는 `app/models/` 안에 `application_record.rb`을 만들어서 다음의 내용을 넣을 필요가 있습니다.
 
 ```
 class ApplicationRecord < ActiveRecord::Base
@@ -65,36 +91,236 @@ class ApplicationRecord < ActiveRecord::Base
 end
 ```
 
+그리고 모든 모델이 이를 상속하고 있는지 확인하세요.
+
 ### 콜백 체인은 `throw(:abort)`로 중단
 
-레일스 4.2에서는 액티브레코드 및 액티브모델 안에서 'before' 콜백이 `false`를 되돌리면, 전체 콜백 체인이 중단되었다. 다른 말로 하면, 따라오는 모든 'before' 콜백과 그 안의 액션은 실행되지 않았다.
+레일스 4.2에서는 액티브레코드 및 액티브모델 안에서 'before' 콜백이 `false`를 되돌리면, 전체 콜백 체인이 중단되었습니다. 다른 말로 하면, 따라오는 모든 'before' 콜백과 그 안의 액션은 실행되지 않았습니다.
 
-레일스 5.0에서는 체인을 중단하고 싶을 때에는 `false`를 반환하는 대신에 반드시 명시적으로 `throw(:abort)` 를 내야 한다.
+레일스 5.0에서는 체인을 중단하고 싶을 때에는 `false`를 반환하는 대신에 반드시 명시적으로 `throw(:abort)`를 호출해야 합니다.
 
-레일스 4.2로부터 레일스 5.0으로 업그레이드하는 경우에는 이와 같은 콜백이 여전히 콜백 체인이 중단할 것이지만 사용중단 경고(deprecation warning)이 나와서 변경이 발생함을 알린다.
+레일스 4.2로부터 레일스 5.0으로 업그레이드하는 경우에는 이와 같은 콜백이 여전히 콜백 체인이 중단될 것입니다만 제거 예정 경고(deprecation warning)이 출력됩니다.
 
-준비가 되었으면 `config/application.rb` 파일에 다음 설정을 추가해 새로운 기능을 사용하고 사용중단 경고를 없앨 수 있다.
+준비가 되었으면 `config/application.rb` 파일에 다음 설정을 추가해 새로운 기능을 사용하고 제거 예정 경고를 없앨 수 있습니다.
 
     ActiveSupport.halt_callback_chains_on_return_false = false
 
-이 옵션은 액티브서포트 안의 다른 콜백에는 영향을 주지 않는다. 'before' 콜백이 아닌 것은 리턴값으로 연쇄가 중단된 적이 없다.
+이 옵션은 Active Support 안의 다른 콜백에는 영향을 주지 않습니다. 'before' 콜백이 아닌 경우에는 체인을 중단시키지 않습니다.
 
 자세한 설명은 [#17227](https://github.com/rails/rails/pull/17227)을 참고해주세요.
 
 ### 액티브잡이 ApplicationJob을 상속
 
-레일스 4.2에서는 ActiveJob이 `ActiveJob::Base`로부터 상속하며, 레일스 5.0에서는 바뀌어서 `ApplicationJob`으로부터 상속한다.
+레일스 4.2에서는 Active Job이 `ActiveJob::Base`로부터 상속하며, 레일스 5.0에서는 바뀌어서 `ApplicationJob`으로부터 상속합니다.
 
-레일스 4.2로부터 레일스 5.0으로 업그레이드하는 경우에는 `app/jobs/`안에 `application_job.rb` 파일을 만들어서 다음의 내용을 넣을 필요가 있다.
+레일스 4.2로부터 레일스 5.0으로 업그레이드하는 경우에는 `app/jobs/` 안에 `application_job.rb` 파일을 만들어서 다음을 넣어야 합니다.
 
 ```
 class ApplicationJob < ActiveJob::Base
 end
 ```
 
-그리고 나서 모든 잡 클래스가 이를 상속하도록 한다.
+그리고 나서 모든 잡 클래스가 이를 상속하도록 합니다.
 
 자세한 설명은 [#19034](https://github.com/rails/rails/pull/19034)을 참고해주세요.
+
+### Rails 컨트롤러 테스트
+
+`assigns`와 `assert_template`가 `rails-controller-testing` 젬으로 분리되었습니다.
+컨트롤러 테스트에서 이 메소드들을 계속 사용하고 싶다면 Gemfile에
+`gem 'rails-controller-testing'`를 추가해주세요.
+
+만약 Rspec을 사용하고 있다면 필요한 추가 설정을 젬의 공식 문서에서 확인하세요.
+
+### 배포 환경에서 자동 로딩이 비활성화 됨
+
+이제 배포 환경에서 실행 후에 자동 로딩이 비활성화됩니다.
+
+Eager loading은 애플리케이션의 실행 과정 중 일부이므로 최상위 레벨의 상수들은 문제 없으며,
+여전히 자동으로 불러와지므로 직접 불러올 필요가 없습니다.
+
+정규 메소드 본체와 같은, 런타임에서만 실행되는 깊은 곳에 있는 상수들도 이들을 정의하고 있는
+파일이 실행 시점에 eager loading되기 때문에 문제 없이 동작합니다.
+
+대부분의 애플리케이션은 이 변경에 대해서 딱히 무언가를 할 필요는 없습니다. 하지만 아주 드믈게
+배포 환경에서 자동 로딩을 필요로 하는 경우에는
+`Rails.application.config.enable_dependency_loading`를 `true`로 설정해주세요.
+
+### XML 직렬화
+
+`ActiveModel::Serializers::Xml`은 이제 `activemodel-serializers-xml` 젬으로
+추출되었습니다. XML 직렬화 기능을 계속 사용하고 싶다면 Gemfile에
+`gem 'activemodel-serializers-xml'`를 추가해주세요.
+
+### 오래된 `mysql` 데이터베이스 어댑터 호환성 제거
+
+Rails 5는 `mysql` 데이터베이스 어댑터 호환성을 제거했습니다. 사용자들은 이제 `mysql2`를
+대신 사용해야 합니다. 별도의 잼으로 분리될 예정이며, 유지보수할 사람을 찾고 있습니다.
+
+### Debugger에 대한 호환성 제거
+
+Rails 5가 기본으로 요구하는 Ruby 2.2는 `debugger`를 더 이상 지원하지 않습니다.
+그 대신 `byebug`를 사용하세요.
+
+### 태스크와 테스트를 실행하기 위해서 bin/rails를 사용
+
+Rails 5는 rake 대신에 `bin/rails`를 사용하여 태스크와 테스트를 실행할 수 있는 기능을
+추가했습니다.
+
+새 테스트 러너를 사용하려면 `bin/rails test`를 입력하세요
+
+`rake dev:cache`는 이제 `rails dev:cache`입니다.
+
+`bin/rails`를 실행해서 사용가능한 명령 목록을 확인하세요.
+
+### `ActionController::Parameters`는 더 이상 `HashWithIndifferentAccess`를 상속하지 않음
+
+애플리케이션에서 `params`를 호출하면 이제 해시 대신 객체를 반환합니다. 만약 매개변수를 허가된
+상태로만 사용하고 있었다면 어떠한 변경도 필요 없습니다. 만약 `slice`처럼 `permitted?`에
+관계 없이 해시에 의존하는 메소드를 사용하고 있었다면 이를 허가하고, 해시로 변환하도록
+애플리케이션을 업그레이드해야 합니다
+
+    params.permit([:proceed_to, :return_to]).to_h
+
+### `protect_from_forgery`의 기본 설정이 `prepend: false`로 변경
+
+`protect_from_forgery`의 기본 설정이 `prepend: false`로 변경되었습니다. 이는 호출된
+시점에 콜백 체인에 추가된다는 것을 의미합니다. 만약 `protect_from_forgery`를 가장 먼저
+호출하고 싶다면 애플리케이션이 `protect_from_forgery prepend: true`을 사용하도록
+변경하세요.
+
+### 기본 템플릿 핸들러가 RAW로 변경
+
+이제 처리할 수 없는 확장자의 경우, RAW 핸들러를 사용하여 처리하게 됩니다. 지금까지 Rails는
+이러한 경우 ERB 템플릿 핸들러를 사용하고 있었습니다.
+
+만약 이러한 파일들을 RAW 핸들러를 통해서 처리하고 싶지 않다면, 적절한 템플릿 핸들러를 사용할
+수 있도록 각 파일에 필요한 확장자를 추가해야 합니다.
+
+### 템플릿 의존성 탐색시에 와일드 카드 매칭이 추가됨
+
+템플릿 의존성에서 와일드 카드 매칭을 사용할 수 있게 됩니다. 예를 들어 다음과 같은 템플릿을
+정의했다고 가정해봅시다.
+
+```erb
+<% # Template Dependency: recordings/threads/events/subscribers_changed %>
+<% # Template Dependency: recordings/threads/events/completed %>
+<% # Template Dependency: recordings/threads/events/uncompleted %>
+```
+
+이제 이 의존성들을 와일드 카드를 사용하여 한번에 호출할 수 있습니다.
+
+```erb
+<% # Template Dependency: recordings/threads/events/* %>
+```
+
+### `protected_attributes` 젬 지원 제거
+
+`protected_attributes` 젬은 이제 Rails 5에서 지원되지 않습니다.
+
+### `activerecord-deprecated_finders` 젬 지원 제거
+
+`activerecord-deprecated_finders` 젬은 이제 Rails 5에서 지원되지 않습니다.
+
+### `ActiveSupport::TestCase`의 기본 테스트 순서가 임의로 변경됨
+
+애플리케이션에서 테스트를 실행할 때, 기본 순서가 `:sorted` 대신 `:random`로 변경됩니다.
+기존의 `:sorted`를 사용하려면 설정을 변경하세요.
+
+```ruby
+# config/environments/test.rb
+Rails.application.configure do
+  config.active_support.test_order = :sorted
+end
+```
+
+### `ActionController::Live`이 `Concern`이 됨
+
+컨트롤러에서 `ActionController::Live`를 불러오고 있는 다른 모듈을 사용하고 있었다면, 이제 `ActiveSupport::Concern`도 확장해야 합니다. 또는 `self.included` 훅을 사용하여 `ActionController::Live`를 직접 컨트롤러에 불러오고 `StreamingSupport`를 포함시키세요.
+
+이 말은 만약 애플리케이션에서 전용 스트리밍 모듈을 사용하고 있었다면, 다음과 같은 코드는
+배포 환경에서 동작하지 않는다는 의미입니다.
+
+```ruby
+# This is a work-around for streamed controllers performing authentication with Warden/Devise.
+# See https://github.com/plataformatec/devise/issues/2332
+# Authenticating in the router is another solution as suggested in that issue
+class StreamingSupport
+  include ActionController::Live # Rails 5 배포환경에서는 동작하지 않습니다.
+  # extend ActiveSupport::Concern # 이 코드를 활성화하기 전까지는
+
+  def process(name)
+    super(name)
+  rescue ArgumentError => e
+    if e.message == 'uncaught throw :warden'
+      throw :warden
+    else
+      raise e
+    end
+  end
+end
+```
+
+### 새 프레임워크 기본값
+
+#### Active Record `belongs_to`가 필수로 변경됨
+
+`belongs_to`는 이제 관계가 존재하지 않는 경우 검증 에러를 발생시킵니다.
+
+이는 `optional: true`를 사용하여 비활성화할 수 있습니다.
+
+이 기본값은 새 애플리케이션에서 자동으로 설정됩니다. 만약 애플리케이션에서 이 기능을 사용하고
+싶다면 initializer에서 활성화시켜줘야 합니다.
+
+    config.active_record.belongs_to_required_by_default = true
+
+#### 폼 별 CSRF 토큰
+
+Rails 5는 이제 JavaScript로 생성되는 폼을 통한 코드 주입 공격에 대응하기 위해 각 폼 별로
+CSRF 토큰을 지원합니다. 이 옵션을 켜면 애플리케이션의 각 폼은 액션과 전송 방식을 구별하는
+전용 CSRF 토큰을 가지게 됩니다.
+
+    config.action_controller.per_form_csrf_tokens = true
+
+#### Origin Check와 Forgery Protection
+
+추가 CSRF 방어를 위해 HTTP `Origin` 헤더를 확인하도록 설정할 수 있습니다. 다음을 설정에서
+`true`로 변경하세요.
+
+    config.action_controller.forgery_protection_origin_check = true
+
+#### Action Mailer 큐 이름 설정 추가
+
+기본 메일러 큐 이름은 `mailers`입니다. 이 설정은 큐 이름을 전역적으로 변경할 수 있게 해줍니다.
+다음을 설정에서 변경하세요.
+
+    config.action_mailer.deliver_later_queue_name = :new_queue_name
+
+#### Action Mailer 뷰에서 조각 캐싱 지원 추가
+
+`config.action_mailer.perform_caching`를 통해 Action Mailer 뷰에서 캐싱을 지원할지를 설정하세요.
+
+    config.action_mailer.perform_caching = true
+
+#### `db:structure:dump`의 출력을 변경
+
+`schema_search_path`나 다른 PostgreSQL 익스텐션을 사용하고 있다면 스키마를 어떻게
+덤프할지를 제어할 수 있을 것입니다. `:all`로 모든 덤프를 생성할 수 있으며, 아니면
+`:schema_search_path`로 설정하여 특정 스키마 검색 경로로부터 생성할 수도 있습니다.
+
+    config.active_record.dump_schemas = :all
+
+#### 서브도메인에서 HSTS를 활성화하기 위한 SSL 옵션 추가
+
+서브도메인에서 HSTS를 활성화하려면 다음과 같이 설정하세요.
+
+    config.ssl_options = { hsts: { subdomains: true } }
+
+#### 수신자의 시간대 보존
+
+Ruby 2.4를 사용할 때, `to_time`를 호출할 때 수신자의 시간대를 보존할 수 있습니다.
+
+    ActiveSupport.to_time_preserves_timezone = false
 
 레일스 4.1에서 레일스 4.2로 업그레이드
 -------------------------------------
@@ -143,7 +369,7 @@ end
 현재, 액티브레코드에서는 `after_rollback`이나 `after_commit` 콜백에서 에러를 다루고 있으며, 예외가 발생한 경우에는 로그 출력만 발생합니다. 다음 버전부터는 이러한 에러를 잡아주지 않게 되므로 주의해주세요.
 앞으로는 다른 액티브레코드 콜백과 동일한 에러 처리를 하게 됩니다.
 
-`after_rollback` 콜백이나 `after_commit` 콜백을 정의하면 이 변경에 대한 사용중단 안내가 출력됩니다. 이 변경 내용을 잘 이해하고, 이에 대한 대비가 되었다면 `config/application.rb`에 다음의 설정을 통해서 사용중단 안내가 출력되지 않도록 변경할 수 있습니다.
+`after_rollback` 콜백이나 `after_commit` 콜백을 정의하면 이 변경에 대한 제거 예정 안내가 출력됩니다. 이 변경 내용을 잘 이해하고, 이에 대한 대비가 되었습니다면 `config/application.rb`에 다음의 설정을 통해서 제거 예정 안내가 출력되지 않도록 변경할 수 있습니다.
 
     config.active_record.raise_in_transactional_callbacks = true
 
@@ -153,7 +379,7 @@ end
 
 Rails 5.0의 테스트 케이스는 임의의 순서로 실행될 예정입니다. 이 변경에 대비해서 테스트 실행순서를 명시적으로 지정하는 `active_support.test_order`라는 새로운 설정이 Rails 4.2에서 도입되었습니다. 이 옵션을 사용하여 테스트의 실행 순서를 지금 그대로 하고 싶은 경우에는 `:sorted`를 지정하고, 임의 순서대로 실행하는 것을 지금 도입하고 싶은 경우에는 `:random`를 지정할 수 있습니다.
 
-이 옵션에 값을 주지 않으면 사용중단 안내가 출력됩니다. 사용중단 안내가 출력되지 않게 하려면 test 환경에 다음을 추가하세요.
+이 옵션에 값을 주지 않으면 제거 예정 안내가 출력됩니다. 제거 예정 안내가 출력되지 않게 하려면 test 환경에 다음을 추가하세요.
 
 ```ruby
 # config/environments/test.rb
@@ -264,7 +490,7 @@ end
 ```
 
 ### Foreign Key 지원
-마이그레이션 DSL이 외래키 정의를 지원하기 위해서 확장되었습니다. 만약 Foreigner gem을 사용하고 있다면, 이를 제거하는 것을 고려할 수 있습니다. Rails에서 새로 지원하는 외래키 지원은 Foreigner의 일부분입니다. 이는 모든 Foreigner의 정의가 새로운 Rails 마이그레이션 DSL로 완전히 대체될 수 없다는 의미입니다.
+마이그레이션 DSL이 외래키 정의를 지원하기 위해서 확장되었습니다. 만약 Foreigner gem을 사용하고 있습니다면, 이를 제거하는 것을 고려할 수 있습니다. Rails에서 새로 지원하는 외래키 지원은 Foreigner의 일부분입니다. 이는 모든 Foreigner의 정의가 새로운 Rails 마이그레이션 DSL로 완전히 대체될 수 없다는 의미입니다.
 
 변경하는 과정은 다음과 같습니다.
 
@@ -296,7 +522,7 @@ xhr :get, :index, format: :js
 
 `XmlHttpRequest`를 명시적으로 테스트해주세요.
 
-JavaScript를 원격의 `<script>` 태그로부터 읽어와야 한다면, 그 액션에서는 CSRF 보호를 꺼주세요.
+JavaScript를 원격의 `<script>` 태그로부터 읽어와야 합니다면, 그 액션에서는 CSRF 보호를 꺼주세요.
 
 ### Spring
 
@@ -347,7 +573,7 @@ Rails.application.config.action_dispatch.cookies_serializer = :hybrid
 
 이를 통해 `Marshal`에서 직렬화된 기존의 cookies를 새로운 `JSON` 기반의 형식으로 투명하게 넘어갈 수 있습니다.
 
-`:json`또는 `:hybrid` 직렬화를 사용하는 경우, 일부의 Ruby 객체가 JSON으로서 직렬화되지 않을 가능성이 있다는 점에 주의해주세요. 예를 들면, `Date` 객체나 `Time` 객체는 문자열로 직렬화되며, `Hash`의 키도 직렬화됩니다.
+`:json`또는 `:hybrid` 직렬화를 사용하는 경우, 일부의 Ruby 객체가 JSON으로서 직렬화되지 않을 가능성이 있습니다는 점에 주의해주세요. 예를 들면, `Date` 객체나 `Time` 객체는 문자열로 직렬화되며, `Hash`의 키도 직렬화됩니다.
 
 ```ruby
 class CookiesController < ApplicationController
@@ -496,7 +722,7 @@ ActiveRecord::FixtureSet.context_class.send :include, FixtureFileHelpers
 config.i18n.enforce_available_locales = false
 ``` 
 
-available_locales의 강제는 보안을 위한 것입니다. 다시 말해, 애플리케이션이 파악하지 못한 로케일을 가지는 사용자의 입력이 로케일 정보로서 사용되지 않도록 하는 것입니다. 따라서, 어쩔 수 없는 이유가 존재하지 않는다면 이 옵션을 false로 변경하지 말아주세요.
+available_locales의 강제는 보안을 위한 것입니다. 다시 말해, 애플리케이션이 파악하지 못한 로케일을 가지는 사용자의 입력이 로케일 정보로서 사용되지 않도록 하는 것입니다. 따라서, 어쩔 수 없는 이유가 존재하지 않습니다면 이 옵션을 false로 변경하지 말아주세요.
 
 ### 관계에 대한 mutator 메소드 호출
 
@@ -616,7 +842,7 @@ set_callback :save, :around, ->(r, block) { stuff; result = block.call; stuff }
 ### HTTP PATCH
 
 레일스 4에서는 `config/routes.rb`에서 RESTful한 리소스를 선언할 때에, 변경을 위한 HTTP 동사로 `PATCH`가 적용되었습니다. `update` 액션은 이전대로 사용할 수 있으며 `PUT` 요청은 앞으로도 `update` 액션으로 라우팅됩니다.
-표준적인 RESTful만을 사용하고 있다면 이에 대한 변경을 할 필요가 없습니다.
+표준적인 RESTful만을 사용하고 있습니다면 이에 대한 변경을 할 필요가 없습니다.
 
 ```ruby
 resources :users
@@ -634,7 +860,7 @@ class UsersController < ApplicationController
 end
 ```
 
-단, `form_for`를 사용하여 리소스를 변경하고, `PUT` HTTP 메소드를 사용하는 라우팅과 연동하고 있다면 변경해야할 필요가 있습니다.
+단, `form_for`를 사용하여 리소스를 변경하고, `PUT` HTTP 메소드를 사용하는 라우팅과 연동하고 있습니다면 변경해야할 필요가 있습니다.
 
 ```ruby
 resources :users, do
@@ -654,7 +880,7 @@ class UsersController < ApplicationController
 end
 ```
 
-이 액션이 공개 API에는 사용되고 있지 않고, HTTP 메소드를 자유롭게 변경할 수 있다면, 라우팅을 변경하여 `patch`를 `put` 대신에 사용할 수 있습니다.
+이 액션이 공개 API에는 사용되고 있지 않고, HTTP 메소드를 자유롭게 변경할 수 있습니다면, 라우팅을 변경하여 `patch`를 `put` 대신에 사용할 수 있습니다.
 
 Rails 4에서는 `PUT` 요청을 `/users/:id`에 전송하면, 기존과 마찬가지로 `update`에 라우팅됩니다. 이를 위해, 실제의 PUT 요청을 받는 API는 앞으로도 사용할 수 있습니다. 이 경우, `PATCH` 요청도 `/users/:id` 경유로 `update` 액션에 라우팅됩니다.
 
@@ -725,7 +951,7 @@ Bundler.require(:default, Rails.env)
 
 * 레일스 4.0에서는 Strong Parameters가 도입되면서 `attr_accessible`과 `attr_protected`가 제거되었습니다. 이를 계속해서 사용하고 싶은 경우에는 [Protected Attributes gem](https://github.com/rails/protected_attributes)를 도입하여 부드럽게 업그레이드를 할 수 있습니다.
 
-* Protected Attributes를 사용하지 않는다면 `whitelist_attributes`나 `mass_assignment_sanitizer` 옵션 등, 이 gem에 관련된 모든 옵션을 제거할 수 있습니다.
+* Protected Attributes를 사용하지 않습니다면 `whitelist_attributes`나 `mass_assignment_sanitizer` 옵션 등, 이 gem에 관련된 모든 옵션을 제거할 수 있습니다.
 
 * 레일스 4.0의 스코프에서는 Proc이나 lambda 등의 호출 가능한 객체를 사용하는 것이 의무가 되었습니다.
 
@@ -1053,7 +1279,7 @@ ActiveSupport.on_load(:action_controller) do
   wrap_parameters format: [:json]
 end
 
-# JSON의 루트 요소를 기본으로 비활성화 한다
+# JSON의 루트 요소를 기본으로 비활성화 합니다
 ActiveSupport.on_load(:active_record) do
   self.include_root_in_json = false
 end

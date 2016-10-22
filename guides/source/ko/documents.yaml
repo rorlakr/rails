@@ -34,9 +34,10 @@
       url: active_record_querying.html
       description: Active Record가 제공하는 모든 데이터베이스 쿼리 인터페이스에 대해서 설명합니다.
     -
-      name: Active Model
+      name: Active Model Basics
       url: active_model_basics.html
       description: Active Record를 사용하지 않고 모델 클래스를 다루는 방법에 대해서 설명합니다.
+      work_in_progress: true
 -
   name: View
   documents:
@@ -53,28 +54,6 @@
       name: Action View Form Helper
       url: form_helpers.html
       description: 내장되어있는 폼 헬퍼에 대해서 설명합니다.
-    -
-      name: "레일스에서 캐싱하기"
-      url: caching_with_rails.html
-      description: 캐시를 사용하여 레일스 애플리케이션을 빠르게 만드는 방법에 대해서 설명합니다.
-    -
-      name: Active Support Instrumentation
-      work_in_progress: true
-      url: active_support_instrumentation.html
-      description: 액티브서포트를 통해 레일스나 다른 루비 코드에서 이벤트를 계측하는 방법에 대해서 설명합니다.
-    -
-      name: 레일스 애플리케이션 프로파일링
-      work_in_progress: true
-      url: profiling.html
-      description: 성능을 향상시키기 위해 레일스 애플리케이션을 분석하는 방법에 대해서 설명합니다.
-    -
-      name: 레일스로 API 전용 애플리케이션 만들기
-      url: api_app.html
-      description: 레일스를 통해 효율적으로 JSON API 애플리케이션을 만드는 방법에 대해서 설명합니다.
-    -
-      name: Action Cable 살펴보기
-      url: action_cable_overview.html
-      description: 실시간 기능을 구현하기 위해 액션케이블이 어떻게 동작하는지, 웹소켓을 어떻게 사용하는지에 대해서 설명합니다.
 -
   name: Controller
   documents:
@@ -98,11 +77,11 @@
       url: i18n.html
       description: 레일스 애플리케이션에서 국제화를 지원하는 방법에 대해서 설명합니다. 이를 이용하면 애플리케이션을 서로 다른 언어로 번역할 수 있으며, 단수형/복수형에 대한 규칙을 변경하거나, 각 나라에 맞는 날짜 형식을 설정할 수 있습니다.
     -
-      name: Action Mailer
+      name: Action Mailer Basics
       url: action_mailer_basics.html
       description: Action Mailer를 사용해서 메일을 송수신하는 방법에 대해 설명합니다.
     -
-      name: Active Job
+      name: Active Job Basics
       url: active_job_basics.html
       description: 백그라운드에서 동작하는 잡(Job)을 만들고, 큐에 전송하고 실행하는데에 있어 필요한 모든 것을 설명합니다.
     -
@@ -142,6 +121,29 @@
       name: 상수 자동 읽기와 다시 읽기
       url: autoloading_and_reloading_constants.html
       description: 상수 자동 읽기와 다시 읽기가 어떻게 이루어지는지 설명합니다.
+    -
+      name: "레일스에서 캐싱하기"
+      url: caching_with_rails.html
+      description: 캐시를 사용하여 레일스 애플리케이션을 빠르게 만드는 방법에 대해서 설명합니다.
+    -
+      name: Active Support Instrumentation
+      work_in_progress: true
+      url: active_support_instrumentation.html
+      description: 액티브서포트를 통해 레일스나 다른 루비 코드에서 이벤트를 계측하는 방법에 대해서 설명합니다.
+    -
+      name: 레일스 애플리케이션 프로파일링
+      work_in_progress: true
+      url: profiling.html
+      description: 성능을 향상시키기 위해 레일스 애플리케이션을 분석하는 방법에 대해서 설명합니다.
+    -
+      name: 레일스로 API 전용 애플리케이션 만들기
+      url: api_app.html
+      description: 레일스를 통해 효율적으로 JSON API 애플리케이션을 만드는 방법에 대해서 설명합니다.
+    -
+      name: Action Cable 살펴보기
+      url: action_cable_overview.html
+      description: 실시간 기능을 구현하기 위해 액션케이블이 어떻게 동작하는지, 웹소켓을 어떻게 사용하는지에 대해서 설명합니다.
+
 -
   name: 레일스 확장하기
   documents:
@@ -170,10 +172,6 @@
       name: Ruby on Rails에 기여하는 방법
       url: contributing_to_ruby_on_rails.html
       description: Rails는 '어떤 다른 사람의 프레임워크'가 아닙니다. 현재도 계속되고 있는 Rails 프레임워크 개발에 기여하는 다양한 방법에 대해서 설명합니다.
-    -
-      name: 레일스 코어 개발 환경 구축 방법
-      url: development_dependencies_install.html
-      description: Ruby on Rails 자체의 개발 환경을 구축하는 방법에 대해서 설명합니다.
     -
       name: API 문서 작성 가이드라인
       url: api_documentation_guidelines.html

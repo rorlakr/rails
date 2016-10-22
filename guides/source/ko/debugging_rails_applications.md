@@ -108,9 +108,10 @@ Title: Rails debugging guide
 
 ### 로거란?
 
-Rails는 `ActiveSupport::Logger` 클래스를 사용하여 로그 정보를 출력합니다. 필요에 따라, `Log4r` 등의 다른 로거로 변경해도 좋습니다.
+Rails는 `ActiveSupport::Logger` 클래스를 사용하여 로그 정보를 출력합니다.
+필요에 따라, `Log4r` 등의 다른 로거로 변경해도 좋습니다.
 
-다른 로거의 설정은 `environment.rb` 또는 각 환경의 설정파일에서 할 수 있습니다.
+다른 로거의 설정은 `config/application.rb` 또는 각 환경의 설정파일에서 할 수 있습니다.
 
 ```ruby
 Rails.logger = Logger.new(STDOUT)
@@ -128,22 +129,28 @@ TIP: 로그의 저장 위치는 기본으로 `Rails.root/log/`로 되어 있습�
 
 ### 로그의 출력 레벨
 
-메시지의 로그 레벨이 설정되어 있는 최소 로그 레벨 이상이 되었을 경우에만 로그 파일에 그 메시지를 출력합니다. 현재 로그 레벨을 알고 싶은 경우에는 `Rails.logger.level` 메소드를 호출하세요.
+메시지의 로그 레벨이 설정되어 있는 최소 로그 레벨 이상이 되었을 경우에만 로그
+파일에 그 메시지를 출력합니다. 현재 로그 레벨을 알고 싶은 경우에는
+`Rails.logger.level` 메소드를 호출하세요.
 
-지정가능한 로그 레벨은 `:debug`, `:info`, `:warn`, `:error`, `:fatal`, `:unknown`의 6가지가 있으며, 각각 0부터 5까지의 숫자에 대응합니다. 기본 로그 레벨을 변경하려면 아래와 같이 추가하세요.
+지정가능한 로그 레벨은 `:debug`, `:info`, `:warn`, `:error`, `:fatal`,
+`:unknown`의 6가지가 있으며, 각각 0부터 5까지의 숫자에 대응합니다. 기본 로그
+레벨을 변경하려면 아래와 같이 추가하세요.
 
 ```ruby
-config.log_level = :warn # 환경마다 initializer에서 사용 가능
+config.log_level = :warn # 환경마다, 또는 initializer에서 사용 가능
 Rails.logger.level = 0 # 언제라도 사용 가능
 ```
 
-이것은 development 환경이나 staging 환경에서는 로그를 출력하고, production 환경에서는 필요 없는 정보를 로그에 출력하고 싶지 않을 경우 등에 유용합니다.
+이것은 development 환경이나 staging 환경에서는 로그를 출력하고, 실제 환경에서는
+필요 없는 정보를 로그에 출력하고 싶지 않을 경우 등에 유용합니다.
 
 TIP: Rails의 기본 로그 레벨은 모든 환경에서 `debug`입니다.
 
 ### 메시지 전송
 
-컨트롤러, 모델, 메일러에서 로그를 남기고 싶은 경우에는 `logger.(debug|info|warn|error|fatal)`를 사용합니다.
+컨트롤러, 모델, 메일러에서 로그를 남기고 싶은 경우에는
+`logger.(debug|info|warn|error|fatal)`를 사용합니다.
 
 ```ruby
 logger.debug "Person attributes hash: #{@person.attributes.inspect}"
@@ -176,7 +183,7 @@ end
 ```
 
 이 컨트롤러의 액션을 실행하면 아래와 같은 로그가 생성됩니다.
-ㄴ
+
 ``` 
 Processing ArticlesController#create (for 127.0.0.1 at 2008-09-08 11:52:54) [POST]
   Session ID: BAh7BzoMY3NyZl9pZCIlMDY5MWU1M2I1ZDRjODBlMzkyMWI1OTg2NWQyNzViZjYiCmZsYXNoSUM6J0FjdGl
@@ -227,7 +234,7 @@ logger.debug {"Person attributes hash: #{@person.attributes.inspect}"}
 
 넘긴 블럭의 내용(여기에서는 문자열의 식전개)은 debug가 유효한 경우에만 처리됩니다. 이 방법을 통해서 얻어지는 성능의 개선은 대량의 로그를 출력하는 경우가 아니라면 크게 실감이 되지 않을 수 있습니다만, 그렇다 하더라도 채용할 만한 가치는 있습니다.
 
-`byebug` gem을 사용해서 디버깅하기
+`byebug` 젬을 사용해서 디버깅하기
 ---------------------------------
 
 코드가 기대한대로 동작하지 않는 경우에는 로그나 콘솔에 출력해서 문제를 진단할 필요가 있습니다. 하지만 이 방법으로는 에러 추적을 몇번이고 반복해야 하므로, 근본적인 원인을 찾기에는 그다지 효율이 좋다고 말할 수 없습니다. 실행중인 코드의 상황을 확인할 필요가 있는 경우에 가장 의지할 만한 것은 역시 디버거입니다.
@@ -236,7 +243,7 @@ logger.debug {"Person attributes hash: #{@person.attributes.inspect}"}
 
 ### 설치
 
-`byebug` gem을 사용하면, Rails 코드에 중단점을 지정하여 단계별로 실행할 수 있습니다. 다음을 실행하는 것으로 gem을 설치할 수 있습니다.
+`byebug` 젬을 사용하면, Rails 코드에 중단점을 지정하여 단계별로 실행할 수 있습니다. 다음을 실행하는 것으로 젬을 설치할 수 있습니다.
 
 ```bash
 $ gem install byebug
@@ -280,16 +287,15 @@ end
 다음은 예시입니다.
 
 ```bash
-=> Booting WEBrick
+=> Booting Puma
 => Rails 5.0.0 application starting in development on http://0.0.0.0:3000
 => Run `rails server -h` for more startup options
-=> Notice: server is listening on all interfaces (0.0.0.0). Consider using 127.0.0.1 (--binding option)
-=> Ctrl-C to shutdown server
-[2014-04-11 13:11:47] INFO  WEBrick 1.3.1
-[2014-04-11 13:11:47] INFO  ruby 2.1.1 (2014-02-24) [i686-linux]
-[2014-04-11 13:11:47] INFO  WEBrick::HTTPServer#start: pid=6370 port=3000
-
-
+Puma starting in single mode...
+* Version 3.4.0 (ruby 2.3.1-p112), codename: Owl Bowl Brawl
+* Min threads: 5, max threads: 5
+* Environment: development
+* Listening on tcp://localhost:3000
+Use Ctrl-C to stop
 Started GET "/" for 127.0.0.1 at 2014-04-11 13:11:48 +0200
   ActiveRecord::SchemaMigration Load (0.2ms)  SELECT "schema_migrations".* FROM "schema_migrations"
 Processing by ArticlesController#index as HTML
@@ -305,30 +311,57 @@ Processing by ArticlesController#index as HTML
    10:     respond_to do |format|
    11:       format.html # index.html.erb
    12:       format.json { render json: @articles }
+(byebug)
+```
+
+그러면 애플리케이션의 깊은 곳으로 들어가봅시다. 우선 디버거의 헬프를 확인해
+보는 것이 좋습니다. `help`를 입력해보세요.
+
+```
+(byebug) help
+
+  break      -- Sets breakpoints in the source code
+  catch      -- Handles exception catchpoints
+  condition  -- Sets conditions on breakpoints
+  continue   -- Runs until program ends, hits a breakpoint or reaches a line
+  debug      -- Spawns a subdebugger
+  delete     -- Deletes breakpoints
+  disable    -- Disables breakpoints or displays
+  display    -- Evaluates expressions every time the debugger stops
+  down       -- Moves to a lower frame in the stack trace
+  edit       -- Edits source files
+  enable     -- Enables breakpoints or displays
+  finish     -- Runs the program until frame returns
+  frame      -- Moves to a frame in the call stack
+  help       -- Helps you using byebug
+  history    -- Shows byebug's history of commands
+  info       -- Shows several informations about the program being debugged
+  interrupt  -- Interrupts the program
+  irb        -- Starts an IRB session
+  kill       -- Sends a signal to the current process
+  list       -- Lists lines of source code
+  method     -- Shows methods of an object, class or module
+  next       -- Runs one or more lines of code
+  pry        -- Starts a Pry session
+  quit       -- Exits byebug
+  restart    -- Restarts the debugged program
+  save       -- Saves current byebug session to a file
+  set        -- Modifies byebug settings
+  show       -- Shows byebug settings
+  source     -- Restores a previously saved byebug session
+  step       -- Steps into blocks or methods one or more times
+  thread     -- Commands to manipulate threads
+  tracevar   -- Enables tracing of a global variable
+  undisplay  -- Stops displaying all or some expressions when program stops
+  untracevar -- Stops tracing a global variable
+  up         -- Moves to a higher frame in the stack trace
+  var        -- Shows variables and its values
+  where      -- Displays the backtrace
 
 (byebug)
 ```
 
-그러면 애플리케이션의 깊은 곳으로 들어가봅시다. 우선 디버거의 헬프를 확인해보는 것이 좋을 것입니다. `help`를 입력해보세요.
-
-``` 
-(byebug) help
-
-byebug 2.7.0
-
-Type 'help <command-name>' for help on a specific command
-
-Available commands:
-backtrace  delete   enable  help       list    pry next  restart  source     up
-break      disable  eval    info       method  ps        save     step       var
-catch      display  exit    interrupt  next    putl      set      thread
-condition  down     finish  irb        p       quit      show     trace
-continue   edit     frame   kill       pp      reload    skip     undisplay
-```
-
-TIP: 각각의 명령어의 헬프를 보기 위해서는 디버거의 프롬프트에서 `help <명령어>`라고 입력합니다（예시: _`help list`_）. 디버그용 명령은 다른 명령과 구별 가능한 범위 내에서 단축시켜서 사용할 수 있습니다. 예를 들자면, `list` 명령 대신에 `l`이라고 입력할 수도 있습니다.
-
-이전의 10행을 출력하기 위해서는 `list-`(또는 `l-`)라고 입력합니다.
+이전의 10줄을 확인하고 싶다면 `list-`(또는 `l-`)를 입력하세요.
 
 ```
 (byebug) l-
@@ -344,10 +377,9 @@ TIP: 각각의 명령어의 헬프를 보기 위해서는 디버거의 프롬프
    8      @articles = Article.find_recent
    9
    10      respond_to do |format|
-
 ```
 
-이에서 알 수 있듯, 해당하는 파일에 이동하여 `byebug` 호출을 추가한 행의 앞 부분을 확인할 수 있습니다. 마지막으로 `list=`라고 입력하여 현재 위치로 돌아가봅시다.
+이를 통해서 파일 내부에서 `byebug`를 호출한 라인의 윗부분에 어떤 코드가 있는지를 확인할 수 있습니다. 마지막으로, 원래 있었던 곳으로 돌아가려면 `list=`를 입력하면 됩니다.
 
 ```
 (byebug) list=
@@ -363,7 +395,6 @@ TIP: 각각의 명령어의 헬프를 보기 위해서는 디버거의 프롬프
    10:     respond_to do |format|
    11:       format.html # index.html.erb
    12:       format.json { render json: @articles }
-
 (byebug)
 ```
 
@@ -378,13 +409,13 @@ TIP: 각각의 명령어의 헬프를 보기 위해서는 디버거의 프롬프
 ```
 (byebug) where
 --> #0  ArticlesController.index
-      at /PathTo/project/test_app/app/controllers/articles_controller.rb:8
-    #1  ActionController::ImplicitRender.send_action(method#String, *args#Array)
-      at /PathToGems/actionpack-5.0.0/lib/action_controller/metal/implicit_render.rb:4
+      at /PathToProject/app/controllers/articles_controller.rb:8
+    #1  ActionController::BasicImplicitRender.send_action(method#String, *args#Array)
+      at /PathToGems/actionpack-5.0.0/lib/action_controller/metal/basic_implicit_render.rb:4
     #2  AbstractController::Base.process_action(action#NilClass, *args#Array)
-      at /PathToGems/actionpack-5.0.0/lib/abstract_controller/base.rb:189
-    #3  ActionController::Rendering.process_action(action#NilClass, *args#NilClass)
-      at /PathToGems/actionpack-5.0.0/lib/action_controller/metal/rendering.rb:10
+      at /PathToGems/actionpack-5.0.0/lib/abstract_controller/base.rb:181
+    #3  ActionController::Rendering.process_action(action, *args)
+      at /PathToGems/actionpack-5.0.0/lib/action_controller/metal/rendering.rb:30
 ...
 ```
 
@@ -393,18 +424,17 @@ TIP: 각각의 명령어의 헬프를 보기 위해서는 디버거의 프롬프
 ```
 (byebug) frame 2
 
-[184, 193] in /PathToGems/actionpack-5.0.0/lib/abstract_controller/base.rb
-   184:       # is the intended way to override action dispatching.
-   185:       #
-   186:       # Notice that the first argument is the method to be dispatched
-   187:       # which is *not* necessarily the same as the action name.
-   188:       def process_action(method_name, *args)
-=> 189:         send_action(method_name, *args)
-   190:       end
-   191:
-   192:       # Actually call the method associated with the action. Override
-   193:       # this method if you wish to change how action methods are called,
-
+[176, 185] in /PathToGems/actionpack-5.0.0/lib/abstract_controller/base.rb
+   176:       # is the intended way to override action dispatching.
+   177:       #
+   178:       # Notice that the first argument is the method to be dispatched
+   179:       # which is *not* necessarily the same as the action name.
+   180:       def process_action(method_name, *args)
+=> 181:         send_action(method_name, *args)
+   182:       end
+   183:
+   184:       # Actually call the method associated with the action. Override
+   185:       # this method if you wish to change how action methods are called,
 (byebug)
 ```
 
@@ -444,7 +474,9 @@ TIP: 각각의 명령어의 헬프를 보기 위해서는 디버거의 프롬프
    12:       format.json { render json: @articles }
 
 (byebug) instance_variables
-[:@_action_has_layout, :@_routes, :@_headers, :@_status, :@_request, :@_response, :@_env, :@_prefixes, :@_lookup_context, :@_action_name, :@_response_body, :@marked_for_same_origin_verification, :@_config]
+[:@_action_has_layout, :@_routes, :@_request, :@_response, :@_lookup_context,
+ :@_action_name, :@_response_body, :@marked_for_same_origin_verification,
+ :@_config]
 ```
 
 이와 같이, 컨트롤러에서 접근할 수 있는 모든 변수가 출력됩니다. 출력된 변수 목록은 코드의 실행과 함께 동적으로 갱신됩니다. 예를 들어, `next` 명령으로 한 라인을 실행했다고 해봅시다(이 명령에 대해서는 다음에 설명합니다).
@@ -469,8 +501,10 @@ TIP: 각각의 명령어의 헬프를 보기 위해서는 디버거의 프롬프
 그러면 instance_variables을 다시 한번 확인해보죠.
 
 ```
-(byebug) instance_variables.include? "@articles"
-true
+(byebug) instance_variables
+[:@_action_has_layout, :@_routes, :@_request, :@_response, :@_lookup_context,
+ :@_action_name, :@_response_body, :@marked_for_same_origin_verification,
+ :@_config, :@articles]
 ```
 
 정의 부분이 실행된 것으로, 이번에는 `@articles`도 인스턴스 변수 목록에 포함되어 있습니다.
@@ -482,11 +516,19 @@ TIP: `irb` 명령을 사용하는 것으로, **irb** 모드로 실행할 수도 
 
 ```
 (byebug) help var
-v[ar] cl[ass]                   show class variables of self
-v[ar] const <object>            show constants of object
-v[ar] g[lobal]                  show global variables
-v[ar] i[nstance] <object>       show instance variables of object
-v[ar] l[ocal]                   show local variables
+
+  [v]ar <subcommand>
+
+  Shows variables and its values
+
+
+  var all      -- Shows local, global and instance variables of self.
+  var args     -- Information about arguments of the current scope
+  var const    -- Shows constants of an object.
+  var global   -- Shows global variables.
+  var instance -- Shows instance variables of self or a specific object.
+  var local    -- Shows local variables in current scope.
+
 ```
 
 이 메소드는 현재 컨텍스트에서 변수의 값을 검사할 때에 유용한 방법입니다. 예를 들자면, 현 시점에서 지역 변수가 아무것도 정의되지 않은 상태인지 확인해봅시다.
@@ -503,13 +545,15 @@ v[ar] l[ocal]                   show local variables
 @_start_transaction_state = {}
 @aggregation_cache = {}
 @association_cache = {}
-@attributes = {"id"=>nil, "created_at"=>nil, "updated_at"=>nil}
-@attributes_cache = {}
-@changed_attributes = nil
-...
+@attributes = #<ActiveRecord::AttributeSet:0x007fd0682a9b18 @attributes={"id"=>#<ActiveRecord::Attribute::FromDatabase:0x007fd0682a9a00 @name="id", @value_be...
+@destroyed = false
+@destroyed_by_association = nil
+@marked_for_destruction = false
+@new_record = true
+@readonly = false
+@transaction_state = nil
+@txn = nil
 ```
-
-TIP: `p`(print) 명령과 `pp`(pretty print) 명령을 사용해서 Ruby 식을 평가하고, 변수의 값을 콘솔에 출력할 수도 있습니다.
 
 `display` 명령을 사용해서 변수를 모니터링할 수도 있습니다. 이것은 디버거에서 코드를 계속 실행하면서 변수의 값이 어떤 식으로 변하는지 추적할 때에 무척 유용합니다.
 
@@ -524,13 +568,8 @@ TIP: `p`(print) 명령과 `pp`(pretty print) 명령을 사용해서 Ruby 식을 
 
 이것으로 트레이스 실행 중에 현재 실행 중인 위치를 확인하고, 이용 가능한 변수를 언제든지 확인할 수 있게 되었습니다. 애플리케이션의 실행에 대해서 좀 더 배워봅시다.
 
-`step` 명령(단축형은 `s`)를 사용하면, 프로그램을 계속 실행하고, 다음 중단점까지 진행하면 디버거에게 제어 권한을 돌려줍니다.
-
-`step`과 무척 비슷한 `next`를 사용해도 괜찮습니다만, `next`는 그 코드의 라인에 함수나 메소드 호출이 있더라도 멈추지 않고 그 함수나 메소드를 실행해버린다는 점이 다릅니다.
-
-TIP: `step n`이나 `next n`을 입력하여 `n` 줄 만큼 진행할 수도 있습니다.
-
-`next`와 `step`의 차이점은 다음과 같습니다. `step`은 다음 코드를 실행하면 거기서 멈추므로, 항상 1줄만을 실행합니다. `next`는 메소드가 있어도 그 내부에 들어가지 않고 그 다음 라인으로 진행합니다.
+`step` 명령(단축형은 `s`)를 사용하면, 프로그램을 계속 실행하고, 다음 중단점까지
+진행하면 디버거에게 제어 권한을 돌려줍니다. `next`는 `step`과 유사합니다만, `step`은 다음 줄의 코드를 실행하기 직전까지 진행하는 반면, `next`는 메소드가 있어도 그 내부를 확인하지 않고 진행합니다.
 
 다음과 같은 예제를 생각해봅시다.
 
@@ -538,15 +577,13 @@ TIP: `step n`이나 `next n`을 입력하여 `n` 줄 만큼 진행할 수도 있
 Started GET "/" for 127.0.0.1 at 2014-04-11 13:39:23 +0200
 Processing by ArticlesController#index as HTML
 
-[1, 8] in /home/davidr/Proyectos/test_app/app/models/article.rb
-   1: class Article < ActiveRecord::Base
-   2:
-   3:   def self.find_recent(limit = 10)
-   4:     byebug
-=> 5:     where('created_at > ?', 1.week.ago).limit(limit)
-   6:   end
-   7:
-   8: end
+[1, 6] in /PathToProject/app/models/article.rb
+   1: class Article < ApplicationRecord
+   2:   def self.find_recent(limit = 10)
+   3:     byebug
+=> 4:     where('created_at > ?', 1.week.ago).limit(limit)
+   5:   end
+   6: end
 
 (byebug)
 ```
@@ -555,9 +592,7 @@ Processing by ArticlesController#index as HTML
 
 ```
 (byebug) next
-앞의 프레임의 실행이 완료되었으므로, Next에 의해서 1개 위의 프레임으로 이동합니다.
-
-[4, 13] in /PathTo/project/test_app/app/controllers/articles_controller.rb
+[4, 13] in /PathToProject/app/controllers/articles_controller.rb
     4:   # GET /articles
     5:   # GET /articles.json
     6:   def index
@@ -592,7 +627,9 @@ Processing by ArticlesController#index as HTML
 (byebug)
 ```
 
-이것은 자신의 코드의, 나아가서 Ruby on Rails의 버그를 찾기 위한 무척 좋은 방법입니다.
+이것은 자신의 코드의 버그를 찾기 위한 무척 좋은 방법입니다.
+
+TIP: `step n`이나 `next n`을 사용하여 `n`번 만큼 한번에 진행할 수 있습니다.
 
 ### 중단점
 
@@ -600,14 +637,14 @@ Processing by ArticlesController#index as HTML
 
 `break`(또는 `b`) 명령을 사용해서 중단점을 동적으로 추가할 수도 있습니다. 직접 중단점을 추가할 수 있는 방법은 아래의 3가지가 있습니다.
 
-* `break line`: 현재 소스 파일의 _line_이 가리키는 줄에 중단점을 설정합니다.
-* `break file:line [if expression]`: _file_의 _line_번째 줄에 중단점을 설정합니다. _expression_이 주어진 경우, 그 식이 _true_를 반환하는 경우에만 디버거가 실행됩니다.
-* `break class(.|\#)method [if expression]`: _class_에 정의되어 있는 _method_에 중단점을 설정합니다('.'과 '\#'는 각각 클래스와 인스턴스 메소드를 가리킵니다). _expression_의 동작은 file:line의 경우와 같습니다.
+* `break n`: 현재 소스 파일의 숫자 _n_이 가리키는 줄에 중단점을 설정합니다.
+* `break file:line [if expression]`: _file_의 _n_번째 줄에 중단점을 설정합니다. _expression_이 주어진 경우, 그 식이 _true_를 반환하는 경우에만 디버거가 실행됩니다.
+* `break class(.|\#)method [if expression]`: _class_에 정의되어 있는 _method_에 중단점을 설정합니다('.'과 '\#'는 각각 클래스와 인스턴스 메소드를 가리킵니다). _expression_의 동작은 file:n의 경우와 같습니다.
 
 아까와 같은 상황으로 예시를 들어보겠습니다.
 
 ```
-[4, 13] in /PathTo/project/app/controllers/articles_controller.rb
+[4, 13] in /PathToProject/app/controllers/articles_controller.rb
     4:   # GET /articles
     5:   # GET /articles.json
     6:   def index
@@ -620,11 +657,11 @@ Processing by ArticlesController#index as HTML
    13:   end
 
 (byebug) break 11
-Created breakpoint 1 at /PathTo/project/app/controllers/articles_controller.rb:11
+Successfully created breakpoint with id 1
 
 ```
 
-중단점을 목록으로 확인하기 위해서는 `info breakpoints `_n_이나 `info break `_n_을 사용합니다. 번호를 지정하면, 그 번호의 중단점을 목록 형태로 나타냅니다. 번호를 지정하지 않은 경우에는 모든 중단점을 보여줍니다.
+`info breakpoints`를 사용하여 중단점 목록을 확인하세요. 숫자를 넘기면 그 번호의 중단점을 보여줍니다. 그렇지 않으면 모든 중단점을 보여줍니다.
 
 ```
 (byebug) info breakpoints
@@ -642,8 +679,8 @@ No breakpoints.
 
 중단점을 활성화하거나, 무효로 만들 수도 있습니다.
 
-* `enable breakpoints`: _breakpoints_로 지정한 중단점의 목록(지정하지 않은 경우는 모든 중단점)을 활성화합니다. 중단점은 활성화 상태로 생성됩니다.
-* `disable breakpoints`: _breakpoints_로 지정한 중단점이 비활성화 되어, 해당 지점에서 디버거가 멈추지 않게 됩니다.
+* `enable breakpoints [n [m [...]]]`: _breakpoints_로 지정한 중단점의 목록(지정하지 않은 경우는 모든 중단점)을 활성화합니다. 중단점은 활성화 상태로 생성됩니다.
+* `disable breakpoints [n [m [...]]]`: _breakpoints_로 지정한 중단점이 비활성화 되어, 해당 지점에서 디버거가 멈추지 않게 됩니다.
 
 ### 예외 잡기
 
@@ -655,18 +692,18 @@ No breakpoints.
 
 디버거로 정지된 애플리케이션을 재개하는 방법은 두 가지가 있습니다.
 
-* `continue` [line-specification] \(또는 `c`): 스크립트가 직전에 정지되어 있던 주소로부터 프로그램의 실행을 재개합니다. 이 경우, 그때까지 설정되어 있던 중단점이 모두 무시됩니다. 옵션으로 특정 줄 번호를 한번만 유효한 중단점으로 설정할 수 있습니다.で指定できます。このワンタイムブレークポイントに達するとブレークポイントは削除されます。
-* `finish` [frame-number] \(또는 `fin`): 지정한 스택 프레임이 돌아올 때까지 계속해서 실행합니다. frame-number가 지정되어 있지 않은 경우에는 현재 선택되어 있는 프레임이 돌아올 때까지 실행합니다. 프레임의 위치가 지정되어 있지 않은(up이나 down, 또는 프레임 번호가 지정되어 있지 않은) 경우에는 현재 위치로부터 가장 가까운 프레임 또는 0프레임부터 시작합니다. 프레임 번호를 지정하면, 그 프레임이 돌아올 때까지 계속 실행합니다.
+* `continue [n]`: 스크립트가 직전에 정지되어 있던 주소로부터 프로그램의 실행을 재개합니다. 이 경우, 그때까지 설정되어 있던 중단점이 모두 무시됩니다. 옵션으로 특정 줄 번호를 한번만 유효한 중단점으로 설정할 수 있습니다.
+* `finish [n]`: 지정한 스택 프레임이 돌아올 때까지 계속해서 실행합니다. frame-number가 지정되어 있지 않은 경우에는 현재 선택되어 있는 프레임이 돌아올 때까지 실행합니다. 프레임의 위치가 지정되어 있지 않은(up이나 down, 또는 프레임 번호가 지정되어 있지 않은) 경우에는 현재 위치로부터 가장 가까운 프레임 또는 0프레임부터 시작합니다. 프레임 번호를 지정하면, 그 프레임이 돌아올 때까지 계속 실행합니다.
 
 ### 편집
 
 디버거 상의 코드를 에디터에서 열기 위한 명령어는 두 가지가 있습니다.
 
-* `edit [file:line]`: _file_을 에디터로 엽니다. 에디터는 EDITOR 환경 변수에 지정되어 있는 것을 사용합니다. _line_으로 몇번째 줄인지를 지정할 수도 있습니다.
+* `edit [file:n]`: _file_을 에디터로 엽니다. 에디터는 EDITOR 환경 변수에 지정되어 있는 것을 사용합니다. _n_으로 몇번째 줄인지를 지정할 수 있습니다.
 
 ### 종료
 
-디버깅을 종료할 때에는 `quit` 명령(단축형은 `q`) 또는 별칭인 `exit`을 사용하세요.ㄴ
+디버깅을 종료할 때에는 `quit` 명령(단축형은 `q`) 또는 별칭인 `exit`을 사용하세요. 아니면 `q!`를 입력하여 `Really quit? (y/n)`를 무시할 수 있습니다.
 
 quit을 실행하면 사실상 모든 스레드가 종료됩니다. 결과적으로 서버도 종료되므로, 재기동시킬 필요가 있습니다.
 
@@ -674,19 +711,80 @@ quit을 실행하면 사실상 모든 스레드가 종료됩니다. 결과적으
 
 `byebug`의 동작을 변경하기 위한 옵션이 몇가지 존재합니다.
 
-* `set autoreload`: 소스 코드가 변경되면 다시 읽어옵니다(기본값: true).
-* `set autolist`: 모든 중단점에서 `list` 명령을 실행합니다(기본값: true).
-* `set listsize _n_`: 목록 표시의 줄수를 _n_개로 변경합니다(기본값: 10).
-* `set forcestep`: `next`나 `step` 명령을 실행하면 항상 새로운 줄로 이동하게 됩니다.
+```
+(byebug) help set
 
-모든 옵션을 확인하려면 `help set`를 실행하세요. 특정 `set` 명령을 확인하기 위해서는 `help set `_subcommand_를 실행하세요.
+  set <setting> <value>
+
+  Modifies byebug settings
+
+  Boolean values take "on", "off", "true", "false", "1" or "0". If you
+  don't specify a value, the boolean setting will be enabled. Conversely,
+  you can use "set no<setting>" to disable them.
+
+  You can see these environment settings with the "show" command.
+
+  List of supported settings:
+
+  autosave       -- Automatically save command history record on exit
+  autolist       -- Invoke list command on every stop
+  width          -- Number of characters per line in byebug's output
+  autoirb        -- Invoke IRB on every stop
+  basename       -- <file>:<line> information after every stop uses short paths
+  linetrace      -- Enable line execution tracing
+  autopry        -- Invoke Pry on every stop
+  stack_on_error -- Display stack trace when `eval` raises an exception
+  fullpath       -- Display full file names in backtraces
+  histfile       -- File where cmd history is saved to. Default: ./.byebug_history
+  listsize       -- Set number of source lines to list by default
+  post_mortem    -- Enable/disable post-mortem mode
+  callstyle      -- Set how you want method call parameters to be displayed
+  histsize       -- Maximum number of commands that can be stored in byebug history
+  savefile       -- File where settings are saved to. Default: ~/.byebug_save
+```
 
 TIP: 이 설정들은 홈 폴더의 `.byebugrc` 파일에 저장해둘 수도 있습니다. 디버거가 실행되면, 이 설정이 전역으로 적용됩니다. 다음은 예시입니다.
 
 ```bash
-set forcestep
+set callstyle short
 set listsize 25
 ```
+
+`web-console` 젬으로 디버깅하기
+-----------------------------------
+
+웹 콘솔은 `byebug`와 비슷하지만 브라우저에서 동작한다는 점이 다릅니다. 개발중인 페이지에서 뷰나 컨트롤러의 컨텍스트에 존재하는 콘솔을 요청할 수 있습니다. 콘솔은 HTML 요소들의 뒤에 랜더링됩니다.
+
+### 콘솔
+
+컨트롤러의 액션이나 뷰에서 `console` 메소드로 콘솔을 호출할 수 있습니다.
+
+예를 들어, 컨트롤러라면,
+
+```ruby
+class PostsController < ApplicationController
+  def new
+    console
+    @post = Post.new
+  end
+end
+```
+
+뷰라면,
+
+```html+erb
+<% console %>
+
+<h2>New Post</h2>
+```
+
+와 같이 호출할 수 있습니다.
+
+이는 뷰에 콘솔을 랜더링합니다. `console`의 호출 위치에 대해서 신경쓸 필요는 없습니다. 콘솔은 콘솔이 호출된 위치에 관계없이 HTML 요소들의 가장 마지막에 랜더링됩니다.
+
+콘솔은 순수한 Ruby 코드로 실행됩니다. 클래스를 선언하거나 초기화할 수 있고, 새 모델을 만들거나, 변수들을 검사할 수도 있습니다.
+
+NOTE: 요청 당 단 하나의 콘솔만을 랜더링할 수 있습니다. 그렇지 않으면 `web-console`이 두번째 `console` 호출시에 에러를 던질 것입니다.
 
 메모리 누수 디버깅
 ------------------------------------
@@ -714,18 +812,10 @@ Valgrind의 설치 방법과 Ruby에서의 사용 방법에 대해서는 [Valgri
 * [Exception Notifier](https://github.com/smartinez87/exception_notification/tree/master): Rails 애플리케이션에서의 에러 발생시의 메일러 객체와 메일 통지 전송 템플릿의 기본 값을 제공합니다.
 * [Better Errors](https://github.com/charliesome/better_errors): Rails 표준 에러 페이지를 소스 코드나 변수 조사에 편리한 컨텍스트 정보를 추가하여 보여줍니다.
 * [RailsPanel](https://github.com/dejan/rails_panel): Rails 개발용의 Chrome 확장 기능입니다. 이것이 있으면 development.log에서 tail 명령을 실행할 필요가 없어집니다. Rails 애플리케이션의 요청에 대한 모든 정보를 브라우저 상(Developer Tools 패널)에서 볼 수 있습니다. db 시간, 랜더링 시간, 총 시간, 파라미터 리스트, 출력한 뷰 등을 볼 수 있습니다.
+* [Pry](https://github.com/pry/pry): IRB를 대체할 수 있는 구현체입니다.
 
 참고자료
 ----------
 
-* [ruby-debug 홈페이지](http://bashdb.sourceforge.net/ruby-debug/home-page.html)(영어)
-* [debugger 홈페이지](https://github.com/cldwalker/debugger)(영어)
 * [byebug 홈페이지](https://github.com/deivid-rodriguez/byebug)(영어)
 * [web-console 홈페이지](https://github.com/rails/web-console)(영어)
-* [글: ruby-debug에서 Rails 애플리케이션을 디버깅하기](http://www.sitepoint.com/debug-rails-app-ruby-debug/)(영어)
-* [Ryan Bates의 스크린 캐스트: Ruby 디버깅(개정판)](http://railscasts.com/episodes/54-debugging-ruby-revised)(영어)
-* [Ryan Bates의 스크린 캐스트: 스택 트레이스](http://railscasts.com/episodes/24-the-stack-trace)(영어)
-* [Ryan Bates의 스크린 캐스트: 로거](http://railscasts.com/episodes/56-the-logger)(영어)
-* [ruby-debug를 사용한 디버깅](http://bashdb.sourceforge.net/ruby-debug.html)(영어)
-
-TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.
