@@ -176,21 +176,18 @@ render template: "products/show"
 
 #### 별도의 파일을 사용하기
 
-`render` 메소드로 지정할 수 있는 뷰는 현재 애플리케이션의 폴더 바깥에 있어도 상관 없습니다(예를 들어, 2개의 Rails 애플리케이션이 같은 뷰 템플릿을 공유하고 있는 경우).
-
-```ruby
-render "/u/apps/warehouse_app/current/app/views/products/show"
-```
-
-Rails는 경로가 `/`로 시작되는 경우 별도의 파일을 사용한 랜더링이라고 인식합니다. 이러한 경우에 좀 더 명확하게 표현하고 싶은 경우에는 아래처럼 `:file` 옵션을 사용할 수 있습니다(Rails 2.2 이전에서는 해당 옵션을 반드시 사용해야 했습니다).
+`render` 메소드로 지정할 수 있는 뷰는 현재 애플리케이션의 폴더 바깥에 있어도 상관 없습니다.
 
 ```ruby
 render file: "/u/apps/warehouse_app/current/app/views/products/show"
 ```
 
-`:file` 옵션으로 주어진 경로는 파일 시스템을 기준으로 하는 절대 경로입니다. 당연하지만 해당 파일에 대한 접근 권한이 부여되어있어야 합니다.
+`:file` 옵션으로 주어진 경로는 파일 시스템을 기준으로 하는 절대 경로입니다.
+당연하지만 해당 파일에 대한 접근 권한이 부여되어있어야 합니다.
 
-NOTE: 파일을 사용하는 경우, 기본적으로 현재 레이아웃이 무시됩니다. 이 랜더링 작업을 현재 레이아웃 내부에서 수행하고 싶은 경우에는 `layout: true` 옵션을 추가할 필요가 있습니다.
+NOTE: `:file` 옵션을 사용자 입력과 함께 사용하는 경우 중대한 보안 결함을 만들 수 있습니다. 공격자가 이 기능으로 보안에 영향을 미치는 파일에 접근하려고 시도할 수 있기 때문입니다.
+
+NOTE: 파일을 사용하는 경우, 현재의 레이아웃을 사용합니다.
 
 TIP: Microsoft Windows에서 Rails를 실행하는 경우, 파일을 랜더링하는 경우에 `:file` 옵션을 생략할 수 없습니다. Windows의 파일명 형식이 Unix와 같지 않기 때문입니다.
 
@@ -257,7 +254,7 @@ render html: "<strong>Not Found</strong>".html_safe
 
 TIP: 이 방법은 무척 적은 양의 HTML 코드를 랜더링하고 싶을 때에 편리합니다. 이렇게 랜더링하던 코드가 복잡해지는 경우, 뷰 템플릿 사용을 검토해주세요.
 
-NOTE: 이 옵션을 사용하면 문자열이 'HTML safe'하지 않은 경우에 이스케이프를 수행합니다.
+NOTE: `html:` 옵션을 사용하면 HTML 객체들은 `html_safe` 메소드로 HTML 안전하다고 표시되지 않은 경우에 전부 이스케이프를 수행합니다.
 
 #### JSON 랜더링하기
 
@@ -588,11 +585,13 @@ HTTP 요청에 응답을 돌려주는 또다른 방법으로는 `redirect_to`를
 redirect_to photos_url
 ```
 
-`redirect_to`의 인수로는 어떤 값도 지정할 수 있습니다만, `link_to`나 `url_for`를 사용하는 것이 일반적입니다. 유저를 직전 페이지로 되돌려보내는, 특수한 리다이렉트도 가능합니다.
+`redirect_back`을 사용하여 사용자가 직전에 있었던 페이지로 돌려보낼 수도 있습니다. 이 위치는 `HTTP_REFERER` 헤더를 사용하며, 브라우저에 따라서 지원되지 않는 경우도 있으므로 반드시 `fallback_location`을 지정해주어야 합니다.
 
 ```ruby
-redirect_to :back
+redirect_back(fallback_location: root_path)
 ```
+
+NOTE: `redirect_to`와 `redirect_back`은 메소드 실행 중에 즉시 반환되거나 종료되지 않고, 그저 HTTP 응답을 설정하기만 합니다. 메소드에서 이들 뒤에 있는 코드들은 모두 실행됩니다. 필요하다면 명시적으로 `return`을 호출하거나 다른 종료 방식을 제공할 수 있습니다.
 
 #### 리다이렉트 상태 코드를 변경하기
 
@@ -663,7 +662,7 @@ end
 
 ### `head`로 본문이 없는 응답 생성하기
 
-`head` 메소드를 사용하면 브라우저에게 본문(body)이 없는 응답을 전송할 수 있습니다. 이 메소드의 이름은 `render :nothing`보다도 동작을 명확히 표현하고 있습니다. `head` 메소드에는 인수로 HTTP 상태 코드를 표현하는 심볼을 넘길 수 있습니다([참조 테이블](#status) 참조). 옵션의 인수는 헤더명과 값을 쌍으로 하는 해시값이라고 해석됩니다. 예를 들어 아래의 코드는 응답으로 에러 헤더만을 전송합니다.
+`head` 메소드를 사용하면 브라우저에게 본문(body)이 없는 응답을 전송할 수 있습니다. `head` 메소드에는 인수로 HTTP 상태 코드를 표현하는 심볼을 넘길 수 있습니다([참조 테이블](#status) 참조). 옵션의 인수는 헤더명과 값을 쌍으로 하는 해시값이라고 해석됩니다. 예를 들어 아래의 코드는 응답으로 에러 헤더만을 전송합니다.
 
 ```ruby
 head :bad_request
@@ -1011,6 +1010,42 @@ WARNING: 이미지 파일의 확장자는 생략할 수 없습니다.
 
 이 코드에서 `_ad_banner.html.erb` 파셜과 `_footer.html.erb` 파셜은 많은 페이지에서 재활용 가능한 컨텐츠를 포함할 수 있습니다. 이렇게 하면, 어떤 페이지를 개발중일때 상세한 부분에 대해서는 신경쓰지 않아도 됩니다.
 
+이 가이드의 앞 절에서 살펴 보았듯, `yield`는 레이아웃을 깔끔하게 관리할 수 있는 무척 강력한 도구입니다. 이는 순수한 Ruby로 동작하며 어디서든 사용할 수 있다는 점을 기억하세요. 예를 들어, 유사한 리소스들의 레리아웃 정의를 DRY하게 만들 수 있습니다.
+
+* `users/index.html.erb`
+
+    ```html+erb
+    <%= render "shared/search_filters", search: @q do |f| %>
+      <p>
+        Name contains: <%= f.text_field :name_contains %>
+      </p>
+    <% end %>
+    ```
+
+* `roles/index.html.erb`
+
+    ```html+erb
+    <%= render "shared/search_filters", search: @q do |f| %>
+      <p>
+        Title contains: <%= f.text_field :title_contains %>
+      </p>
+    <% end %>
+    ```
+
+* `shared/_search_filters.html.erb`
+
+    ```html+erb
+    <%= form_for(@q) do |f| %>
+      <h1>Search form:</h1>
+      <fieldset>
+        <%= yield f %>
+      </fieldset>
+      <p>
+        <%= f.submit "Search" %>
+      </p>
+    <% end %>
+    ```
+
 TIP: 모든 페이지에서 공유되는 컨텐츠라면 파셜을 레이아웃에서 직접 사용해도 좋습니다.
 
 #### 파셜 레이아웃
@@ -1058,6 +1093,34 @@ TIP: 모든 페이지에서 공유되는 컨텐츠라면 파셜을 레이아웃�
     ```
 
 위 2개의 뷰에서는 같은 파셜을 랜더링합니다만 ActionView의 submit 헬퍼는 new 액션인 경우에는 "Create Zone"을 반환하고, edit 액션에서는 "Update Zone"을 반환합니다.
+
+몇몇 경우에만 지역변수를 넘기고 싶다면 `local_assigns`를 사용할 수 있습니다.
+
+* `index.html.erb`
+
+  ```erb
+  <%= render user.articles %>
+  ```
+
+* `show.html.erb`
+
+  ```erb
+  <%= render article, full: true %>
+  ```
+
+* `_articles.html.erb`
+
+  ```erb
+  <h2><%= article.title %></h2>
+
+  <% if local_assigns[:full] %>
+    <%= simple_format article.body %>
+  <% else %>
+    <%= truncate article.body %>
+  <% end %>
+  ```
+
+이 방법을 통해서 모든 지역 변수를 선언하지 않고 정말 필요한 것들만 사용할 수 있습니다.
 
 모든 파셜은 언더스코어를 제외한 파셜명과 동일한 이름의 지역 변수를 가집니다. `:object` 옵션을 사용해서 이 지역 변수에 객체를 넘겨줄 수 있습니다.
 
@@ -1214,5 +1277,3 @@ TIP: 컬렉션에 따라, 파셜 내부에서 카운터 변수가 사용되는 �
 이렇게 하면 됩니다. News 뷰에서 새로운 레이아웃을 사용하게 되며, 상단 메뉴가 숨겨지고 "content" div 태그에 있는 우측 메뉴가 새롭게 추가 됩니다.
 
 이와 같은 결과를 얻을 수 있는 서브 템플릿의 사용법은 이외에도 여러가지가 있습니다. 중첩 횟수에는 제한이 없다는 점을 기억하세요. 예를 들어, News 레이아웃에서 새로운 레이아웃을 사용하기 위해 `render template: 'layouts/news'`를 사용해 `ActionView::render` 메소드를 사용할 수도 있습니다. `News` 레이아웃을 서브 템플릿으로 만들고 싶지 않다면 `content_for?(:news_content) ? yield(:news_content) : yield`를 `yield`로 바꾸기만 하면 됩니다.
-
-TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.

@@ -10,7 +10,7 @@ Rails에서 JavaScript 사용하기
 * 겸손한 JavaScript
 * Rails의 내장 헬퍼 사용하기
 * 서버측에서 Ajax를 다루기
-* Turbolinks gem
+* Turbolinks
 
 -------------------------------------------------------------------------------
 
@@ -109,7 +109,7 @@ HTML 생성을 쉽게 하기 위해서 Ruby로 작성된 다양한 뷰 헬퍼 �
 
 Rails의 JavaScript는 '겸손한 JavaScript' 원칙에 따라서 JavaScript에 의한 요소와 Ruby에 의한 요소로 구성되어 있습니다.
 
-JavaScript에 의한 부분은 [rails.js](https://github.com/rails/jquery-ujs/blob/master/src/rails.js)이며, Ruby에 의한 요소는 어떤 정규 뷰 헬퍼를 통해서 DOM에 적절한 태그를 추가합니다. 이를 통해 rails.js에 포함된 CoffeeScript가 DOM 속성을 확인할 수 있게 되며, 이 속성에 따라서 적절한 핸들러를 제공하게 됩니다.
+애셋 파이프라인을 비활성화하지 않는다면 JavaScript에 의한 부분은 [rails.js](https://github.com/rails/jquery-ujs/blob/master/src/rails.js)로 제공되며, Ruby에 의한 요소는 어떤 정규 뷰 헬퍼를 통해서 DOM에 적절한 태그를 추가합니다.
 
 ### form_for
 
@@ -264,7 +264,7 @@ index페이지의 상단에서는 사용자의 목록을 표시합니다. 아래
     respond_to do |format|
       if @user.save
         format.html { redirect_to @user, notice: 'User was successfully created.' }
-        format.js   {}
+        format.js
         format.json { render json: @user, status: :created, location: @user }
       else
         format.html { render action: "new" }
@@ -283,18 +283,18 @@ $("<%= escape_javascript(render @user) %>").appendTo("#users");
 Turbolinks
 ----------
 
-Rails 4에는 [Turbolinks gem](https://github.com/rails/turbolinks)이 포함되어 있습니다. 이 gem은 페이지의 랜더링 속도를 빠르게 만들기 위해서 Ajax를 사용하고 있습니다.
+Rails에는 [Turbolinks 라이브러리](https://github.com/turbolinks/turbolinks)이 포함되어 있습니다. 이는 Ajax를 사용하여 대부분의 애플리케이션에서의 페이지 렌더링 속도를 향상시킵니다.
 
 ### Turbolinks의 동작 원리
 
 Turbolinks는 페이지에 존재하는 모든 `<a>`에 클릭 핸들러를 하나씩 추가합니다. 브라우저에서 [PushState](https://developer.mozilla.org/en-US/docs/Web/API/History_API)가 지원되는 경우 Turbolinks는 그 페이지를 위한 Ajax 요청을 생성하고, 서버로부터 응답을 분석하여 그 페이지의 `<body>` 전체를 응답의 `<body>`로 교체합니다. 이어서, Turbolinks는 PushState를 사용하여 올바른 URL로 변경하여 새로고침 시맨틱을 유지하며 깨끗한 URL을 유지합니다.
 
-Turbolinks를 활성화하려면 Turbolinks를 Gemfile에 추가하고, CoffeeScript의 매니페스트(`app/assets/javascripts/application.js`)에 `//= require turbolinks`를 추가합니다.
+Turbolinks를 활성화하려면 Turbolinks를 Gemfile에 추가하고, JavaScript의 매니페스트(`app/assets/javascripts/application.js`)에 `//= require turbolinks`를 추가합니다.
 
-Turbolinks를 특정 링크에서만 끄고 싶은 경우에는 태그에 `data-no-turbolink` 속성을 추가합니다.
+Turbolinks를 특정 링크에서만 끄고 싶은 경우에는 태그에 `data-turbolinks="false"`를 추가합니다.
 
 ```html
-<a href="..." data-no-turbolink>No turbolinks here</a>.
+<a href="..." data-turbolinks="false">No turbolinks here</a>.
 ```
 
 ### 페이지 변경 이벤트
@@ -309,11 +309,11 @@ $(document).ready ->
 하지만 일반적인 페이지 로딩 프로세스는 Turbolinks에 의해서 덮어써지기 때문에 페이지 로딩에 의존하는 이벤트가 발생하지 않습니다. 이러한 코드가 있는 경우에는 다음과 같이 변경해야합니다.
 
 ```coffeescript
-$(document).on "page:change", ->
+$(document).on "turbolinks:load", ->
   alert "page has loaded!"
 ```
 
-그 외에도 연결 가능한 이벤트 등에 대해서는 [Turbolinks README](https://github.com/rails/turbolinks/blob/master/README.md)를 참조해주세요.
+그 외에도 연결 가능한 이벤트 등에 대해서는 [Turbolinks README](https://github.com/turbolinks/turbolinks/blob/master/README.md)를 참조해주세요.
 
 그 외의 리소스
 ---------------

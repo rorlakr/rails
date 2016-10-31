@@ -116,7 +116,7 @@ $ cd blog
 
 | 파일/폴더 | 목적 |
 | ----------- | ------- |
-|app/|여기에는 애플리케이션의 컨트롤러, 모델, 뷰, 헬퍼, 메일러, 그리고 애셋이 위치하고 있습니다. 이후, 가이드에서는 기본적으로 이 폴더를 중심으로 설명을 진행합니다.|
+|app/|여기에는 애플리케이션의 컨트롤러, 모델, 뷰, 헬퍼, 메일러, 채널, 잡, 애셋이 위치하고 있습니다. 이후, 가이드에서는 기본적으로 이 폴더를 중심으로 설명을 진행합니다.|
 |bin/|여기에는 애플리케이션을 기동하거나, 배포하기 위한 레일스 스크립트 등의 스크립트 파일들이 포함되어 있습니다.|
 |config/|애플리케이션의 설정 파일(라우팅, 데이터베이스 등)이 위치하고 있습니다. 자세한 내용은[레일스 애플리케이션 설정하기](configuring.html) 를 참조해주세요.|
 |config.ru|애플리케이션 기동시에 필요한 Rack 기반 서버 용 설정 파일입니다.|
@@ -226,7 +226,12 @@ Rails.application.routes.draw do
 end
 ```
 
-`root 'welcome#index'`라고 작성하는 것으로, 레일스에게 애플리케이션의 기본 URL에 대한 접속 요청을 welcome 컨트롤러의 index 액션으로 보내라고 지시할 수 있습니다. 이와 같이 `get 'welcome/index'`는 <http://localhost:3000/welcome/index>라는 요청을 welcome 컨트롤러의 index 액션으로 할당합니다. 후자는 위에서 컨트롤러 제너레이터(`bin/rails generate controller welcome index`를 실행했을 때, 자동적으로 생성되어 있습니다.
+`root 'welcome#index'`라고 작성하는 것으로, 레일스에게 애플리케이션의 기본
+URL에 대한 접속 요청을 welcome 컨트롤러의 index 액션으로 보내라고 지시할 수
+있습니다. 이와 같이 `get 'welcome/index'`는
+<http://localhost:3000/welcome/index>라는 요청을 welcome 컨트롤러의
+index 액션으로 할당합니다. 후자는 위에서 컨트롤러 제너레이터(`bin/rails
+generate controller Welcome index`를 실행했을 때, 자동적으로 생성됩니다.
 
 브라우저에서 <http://localhost:3000>를 출력해보죠(제너레이터를 실행하기 위해서 레일스 웹서버를 정지하고 있었다면 `bin/rails server`를 재실행해주세요). `app/views/welcome/index.html.erb`에 작성했던 "Hello, Rails!"라는 문제가 브라우저 상에 표시될 것입니다. `WelcomeController`의 `index`액션으로 라우팅이 수행되어 뷰가 정상적으로 출력되는 것을 확인할 수 있습니다.
 
@@ -1142,6 +1147,9 @@ class Comment < ApplicationRecord
 end
 ```
 Comment 모델의 내용은 이전에 보았던 `Article` 모델과 무척 닮아 있습니다. 다른 점이라고 한다면 액티브레코드의 _관계(Association)_를 설정하기 위한 `belongs_to :article`라는 줄이 있다는 부분 뿐입니다. 관계에 대해서는 다음 절에서 설명합니다.
+
+명령에서 사용된 `:reference` 키워드는 모델을 위한 특별한 데이터 형식입니다.
+이는 데이터베이스 테이블에 주어진 모델 이름에 `_id`를 붙인 키를 추가하고 정수 값을 받을 수 있게 합니다. 다음 `db/schema.rb`를 읽고 나면 좀 더 잘 이해할 수 있을겁니다.
 
 모델 파일 외에도 마이그레이션 파일도 생성되어 있습니다. 마이그레이션 파일은 모델에 대응하는 데이터베이스 테이블을 생성하는 내용을 담고 있습니다.
 

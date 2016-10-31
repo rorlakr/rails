@@ -14,7 +14,7 @@ Rails 가이드의 가이드라인
 마크다운(Markdown)
 -------
 
-가이드는 [GitHub Flavored Markdown](http://github.github.com/github-flavored-markdown/)으로 작성되어 있습니다. 참고자료로 정리된 [Markdown 문서](http://daringfireball.net/projects/markdown/syntax), [치트 시트](http://daringfireball.net/projects/markdown/basics), 일반 마크다운과의 차이점에 관한 [문서](http://github.github.com/github-flavored-markdown/)가 있습니다.
+가이드는 [GitHub Flavored Markdown](https://github.github.com/github-flavored-markdown/)으로 작성되어 있습니다. 참고자료로 정리된 [Markdown 문서](http://daringfireball.net/projects/markdown/syntax), [치트 시트](http://daringfireball.net/projects/markdown/basics), 일반 마크다운과의 차이점에 관한 [문서](https://github.github.com/github-flavored-markdown/)가 있습니다.
 
 Prologue
 --------

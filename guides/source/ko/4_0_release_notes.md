@@ -106,7 +106,7 @@ Rails 4.0에서는 많은 기능이 분리되어 gem이 되었습니다. 분리�
 * Active Record 모델에 대량할당 보호([GitHub](https://github.com/rails/protected_attributes), [Pull Request](https://github.com/rails/rails/pull/7251))
 * ActiveRecord::SessionStore([GitHub](https://github.com/rails/activerecord-session_store), [Pull Request](https://github.com/rails/rails/pull/7436))
 * Active Record Observer 패턴([GitHub](https://github.com/rails/rails-observers)、[Commit](https://github.com/rails/rails/commit/39e85b3b90c58449164673909a6f1893cba290b2))
-* Active Resource([GitHub](https://github.com/rails/activeresource), [Pull Request](https://github.com/rails/rails/pull/572), [블로그 포스팅](http://yetimedia.tumblr.com/post/35233051627/activeresource-is-dead-long-live-activeresource))
+* Active Resource([GitHub](https://github.com/rails/activeresource), [Pull Request](https://github.com/rails/rails/pull/572), [블로그 포스팅](http://yetimedia-blog-blog.tumblr.com/post/35233051627/activeresource-is-dead-long-live-activeresource))
 * 액션 캐시([GitHub](https://github.com/rails/actionpack-action_caching), [Pull Request](https://github.com/rails/rails/pull/7833))
 * 페이지 캐시([GitHub](https://github.com/rails/actionpack-page_caching), [Pull Request](https://github.com/rails/rails/pull/7833))
 * Sprockets([GitHub](https://github.com/rails/sprockets-rails))

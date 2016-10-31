@@ -106,7 +106,7 @@ If `return` is needed it is recommended to explicitly define a method.
 식의 실행 결과를 함께 적는 경우, 앞 부분에 "# => "를 추가해서 횡으로 정렬하세요.
 
 ```ruby
-# For checking if a fixnum is even or odd.
+# For checking if an integer is even or odd.
 #
 #   1.even? # => false
 #   1.odd?  # => true

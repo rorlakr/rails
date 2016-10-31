@@ -334,7 +334,7 @@ require 'erb'
 
 그런데, Rails에는 `post.rb`와 같은 파일을 탐색하는 `$LOAD_PATH`와 비슷한 폴더 목록이 있습니다. 이 목록은 `autoload_paths`이라고 불리고 있으며 기본으로는 다음과 같은 것들이 포함되어 있습니다.
 
-* 애플리케이션과 엔진의 `app` 폴더 하의 모든 폴더들. `app/controllers` 등이 대상. `app` 밑에 있는 `app/workers` 등의 폴더들도 모두 `autoload_paths`에 자동적으로 포함되므로, 기본 폴더로 지정할 필요는 없습니다.
+* 실행 시점에 존재하는 애플리케이션과 엔진의 `app` 폴더 하의 모든 폴더들. `app/controllers` 등이 대상. `app` 밑에 있는 `app/workers` 등의 폴더들도 모두 `autoload_paths`에 자동적으로 포함되므로, 기본 폴더로 지정할 필요는 없습니다.
 
 * 애플리케이션과 엔진의 모든 `app/*/concerns` 제2의 하위 폴더.
 

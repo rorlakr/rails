@@ -2,7 +2,9 @@
 Action Mailer 기초
 ====================
 
-여기에서는 애플리케이션에서 메일을 주고 받기 위해서 필요한 모든 것들과 Action Mailer에 대해 다양한 설명을 제공합니다. 또한 메일러를 테스트하기 위한 방법에 대해서도 설명합니다.
+여기에서는 애플리케이션에서 메일을 주고 받기 위해서 필요한 모든 것들과 Action
+Mailer에 대해 다양한 설명을 제공합니다. 또한 메일러를 테스트하기 위한 방법에
+대해서도 설명합니다.
 
 이 가이드의 내용:
 
@@ -16,7 +18,10 @@ Action Mailer 기초
 시작하면서
 ------------
 
-Action Mailer를 사용하여 애플리케이션의 메일러 클래스나 뷰에서 메일을 전송할 수 있습니다. 메일러의 동작은 컨트롤러와 유사한 부분이 많습니다. 메일러는 `ActionMailer::Base`를 상속하고 `app/mailers`에 위치하며 `app/views`에 있는 뷰와 연결됩니다.
+Action Mailer를 사용하여 애플리케이션의 메일러 클래스나 뷰에서 메일을 전송할
+수 있습니다. 메일러의 동작은 컨트롤러와 유사한 부분이 많습니다. 메일러는
+`ActionMailer::Base`를 상속하고 `app/mailers`에 위치하며 `app/views`에 있는
+뷰와 연결됩니다.
 
 메일을 보내기
 --------------
@@ -145,9 +150,13 @@ $ bin/rails generate scaffold user name email login
 $ bin/rails db:migrate
 ```
 
-사용자 모델을 생성했으므로 이어서 `app/controllers/users_controller.rb`를 편집하고, 새 사용자가 생성된 직후에 `UserMailer`의 `UserMailer.welcome_email`을 사용하여 그 사용자에게 메일이 전송되도록 합시다.
+사용자 모델을 생성했으므로 이어서 `app/controllers/users_controller.rb`를
+편집하고, 새 사용자가 생성된 직후에 `UserMailer`의 `UserMailer.welcome_email`을
+사용하여 그 사용자에게 메일이 전송되도록 합시다.
 
-Action Mailer는 Active Job과 잘 결합되어 있으므로, Web의 요청/응답 흐름의 바깥에서 비동기로 메일을 전송합니다. 이 덕분에 사용자는 메일 전송이 끝나기를 기다릴 필요가 없습니다.
+Action Mailer는 Active Job과 잘 결합되어 있으므로, Web의 요청/응답 흐름의
+바깥에서 비동기로 메일을 전송합니다. 이 덕분에 사용자는 메일 전송이 끝나기를
+기다릴 필요가 없습니다.
 
 ```ruby
 class UsersController < ApplicationController
@@ -172,9 +181,17 @@ class UsersController < ApplicationController
 end
 ```
 
-NOTE: Active Job은 기본으로 작업을 ':inline'으로 실행합니다. 따라서 이 시점에서 `deliver_later`를 사용해서 메일을 전송할 수 있습니다. 또한, 메일을 나중에 백그라운드로 전송하고 싶은 경우에는 Sidekiq이나 Resque등의 백엔드 큐 시스템을 사용하도록 Active Job을 설정하면 됩니다.
+NOTE: Active Job은 기본으로 작업을 `:async` 어댑터로 실행합니다. 따라서 이
+시점에서 `deliver_later`를 사용해서 메일을 전송할 수 있습니다. Active Job의
+기본 어댑터는 프로세스 내의 스레드 풀을 사용하여 동작합니다. 이는 별도의
+인프라를 요구하지 않으므로 개발/테스트 환경에는 잘 맞습니다만, 재시작할 때마다
+쌓여있는 작업을 버리기 때문에 Production 환경에서는 그다지 적절하지 않습니다.
+영속적인 백엔드가 필요하다면 Sidekiq이나 Resque 등의 백엔드 큐 시스템을
+사용하도록 Active Job을 설정하면 됩니다.
 
-메일을 cronjob 등에서 지금 바로 보내고 싶은 경우에는 `deliver_now`를 호출하면 됩니다.
+메일을 cronjob 등에서 지금 바로 보내고 싶은 경우에는 `deliver_now`를
+호출하면
+됩니다.
 
 ```ruby
 class SendWeeklySummary
@@ -186,13 +203,19 @@ class SendWeeklySummary
 end
 ```
 
-이 `welcome_email` 메소드는 `ActionMailer::MessageDelivery` 객체를 하나 반환합니다. 이 객체는 그 메일 자신이 전송 대상임을 `deliver_now`나 `deliver_later`에 알립니다. `ActionMailer::MessageDelivery` 객체는 `Mail::Message`를 감싸고 있습니다. 내부의 `Mail::Message` 객체를 꺼내거나 변경하고 싶은 경우에는 `ActionMailer::MessageDelivery` 객체의 `message` 메소드를 통해서 접근할 수 있습니다.
+이 `welcome_email` 메소드는 `ActionMailer::MessageDelivery` 객체를 하나
+반환합니다. 이 객체는 그 메일 자신이 전송 대상임을 `deliver_now`나
+`deliver_later`에 알립니다. `ActionMailer::MessageDelivery` 객체는
+`Mail::Message`를 감싸고 있습니다. 내부의 `Mail::Message` 객체를 꺼내거나
+변경하고 싶은 경우에는 `ActionMailer::MessageDelivery` 객체의 `message`
+메소드를 통해서 접근할 수 있습니다.
 
 ### 헤더의 값을 자동으로 인코딩하기
 
 Action Mailer는 메일의 헤더나 본문의 멀티바이트 문자를 자동적으로 인코딩합니다.
 
-다른 문자셋을 정의하고 싶을 때나, 사전에 직접 다른 인코딩 변환을 해두고 싶을 때에는 [Mail](https://github.com/mikel/mail) 라이브러리를 참조해주세요.
+다른 문자셋을 정의하고 싶을 때나, 사전에 직접 다른 인코딩 변환을 해두고 싶을
+때에는 [Mail](https://github.com/mikel/mail) 라이브러리를 참조해주세요.
 
 ### Action Mailer의 모든 메소드
 
@@ -212,28 +235,37 @@ Action Mailer에서는 파일을 간단하게 첨부할 수 있습니다.
     attachments['filename.jpg'] = File.read('/path/to/filename.jpg')
     ```
 
-  `mail` 메소드를 호출하면, Multipart 형식의 메일이 전송됩니다. 전송되는 메일은 Top level이 `multipart/mixed`이고, 첫번째 부분이 `multipart/alternative`라는 올바른 형식으로 중첩되어 있는 일반 텍스트 메일 또는 HTML 메일입니다.
+  `mail` 메소드를 호출하면, Multipart 형식의 메일이 전송됩니다. 전송되는 메일은
+Top level이 `multipart/mixed`이고, 첫번째 부분이 `multipart/alternative`라는
+올바른 형식으로 중첩되어 있는 일반 텍스트 메일 또는 HTML 메일입니다.
 
-NOTE: 메일에 첨부된 파일은 자동적으로 Base64로 인코딩됩니다. 다른 인코딩을 사용하고 싶은 경우에는 사전에 원하는 인코딩을 적용한 내용물을 `Hash`로 감싸서 `attachments`로 넘겨주세요.
+NOTE: 메일에 첨부된 파일은 자동적으로 Base64로 인코딩됩니다. 다른 인코딩을
+사용하고 싶은 경우에는 사전에 원하는 인코딩을 적용한 내용물을 `Hash`로 감싸서
+`attachments`로 넘겨주세요.
 
-* Action Mailer와 Mail는 헤더와 컨텐츠를 지정하여 파일명을 넘겨주면 그것들을 사용합니다.
+* Action Mailer와 Mail는 헤더와 컨텐츠를 지정하여 파일명을 넘겨주면 그것들을
+사용합니다.
 
     ```ruby
     encoded_content = SpecialEncode(File.read('/path/to/filename.jpg'))
     attachments['filename.jpg'] = {
-      mime_type: 'application/x-gzip',
+      mime_type: 'application/gzip',
       encoding: 'SpecialEncoding',
       content: encoded_content
     }
     ```
 
-NOTE: 인코딩의 종류를 지정하면 Mail은 내용물이 이미 인코딩 되었다고 생각하고 Base64로 인코딩을 시도하지 않습니다.
+NOTE: 인코딩의 종류를 지정하면 Mail은 내용물이 이미 인코딩 되었다고 생각하고
+Base64로 인코딩을 시도하지 않습니다.
 
 #### 파일을 인라인으로 첨부하기
 
-Action Mailer 3.0부터 파일을 인라인으로 첨부할 수 있습니다. 이 기능은 3.0보다 이전에 이루어졌던 여러 트릭들을 바탕으로 최대한 이상적이고, 단순하게 구현한 것입니다.
+Action Mailer 3.0부터 파일을 인라인으로 첨부할 수 있습니다. 이 기능은 3.0보다
+이전에 이루어졌던 여러 트릭들을 바탕으로 최대한 이상적이고, 단순하게 구현한
+것입니다.
 
-* Mail에 인라인 첨부를 사용하도록 지시하려면 Mailer의 attachments 메소드에 `#inline`을 호출하기만 하면 됩니다.
+* Mail에 인라인 첨부를 사용하도록 지시하려면 Mailer의 attachments 메소드에
+`#inline`을 호출하기만 하면 됩니다.
 
     ```ruby
     def welcome
@@ -329,6 +361,23 @@ end
 ```
 
 이 코드는 HTML 형식을 'another_template.html.erb' 템플릿을 사용하여 랜더링하며, 텍스트일 경우에는 `:text`로 랜더링합니다. 랜더링 명령은 Action Controller에서 사용하고 있는 것과 동일하므로 `:text`, `:inline` 등의 옵션을 동일하게 사용할 수 있습니다.
+
+#### 메일러 뷰 캐싱하기
+
+애플리케이션 뷰처럼 메일러 뷰에서도 `cache` 메소드를 사용하며 캐싱을 할 수
+있습니다.
+
+```
+<% cache do %>
+  <%= @company.name %>
+<% end %>
+```
+
+이 기능을 사용하기 위해서는 애플리케이션에 다음의 설정을 추가해주세요.
+
+```
+  config.action_mailer.perform_caching = true
+```
 
 ### Action Mailer의 레이아웃
 
@@ -553,7 +602,9 @@ Action Mailer를 설정하기
 |`deliveries`|`delivery_method :test`를 사용해서 Action Mailer로부터 전송된 메일 배열을 저장합니다. 유닛 테스트나 기능테스트에서 유용합니다.|
 |`default_options`|`mail` 메소드 옵션(`:from`, `:reply_to` 등)의 기본값을 설정합니다.|
 
-가능한 모든 설정 옵션을 보기 위해서는 'Rails 애플리케이션을 설정하기'의 [Action Mailer를 설정하기](configuring.html#action-mailer를-설정하기)를 참조해주세요.
+가능한 모든 설정 옵션을 보기 위해서는 'Rails 애플리케이션을 설정하기'의
+[Action Mailer를 설정하기](configuring.html#action-mailer를-설정하기)를
+참조해주세요.
 
 ### Action Mailer의 설정 예시
 
@@ -564,7 +615,7 @@ config.action_mailer.delivery_method = :sendmail
 # Defaults to:
 # config.action_mailer.sendmail_settings = {
 #   location: '/usr/sbin/sendmail',
-#   arguments: '-i -t'
+#   arguments: '-i'
 # }
 config.action_mailer.perform_deliveries = true
 config.action_mailer.raise_delivery_errors = true
@@ -573,7 +624,9 @@ config.action_mailer.default_options = {from: 'no-reply@example.com'}
 
 ### Gmail을 위한 Action Mailer 설정
 
-Action Mailer에 [Mail gem](https://github.com/mikel/mail)이 도입되었으므로 `config/environments/$RAILS_ENV.rb` 파일에 아래와 같이 무척 간단해진 설정을 추가해주세요.
+Action Mailer에 [Mail gem](https://github.com/mikel/mail)이 도입되었으므로
+`config/environments/$RAILS_ENV.rb` 파일에 아래와 같이 무척 간단해진 설정을
+추가해주세요.
 
 ```ruby
 config.action_mailer.delivery_method = :smtp
@@ -590,12 +643,16 @@ config.action_mailer.smtp_settings = {
 메일러 테스트
 --------------
 
-메일러의 테스트 방법은 테스트 가이드의 [메일러 테스트하기](testing.html#메일러-테스트하기)를 참조해주세요.
+메일러의 테스트 방법은 테스트 가이드의
+[메일러 테스트하기](testing.html#메일러-테스트하기)를 참조해주세요.
 
 메일을 전송 직전에 변경하기
 -------------------
 
-메일을 전송하기 전에 약간의 수정을 하고 싶은 경우가 있습니다. 다행히 Action Mailer는 모든 메일을 전송하기 전에 추가작업을 하기 위한 방법을 제공합니다. 이것을 사용하여 메일이 최종적으로 전송 에이전트에게 넘기기 직전에 메일의 내용을 수정하기 위한 코드를 등록할 수 있습니다.
+메일을 전송하기 전에 약간의 수정을 하고 싶은 경우가 있습니다. 다행히 Action
+Mailer는 모든 메일을 전송하기 전에 추가작업을 하기 위한 방법을 제공합니다.
+이것을 사용하여 메일이 최종적으로 전송 에이전트에게 넘기기 직전에 메일의 내용을
+수정하기 위한 코드를 등록할 수 있습니다.
 
 ```ruby
 class SandboxEmailInterceptor
@@ -605,12 +662,15 @@ class SandboxEmailInterceptor
 end
 ```
 
-인터셉터가 동작하기 위해서는 Action Mailer 프레임워크에 등록할 필요가 있습니다. 이 코드는 다음과 같이 initializer의 `config/initializers/sandbox_email_interceptor.rb` 파일에서 처리할 수 있습니다.
+인터셉터가 동작하기 위해서는 Action Mailer 프레임워크에 등록할 필요가 있습니다.
+이 코드는 다음과 같이 initializer의
+`config/initializers/sandbox_email_interceptor.rb` 파일에서 처리할 수 있습니다.
 
 ```ruby
 ActionMailer::Base.register_interceptor(SandboxEmailInterceptor) if Rails.env.staging?
 ```
 
-NOTE: 이 예제에서는 "staging"라는 환경을 사용하고 있습니다. 이것은 실제 환경(production환경)과 같은 상태에서 테스트를 하기 위한 환경입니다. Rails의 커스텀 환경에 대해서는 [Rails 환경을 생성하기](configuring.html#rails-환경을-생성하기)를 참조해주세요.
-
-TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.
+NOTE: 이 예제에서는 "staging"라는 환경을 사용하고 있습니다. 이것은 실제
+환경(production환경)과 같은 상태에서 테스트를 하기 위한 환경입니다. Rails의
+커스텀 환경에 대해서는
+[Rails 환경을 생성하기](configuring.html#rails-환경을-생성하기)를 참조해주세요.

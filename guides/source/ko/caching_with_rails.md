@@ -103,16 +103,18 @@ TIP: Memcached 등의 캐시 저장소에서는 오래된 캐시 파일을 자�
 
 #### 컬렉션 캐싱
 
-`render` 헬퍼는 컬렉션의 개별 템플릿을 그릴 때도 캐싱을 사용할 수 있습니다. 위의 예제에서 `each`
-를 사용한 코드에서 각각을 가져오는 대신 한 번에 모든 캐시 템플릿을 가져올 수도 있습니다.
-콜렉션을 랜더링 하는 경우에 `cached: true`를 지정해주세요.
+`render` 헬퍼는 컬렉션의 개별 템플릿을 그릴 때도 캐싱을 사용할 수 있습니다.
+위의 예제에서 `each`를 사용한 코드에서 각각을 가져오는 대신 한 번에 모든 캐시
+템플릿을 가져올 수도 있습니다. 콜렉션을 랜더링 하는 경우에 `cached: true`를
+지정해주세요.
 
 ```erb
 <%= render partial: 'products/product', collection: @products, cached: true %>
 ```
 
-이 코드는 이전까지 사용되었던 모든 캐시 템플릿이 한 번에 가져오며, 극적으로 속도가 향상됩니다.
-나아가 지금까지 캐시되지 않았던 템플릿도 캐시에 추가되어 다음 랜더링 시에 한 번에 읽어올 수 있게 됩니다.
+이 코드는 이전까지 사용되었던 모든 캐시 템플릿이 한 번에 가져오며, 극적으로
+속도가 향상됩니다. 나아가 지금까지 캐시되지 않았던 템플릿도 캐시에 추가되어
+다음 랜더링 시에 한 번에 읽어올 수 있게 됩니다.
 
 
 ### 러시아 인형 캐싱
@@ -167,8 +169,9 @@ end
 
 #### 암묵적인 의존성
 
-대부분의 경우, 템플릿의 의존성은 템플릿 자신이 호출하는 `render`에 의해서 발생합니다.
-다음 예제에서는 디코딩하는 방법을 다루는 `ActionView::Digestor`를 사용하는 `render` 호출 예제입니다.
+대부분의 경우, 템플릿의 의존성은 템플릿 자신이 호출하는 `render`에 의해서
+발생합니다. 다음 예제에서는 디코딩하는 방법을 다루는 `ActionView::Digestor`를
+사용하는 `render` 호출 예제입니다.
 
 ```ruby
 render partial: "comments/comment", collection: commentable.comments
@@ -176,11 +179,11 @@ render "comments/comments"
 render "comments/comments"
 render("comments/comments")
 
-render "header"        => render("comments/header")
+render "header" 는 render("comments/header") 가 됩니다.
 
-render(@topic)         => render("topics/topic")
-render(topics)         => render("topics/topic")
-render(message.topics) => render("topics/topic")
+render(@topic)         는 render("topics/topic") 가 됩니다.
+render(topics)         는 render("topics/topic") 가 됩니다.
+render(message.topics) 는 render("topics/topic") 가 됩니다.
 ```
 
 한편 일부는 호출할 때에 캐시가 적절하게 동작하도록 변경해야 합니다.
@@ -243,17 +246,19 @@ render partial: "documents/document", collection: @project.documents.where(publi
 
 ### 저레벨 캐시
 
-뷰의 조각을 캐싱하는 것이 아니라 특정 값이나 쿼리의 결과만을 캐싱하고 싶은 경우가 있습니다.
-레일스의 캐싱 기법으로는 어떤 정보라도 캐시에 저장할 수 있습니다.
+뷰의 조각을 캐싱하는 것이 아니라 특정 값이나 쿼리의 결과만을 캐싱하고 싶은
+경우가 있습니다. 레일스의 캐싱 기법으로는 어떤 정보라도 캐시에 저장할 수
+있습니다.
 
-저레벨 캐시의 가장 효과적인 구현 방법은 `Rails.cache.fetch` 메소드를 사용하는 것입니다.
-이 메소드는 캐시 저장/읽기 모두에 대응합니다. 인수가 하나일 경우 키를 사용해 캐시로부터 값을 반환합니다.
-블록을 인수로 넘기면 해당 키의 캐시가 없는 경우, 블록을 실행하고 결과를 캐싱한 뒤 그 값을 반환합니다.
+저레벨 캐시의 가장 효과적인 구현 방법은 `Rails.cache.fetch` 메소드를 사용하는
+것입니다. 이 메소드는 캐시 저장/읽기 모두에 대응합니다. 인수가 하나일 경우
+키를 사용해 캐시로부터 값을 반환합니다. 블록을 인수로 넘기면 해당 키의 캐시가
+없는 경우, 블록을 실행합니다. 그리고 블록의 실행 결과를 주어진 키에 저장합니다.
 해당하는 키의 캐시가 있는 경우, 블록은 실행되지 않습니다.
 
-다음 예시를 보죠. 애플리케이션에 `Product` 모델이 있고, 여러 웹사이트의 제품 가격을 검색하는 인스턴스
-메소드가 구현되어 있다고 합시다. 저레벨 캐시를 사용하는 경우 이 메소드로부터 완벽한 데이터를 반환할 수
-있습니다.
+다음 예시를 보죠. 애플리케이션에 `Product` 모델이 있고, 여러 웹사이트의 제품
+가격을 검색하는 인스턴스 메소드가 구현되어 있다고 합시다. 저레벨 캐시를
+사용하는 경우 이 메소드로부터 완벽한 데이터를 반환할 수 있습니다.
 
 ```ruby
 class Product < ApplicationRecord
@@ -357,7 +362,7 @@ initializer에 `:size` 옵션을 지정합니다(기본값은 32MB). 캐시가 �
 config.cache_store = :memory_store, { size: 64.megabytes }
 ```
 
-레일스 서버 프로세스를 복수 실행한다면(mongrel_cluster나 Phusion Passenger를 사용하는 경우),
+레일스 서버 프로세스를 복수 실행한다면(Phusion Passenger나 puma 클러스터를 사용하는 경우),
 캐시 데이터는 프로세스 간에 공유되지 않습니다. 이 캐시 저장소는 대규모로 배포되는 애플리케이션에는
 적당하지 않습니다. 단, 작은 규모의 트래픽이 적은 사이트에서 서버 프로세스를 몇 개 정도만 사용한다면
 문제 없이 동작합니다. 물론 개발 환경이나 테스트 환경에서도 동작합니다.
@@ -495,10 +500,35 @@ class ProductsController < ApplicationController
 end
 ```
 
+때때로 캐시된 응답이 필요할 때가 있습니다. 예를 들어 정적인 페이지는 유효기간이
+필요하지 않습니다. 이를 위해서 `http_cache_forever` 헬퍼를 사용하여 프록시가
+이를 무기한으로 캐싱하도록 만들 수 있습니다.
+
+캐싱된 응답은 기본으로 공개되지 않으며, 사용자의 웹 브라우저에서만 캐시가
+유지됩니다. 프록시가 응답을 캐싱하길 원한다면 `public: true`를 통해 모든
+사용자에게 캐시된 응답을 넘겨주세요.
+
+이 헬퍼를 사용하면 `last_modified` 헤더가 `Time.new(2011, 1, 1).utc`로,
+`expires` 헤더가 100년으로 설정됩니다.
+
+WARNING: 브라우저 캐시를 강제로 무효화하지 않는 이상 이 캐시는 사라지지 않기 때문에 이 메소드는 주의해서 사용해주세요.
+
+```ruby
+class HomeController < ApplicationController
+  def index
+    http_cache_forever(public: true) do
+      render
+    end
+  end
+end
+```
+
 ### 강한 ETag와 약한 ETag
 
-레일스에서는 기본으로 약한 ETag를 사용합니다. 약한 ETag에서는 응답의 본문이 미묘하게 다른 경우에도 같은 ETag를 부여하므로,
-사실상 같은 응답인 것처럼 다룹니다. 응답 본문의 극히 일부가 변경된 경우, 페이지의 재생성을 피하고 싶은 경우에 편리합니다.
+레일스에서는 기본으로 약한 ETag를 사용합니다. 약한 ETag에서는 응답의 본문이
+미묘하게 다른 경우에도 같은 ETag를 부여하므로, 사실상 같은 응답인 것처럼
+다룹니다. 응답 본문의 극히 일부가 변경된 경우, 페이지의 재생성을 피하고 싶은
+경우에 편리합니다.
 
 약한 Etag에는 `W/`가 앞에 추가되며, 이를 통해 강한 ETag와 구별할 수 있습니다.
 
@@ -507,9 +537,10 @@ end
   "618bbc92e2d35ea1945008b42799b0e7" → 강한 ETag
 ```
 
-강한 ETag는 약한 ETag와는 다르게 바이트 레벨에서 응답이 완전히 일치할 것을 요구합니다.
-큰 영상이나 PDF 파일 내부에서 Range 요청을 하는 경우에 편리합니다. Akamai 등 일부 CDN에서는
-강한 ETag만을 지원하고 있습니다. 강한 ETag가 필요한 경우에는 다음과 같이 설정해주세요.
+강한 ETag는 약한 ETag와는 다르게 바이트 레벨에서 응답이 완전히 일치할 것을
+요구합니다. 큰 영상이나 PDF 파일 내부에서 Range 요청을 하는 경우에 편리합니다.
+Akamai 등 일부 CDN에서는 강한 ETag만을 지원하고 있습니다. 강한 ETag가 필요한
+경우에는 다음과 같이 설정해주세요.
 
 ```ruby
   class ProductsController < ApplicationController

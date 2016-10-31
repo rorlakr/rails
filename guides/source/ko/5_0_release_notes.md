@@ -3,40 +3,50 @@ Ruby on Rails 5.0 릴리스 노트
 
 Rails 5.0에서 주목할 점
 
-* 액션케이블
+* 액션 케이블
 * Rails API
-* 액션레코드 속성 API
+* 액션 레코드 속성 API
 * 테스트 러너
 * Rake 명령을 `rails` 명령으로 통일
 * Sprockets 3
 * Turbolinks 5
 * 루비 2.2.2 이상의 버전을 요구
 
-이 릴리스에서는 주요 변경점에 대해서만 설명합니다. 수정된 버그 및 변경점에 대해서는 Github Rails 저장소에 있는 [커밋 목록](https://github.com/rails/rails/commits/5-0-stable)의 changelog를 참고해주세요.
+이 릴리스에서는 주요 변경점에 대해서만 설명합니다. 수정된 버그 및 변경점에 대해서는 Github Rails
+저장소에 있는 changelog나 [커밋 목록](https://github.com/rails/rails/commits/5-0-stable)을
+참고해주세요.
 
 --------------------------------------------------------------------------------
 
 Rails 5.0로 업그레이드하기
 ----------------------
 
-기존 애플리케이션을 업그레이드한다면 그 전에 충분한 테스트 커버리지를 확보하는 것이 좋습니다. 애플리케이션이 Rails 4.2로 업그레이드되지 않았다면 우선 이를 우선하고, 애플리케이션이 정상적으로 동작하는지 충분히 확인한 뒤에 Rails 5.0을 올려주세요. 업그레이드 시의 주의점에 대해서는 [Ruby on Rails 업그레이드 가이드](upgrading_ruby_on_rails.html#rails-4-2에서-Rails-5-0로-업그레이드)를 참고해주세요.
+기존 애플리케이션을 업그레이드한다면 그 전에 충분한 테스트 커버리지를 확보하는 것이 좋습니다.
+애플리케이션이 Rails 4.2로 업그레이드되지 않았다면 우선 이를 우선하고, 애플리케이션이 정상적으로
+동작하는지 충분히 확인한 뒤에 Rails 5.0을 올려주세요. 업그레이드 시의 주의점에 대해서는
+[Ruby on Rails 업그레이드 가이드](upgrading_ruby_on_rails.html#rails-4-2에서-rails-5-0로-업그레이드)를 참고해주세요.
 
 
 주요 변경점
 --------------
 
-### 액션케이블
+### 액션 케이블
 
-액션케이블은 레일스 5에서 새롭게 도입된 프레임워크로 레일스 애플리케이션에서 [웹 소켓](https://en.wikipedia.org/wiki/WebSocket)과 관련된 부분을 부드럽게 통합합니다.
+액션 케이블은 Rails 5에서 새롭게 도입된 프레임워크로 Rails 애플리케이션에서
+[웹 소켓](https://en.wikipedia.org/wiki/WebSocket)과 관련된 부분을 부드럽게 통합합니다.
 
-액션 케이블을 도입하면, 레일스 애플리케이션의 좋은 효율과 확장 가능성을 유지하며 기존의 레일스 애플리케이션과 동일한 스타일, 방법으로 실시간 기능을 루비로 작성할 수 있습니다. 액션케이블은 클라이언트 쪽의 자바 스크립트 프레임워크와 서버 쪽의 루비 프레임워크를 동시에 제공합니다. 액션레코드와 같은 ORM으로 작성된 모든 도메인 모델에 접근할 수 있습니다.
+액션 케이블을 도입하면, Rails 애플리케이션의 좋은 생산성과 확장 가능성을 유지하며 기존의 Rails
+애플리케이션과 동일한 스타일, 방법으로 실시간 기능을 루비로 작성할 수 있습니다. 액션 케이블은 클라이언트
+쪽의 자바 스크립트 프레임워크와 서버 쪽의 루비 프레임워크를 동시에 제공합니다. 액션 레코드와 같은
+ORM으로 작성된 모든 도메인 모델에 접근할 수 있습니다.
 
-자세한 설명은 [액션케이블의 개요](action_cable_overview.html)를 참조해주세요.
+자세한 설명은 [액션 케이블의 개요](action_cable_overview.html)를 참조해주세요.
 
 ### API 애플리케이션
 
-API만을 제공하는 간단한 애플리케이션을 레일스를 사용해 생성할 수 있게 되었습니다.
-[Twitter](https://dev.twitter.com) API나 [GitHub](http://developer.github.com) API와 같은 공용 API 서버는 물론, 그 외의 애플리케이션을 위한 API 서버를 작성할 때에도 편리합니다.
+API만을 제공하는 간단한 애플리케이션을 Rails를 사용해 생성할 수 있게 되었습니다.
+[Twitter](https://dev.twitter.com) API나 [GitHub](http://developer.github.com)
+API와 같은 공용 API 서버는 물론, 그 외의 애플리케이션을 위한 API 서버를 작성할 때에도 편리합니다.
 
 API Rails 애플리케이션을 생성하려면 다음의 명령어를 사용합니다.
 
@@ -46,24 +56,29 @@ $ rails new my_api --api
 
 이 명령은 다음 3개의 동작을 실행합니다.
 
-- 사용하는 미들웨어를 일반적인 상황보다 적게 사용하여 서버를 실행하도록 설정합니다. 특히 브라우저용 애플리케이션에서 유용한 미들웨어(쿠키에 대한 지원 등)를 일체 사용할 수 없게 됩니다.
-- `ApplicationController`는 기존의 `ActionController::Base` 대신에 `ActionController::API`를 상속합니다. 미들웨어와 마찬가지로 액션컨트롤러 모듈에서 브라우저용 애플리케이션에서만 사용되는 모듈을 모두 제외합니다.
+- 사용하는 미들웨어를 일반적인 상황보다 적게 사용하여 서버를 실행하도록 설정합니다.
+  특히 브라우저용 애플리케이션에서 유용한 미들웨어(쿠키에 대한 지원 등)를 일체 사용할 수 없게 됩니다.
+- `ApplicationController`는 기존의 `ActionController::Base` 대신에
+  `ActionController::API`를 상속합니다. 미들웨어와 마찬가지로 액션컨트롤러 모듈에서 브라우저용
+  애플리케이션에서만 사용되는 모듈을 모두 제외합니다.
 - 제너레이터가 뷰, 헬퍼, 애셋을 생성하지 않습니다.
 
-생성된 API 애플리케이션은 API 제공하기 위한 기본이 되며, 필요에 따라서 [기능을 추가](api_app.html) 할 수 있게 됩니다.
+생성된 API 애플리케이션은 API 제공하기 위한 토대가 되며, 필요에 따라서
+[기능을 추가](api_app.html) 할 수 있습니다.
 
-자세한 설명은 [레일스에서 API 전용 애플리케이션을 만들기](api_app.html)를 참고하세요.
+자세한 설명은 [Rails에서 API 전용 애플리케이션을 만들기](api_app.html)를 참고하세요.
 
-### 액티브레코드 속성 API
+### 액티브 레코드 속성 API
 
 모델에 type 속성을 정의합니다. 필요하다면 기존의 속성을 덮어써도 좋습니다.
 이를 사용하여 모델의 속성을 SQL로 어떻게 상호변환할지를 제어할 수 있습니다.
 또한 `ActiveRecord::Base.where`에 넘겨진 값의 동작을 변경할 수도 있습니다.
-이를 통하여 구현의 상세나 몽키 패치에 의존하지 않고 액티브레코드의 대부분에서 도메인 객체를 사용할 수 있게 됩니다.
+이를 통하여 구현의 세부나 몽키 패치에 의존하지 않고 액티브 레코드의 대부분에서 도메인
+객체를 사용할 수 있게 됩니다.
 
 다음과 같이 사용할 수도 있습니다.
 
-* 액티브레코드에서 검출된 타입을 덮어쓸 수 있습니다.
+* 액티브 레코드에서 검출된 타입을 덮어쓸 수 있습니다.
 * 기본 동작을 지정할 수 있습니다.
 * 속성은 데이터베이스 컬럼을 요구하지 않습니다.
 
@@ -97,18 +112,20 @@ store_listing.price_in_cents # => 10
 StoreListing.new.my_string # => "new default"
 StoreListing.new.my_default_proc # => 2015-05-30 11:04:48 -0600
 model = StoreListing.new(field_without_db_column: ["1", "2", "3"])
-model.attributes #=> {field_without_db_column: [1, 2, 3]}
+model.attributes # => {field_without_db_column: [1, 2, 3]}
 ```
 
 **커스텀 타입 만들기:**
 
 독자적인 타입을 정의할 수 있으며, 이는 값의 타입으로 정의된 메소드에 응답하는 경우에 한해서만 가능합니다.
-`deserialize` 메소드나 `cast` 메소드는 작성한 타입 객체로 호출되어 데이터베이스나 컨트롤러로부터의 받은 실제 입력을 인자로 사용합니다.
+`deserialize` 메소드나 `cast` 메소드는 작성한 타입 객체로 호출되어 데이터베이스나 컨트롤러에게
+받은 실제 입력을 인자로 사용합니다.
 이는 통화 변환처럼 직접 별도의 변환을 해야하는 경우에 유용합니다.
 
 **쿼리하기:**
 
-`ActiveRecord::Base.where`이 호출되면 모델 클래스에 정의된 타입을 사용하여 값을 SQL로 변환하고, 그 값의 객체로 `serialize`를 호출합니다.
+`ActiveRecord::Base.where`이 호출되면 모델 클래스에 정의된 타입을 사용하여 값을 SQL로 변환하고,
+그 값의 객체로 `serialize`를 호출합니다.
 
 이를 통해서 SQL 쿼리를 실행할 때에 객체를 어떻게 변환할지를 지정할 수 있게 됩니다.
 
@@ -121,19 +138,20 @@ model.attributes #=> {field_without_db_column: [1, 2, 3]}
 
 ### 테스트 러너
 
-새로운 테스트 러너가 도입되어, 레일스에서의 테스트 실행 기능이 강화되었습니다.
+새로운 테스트 러너가 도입되어, Rails에서의 테스트 실행 기능이 강화되었습니다.
 `bin/rails test`로 명령하면 테스트 러너를 사용할 수 있습니다.
 
-테스트 러너는 `RSpec`, `minitest-reporters`, `maxitest`로부터 영감을 얻었습니다.
+테스트 러너는 `RSpec`, `minitest-reporters`, `maxitest` 등으로부터 영감을 얻었습니다.
 다음과 같은 많은 개선이 이루어졌습니다.
 
-- 테스트의 줄번호를 지정하여 한 테스트만을 실행.
-- 테스트의 줄번호를 지정하여 여러 테스트를 실행.
+- 테스트의 줄번호를 지정하여 한 테스트만을 실행합니다.
+- 테스트의 줄번호를 지정하여 여러 테스트를 실행합니다.
 - 실패한 경우에 보여주는 메시지가 개선되어, 실패한 테스트를 곧장 재실행할 수 있게 되었습니다.
 - `-f` 옵션을 사용하면 실패했을 때에 곧바로 테스트를 정지할 수 있습니다.
 - `-d` 옵션을 사용하면 테스트가 완료될때까지 메시지 출력을 미룰 수 있습니다.
 - `-b` 옵션을 사용하면 예외에 대한 전체 백트레이스를 얻을 수 있습니다.
-- `Minitest`와 통합되어 `-s`로 시드 데이터를 지정, `-n`으로 특정 테스트명을 지정, `-v`로 자세한 메시지 출력을 활성화 하는 등 다양한 옵션을 사용할 수 있게 되었습니다.
+- `Minitest`와 통합되어 `-s`로 시드 데이터를 지정, `-n`으로 특정 테스트명을 지정,
+  `-v`로 자세한 메시지 출력을 활성화 하는 등 다양한 옵션을 사용할 수 있게 되었습니다.
 - 테스트 출력에 색깔이 추가되었습니다.
 
 Railties
@@ -143,7 +161,7 @@ Railties
 
 ### 제거된 것들
 
-*  `debugger`를 지원하지 않습니다. `debugger`는 루비 2.2에서는 지원되지 않으므로 앞으로는 byebug를 사용할 것.
+*  `debugger`를 지원하지 않습니다. `debugger`는 루비 2.2에서는 지원되지 않으므로 앞으로는 byebug를 사용.
     ([commit](https://github.com/rails/rails/commit/93559da4826546d07014f8cfa399b64b4a143127))
 
 *   제거 예정이었던 `test:all` 태스크와 `test:all:db` 태스크를 제거.
@@ -185,10 +203,10 @@ Railties
     ([commit](https://github.com/rails/rails/commit/89a12c931b1f00b90e74afffcdc2fc21f14ca663),
      [Pull Request](https://github.com/rails/rails/pull/22068))
 
-*   레일스 애플리케이션을 touch `tmp/restart.txt`로 재기동하는 `bin/rails restart` 태스크가 추가됨.
+*   Rails 애플리케이션을 touch `tmp/restart.txt`로 재기동하는 `bin/rails restart` 태스크가 추가됨.
     ([Pull Request](https://github.com/rails/rails/pull/18965))
 
-*   모든 정의된 이니셜라이져를 레일스가 실행하는 순서대로 출력하는 `bin/rails initializers` 태스크가 추가됨.
+*   모든 정의된 이니셜라이져를 Rails가 실행하는 순서대로 출력하는 `bin/rails initializers` 태스크가 추가됨.
     ([Pull Request](https://github.com/rails/rails/pull/19323))
 
 *   development 모드에서 캐시의 활성화 여부를 지정하는 `bin/rails dev:cache`가 추가됨.
@@ -345,10 +363,10 @@ Action Pack
 *   `protect_from_forgery`의 prepend의 기본값이 `false`로 변경됨.
     ([commit](https://github.com/rails/rails/commit/39794037817703575c35a75f1961b01b83791191))
 
-*   `ActionController::TestCase`는 레일스 5.1에서 gem으로 추출될 예정. 앞으로는 `ActionDispatch::IntegrationTest`를 사용.
+*   `ActionController::TestCase`는 Rails 5.1에서 gem으로 추출될 예정. 앞으로는 `ActionDispatch::IntegrationTest`를 사용.
     ([commit](https://github.com/rails/rails/commit/4414c5d1795e815b102571425974a8b1d46d932d))
 
-*   레일스에서 생성하는 ETag이 '강한' 방식에서 '약한' 방식으로 변경됨.
+*   Rails에서 생성하는 ETag이 '강한' 방식에서 '약한' 방식으로 변경됨.
     ([Pull Request](https://github.com/rails/rails/pull/17573))
 
 *   컨트롤러 액션에서 `render`가 명시적으로 호출되지 않고, 대응하는 템플릿도 없는 경우, 에러 대신에 `head :no_content`를 암묵적으로 호출하게 됨.
@@ -359,10 +377,6 @@ Action Pack
 
 *   요청의 인코딩과 응답을 해석하는 부분이 통합 테스트에 추가됨.
     ([Pull Request](https://github.com/rails/rails/pull/21671))
-
-*   컨트롤러 액션에서 응답이 명시적으로 지정되지 않은 경우의 기본 랜더링 방식이 변경됨.
-    ([Pull Request](https://github.com/rails/rails/pull/23827))
-
 
 *   컨트롤러 레벨에서 뷰 컨텍스트에 접근하는 `ActionController#helpers`가 추가됨.
     ([Pull Request](https://github.com/rails/rails/pull/24866))
@@ -502,7 +516,7 @@ Active Record
 
 *   오래된 `mysql` 데이터베이스 어댑터에 대한 지원이 제거됨.
     앞으로는 `mysql2`를 사용. 오래된 어댑터에 대한 유지 보수 담당자가 정해지면 해당 어댑터는 별도의 gem으로 분리될 예정.
-    ([Pull Request 1](https://github.com/rails/rails/pull/22642)], [Pull Request 2](https://github.com/rails/rails/pull/22715))
+    ([Pull Request 1](https://github.com/rails/rails/pull/22642), [Pull Request 2](https://github.com/rails/rails/pull/22715))
 
 *   `protected_attributes` 잼 지원이 종료됨.
     ([commit](https://github.com/rails/rails/commit/f4fbc0301021f13ae05c8e941c8efc4ae351fdf9))
@@ -512,6 +526,9 @@ Active Record
 
 *   `activerecord-deprecated_finders` 잼 지원이 종료됨.
     ([commit](https://github.com/rails/rails/commit/78dab2a8569408658542e462a957ea5a35aa4679))
+
+*   `ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES` 상수가 제거됨.
+    ([commit](https://github.com/rails/rails/commit/a502703c3d2151d4d3b421b29fefdac5ad05df61))
 
 ### 제거 예정
 
@@ -604,9 +621,6 @@ Active Record
 *   `ActiveRecord::Relation`에 `#or` 메소드를 추가. WHERE절이나 HAVING절을 결합.
     ([commit](https://github.com/rails/rails/commit/b0b37942d729b6bdcd2e3178eda7fa1de203b3d0))
 
-*   `#touch`에 `:time` 옵션을 추가.
-    ([Pull Request](https://github.com/rails/rails/pull/18956))
-
 *   `ActiveRecord::Base.suppress`을 추가. 지정 블럭을 실행 중에 수신자가 저장되지 않도록 함.
     ([Pull Request](https://github.com/rails/rails/pull/18910))
 
@@ -691,6 +705,15 @@ Active Record
 
 *   `touch` 메소드에 `:time` 옵션을 추가. 레코드에 현재 시각 이외의 시각을 지정할 수 있음.
     ([Pull Request](https://github.com/rails/rails/pull/18956))
+
+*   얕은 에러가 발생하지 않도록 트랜잭션 콜백을 변경.
+    이전에는 트랜잭션 콜백 내부에서 발생한 어떤 에러든 (새로 제거 예정이 된)
+    `raise_in_transactional_callbacks = true`를
+    사용하지 않더라도 처리했음.
+
+    더이상 이 에러들은 자동으로 처리되지 않으며, 다른 콜백들과 마찬가지로 해당하는 에러를 처리해줄
+    때까지 거슬러 올라게 됨.
+    ([commit](https://github.com/rails/rails/commit/07d3d402341e81ada0214f2cb2be1da69eadfe72))
 
 Active Model
 ------------

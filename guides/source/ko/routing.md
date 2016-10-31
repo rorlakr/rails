@@ -7,16 +7,16 @@ Rails 라우팅
 
 * routes.rb를 읽는 방법
 * 직접 라우팅을 작성하는 방법(리소스 베이스의 라우팅을 추천합니다만, match 메소드를 사용한 라우팅도 가능합니다)
-* 액션에서 받는 파라미터
+* 컨트롤러의 액션에 넘길 라우트 매개변수를 선언하는 방법
 * 라우트 헬퍼를 사용해서 경로나 URL을 자동생성하는 방법
-* 제한을 추가하거나 Rack 엔드포인트 생성하는 방법
+* 제한을 추가하거나 Rack 엔드포인트 추가하는 방법
 
 --------------------------------------------------------------------------------
 
 Rails 라우터의 목적
 -------------------------------
 
-Rails의 라우터는 요청받은 URL을 인식하고 적절한 컨트롤러의 액션을 매칭합니다. 라우터는 뷰에서 이러한 경로나 URL을 직접 하드 코딩하는 것을 피하기 위한 경로나 URL도 제공합니다.
+Rails의 라우터는 요청받은 URL을 인식하고 적절한 컨트롤러의 액션이나 Rack 애플리케이션에 매칭합니다. 라우터는 뷰에서 이러한 경로나 URL을 직접 하드 코딩하는 것을 피하기 위한 경로나 URL도 제공합니다.
 
 ### URL을 실제 코드와 연결하기
 
@@ -385,7 +385,7 @@ end
 | PATCH/PUT | /comments/:id(.:format)                | comments#update   | sekret_comment_path      |
 | DELETE    | /comments/:id(.:format)                | comments#destroy  | sekret_comment_path      |
 
-### 라우팅의 'concern' 기능
+### 라우팅의 'concern'
 
 concern을 사용하여, 다른 리소스나 라우팅의 내부에서 사용할 수 있는 공통의 라우팅을 선언할 수 있습니다. concern은 아래와 같이 정의합니다.
 
@@ -545,29 +545,23 @@ Rails에서는 리소스 라우팅을 사용할 때에 임의의 URL을 액션�
 
 ### 파라미터 나누기
 
-일반적인 라우팅을 설정한다면, Rails가 브라우저로부터 받은 HTTP 요청을 라우팅에 매칭하기 위한 심볼을 몇 개 넘깁니다. 이 심볼 중 `:controller`와 `:action`은 애플리케이션의 컨트롤러와 액션에 각각 매칭됩니다. 아래의 예제를 보시죠.
+일반적인 라우팅을 설정하는 경우라면, Rails가 받은 HTTP 요청을 라우팅에 매칭하기 위한 심볼을 몇 개 넘깁니다. 아래의 예제를 보시죠.
 
 ```ruby
-get ':controller(/:action(/:id))'
+get 'photos(/:id)', to: :display
 ```
 
-브라우저에서 보낸 `/photos/show/1` 요청은 위의 라우팅으로 처리하게 된다면, `Photos` 컨트롤러의 `show` 액션이 호출되며, URL의 마지막에 있는 `"1"`은 `params[:id]`를 통해 접근할 수 있습니다. `:action`과 `:id`가 필수가 아니라는 점을 ()로 표현하고 있으므로, 이 라우팅은 `/photos`를 `PhotosController#index`로 넘겨줄 수도 있습니다.
+브라우저에서 보낸 `/photos/1` 요청은 위의 (이전에 이에 매칭되는 라우트가 없었기 때문에) 라우팅으로 처리하게 되며, `Photos` 컨트롤러의 `display` 액션이 호출됩니다. 그리고 URL의 마지막에 있는 `"1"`은 `params[:id]`를 통해 접근할 수 있습니다. `:id`가 필수가 아니라는 점을 ()로 표현하고 있으므로, 이 라우팅은 `/photos`를 `PhotosController#display`로 넘겨줄 수도 있습니다.
 
 ### 동적인 세그먼트
 
-일반 라우팅의 일부로서, 문자열을 고정하지 않는 동적인 세그먼트를 자유롭게 사용할 수 있습니다. `:controller`나 `:action`을 제외한 어떤 것이라도 `params`에 포함시켜 액션에 건네줄 수 있습니다. 아래와 같은 라우팅을 선언했다고 가정합시다.
+일반 라우팅의 일부로서, 문자열을 고정하지 않는 동적인 세그먼트를 자유롭게 사용할 수 있습니다. 어떤 것이라도 `params`에 포함시켜 액션에 건네줄 수 있습니다. 아래와 같은 라우팅을 선언했다고 가정합시다.
 
 ```ruby
-get ':controller/:action/:id/:user_id'
+get 'photos/:id/:user_id', to: 'photos#show'
 ```
 
-브라우저에서의 `/photos/show/1/2` 경로는 `Photos` 컨트롤러의 `show` 액션에 매칭됩니다. 이 경우에는 `params[:id]`에는 `"1"`, `params[:user_id]`에는 `"2"`가 저장됩니다.
-
-NOTE: `:controller` 경로 세그먼트를 사용하는 경우 `:namespace`나 `:module`를 함께 사용할 수 없습니다. 반드시 사용하고 싶다면, 아래와 같이 필요한 네임스페이스에서만 :controller`에 제약을 추가합니다.
-
-```ruby
-get ':controller(/:action(/:id))', controller: /admin\/[^\/]+/
-```
+브라우저에서의 `/photos/1/2` 요청은 `Photos` 컨트롤러의 `show` 액션에 매칭됩니다. 이 경우에는 `params[:id]`에는 `"1"`, `params[:user_id]`에는 `"2"`가 저장됩니다.
 
 TIP: 동적인 세그먼트 분할에서는 기본적으로 마침표(`.`)을 사용할 수 없습니다. 이는 마침표가 라우팅에서 포맷을 구분하기 위한 용도로 사용되고 있기 때문입니다. 반드시 동적 세그먼트 내에서 마침표를 쓰고 싶은 때에는 기본 설정을 덮어써야합니다. 예를 들어 `id: /[^\/]+/`라고 사용한다면 슬래시 이외의 모든 문자를 사용할 수 있습니다.
 
@@ -576,30 +570,22 @@ TIP: 동적인 세그먼트 분할에서는 기본적으로 마침표(`.`)을 �
 라우트 선언시에 콜론을 사용하지 않은 경우, 정적인 세그먼트가 되어 고정 문자열을 사용하게 됩니다.
 
 ```ruby
-get ':controller/:action/:id/with_user/:user_id'
+get 'photos/:id/with_user/:user_id', to: 'photos#show'
 ```
 
-이 라우팅에서는 `/photos/show/1/with_user/2`와 같은 경로가 매칭됩니다. `with_user`는 그대로 사용되고 있습니다. 이 때 액션에서 사용할 수 있는 `params`는 `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`가 됩니다.
+이 라우팅에서는 `/photos/1/with_user/2`와 같은 경로가 매칭됩니다. `with_user`는 그대로 사용되고 있습니다. 이 때 액션에서 사용할 수 있는 `params`는 `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`가 됩니다.
 
 ### 쿼리 문자열
 
 쿼리 문자열으로 지정되어있는 파라미터도 모두 `params`에 포함됩니다. 아래의 라우팅으로 예를 들어 보겠습니다.
 
 ```ruby
-get ':controller/:action/:id'
-```
-
-브라우저에서 `/photos/show/1?user_id=2`라는 경로를 요청받으면 `Photos` 컨트롤러의 `show` 액션에 매칭됩니다. 이 때 `params`는 `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`가 됩니다.
-
-### 기본 설정을 정의하기
-
-`:controller` 심볼이나 `:action` 심볼은 라우팅 내에서 명시적으로 지정할 필요가 없습니다. 이 들은 아래와 같이 기본으로 지정할 수 있습니다.
-
-```ruby
 get 'photos/:id', to: 'photos#show'
 ```
 
-이 라우팅은 `/photos/12`라는 경로에 매칭되며, `Photos` 컨트롤러의 `show` 액션에 할당됩니다.
+브라우저에서 `/photos/1?user_id=2`라는 경로를 요청받으면 `Photos` 컨트롤러의 `show` 액션에 매칭됩니다. 이 때 `params`는 `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`가 됩니다.
+
+### 기본 설정을 정의하기
 
 `:defaults` 옵션에 해시를 넘기는 것으로 추가 기본 설정을 정의할 수도 있습니다. 이 정의는 동적 세그먼트로서 지정하지 않은 파라미터에 대해서도 적용됩니다. 예를 들면,
 
@@ -692,6 +678,8 @@ end
 ```
 
 NOTE: 요청 기반의 조건은 Request 객체에 대해 지정된 메소드를 호출합니다. 메소드를 호출할 때에는 호출시에 넘긴 해시의 키와 동일한 이름의 메소드를 Request 객체로 호출하며, 반환된 값과 해시의 값을 비교합니다. 따라서, 조건에 사용된 값의 타입이 대응하는 Request 객체 메소드의 결과의 타입과 일치해야합니다. 예를 들어 `constraints: { subdomain: 'api' }`라는 조건은 `api` 서브 도메인을 정상적으로 매칭할 수 있습니다만, `constraints: { subdomain: :api }`와 같이 심볼을 사용한 경우에는 `api`와 정상적으로 비교되지 않습니다. `request.subdomain`가 돌려주는 `'api'`는 문자열이기 때문입니다.
+
+NOTE: `format` 조건에는 예외가 하나 있습니다. 요청 객체의 메소드에는 모든 경로에서 내부적으로 사용하는 조건부 파라미터가 존재합니다. 세그먼트 조건이 선행하며 `format` 조건은 해시를 통해서 강제되었을 경우에만 적용됩니다. 예를 들어 `get 'foo', constraints: { format: 'json' }`는 format이 조건부이기 때문에 `GET  /foo`를 매칭합니다. 하지만 [람다](#복잡한-조건)를 사용하여 `get 'foo', constraints: lambda { |req| req.format == :json }`와 같이 정의한다면 명시적으로 JSON 요청만을 처리하게 됩니다.
 
 ### 복잡한 조건
 
@@ -793,10 +781,10 @@ Rails는 호스트(`http://www.example.com` 등)가 URL에 지정되어있지 �
 `Post` 컨트롤러의 `index` 액션에 대응하는 `'posts#index'`같은 문자열 대신에 임의의 <a href="rails_on_rack.html">Rack 애플리케이션</a>을 매쳐의 엔드 포인트로 지정할 수 있습니다.
 
 ```ruby
-match '/application.js', to: Sprockets, via: :all
+match '/application.js', to: MyRackApp, via: :all
 ```
 
-Rails 라우터의 입장에서 보면 `Sprockets`은 `call`에 응답해서 `[status, headers, body]`를 돌려주기만 하면 라우팅이 된 장소가 Rack 애플리케이션이든 액션이든 관계가 없습니다. 이것은 Rack 애플리케이션이 모든 HTTP 메서드를 적절하게 다루기를 원할 수 있으므료, `via: :all`의 적절한 사용 예시가 될 수 있습니다.
+Rails 라우터의 입장에서 보면 `MyRackApp`은 `call`에 응답해서 `[status, headers, body]`를 돌려주기만 하면 라우팅이 된 장소가 Rack 애플리케이션이든 액션이든 관계가 없습니다. 이것은 Rack 애플리케이션이 모든 HTTP 메서드를 적절하게 다루기를 원할 수 있으므료, `via: :all`의 적절한 사용 예시가 될 수 있습니다.
 
 NOTE: 참고로 `'posts#index'`는 `PostsController.action(:index)`라는 형태로 변환됩니다. 이는 올바른 Rack 애플리케이션을 반환합니다.
 
@@ -1043,7 +1031,7 @@ Rails에는 라우팅을 확인하는 기능과 테스트를 하기 위한 기�
 
 ### 기존의 룰을 한번에 확인하기
 
-현재 애플리케이션에서 사용가능한 라우팅을 모두 보기 위해서는 서버가 **development** 환경에서 동작하고 있는 상태로 브라우저에서 `http://localhost:3000/rails/info/routes`에 접속합니다. 터미널에서 `bin/rails routes`를 실행해도 같은 결과를 얻을 수 있습니다.
+현재 애플리케이션에서 사용가능한 라우팅을 모두 보기 위해서는 서버가 **development** 환경에서 동작하고 있는 상태로 브라우저에서 `http://localhost:3000/rails/info/routes`에 접속합니다. 터미널에서 `rails routes`를 실행해도 같은 결과를 얻을 수 있습니다.
 
 어떤 방법을 사용하더라도 `routes.rb` 파일에 기록된 순서대로 라우팅이 표시됩니다. 하나의 라우팅에 에 대해 다음과 같은 정보를 보여줍니다.
 
@@ -1052,7 +1040,7 @@ Rails에는 라우팅을 확인하는 기능과 테스트를 하기 위한 기�
 * 매칭되는 URL 패턴
 * 그 라우팅에서 사용되는 파라미터
 
-아래는 어떤 RESTful한 라우팅에 대해서 `bin/rails routes`을 실행한 결과를 발췌한 것입니다.
+아래는 어떤 RESTful한 라우팅에 대해서 `rails routes`을 실행한 결과를 발췌한 것입니다.
 
 ```
     users GET    /users(.:format)          users#index
@@ -1061,13 +1049,24 @@ new_user GET    /users/new(.:format)      users#new
 edit_user GET    /users/:id/edit(.:format) users#edit
 ```
 
-`CONTROLLER` 환경 변수를 넘겨서 특정 컨트롤러의 라우팅 목록만을 볼 수도 있습니다.
+grep 옵션(-g)을 사용하여 라우팅 목록을 확인할 수도 있습니다. URL 헬퍼 메소드 이름, HTTP 동사, 또는 URL 경로에 부분적으로일치하는 모든 라우팅을 출력합니다.
 
-```bash
-$ CONTROLLER=users bin/rails routes
+```
+$ bin/rails routes -g new_comment
+$ bin/rails routes -g POST
+$ bin/rails routes -g admin
 ```
 
-TIP: 라우팅 목록이 너무 길지 않다면 `bin/rails routes` 쪽이 읽기 편할 것입니다. 
+-c 옵션을 사용해서 특정 컨트롤러의 라우팅 목록만을 볼 수도 있습니다.
+
+```
+$ bin/rails routes -c users
+$ bin/rails routes -c admin/users
+$ bin/rails routes -c Comments
+$ bin/rails routes -c Articles::CommentsController
+```
+
+TIP: 라우팅 목록이 너무 길지 않다면 `rails routes` 쪽이 읽기 편할 것입니다. 
 
 ### 라우팅 테스트하기
 
@@ -1107,5 +1106,3 @@ assert_recognizes({ controller: 'photos', action: 'create' }, { path: 'photos', 
 ```ruby
 assert_routing({ path: 'photos', method: :post }, { controller: 'photos', action: 'create' })
 ```
-
-TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.

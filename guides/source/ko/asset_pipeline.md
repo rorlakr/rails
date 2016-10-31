@@ -17,19 +17,24 @@ Asset Pipeline
 애셋 파이프라인에 대해서
 ---------------------------
 
-애셋 파이프라인이란 JavaScript나 CSS 애셋을 최소화(minify: 공백이나 개행 등을 제거) 또는 압축하여 연결하는 프레임워크입니다. 애셋 파이프라인에서는 CoffeeScript나 SASS, ERB 등의 다른 언어로 기술된 애셋을 생성하는 기능을 추가할 수도 있습니다.
+애셋 파이프라인이란 JavaScript나 CSS 애셋을 최소화(minify: 공백이나 개행 등을
+제거) 또는 압축하여 연결하는 프레임워크입니다. 애셋 파이프라인에서는
+CoffeeScript나 SASS, ERB 등의 다른 언어로 기술된 애셋을 생성하는 기능을 추가할
+수도 있습니다.
+거기에 다른 젬들로부터 애셋을 자동으로 애플리케이션에 결합해주기도 합니다.
+예를 들어, jquery-rails는 jquery.js의 사본을 가지고 있으며 Rails에서 AJAX
+기능을 사용할 수 있게 해줍니다.
 
-기술적으로는 애셋 파이프라인은 이미 Rails 4의 핵심 기능이 아닙니다. 프레임워크로부터 분리되어 [sprockets-rails](https://github.com/rails/sprockets-rails)라는 gem으로 제공되고 있습니다.
-
-Rails에서는 기본적으로 애셋 파이프라인을 사용하고 있습니다.
-
-Rails 애플리케이션을 새로 생성하는 경우에 애셋 파이프라인을 비활성화하고 싶은 경우에는 아래와 같이 `--skip-sprockets` 를 넘겨주세요.
+애셋 파이프라인은 [sprockets-rails](https://github.com/rails/sprockets-rails)
+잼으로 구현되어 있으며, 새 앱을 만들때 기본으로 포함됩니다. 이를 비활성화하고
+싶은 경우에는 아래와 같이 `--skip-sprockets` 를 넘겨주세요.
 
 ```bash
 rails new appname --skip-sprockets
 ```
 
-Rails 4에서는 `sass-rails`, `coffee-rails`, `uglifier` gem이 자동적으로 Gemfile에 추가됩니다. Sprokets는 애셋을 압축할 때 이 gem들을 사용합니다.
+Rails에서는 `sass-rails`, `coffee-rails`, `uglifier` gem이 자동적으로 Gemfile에
+추가됩니다. Sprokets는 애셋을 압축할 때 이 gem들을 사용합니다.
 
 ```ruby
 gem 'sass-rails'
@@ -37,31 +42,56 @@ gem 'uglifier'
 gem 'coffee-rails'
 ```
 
-`--skip-sprockets` 옵션을 사용하면 Rails 4에서 `sass-rails`와 `uglifier`가 Gemfile에 추가되지 않습니다. 그러므로 애셋 파이프라인을 나중에 활성화하고 싶은 경우에는 이 gem들을 Gemfile에 다시 추가해주어야 합니다. 마찬가지로 애플리케이션을 새로 생성할 경우에 `--skip-sprockets` 옵션을 사용하면 `config/application.rb` 파일의 내용물이 약간 변경됩니다. 구체적으로는 sproket railtie에서 필요로하는 내용들이 주석처리됩니다. 애셋 파이프라인을 수동으로 활성화하는 경우에는 이러한 주석처리 된 코드들을 찾아서 주석처리를 해제해주어야 합니다.
+`--skip-sprockets` 옵션을 사용하면 Rails는 이러한 젬들을 Gemfile에 추가하지
+않습니다. 그러므로 애셋 파이프라인을 나중에 활성화하고 싶은 경우에는 이 젬들을
+Gemfile에 다시 추가해주어야 합니다. 마찬가지로 애플리케이션을 새로 생성할 경우
+`--skip-sprockets` 옵션을 사용하면 `config/application.rb` 파일의 내용물이 약간
+변경됩니다. 구체적으로는 sproket railtie에서 필요로하는 내용들이
+주석처리됩니다. 애셋 파이프라인을 수동으로 활성화하는 경우에는 이러한
+주석처리 된 코드들을 찾아서 주석처리를 해제해주어야 합니다.
 
 ```ruby
 # require "sprockets/railtie"
 ```
 
-애셋 압축 방식을 지정하려면 `production.rb`에 존재하는 해당하는 설정을 찾습니다. `config.assets.css_compressor`로는 CSS 압축 방식, `config.assets.js_compressor`로는 JavaScript의 압축 방식을 각각 지정할 수 있습니다.
+애셋 압축 방식을 지정하려면 `production.rb`에 존재하는 해당하는 설정을
+찾습니다. `config.assets.css_compressor`로는 CSS 압축 방식,
+`config.assets.js_compressor`로는 JavaScript의 압축 방식을 각각 지정할 수
+있습니다.
 
 ```ruby
 config.assets.css_compressor = :yui
 config.assets.js_compressor = :uglifier
 ```
 
-NOTE: `sass-rails` gem이 Gemfile에 포함되어 있다면 자동적으로 CSS 압축에 사용됩니다. 이러한 경우 `config.assets.css_compressor` 옵션은 지정되지 않습니다.
+NOTE: `sass-rails` gem이 Gemfile에 포함되어 있다면 자동적으로 CSS 압축에
+사용됩니다. 이러한 경우 `config.assets.css_compressor` 옵션은 지정되지
+않습니다.
 
 
 ### 주요한 기능
 
-애셋 파이프라인의 첫번째 기능은 애셋을 연결하는 것입니다. 이를 통해 브라우저가 웹페이지를 랜더링하기 위해서 서버에 보내야하는 HTTP 요청의 숫자를 줄일 수 있습니다. 웹 브라우저가 동시에 처리할 수 있는 요청 수에는 제한이 있으므로, 동시 요청수를 줄일 수 있다면 그만큼 페이지를 로딩하는 속도가 빨라집니다.
+애셋 파이프라인의 첫번째 기능은 애셋을 연결하는 것입니다. 이를 통해 브라우저가
+웹페이지를 랜더링하기 위해서 서버에 보내야하는 HTTP 요청의 숫자를 줄일 수
+있습니다. 웹 브라우저가 동시에 처리할 수 있는 요청 수에는 제한이 있으므로,
+동시 요청수를 줄일 수 있다면 그만큼 페이지를 로딩하는 속도가 빨라집니다.
 
-Sprockets은 모든 JavaScript 파일을 하나의 마스터 `.js` 파일로 연결하고, 모든 CSS 파일을 하나의 마스터 `.css` 파일로 연결합니다. 이 가이드에서 나중에 설명하겠지만, 애셋 파일을 그룹으로 묶는 방법은 자유롭게 변경할 수 있습니다. production 환경에서는 애셋 파일명에 MD5 핑거프린트를 삽입하여 애셋 파일이 웹 브라우저에서 캐싱되도록 합니다. 핑거프린트의 변경은 애셋 파일의 내용물이 변경되었을 때에 자동적으로 이루어집니다.
+Sprockets은 모든 JavaScript 파일을 하나의 마스터 `.js` 파일로 연결하고, 모든
+CSS 파일을 하나의 마스터 `.css` 파일로 연결합니다. 이 가이드에서 나중에
+설명하겠지만, 애셋 파일을 그룹으로 묶는 방법은 자유롭게 변경할 수 있습니다.
+production 환경에서는 애셋 파일명에 MD5 핑거프린트를 삽입하여 애셋 파일이
+웹 브라우저에서 캐싱되도록 합니다. 핑거프린트의 변경은 애셋 파일의 내용물이
+변경되었을 때에 자동적으로 이루어집니다.
 
-애셋 파이프라인의 또 다른 기능은 애셋의 최소화(압축)입니다. CSS파일의 최소화는 공백과 주석을 제거하는 것으로 이루어집니다. JavaScript의 압축 프로세스는 이보다 더 복잡합니다. 이때에 사용할 방법은 내장된 옵션으로부터 선택하거나 다른 것을 지정할 수 있습니다.
+애셋 파이프라인의 또 다른 기능은 애셋의 최소화(압축)입니다. CSS파일의 최소화는
+공백과 주석을 제거하는 것으로 이루어집니다. JavaScript의 압축 프로세스는 이보다
+더 복잡합니다. 이 때 사용할 방법은 내장된 옵션으로부터 선택하거나 다른 것을
+지정할 수 있습니다.
 
-애셋 파이프라인의 3번재 기능은 보다 고도의 언어를 사용한 코딩을 지원하는 것입니다. 이러한 언어로 작성된 코드는 전처리되어 시렞의 애셋이 됩니다. 기본으로 지원되는 언어는 CSS로 변환되는 SASS, JavaScript로 변환되는 CoffeeScript, CSS/JavaScript로 변환되는 ERB입니다.
+애셋 파이프라인의 3번째 기능은 보다 고도의 언어를 사용한 코딩을 지원하는
+것입니다. 이러한 언어로 작성된 코드는 전처리되어 시렞의 애셋이 됩니다.
+기본으로 지원되는 언어는 CSS로 변환되는 SASS, JavaScript로 변환되는
+CoffeeScript, CSS/JavaScript로 변환되는 ERB입니다.
 
 ### 핑거프린트와 주의점
 
@@ -150,7 +180,7 @@ end
 
 * `vendor/assets`는 JavaScript 플러그인이나 CSS 프레임워크 등, 외부의 단체 등이 관리하는 애셋을 저장합니다.
 
-WARNING: Rails 3으로부터 업그레이드를 하는 경우에는 `lib/assets`과 `vendor/assets`에 저장되어 있는 애셋이 Rails 4에서는 애플리케이션의 매니페스트에 의해서 포함되어 사용가능하다는 점, 단 미리 컴파일될 파일 목록에는 포함되지 않게 되었다는 점을 주의해주세요. 더 자세한 안내는 [애셋을 미리 컴파일하기](#애셋을-미리-컴파일하기)를 참조해주세요.
+WARNING: Rails 3으로부터 업그레이드를 하는 경우에는 `lib/assets`과 `vendor/assets`에 저장되어 있는 애셋이 Rails에서는 애플리케이션의 매니페스트에 의해서 포함되어 사용가능하다는 점, 단 미리 컴파일될 파일 목록에는 포함되지 않게 되었다는 점을 주의해주세요. 더 자세한 안내는 [애셋을 미리 컴파일하기](#애셋을-미리-컴파일하기)를 참조해주세요.
 
 #### 경로 탐색
 
@@ -223,11 +253,11 @@ Sprockets은 애셋을 사용하기 위한 메소드를 추가해주지 않습�
 <%= javascript_include_tag "application" %>
 ```
 
-Rails 4부터 포함되는 turbolinks gem를 사용하고 있는 경우, 'data-turbolinks-track' 옵션을 사용할 수 있습니다. 이것은 애셋이 갱신되어 페이지에 로딩되었는지 아닌지 turbolinks가 확인합니다.
+Rails부터 포함되는 turbolinks gem를 사용하고 있는 경우, 'data-turbolinks-track' 옵션을 사용할 수 있습니다. 이것은 애셋이 갱신되어 페이지에 로딩되었는지 아닌지 turbolinks가 확인합니다.
 
 ```erb
-<%= stylesheet_link_tag "application", media: "all", "data-turbolinks-track" => true %>
-<%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+<%= stylesheet_link_tag "application", media: "all", "data-turbolinks-track" => "reload" %>
+<%= javascript_include_tag "application", "data-turbolinks-track" => "reload" %>
 ```
 
 일반적인 뷰에서는 아래와 같은 방법으로 `public/assets/images` 폴더의 이미지에 접근할 수 있습니다.
@@ -303,7 +333,7 @@ $('#logo').attr src: "<%= asset_path('logo.png') %>"
 
 Sprockets에서는 어떤 애셋을 가져와서 지원할지를 지정할 때에 매니페스트 파일을 사용합니다. 매니페스트 파일에는 _디렉티브(directive)_가 포함되어 있습니다. 디렉티브를 사용하여 필요한 파일을 지정하고, 거기에 기반하여 최종적인 단일 CSS나 JavaScript 파일이 생성됩니다. Sprockets는 디렉티브로 지정된 파일을 읽어와, 필요에 따라서 처리를 하고 연결하여 단일 파일을 생성하여 압축해줍니다(`Rails.application.config.assets.compress`가 true인 경우). 파일을 연결하여 하나로 만드는 것으로 브라우저로부터 서버에 대한 요청 횟수를 줄일 수 있으며, 압축을 통해서 파일 사이즈도 줄여서 페이지를 읽어오는데 걸리는 시간을 대폭 단축시킵니다.
 
-새로 생성한 Rails 4애플리케이션에서는 기본으로 `app/assets/javascripts/application.js` 파일에 다음과 같은 내용이 포함되어 있습니다.
+새로 생성한 Rails 애플리케이션에서는 기본으로 `app/assets/javascripts/application.js` 파일에 다음과 같은 내용이 포함되어 있습니다.
 
 ```js
 // ...
@@ -327,7 +357,7 @@ Rails는 아래의 내용을 포함하는 `app/assets/stylesheets/application.cs
 */
 ```
 
-Rails 4는 `app/assets/javascripts/application.js`와 `app/assets/stylesheets/application.css` 파일을 둘 다 생성합니다. 이것은 Rails 애플리케이션을 새로 생성할 때의 `--skip-sprockets`와는 관계 없이 실행됩니다. 이에 따라 필요에 따라 손쉽게 애셋 파이프라인을 추가할 수도 있습니다.
+Rails는 `app/assets/javascripts/application.js`와 `app/assets/stylesheets/application.css` 파일을 둘 다 생성합니다. 이것은 Rails 애플리케이션을 새로 생성할 때의 `--skip-sprockets`와는 관계 없이 실행됩니다. 이에 따라 필요에 따라 손쉽게 애셋 파이프라인을 추가할 수도 있습니다.
 
 JavaScript에서 사용할 수 있는 디렉티브는 스타일시트에서도 사용할 수 있습니다(그러나 JavaScript와 다르게 스타일시트는 명시적으로 포함된다는 점이 다릅니다). CSS 매니페스트에서의 `require_tree` 디렉티브의 동작은 JavaScript의 경우와 마찬가지로 지정된 폴더에 있는 모든 스타일시트를 require합니다.
 
@@ -392,6 +422,19 @@ config.assets.raise_runtime_errors = false
 
 이 옵션이 true라면 애플리케이션의 애셋이 `config.assets.precompile`에 기술되어 있는 순서대로 모두 불러오는지를 확인합니다. `config.assets.digest`도 true인 경우, 애셋에 대한 요청에서는 다이제스트를 반드시 포함해야합니다.
 
+### 애셋을 찾을 수 없을 때 에러를 던지기
+
+sprockets-rails >= 3.2.0를 사용하고 있다면 애셋을 요청받고, 발견하지 못했을 때
+어떤 행동을 할지 설정할 수 있습니다. "asset fallback"을 끄고 있다면 애셋을
+발견하지 못했을 때 에러를 던집니다.
+
+```ruby
+config.assets.unknown_asset_fallback = false
+```
+
+만약 "asset fallback"이 활성화되어 있다면 애셋의 경로를 찾지 못했다는 메시지가
+에러를 던지는 대신 반환됩니다. 이 동작은 기본으로 활성화되어 있습니다.
+
 ### 다이제스트를 비활성화하기
 
 `config/environments/development.rb`를 다음과 같이 고쳐서 다이제스트를 비활성화할 수 있습니다.
@@ -416,9 +459,13 @@ config.assets.debug = false
 <script src="/assets/application.js"></script> 
 ```
 
-애셋은 서버 기동 후에 첫번째 리퀘스트를 받은 시점에서 컴파일과 캐시가 실행됩니다. Sprockets는 `must-revalidate`라는 Cache-Control HTTP 헤더를 설정하여 이후의 요청에 대한 오버헤드를 줄입니다. 이 경우 브라우저는 304(Not Modified) 응답을 받게 됩니다.
+애셋은 서버 기동 후에 첫번째 리퀘스트를 받은 시점에서 컴파일과 캐시가
+실행됩니다. Sprockets는 `must-revalidate`라는 Cache-Control HTTP 헤더를
+설정하여 이후의 요청에 대한 오버헤드를 줄입니다. 이 경우 브라우저는
+304(Not Modified) 응답을 받게 됩니다.
 
-요청과 요청 사이에 매니페스트에 지정되어 있는 파일 중 하나에서 변경이 있었을 경우, Rails 서버는 새로 컴파일 된 파일을 응답으로 돌려줍니다.
+요청과 요청 사이에 매니페스트에 지정되어 있는 파일 중 하나에서 변경이 있었을
+경우, Rails 서버는 새로 컴파일 된 파일을 응답으로 돌려줍니다.
 
 Rails의 헬퍼 메소드를 사용하여 디버그 모드를 켤 수도 있습니다.
 
@@ -429,14 +476,18 @@ Rails의 헬퍼 메소드를 사용하여 디버그 모드를 켤 수도 있습�
 
 디버그 모드가 이미 켜져있는 경우, `:debug` 옵션은 의미가 없습니다.
 
-development 환경에서 건전성을 확인하기 위한 일환으로 압축을 활성화하거나, 디버그의 필요성에 따라 그때그때 켜고 끌 수 있습니다.
+development 환경에서 건전성을 확인하기 위한 일환으로 압축을 활성화하거나,
+디버그의 필요성에 따라 그때그때 켜고 끌 수 있습니다.
 
 production 환경의 경우
 -------------
 
-Sprockets은 production 환경에서는 위에서 말한 핑거프린트에 의한 스킴을 사용합니다. 기본으로 Rails의 애셋은 전처리된 정적인 애셋으로 웹서버에서 제공됩니다.
+Sprockets은 production 환경에서는 위에서 말한 핑거프린트에 의한 스킴을
+사용합니다. 기본으로 Rails의 애셋은 전처리된 정적인 애셋으로 웹서버에서
+제공됩니다.
 
-MD5는 컴파일된 파일의 내용을 기반으로 전처리중에 생성되며, 파일명에 추가되어 저장됩니다. 매니페스트의 이름은 Rails 헬퍼가 핑거프린트를 추가하여 사용합니다.
+MD5는 컴파일된 파일의 내용을 기반으로 전처리중에 생성되며, 파일명에 추가되어
+저장됩니다. 매니페스트의 이름은 Rails 헬퍼가 핑거프린트를 추가하여 사용합니다.
 
 다음은 예시입니다.
 
@@ -452,19 +503,27 @@ MD5는 컴파일된 파일의 내용을 기반으로 전처리중에 생성되�
 <link href="/assets/application-4dd5b109ee3439da54f5bdfd78a80473.css" media="screen" rel="stylesheet" />
 ```
 
-NOTE: 애셋 파이프라인의 `:cache` 옵션과 `:concat`옵션은 폐기되었습니다. 이러한 옵션은 `javascript_include_tag`와 `stylesheet_link_tag`에서 삭제해주세요.
+NOTE: 애셋 파이프라인의 `:cache` 옵션과 `:concat`옵션은 폐기되었습니다.
+이러한 옵션은 `javascript_include_tag`와 `stylesheet_link_tag`에서
+삭제해주세요.
 
-핑거프린트의 동작에 대해서는 `config.assets.digest` 초기화 옵션에서 제어할 수 있습니다. production 환경에서는 기본으로 `true`이며, 그 이외에서는 `false`입니다.
+핑거프린트의 동작에 대해서는 `config.assets.digest` 초기화 옵션에서 제어할 수
+있습니다. 기본값은 `true`입니다.
 
-NOTE: `config.assets.digest` 옵션은 가급적 변경하지 말아주세요. 파일명에 다이제스트가 포함되지 않으면 먼 미레에 헤더가 설정되었을 때에 클라이언트가 파일의 내용이 변경된 것을 검출하지 못하게 될 수 있습니다.
+NOTE: `config.assets.digest` 옵션은 가급적 변경하지 말아주세요. 파일명에
+다이제스트가 포함되지 않으면 먼 미레에 헤더가 설정되었을 때에 클라이언트가
+파일의 내용이 변경된 것을 검출하지 못하게 될 수 있습니다.
 
 ### 애셋을 전처리하기
 
-Rails에는 파이프라인에 애셋 매니페스트 파일을 수동으로 컴파일하기 위한 태스크가 포함되어 있습니다.
+Rails에는 파이프라인에 애셋 매니페스트 파일을 수동으로 컴파일하기 위한
+태스크가 포함되어 있습니다.
 
-컴파일 된 애셋은 `config.assets.prefix`에서 지정한 위치에 저장됩니다. 이 위치의 기본값은 `/assets` 폴더 입니다.
+컴파일 된 애셋은 `config.assets.prefix`에서 지정한 위치에 저장됩니다. 이
+위치의 기본값은 `/assets` 폴더 입니다.
 
-배포시에 이 태스크를 서버 상에서 실행하면, 컴파일된 애셋이 서버 상에 직접 생성됩니다. 로컬 환경에서 컴파일 하는 방법에 대해서는 다음 절을 참고해주세요.
+배포시에 이 태스크를 서버 상에서 실행하면, 컴파일된 애셋이 서버 상에 직접
+생성됩니다. 로컬 환경에서 컴파일 하는 방법에 대해서는 다음 절을 참고해주세요.
 
 다음이 그 태스크입니다.
 
@@ -472,7 +531,8 @@ Rails에는 파이프라인에 애셋 매니페스트 파일을 수동으로 컴
 $ RAILS_ENV=production bin/rails assets:precompile
 ```
 
-Capistrano (v2.15.1 이후)에는 배포중에 이 태스크를 사용하는 레시피가 포함되어 있습니다. `Capfile`에 다음을 추가합니다.
+Capistrano (v2.15.1 이후)에는 배포중에 이 태스크를 사용하는 레시피가 포함되어
+있습니다. `Capfile`에 다음을 추가합니다.
 
 ```ruby
 load 'deploy/assets'
@@ -481,42 +541,34 @@ load 'deploy/assets'
 이를 통해 `config.assets.prefix`로 지정된 폴더가 `shared/assets`에 링크됩니다.
 이미 이 공유 폴더를 사용하고 있다면 별도의 배포용 태스크를 작성해야합니다.
 
-이 폴더는 복수의 배포에 걸쳐 공유된다는 점이 중요합니다. 이는 서버 이외의 다른 장소에서 캐시되어있는 패이지가 오래된 컴파일된 애셋을 참조하고 있는 경우에도, 캐시된 페이지의 수명이 되어 삭제될 때 까지는 그 오래된 페이지의 참조가 유효하도록 만들기 때문입니다.
+이 폴더는 복수의 배포에 걸쳐 공유된다는 점이 중요합니다. 이는 서버 이외의 다른
+장소에서 캐시되어있는 패이지가 오래된 컴파일된 애셋을 참조하고 있는 경우에도,
+캐시된 페이지의 수명이 되어 삭제될 때까지는 그 오래된 페이지의 참조가
+유효하도록 만들기 때문입니다.
 
-파일을 컴파일 할 때에 기본 매쳐에 의해서 `app/assets` 폴더에 있는 `application.js`, `application.css`, 그리고 모든 비JS/CSS 파일(이를 통해 모든 이미지 파일도 자동적으로 포함됩니다)가 포함됩니다. `app/assets` 폴더에 있는 gem도 포함됩니다.
+파일을 컴파일 할 때에 기본 매쳐에 의해서 `app/assets` 폴더에 있는
+`application.js`, `application.css`, 그리고 모든 비JS/CSS 파일(이를 통해 모든
+이미지 파일도 자동적으로 포함됩니다)가 포함됩니다. `app/assets` 폴더에 있는
+젬도 포함됩니다.
 
 ```ruby
 [ Proc.new { |filename, path| path =~ /app\/assets/ && !%w(.js .css).include?(File.extname(filename)) },
 /application.(css|js)$/ ]
 ```
 
-NOTE: 이 매쳐(그리고 뒤에서 설명할 precompile 배열의 다른 멤버)가 적용되는 것은 컴파일 전이나 컴파일 중의 파일명이 아닌, 컴파일 후의 최종적인 파일명이라는 점을 주의해주세요. 이것은 컴파일 되어서 JavaScript나 CSS로 변환되는 중간 과정인 파일은(순수한 JavaScript/CSS와 마찬가지로) 매쳐의 대상에서 모두 제외된다는 의미입니다. 예를 들자면 `.coffee`와 `.scss` 파일은 컴파일 후에는 각각 JavaScript와 CSS로 변환되므로, 이들은 자동적으로 포함되지 않습니다.
+NOTE: 이 매쳐(그리고 뒤에서 설명할 precompile 배열의 다른 멤버)가 적용되는
+것은 컴파일 전이나 컴파일 중의 파일명이 아닌, 컴파일 후의 최종적인
+파일명이라는 점을 주의해주세요. 이것은 컴파일 되어서 JavaScript나 CSS로
+변환되는 중간 과정인 파일은(순수한 JavaScript/CSS와 마찬가지로) 매쳐의
+대상에서 모두 제외된다는 의미입니다. 예를 들자면 `.coffee`와 `.scss` 파일은
+컴파일 후에는 각각 JavaScript와 CSS로 변환되므로, 이들은 자동적으로 포함되지
+않습니다.
 
-다른 매니페스트나, 그 외의 스타일시트/JavaScript 파일을 포함하고 싶은 경우에는 `config/initializers/assets.rb`의 `precompile`라는 배열을 사용하세요.
+다른 매니페스트나, 그 외의 스타일시트/JavaScript 파일을 포함하고 싶은 경우에는
+`config/initializers/assets.rb`의 `precompile`라는 배열을 사용하세요.
 
 ```ruby
-Rails.application.config.assets.precompile += ['admin.js', 'admin.css', 'swfObject.js']
-```
-
-또는 아래와 같이 모든 애셋을 미리 컴파일할 수도 있습니다.
-
-```ruby
-# config/initializers/assets.rb
-Rails.application.config.assets.precompile << Proc.new do |path|
-  if path =~ /\.(css|js)\z/
-    full_path = Rails.application.assets.resolve(path).to_path
-    app_assets_path = Rails.root.join('app', 'assets').to_path
-    if full_path.starts_with? app_assets_path
-      logger.info "including asset: " + full_path
-      true
-    else
-      logger.info "excluding asset: " + full_path
-      false
-    end
-  else
-    false
-  end
-end
+Rails.application.config.assets.precompile += %w( admin.js admin.css )
 ```
 
 NOTE: precompile 배열에 Sass나 CoffeeScript 파일등을 추가할 경우에도 반드시 `.js`, `.css`로 끝나는 파일명(다시 말해 컴파일이 끝난 시점의 파일명)으로 지정해주세요.
@@ -536,9 +588,11 @@ NOTE: precompile 배열에 Sass나 CoffeeScript 파일등을 추가할 경우에
 "my_image-231a680f23887d9dd70710ea5efd3c62.png"}}
 ```
 
-매니페스트 위치의 기본값은 `config.assets.prefix`로 지정된 장소의 최상위 폴더(기본값은 '/assets')입니다.
+매니페스트 위치의 기본값은 `config.assets.prefix`로 지정된 장소의 최상위
+폴더(기본값은 '/assets')입니다.
 
-NOTE: production 환경에서 발견되지 않는 컴파일 후의 파일이 있다면, 찾을 수 없는 파일명을 에러 메시지에 포함하고 있는 `Sprockets::Helpers::RailsHelper::AssetPaths::AssetNotPrecompiledError`가 발생합니다.
+NOTE: production 환경에서 발견되지 않는 컴파일 후의 파일이 있다면, 찾을 수 없는
+파일명을 에러 메시지에 포함하고 있는 `Sprockets::Helpers::RailsHelper::AssetPaths::AssetNotPrecompiledError`가 발생합니다.
 
 #### 먼 미래에 유효기간이 끝나는 헤더
 
@@ -567,19 +621,20 @@ location ~ ^/assets/ {
   add_header Cache-Control public;
 
   add_header ETag "";
-  break;
 }
 ```
 
 ### 로컬에서 미리 컴파일하기
 
-애셋을 로컬에서 미리 컴파일하는 이유는 몇가지를 생각해볼 수 있습니다. 예를 들자면 다음과 같은 이유입니다.
+애셋을 로컬에서 미리 컴파일하는 이유는 몇가지를 생각해볼 수 있습니다. 예를
+들자면 다음과 같은 이유입니다.
 
 * production 환경의 파일 시스템에 쓰기 권한이 없음
 * 배포를 여러곳에 해야해서 같은 작업을 반복하고 싶지 않음
 * 애셋을 변경하지 않는 배포를 빈번하게 함
 
-로컬에서 컴파일하여 컴파일 후의 애셋 파일을 Git 등에 의해 소스 관리 대상으로 포함하고, 다른 파일과 함께 배포되도록 만들 수 있습니다.
+로컬에서 컴파일하여 컴파일 후의 애셋 파일을 Git 등에 의해 소스 관리 대상으로
+포함하고, 다른 파일과 함께 배포되도록 만들 수 있습니다.
 
 단, 주의할 부분이 있습니다.
 
@@ -593,13 +648,21 @@ location ~ ^/assets/ {
 config.assets.prefix = "/dev-assets"
 ```
 
-`prefix`를 변경하면 Sprockets은 development 환경에서 다른 URL을 사용해서 애셋을 제공하며, 모든 요청이 Sprockets에 넘겨지게 됩니다. production환경의 접두어는 `/assets`를 그대로 사용합니다. 이 변경이 이루어지지 않으면 애플리케이션은 development 환경에서도 production 환경과 동일한 애셋을 제공합니다. 이 경우, 애셋을 다시 컴파일하지 않으면 작업 중의 변경사항이 반영되지 않습니다.
+`prefix`를 변경하면 Sprockets은 development 환경에서 다른 URL을 사용해서 애셋을
+제공하며, 모든 요청이 Sprockets에 넘겨지게 됩니다. production환경의 접두어는
+`/assets`를 그대로 사용합니다. 이 변경이 이루어지지 않으면 애플리케이션은
+development 환경에서도 production 환경과 동일한 애셋을 제공합니다. 이 경우,
+애셋을 다시 컴파일하지 않으면 작업 중의 변경사항이 반영되지 않습니다.
 
-실제로는, 이를 통해 로컬에서 컴파일을 할 수 있게 되므로, 필요에 따라 그 파일들을 소스 관리 시스템에 커밋할 수 있게 됩니다. development 환경은 기대한 대로 동작을 하게 됩니다.
+실제로는, 이를 통해 로컬에서 컴파일을 할 수 있게 되므로, 필요에 따라 그
+파일들을 소스 관리 시스템에 커밋할 수 있게 됩니다. development 환경은 기대한
+대로 동작을 하게 됩니다.
 
 ### 동적인 컴파일
 
-상황에 따라서는 동적으로 컴파일(live compilation)을 사용하고 싶은 경우도 있을 겁니다. 이 상황에서는 파이프라인의 애셋에 대한 요청이 직접 Sprockets을 통해 처리됩니다.
+상황에 따라서는 동적으로 컴파일(live compilation)을 사용하고 싶은 경우도 있을
+겁니다. 이 상황에서는 파이프라인의 애셋에 대한 요청이 직접 Sprockets을 통해
+처리됩니다.
 
 이 옵션을 활성화하려면 아래와 같이 설정합니다.
 
@@ -607,13 +670,21 @@ config.assets.prefix = "/dev-assets"
 config.assets.compile = true
 ```
 
-최초의 요청을 받으면 애셋은 위의 development 환경의 부분에서 설명했듯 컴파일과 캐싱 작업이 이루어 집니다. 헬퍼에서 사용되는 매니페스트 이름은 MD5 해시가 포함됩니다.
+최초의 요청을 받으면 애셋은 위의 development 환경의 부분에서 설명했듯 컴파일과
+캐싱 작업이 이루어 집니다. 헬퍼에서 사용되는 매니페스트 이름은 MD5 해시가
+포함됩니다.
 
-또한 Sprockets는 `Cache-Control` HTTP 헤더를 `max-age=31536000`로 변경합니다. 이 헤더는 서버와 클라이언트의 사이에 존재하는 모든 캐시(프록시 등)에 대해서 서버가 제공하는 컨텐츠는 1년간 캐시해도 좋다고 알립니다. 이에 의해서 그 서버의 애셋에 대한 요청 수를 줄일 수 있으며, 애셋을 브라우저에서 직접 캐시하거나, 그 중간에서 캐시로 대체할 수 있는 기회가 주어집니다.
+또한 Sprockets는 `Cache-Control` HTTP 헤더를 `max-age=31536000`로 변경합니다.
+이 헤더는 서버와 클라이언트의 사이에 존재하는 모든 캐시(프록시 등)에 대해서
+서버가 제공하는 컨텐츠는 1년간 캐시해도 좋다고 알립니다. 이에 의해서 그 서버의
+애셋에 대한 요청 수를 줄일 수 있으며, 애셋을 브라우저에서 직접 캐시하거나,
+그 중간에서 캐시로 대체할 수 있는 기회가 주어집니다.
 
-이 기능은 메모리를 추가로 사용하며, 성능에 영향을 줄 수 있므로 권장하지 않습니다.
+이 기능은 메모리를 추가로 사용하며, 성능에 영향을 줄 수 있므로 권장하지
+않습니다.
 
-실제 애플리케이션의 배포시스템에 JavaScript 런타임이 없는 경우에는 다음을 Gemfile에 추가하세요.
+실제 애플리케이션의 배포시스템에 JavaScript 런타임이 없는 경우에는 다음을
+Gemfile에 추가하세요.
 
 ```ruby
 group :production do
@@ -623,21 +694,52 @@ end
 
 ### CDN
 
-CDN([컨텐츠 전송 네트워크](http://ko.wikipedia.org/wiki/%EC%BD%98%ED%85%90%EC%B8%A0_%EC%A0%84%EC%86%A1_%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC))는 전세계를 대상으로 애셋을 캐싱하는 것을 주목적으로 설계됩니다. 이를 통해 브라우저에서 애셋을 요청하게 되면, 네트워크 상에서 가장 가까운 캐시의 사본이 사용됩니다. production 환경의 Rails 서버로부터 (중간 캐시를 사용하지 않고) 직접 애셋을 제공하고 있다면, 애플리케이션과 브라우저의 사이에서 CDN을 사용하는 것이 가장 좋습니다.
+CDN([컨텐츠 전송 네트워크](http://ko.wikipedia.org/wiki/%EC%BD%98%ED%85%90%EC%B8%A0_%EC%A0%84%EC%86%A1_%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC))는 전세계를
+대상으로 애셋을 캐싱하는 것을 주목적으로 설계됩니다. 이를 통해 브라우저에서
+애셋을 요청하게 되면, 네트워크 상에서 가장 가까운 캐시의 사본이 사용됩니다.
+production 환경의 Rails 서버로부터 (중간 캐시를 사용하지 않고) 직접 애셋을
+제공하고 있다면, 애플리케이션과 브라우저의 사이에서 CDN을 사용하는 것이
+가장 좋습니다.
 
-CDN의 일반적인 사용법은 production 서버를 "origin" 서버로 설정하는 것입니다. 다시 말해, 브라우저가 CDN 상의 애셋을 요청하여, 캐시가 발견되지 않았을 경우 즉시 원 서버로부터 애셋 파일을 가져와서 캐싱하는 식입니다. 예를 들자면, Rails 애플리케이션을 `example.com`이라는 도메인으로 운영하고 있고, `mycdnsubdomain.fictional-cdn.com`라는 CDN이 설정되어 있다고 가정합시다. `mycdnsubdomain.fictional-cdn.com/assets/smile.png`이 요청되면, CDN은 일단 기존 서버의 `example.com/assets/smile.png`에 접근하여 이 요청을 캐싱합니다. CDN에 같은 요청이 다시 발생하면 캐시된 사본을 사용하게 됩니다. CDN이 애셋을 직접 제공하는 경우, 브라우저로부터 요청이 직접 Rails 서버에 넘어가는 경우는 없습니다. CDN이 제공하는 애셋은 네트워크 상에서 브라우저와 가까운 위치에 존재하므로 요청이 빠르게 처리됩니다. 또한, 서버는 애셋 전송에 사용할 시간을 절약할 수 있으므로 애플리케이션의 코드를 좀 더 빠르게 제공할 수 있게 됩니다.
+CDN의 일반적인 사용법은 production 서버를 "origin" 서버로 설정하는 것입니다.
+다시 말해, 브라우저가 CDN 상의 애셋을 요청하여, 캐시가 발견되지 않았을 경우
+즉시 원 서버로부터 애셋 파일을 가져와서 캐싱하는 식입니다. 예를 들자면,
+Rails 애플리케이션을 `example.com`이라는 도메인으로 운영하고 있고,
+`mycdnsubdomain.fictional-cdn.com`라는 CDN이 설정되어 있다고 가정합시다.
+`mycdnsubdomain.fictional-cdn.com/assets/smile.png`이 요청되면, CDN은 일단
+기존 서버의 `example.com/assets/smile.png`에 접근하여 이 요청을 캐싱합니다.
+CDN에 같은 요청이 다시 발생하면 캐시된 사본을 사용하게 됩니다. CDN이 애셋을
+직접 제공하는 경우, 브라우저로부터 요청이 직접 Rails 서버에 넘어가는 경우는
+없습니다. CDN이 제공하는 애셋은 네트워크 상에서 브라우저와 가까운 위치에
+존재하므로 요청이 빠르게 처리됩니다. 또한, 서버는 애셋 전송에 사용할 시간을
+절약할 수 있으므로 애플리케이션의 코드를 좀 더 빠르게 제공할 수 있게 됩니다.
 
 #### CDN에서 정적인 애셋을 제공하기
 
-CDN을 설정하려면, Rails 애플리케이션이 인터넷 상에서 production 환경으로 동작하고 있어야하며, `example.com`처럼 누구라도 접근할 수 있는 URL이 존재해야 합니다. 이어서 클라우드 호스팅 제공자가 제공하는 CDN 서비스와 계약할 필요도 있습니다. 이 경우, CDN의 "origin" 설정을 Rails 애플리케이션의 웹사이트 `example.com`로 설정해야압니다. "origin" 서버의 설정 방법에 대해서는 각 제공자에게 문의해주세요.
+CDN을 설정하려면, Rails 애플리케이션이 인터넷 상에서 production 환경으로
+동작하고 있어야하며, `example.com`처럼 누구라도 접근할 수 있는 URL이 존재해야
+합니다. 이어서 클라우드 호스팅 제공자가 제공하는 CDN 서비스와 계약할 필요도
+있습니다. 이 경우, CDN의 "origin" 설정을 Rails 애플리케이션의 웹사이트
+`example.com`로 설정해야압니다. "origin" 서버의 설정 방법에 대해서는 각
+제공자에게 문의해주세요.
 
-서비스에서 사용하는 CDN으로부터 애플리케이션에서 사용하기 위한 커스텀 서브 도메인(ex: `mycdnsubdomain.fictional-cdn.com`)도 얻어야 합니다. 여기까지로 CDN 서버의 설정이 완료되므로 이번에는 브라우저에 대해서 Rails 서버에 직접 접근하는 것이 아닌 CDN으로부터 애셋을 가져오도록 알려줄 필요가 있습니다. 이를 위해서는 본래 사용하던 상대경로 대신에 CDN을 애셋의 호스트 서버로 사용하도록 Rails를 변경합니다. Rails의 애셋 호스트를 설정하려면 `config/production.rb`의 `config.action_controller.asset_host`를 다음과 같이 설정하세요.
+서비스에서 사용하는 CDN으로부터 애플리케이션에서 사용하기 위한 커스텀 서브
+도메인(ex: `mycdnsubdomain.fictional-cdn.com`)도 얻어야 합니다. 여기까지로
+CDN 서버의 설정이 완료되므로 이번에는 브라우저에 대해서 Rails 서버에 직접
+접근하는 것이 아닌 CDN으로부터 애셋을 가져오도록 알려줄 필요가 있습니다.
+이를 위해서는 본래 사용하던 상대경로 대신에 CDN을 애셋의 호스트 서버로
+사용하도록 Rails를 변경합니다. Rails의 애셋 호스트를 설정하려면
+`config/environments/production.rb`의 `config.action_controller.asset_host`를 다음과 같이
+설정하세요.
 
 ```ruby
 config.action_controller.asset_host = 'mycdnsubdomain.fictional-cdn.com'
 ```
 
-NOTE: 여기에 적는 것은 "호스트명"(서브 도메인과 루트 도메인을 합친 것)뿐입니다. `http://`나 `https://` 같은 프로토콜 스킴을 적을 필요는 없습니다. 애셋에 대한 링크에서 사용되는 프로토콜 스킴은 웹페이지에 대한 요청이 발생했을 때, 그 페이지에 대한 기본 접근 방법에 따라서 적절하게 생성됩니다.
+NOTE: 여기에 적는 것은 "호스트명"(서브 도메인과 루트 도메인을 합친
+것)뿐입니다. `http://`나 `https://` 같은 프로토콜 스킴을 적을 필요는 없습니다.
+애셋에 대한 링크에서 사용되는 프로토콜 스킴은 웹페이지에 대한 요청이 발생했을
+때, 그 페이지에 대한 기본 접근 방법에 따라서 적절하게 생성됩니다.
 
 이 값은 [환경변수](http://ko.wikipedia.org/wiki/%ED%99%98%EA%B2%BD_%EB%B3%80%EC%88%98)로 설정할 수도 있습니다. 이를 사용하면 스테이징 서버를 실행하는 작업이 편해집니다.
 
@@ -645,9 +747,11 @@ NOTE: 여기에 적는 것은 "호스트명"(서브 도메인과 루트 도메�
 config.action_controller.asset_host = ENV['CDN_HOST']
 ```
 
-NOTE: 이 설정을 유효하게 만들려면 서버의 `CDN_HOST` 환경 변수에 값(이 경우라면, `mycdnsubdomain.fictional-cdn.com`)을 설정해두어야 합니다.
+NOTE: 이 설정을 유효하게 만들려면 서버의 `CDN_HOST` 환경 변수에 값(이 경우라면,
+`mycdnsubdomain.fictional-cdn.com`)을 설정해두어야 합니다.
 
-서버와 CDN의 설정을 완료한 후, 다음의 애셋을 가지고 있는 웹 페이지에 접근했다고 가정합니다.
+서버와 CDN의 설정을 완료한 후, 다음의 애셋을 가지고 있는 웹 페이지에
+접근했다고 가정합니다.
 
 ```erb
 <%= asset_path('smile.png') %>
@@ -775,11 +879,21 @@ config.assets.js_compressor = :uglifier
 
 NOTE: `uglifier`를 사용하려면 [ExecJS](https://github.com/sstephenson/execjs#readme)가 지원하는 JavaScript 런타임이 필요합니다. Mac OS X나 Windows를 사용하고 있는 경우에는 OS에 JavaScript 런타임을 설치해주세요.
 
-NOTE: CSS나 JavaScript의 압축을 활성화하는 `config.assets.compress` 옵션은 Rails 4에서 제거되었습니다. 현재는 이 옵션을 설정하더라도 아무 영향도 주지 않습니다. CSS 및 JavaScript 애셋 압축을 제어하기 위해서는 `config.assets.css_compressor`와 `config.assets.js_compressor`를 사용하세요.
+### GZip으로 압축한 애셋 제공하기
+
+기본으로 gzip으로 압축된 애셋이 압축되지 않은 애셋과 함께 생성됩니다. 압축된
+애셋을 사용하면 전송량을 줄일 수 있습니다. 이는 `gzip` 플래그를 통해 변경할
+수 있습니다.
+
+```ruby
+config.assets.gzip = false # 압축된 애셋 생성하지 않기
+```
 
 ### 다른 압축 방법을 사용하기
 
-CSS나 JavaScript의 압축 설정에는 다른 객체를 설정할 수도 있습니다. 설정에 넘길 객체에는 `compress` 메소드가 구현되어 있어야 합니다. 이 메소드는 문자열을 인수로 받아서 압축 결과를 문자열의 형태로 반환하면 됩니다.
+CSS나 JavaScript의 압축 설정에는 다른 객체를 설정할 수도 있습니다. 설정에 넘길
+객체에는 `compress` 메소드가 구현되어 있어야 합니다. 이 메소드는 문자열을
+인수로 받아서 압축 결과를 문자열의 형태로 반환하면 됩니다.
 
 ```ruby
 class Transformer
@@ -794,7 +908,6 @@ end
 ```ruby
 config.assets.css_compressor = Transformer.new
 ```
-
 
 ### _애셋_의 경로를 변경하기
 
@@ -828,18 +941,13 @@ TIP: 자세한 설명은 production 환경용의 웹서버 문서를 참고해�
 애셋의 캐시 저장소
 ------------------
 
-Rails의 캐시 저장소는 Sprockets를 사용해서 development 환경과 production 환경의 애셋을 캐싱할 때 사용됩니다. 캐시 저장소의 설정은 `config.assets.cache_store`에서 변경할 수 있습니다.
+기본으로 Sprockets 캐시는 development 환경과 production 환경에서
+`tmp/cache/assets`를 사용합니다. 이 경로는 다음과 같이 변경할 수 있습니다.
 
-```ruby
-config.assets.cache_store = :memory_store
-```
-
-애셋 캐시 스토어에서 사용할 수 있는 옵션은 애플리케이션의 캐시 스토어와 동일합니다.
-
-
-```ruby
-config.assets.cache_store = :memory_store, { size: 32.megabytes }
-```
+config.assets.configure do |env|
+  env.cache = ActiveSupport::Cache.lookup_store(:memory_store,
+                                                { size: 32.megabytes })
+end
 
 애셋 캐시 스토어를 비활성화 하려면 다음의 코드를 추가합니다.
 
@@ -910,20 +1018,26 @@ config.assets.debug = true
 `production.rb`의 경우.
 
 ```ruby
-# 압축 기능을 사용하려면 config.assets.js_compressor = 를 사용하세요
-# :uglifier config.assets.css_compressor = :yui
+# 사용하고 싶은 전처리기를 선택하세요
+config.assets.js_compressor = :uglifier
+# config.assets.css_compressor = :yui
 
 # 컴파일된 애셋이 발견되지 않는 경우에 애셋 파이프라인으로 돌아가지 않기
 config.assets.compile = false
 
-# 애셋 URL의 다이제스트를 생성하기(Deprecated될 가능성 있음)
+# 애셋 URL의 다이제스트를 생성하기
 config.assets.digest = true
 
 # 추가 애셋을 미리 컴파일하기 (application.js, application.css, 그리고 모든
-# 비JS/CSS 파일이 추가되어 있음) config.assets.precompile += %w( search.js )
+# 비JS/CSS 파일이 추가되어 있음)
+# config.assets.precompile += %w( admin.js admin.css )
 ```
 
-Rails 4는 Sprockets의 기본 설정값을 test 환경을 위한 `test.rb`에서 설정하지 않도록 변경되었습니다. 따라서 `test.rb`에서 Sprockets의 설정을 추가할 필요가 있습니다. test환경에서의 이전 기본값은 `config.assets.compile = true`, `config.assets.compress = false`, `config.assets.debug = false`, `config.assets.digest = false`입니다.
+Rails는 Sprockets의 기본 설정값을 test 환경을 위한 `test.rb`에서 설정하지
+않도록 변경되었습니다. 따라서 `test.rb`에서 Sprockets의 설정을 추가할 필요가
+있습니다. test환경에서의 이전 기본값은 `config.assets.compile = true`,
+`config.assets.compress = false`, `config.assets.debug = false`,
+`config.assets.digest = false`입니다.
 
 다음을 `Gemfile`에 추가해야합니다.
 
@@ -932,5 +1046,3 @@ gem 'sass-rails',   "~> 3.2.3"
 gem 'coffee-rails', "~> 3.2.1"
 gem 'uglifier'
 ```
-
-TIP: 이 가이드는 [Rails Guilde 일본어판](http://railsguides.jp)으로부터 번역되었습니다.
