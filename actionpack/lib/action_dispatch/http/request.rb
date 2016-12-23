@@ -69,7 +69,7 @@ module ActionDispatch
     PASS_NOT_FOUND = Class.new { # :nodoc:
       def self.action(_); self; end
       def self.call(_); [404, { "X-Cascade" => "pass" }, []]; end
-      def self.encoding_for_param(action, param); ::Encoding::UTF_8; end
+      def self.binary_params_for?(action); false; end
     }
 
     def controller_class
@@ -357,7 +357,7 @@ module ActionDispatch
         end
         self.request_parameters = Request::Utils.normalize_encode_params(pr)
       end
-    rescue ParamsParser::ParseError # one of the parse strategies blew up
+    rescue Http::Parameters::ParseError # one of the parse strategies blew up
       self.request_parameters = Request::Utils.normalize_encode_params(super || {})
       raise
     rescue Rack::Utils::ParameterTypeError, Rack::Utils::InvalidParameterError => e

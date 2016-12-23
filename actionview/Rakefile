@@ -3,7 +3,7 @@ require "rake/testtask"
 desc "Default Task"
 task default: :test
 
-task :package
+task package: "assets:compile"
 
 # Run the unit tests
 
@@ -14,7 +14,7 @@ namespace :test do
   task :isolated do
     Dir.glob("test/{actionpack,activerecord,template}/**/*_test.rb").all? do |file|
       sh(Gem.ruby, "-w", "-Ilib:test", file)
-    end or raise "Failures"
+    end || raise("Failures")
   end
 
   Rake::TestTask.new(:template) do |t|
@@ -43,6 +43,21 @@ namespace :test do
       t.verbose = true
       t.ruby_opts = ["--dev"] if defined?(JRUBY_VERSION)
     end
+  end
+end
+
+namespace :ujs do
+  desc "Starts the test server"
+  task :server do
+    system 'bundle exec rackup test/ujs/config.ru -p 4567 -s puma'
+  end
+end
+
+namespace :assets do
+  desc "Compile Action View assets"
+  task :compile do
+    require "blade"
+    Blade.build
   end
 end
 

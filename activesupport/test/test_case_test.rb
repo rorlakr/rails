@@ -138,6 +138,15 @@ class AssertDifferenceTest < ActiveSupport::TestCase
     end
   end
 
+  def test_assert_changes_with_from_option_with_nil
+    error = assert_raises Minitest::Assertion do
+      assert_changes "@object.num", from: nil do
+        @object.increment
+      end
+    end
+    assert_equal "\"@object.num\" isn't nil", error.message
+  end
+
   def test_assert_changes_with_to_option
     assert_changes "@object.num", to: 1 do
       @object.increment
@@ -200,6 +209,15 @@ class AssertDifferenceTest < ActiveSupport::TestCase
     assert_changes "token", from: /\w{32}/, to: /\w{32}/ do
       token = SecureRandom.hex
     end
+  end
+
+  def test_assert_changes_with_message
+    error = assert_raises Minitest::Assertion do
+      assert_changes "@object.num", "@object.num should 1", to: 1 do
+      end
+    end
+
+    assert_equal "@object.num should 1.\n\"@object.num\" didn't change to 1", error.message
   end
 
   def test_assert_no_changes_pass

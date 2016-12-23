@@ -68,13 +68,17 @@ module ActiveRecord
 
       # Implements the ids writer method, e.g. foo.item_ids= for Foo.has_many :items
       def ids_writer(ids)
-        pk_type = reflection.primary_key_type
+        pk_type = reflection.association_primary_key_type
         ids = Array(ids).reject(&:blank?)
         ids.map! { |i| pk_type.cast(i) }
         records = klass.where(reflection.association_primary_key => ids).index_by do |r|
           r.send(reflection.association_primary_key)
-        end.values_at(*ids)
-        replace(records)
+        end.values_at(*ids).compact
+        if records.size != ids.size
+          klass.all.raise_record_not_found_exception!(ids, records.size, ids.size, reflection.association_primary_key)
+        else
+          replace(records)
+        end
       end
 
       def reset
@@ -111,14 +115,6 @@ module ActiveRecord
             yield(record) if block_given?
           end
         end
-      end
-
-      def create(attributes = {}, &block)
-        _create_record(attributes, &block)
-      end
-
-      def create!(attributes = {}, &block)
-        _create_record(attributes, true, &block)
       end
 
       # Add +records+ to this association. Returns +self+ so method calls may
@@ -191,31 +187,6 @@ module ActiveRecord
         end
       end
 
-      # Returns the number of records. If no arguments are given, it counts all
-      # columns using SQL. If one argument is given, it counts only the passed
-      # column using SQL. If a block is given, it counts the number of records
-      # yielding a true value.
-      def count(column_name = nil)
-        return super if block_given?
-        relation = scope
-        if association_scope.distinct_value
-          # This is needed because 'SELECT count(DISTINCT *)..' is not valid SQL.
-          column_name ||= reflection.klass.primary_key
-          relation = relation.distinct
-        end
-
-        value = relation.count(column_name)
-
-        limit  = options[:limit]
-        offset = options[:offset]
-
-        if limit || offset
-          [ [value - offset.to_i, 0].max, limit.to_i ].min
-        else
-          value
-        end
-      end
-
       # Removes +records+ from this association calling +before_remove+ and
       # +after_remove+ callbacks.
       #
@@ -225,11 +196,8 @@ module ActiveRecord
       # +delete_records+. They are in any case removed from the collection.
       def delete(*records)
         return if records.empty?
-        _options = records.extract_options!
-        dependent = _options[:dependent] || options[:dependent]
-
         records = find(records) if records.any? { |record| record.kind_of?(Integer) || record.kind_of?(String) }
-        delete_or_destroy(records, dependent)
+        delete_or_destroy(records, options[:dependent])
       end
 
       # Deletes the +records+ and removes them from this association calling
@@ -255,14 +223,10 @@ module ActiveRecord
       # +count_records+, which is a method descendants have to provide.
       def size
         if !find_target? || loaded?
-          if association_scope.distinct_value
-            target.uniq.size
-          else
-            target.size
-          end
-        elsif !loaded? && !association_scope.group_values.empty?
+          target.size
+        elsif !association_scope.group_values.empty?
           load_target.size
-        elsif !loaded? && !association_scope.distinct_value && target.is_a?(Array)
+        elsif !association_scope.distinct_value && target.is_a?(Array)
           unsaved_records = target.select(&:new_record?)
           unsaved_records.size + count_records
         else
@@ -285,36 +249,6 @@ module ActiveRecord
           @target.blank? && !scope.exists?
         end
       end
-
-      # Returns true if the collections is not empty.
-      # If block given, loads all records and checks for one or more matches.
-      # Otherwise, equivalent to +!collection.empty?+.
-      def any?
-        if block_given?
-          load_target.any? { |*block_args| yield(*block_args) }
-        else
-          !empty?
-        end
-      end
-
-      # Returns true if the collection has more than 1 record.
-      # If block given, loads all records and checks for two or more matches.
-      # Otherwise, equivalent to +collection.size > 1+.
-      def many?
-        if block_given?
-          load_target.many? { |*block_args| yield(*block_args) }
-        else
-          size > 1
-        end
-      end
-
-      def distinct
-        seen = {}
-        load_target.find_all do |record|
-          seen[record.id] = true unless seen.key?(record.id)
-        end
-      end
-      alias uniq distinct
 
       # Replace this collection with +other_array+. This will perform a diff
       # and delete/add only records that have changed.
@@ -365,15 +299,12 @@ module ActiveRecord
       def replace_on_target(record, index, skip_callbacks)
         callback(:before_add, record) unless skip_callbacks
 
-        was_loaded = loaded?
         yield(record) if block_given?
 
-        unless !was_loaded && loaded?
-          if index
-            @target[index] = record
-          else
-            @target << record
-          end
+        if index
+          @target[index] = record
+        else
+          append_record(record)
         end
 
         callback(:after_add, record) unless skip_callbacks
@@ -412,9 +343,9 @@ module ActiveRecord
           end
 
           binds = AssociationScope.get_bind_values(owner, reflection.chain)
-          records = sc.execute(binds, klass, conn)
-          records.each { |record| set_inverse_instance(record) }
-          records
+          sc.execute(binds, klass, conn) do |record|
+            set_inverse_instance(record)
+          end
         end
 
         # We have some records loaded from the database (persisted) and some that are
@@ -434,7 +365,7 @@ module ActiveRecord
           persisted.map! do |record|
             if mem_record = memory.delete(record)
 
-              ((record.attribute_names & mem_record.attribute_names) - mem_record.changes.keys).each do |name|
+              ((record.attribute_names & mem_record.attribute_names) - mem_record.changed_attribute_names_to_save).each do |name|
                 mem_record[name] = record[name]
               end
 
@@ -494,8 +425,9 @@ module ActiveRecord
           records.each { |record| callback(:after_remove, record) }
         end
 
-        # Delete the given records from the association, using one of the methods :destroy,
-        # :delete_all or :nullify (or nil, in which case a default is used).
+        # Delete the given records from the association,
+        # using one of the methods +:destroy+, +:delete_all+
+        # or +:nullify+ (or +nil+, in which case a default is used).
         def delete_records(records, method)
           raise NotImplementedError
         end
@@ -569,6 +501,10 @@ module ActiveRecord
           else
             load_target.select { |r| ids.include?(r.id.to_s) }
           end
+        end
+
+        def append_record(record)
+          @target << record unless @target.include?(record)
         end
     end
   end

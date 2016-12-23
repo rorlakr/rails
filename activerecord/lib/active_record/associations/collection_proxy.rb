@@ -106,12 +106,6 @@ module ActiveRecord
       #   #      #<Pet id: 2, name: "Spook", person_id: 1>,
       #   #      #<Pet id: 3, name: "Choo-Choo", person_id: 1>
       #   #    ]
-      #
-      #   person.pets.select(:name) { |pet| pet.name =~ /oo/ }
-      #   # => [
-      #   #      #<Pet id: 2, name: "Spook">,
-      #   #      #<Pet id: 3, name: "Choo-Choo">
-      #   #    ]
 
       # Finds an object in the collection responding to the +id+. Uses the same
       # rules as ActiveRecord::Base.find. Returns ActiveRecord::RecordNotFound
@@ -724,6 +718,12 @@ module ActiveRecord
         @association.destroy(*records)
       end
 
+      ##
+      # :method: distinct
+      #
+      # :call-seq:
+      #   distinct(value = true)
+      #
       # Specifies whether the records should be unique or not.
       #
       #   class Person < ActiveRecord::Base
@@ -738,11 +738,32 @@ module ActiveRecord
       #
       #   person.pets.select(:name).distinct
       #   # => [#<Pet name: "Fancy-Fancy">]
-      def distinct
-        @association.distinct
-      end
-      alias uniq distinct
+      #
+      #   person.pets.select(:name).distinct.distinct(false)
+      #   # => [
+      #   #      #<Pet name: "Fancy-Fancy">,
+      #   #      #<Pet name: "Fancy-Fancy">
+      #   #    ]
 
+      #--
+      def uniq
+        load_target.uniq
+      end
+
+      def calculate(operation, column_name)
+        null_scope? ? scope.calculate(operation, column_name) : super
+      end
+
+      def pluck(*column_names)
+        null_scope? ? scope.pluck(*column_names) : super
+      end
+
+      ##
+      # :method: count
+      #
+      # :call-seq:
+      #   count(column_name = nil, &block)
+      #
       # Count all records.
       #
       #   class Person < ActiveRecord::Base
@@ -762,17 +783,6 @@ module ActiveRecord
       # perform the count using Ruby.
       #
       #   person.pets.count { |pet| pet.name.include?('-') } # => 2
-      def count(column_name = nil, &block)
-        @association.count(column_name, &block)
-      end
-
-      def calculate(operation, column_name)
-        null_scope? ? scope.calculate(operation, column_name) : super
-      end
-
-      def pluck(*column_names)
-        null_scope? ? scope.pluck(*column_names) : super
-      end
 
       # Returns the size of the collection. If the collection hasn't been loaded,
       # it executes a <tt>SELECT COUNT(*)</tt> query. Else it calls <tt>collection.size</tt>.
@@ -851,6 +861,12 @@ module ActiveRecord
         @association.empty?
       end
 
+      ##
+      # :method: any?
+      #
+      # :call-seq:
+      #   any?()
+      #
       # Returns +true+ if the collection is not empty.
       #
       #   class Person < ActiveRecord::Base
@@ -880,10 +896,13 @@ module ActiveRecord
       #     pet.group == 'dogs'
       #   end
       #   # => true
-      def any?(&block)
-        @association.any?(&block)
-      end
 
+      ##
+      # :method: many?
+      #
+      # :call-seq:
+      #   many?()
+      #
       # Returns true if the collection has more than one record.
       # Equivalent to <tt>collection.size > 1</tt>.
       #
@@ -918,9 +937,6 @@ module ActiveRecord
       #     pet.group == 'cats'
       #   end
       #   # => true
-      def many?(&block)
-        @association.many?(&block)
-      end
 
       # Returns +true+ if the given +record+ is present in the collection.
       #

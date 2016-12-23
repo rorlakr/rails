@@ -76,7 +76,7 @@ module ActiveRecord
     #   Post.find_by "published_at < ?", 2.weeks.ago
     def find_by(arg, *args)
       where(arg, *args).take
-    rescue RangeError
+    rescue ::RangeError
       nil
     end
 
@@ -84,7 +84,7 @@ module ActiveRecord
     # an ActiveRecord::RecordNotFound error.
     def find_by!(arg, *args)
       where(arg, *args).take!
-    rescue RangeError
+    rescue ::RangeError
       raise RecordNotFound.new("Couldn't find #{@klass.name} with an out of range value",
                                @klass.name)
     end
@@ -321,7 +321,7 @@ module ActiveRecord
       relation = apply_join_dependency(self, construct_join_dependency(eager_loading: false))
       return false if ActiveRecord::NullRelation === relation
 
-      relation = relation.except(:select, :order).select(ONE_AS_ONE).limit(1)
+      relation = relation.except(:select, :distinct).select(ONE_AS_ONE).limit(1)
 
       case conditions
       when Array, Hash
@@ -333,7 +333,7 @@ module ActiveRecord
       end
 
       connection.select_value(relation, "#{name} Exists", relation.bound_attributes) ? true : false
-    rescue RangeError
+    rescue ::RangeError
       false
     end
 
@@ -345,7 +345,7 @@ module ActiveRecord
     # of results obtained should be provided in the +result_size+ argument and
     # the expected number of results should be provided in the +expected_size+
     # argument.
-    def raise_record_not_found_exception!(ids = nil, result_size = nil, expected_size = nil) # :nodoc:
+    def raise_record_not_found_exception!(ids = nil, result_size = nil, expected_size = nil, key = primary_key) # :nodoc:
       conditions = arel.where_sql(@klass.arel_engine)
       conditions = " [#{conditions}]" if conditions
       name = @klass.name
@@ -353,15 +353,15 @@ module ActiveRecord
       if ids.nil?
         error = "Couldn't find #{name}"
         error << " with#{conditions}" if conditions
-        raise RecordNotFound, error
+        raise RecordNotFound.new(error, name)
       elsif Array(ids).size == 1
-        error = "Couldn't find #{name} with '#{primary_key}'=#{ids}#{conditions}"
-        raise RecordNotFound.new(error, name, primary_key, ids)
+        error = "Couldn't find #{name} with '#{key}'=#{ids}#{conditions}"
+        raise RecordNotFound.new(error, name, key, ids)
       else
-        error = "Couldn't find all #{name.pluralize} with '#{primary_key}': "
+        error = "Couldn't find all #{name.pluralize} with '#{key}': "
         error << "(#{ids.join(", ")})#{conditions} (found #{result_size} results, but was looking for #{expected_size})"
 
-        raise RecordNotFound, error
+        raise RecordNotFound.new(error, name, primary_key, ids)
       end
     end
 
@@ -458,7 +458,7 @@ module ActiveRecord
         else
           find_some(ids)
         end
-      rescue RangeError
+      rescue ::RangeError
         raise RecordNotFound, "Couldn't find #{@klass.name} with an out of range ID"
       end
 
@@ -466,9 +466,9 @@ module ActiveRecord
         if ActiveRecord::Base === id
           id = id.id
           ActiveSupport::Deprecation.warn(<<-MSG.squish)
-          You are passing an instance of ActiveRecord::Base to `find`.
-          Please pass the id of the object by calling `.id`.
-        MSG
+            You are passing an instance of ActiveRecord::Base to `find`.
+            Please pass the id of the object by calling `.id`.
+          MSG
         end
 
         relation = where(primary_key => id)

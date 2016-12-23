@@ -4,7 +4,7 @@ module ActiveSupport
   module Cache
     # A cache store implementation which stores everything into memory in the
     # same process. If you're running multiple Ruby on Rails server processes
-    # (which is the case if you're using mongrel_cluster or Phusion Passenger),
+    # (which is the case if you're using Phusion Passenger or puma clustered mode),
     # then this means that Rails server process instances won't be able
     # to share cache data with each other and this may not be the most
     # appropriate cache in that scenario.
@@ -57,7 +57,7 @@ module ActiveSupport
           start_time = Time.now
           cleanup
           instrument(:prune, target_size, from: @cache_size) do
-            keys = synchronize { @key_access.keys.sort { |a,b| @key_access[a].to_f <=> @key_access[b].to_f } }
+            keys = synchronize { @key_access.keys.sort { |a, b| @key_access[a].to_f <=> @key_access[b].to_f } }
             keys.each do |key|
               delete_entry(key, options)
               return if @cache_size <= target_size || (max_time && Time.now - start_time > max_time)

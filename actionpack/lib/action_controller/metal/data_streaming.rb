@@ -64,7 +64,7 @@ module ActionController #:nodoc:
       # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
       # for the Cache-Control header spec.
       def send_file(path, options = {}) #:doc:
-        raise MissingFile, "Cannot read file #{path}" unless File.file?(path) and File.readable?(path)
+        raise MissingFile, "Cannot read file #{path}" unless File.file?(path) && File.readable?(path)
 
         options[:filename] ||= File.basename(path) unless options[:url_based_filename]
         send_file_headers! options
@@ -112,6 +112,9 @@ module ActionController #:nodoc:
       def send_file_headers!(options)
         type_provided = options.has_key?(:type)
 
+        self.content_type = DEFAULT_SEND_FILE_TYPE
+        response.sending_file = true
+
         content_type = options.fetch(:type, DEFAULT_SEND_FILE_TYPE)
         raise ArgumentError, ":type option required" if content_type.nil?
 
@@ -135,8 +138,6 @@ module ActionController #:nodoc:
         end
 
         headers["Content-Transfer-Encoding"] = "binary"
-
-        response.sending_file = true
 
         # Fix a problem with IE 6.0 on opening downloaded files:
         # If Cache-Control: no-cache is set (which Rails does by default),

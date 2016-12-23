@@ -1,7 +1,7 @@
 module RailsGuides
   class Markdown
     class Renderer < Redcarpet::Render::HTML
-      def initialize(options={})
+      def initialize(options = {})
         super
       end
 
@@ -77,7 +77,7 @@ HTML
             "ruby; html-script: true"
           when "html"
             "xml" # HTML is understood, but there are .xml rules in the CSS
-            else
+          else
             "plain"
           end
         end
@@ -92,14 +92,15 @@ HTML
           # as a list item, but as a paragraph starting with a plain
           # asterisk.
           body.gsub(/^(TIP|IMPORTANT|CAUTION|WARNING|NOTE|INFO|TODO)[.:](.*?)(\n(?=\n)|\Z)/m) do
-            css_class = case $1
-                        when "CAUTION", "IMPORTANT"
-                          "warning"
-                        when "TIP"
-                          "info"
-                        else
-                          $1.downcase
-                        end
+            css_class = \
+              case $1
+              when "CAUTION", "IMPORTANT"
+                "warning"
+              when "TIP"
+                "info"
+              else
+                $1.downcase
+              end
             # added by Lucius
             original_text = $2
             if original_text =~ /\n*(.+?)\s*\[{3}(.+?)\]{3}\s*/

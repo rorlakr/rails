@@ -1,8 +1,7 @@
-require "active_support/core_ext/regexp"
 
 module ActiveRecord
   module DynamicMatchers #:nodoc:
-    def respond_to?(name, include_private = false)
+    def respond_to_missing?(name, include_private = false)
       if self == Base
         super
       else
@@ -63,10 +62,10 @@ module ActiveRecord
 
         def define
           model.class_eval <<-CODE, __FILE__, __LINE__ + 1
-          def self.#{name}(#{signature})
-            #{body}
-          end
-        CODE
+            def self.#{name}(#{signature})
+              #{body}
+            end
+          CODE
         end
 
         private
@@ -75,14 +74,14 @@ module ActiveRecord
             "#{finder}(#{attributes_hash})"
           end
 
-        # The parameters in the signature may have reserved Ruby words, in order
-        # to prevent errors, we start each param name with `_`.
+          # The parameters in the signature may have reserved Ruby words, in order
+          # to prevent errors, we start each param name with `_`.
           def signature
             attribute_names.map { |name| "_#{name}" }.join(", ")
           end
 
-        # Given that the parameters starts with `_`, the finder needs to use the
-        # same parameter name.
+          # Given that the parameters starts with `_`, the finder needs to use the
+          # same parameter name.
           def attributes_hash
             "{" + attribute_names.map { |name| ":#{name} => _#{name}" }.join(",") + "}"
           end

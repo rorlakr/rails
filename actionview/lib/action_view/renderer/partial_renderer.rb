@@ -1,5 +1,4 @@
 require "concurrent/map"
-require "active_support/core_ext/regexp"
 require "action_view/renderer/partial_renderer/collection_caching"
 
 module ActionView
@@ -99,7 +98,7 @@ module ActionView
   #
   #   <%= render partial: "ad", collection: @advertisements, spacer_template: "ad_divider" %>
   #
-  # If the given <tt>:collection</tt> is nil or empty, <tt>render</tt> will return nil. This will allow you
+  # If the given <tt>:collection</tt> is +nil+ or empty, <tt>render</tt> will return nil. This will allow you
   # to specify a text which will displayed instead by using this form:
   #
   #   <%= render(partial: "ad", collection: @advertisements) || "There's no ad to be displayed" %>
@@ -333,8 +332,6 @@ module ActionView
           view, locals, block = @view, @locals, @block
           object, as = @object, @variable
 
-          view.instance_variable_set(:@log_payload_for_partial_render, payload)
-
           if !block && (layout = @options[:layout])
             layout = find_template(layout.to_s, @template_keys)
           end
@@ -347,19 +344,20 @@ module ActionView
           end
 
           content = layout.render(view, locals) { content } if layout
+          payload[:cache_hit] = view.cache_hit
           content
         end
       end
 
-    # Sets up instance variables needed for rendering a partial. This method
-    # finds the options and details and extracts them. The method also contains
-    # logic that handles the type of object passed in as the partial.
-    #
-    # If +options[:partial]+ is a string, then the +@path+ instance variable is
-    # set to that string. Otherwise, the +options[:partial]+ object must
-    # respond to +to_partial_path+ in order to setup the path.
+      # Sets up instance variables needed for rendering a partial. This method
+      # finds the options and details and extracts them. The method also contains
+      # logic that handles the type of object passed in as the partial.
+      #
+      # If +options[:partial]+ is a string, then the +@path+ instance variable is
+      # set to that string. Otherwise, the +options[:partial]+ object must
+      # respond to +to_partial_path+ in order to setup the path.
       def setup(context, options, block)
-        @view   = context
+        @view = context
         @options = options
         @block   = block
 
@@ -467,13 +465,13 @@ module ActionView
         end
       end
 
-    # Obtains the path to where the object's partial is located. If the object
-    # responds to +to_partial_path+, then +to_partial_path+ will be called and
-    # will provide the path. If the object does not respond to +to_partial_path+,
-    # then an +ArgumentError+ is raised.
-    #
-    # If +prefix_partial_path_with_controller_namespace+ is true, then this
-    # method will prefix the partial paths with a namespace.
+      # Obtains the path to where the object's partial is located. If the object
+      # responds to +to_partial_path+, then +to_partial_path+ will be called and
+      # will provide the path. If the object does not respond to +to_partial_path+,
+      # then an +ArgumentError+ is raised.
+      #
+      # If +prefix_partial_path_with_controller_namespace+ is true, then this
+      # method will prefix the partial paths with a namespace.
       def partial_path(object = @object)
         object = object.to_model if object.respond_to?(:to_model)
 

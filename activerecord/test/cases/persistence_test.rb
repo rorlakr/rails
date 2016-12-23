@@ -90,6 +90,14 @@ class PersistenceTest < ActiveRecord::TestCase
     assert_equal count, Pet.joins(:toys).where(where_args).delete_all
   end
 
+  def test_delete_all_with_left_joins
+    where_args = { toys: { name: "Bone" } }
+    count = Pet.left_joins(:toys).where(where_args).count
+
+    assert_equal count, 1
+    assert_equal count, Pet.left_joins(:toys).where(where_args).delete_all
+  end
+
   def test_delete_all_with_joins_and_where_part_is_not_hash
     where_args = ["toys.name = ?", "Bone"]
     count = Pet.joins(:toys).where(where_args).count
@@ -391,14 +399,14 @@ class PersistenceTest < ActiveRecord::TestCase
     end
     topic = klass.create(title: "Another New Topic")
     assert_queries(0) do
-      topic.update_attribute(:title, "Another New Topic")
+      assert topic.update_attribute(:title, "Another New Topic")
     end
   end
 
   def test_update_does_not_run_sql_if_record_has_not_changed
     topic = Topic.create(title: "Another New Topic")
-    assert_queries(0) { topic.update(title: "Another New Topic") }
-    assert_queries(0) { topic.update_attributes(title: "Another New Topic") }
+    assert_queries(0) { assert topic.update(title: "Another New Topic") }
+    assert_queries(0) { assert topic.update_attributes(title: "Another New Topic") }
   end
 
   def test_delete
@@ -451,6 +459,20 @@ class PersistenceTest < ActiveRecord::TestCase
     assert_equal "bulk updated with hash!", Topic.find(2).content
     assert_nil Topic.find(1).last_read
     assert_nil Topic.find(2).last_read
+  end
+
+  def test_update_all_with_joins
+    where_args = { toys: { name: "Bone" } }
+    count = Pet.left_joins(:toys).where(where_args).count
+
+    assert_equal count, Pet.joins(:toys).where(where_args).update_all(name: "Bob")
+  end
+
+  def test_update_all_with_left_joins
+    where_args = { toys: { name: "Bone" } }
+    count = Pet.left_joins(:toys).where(where_args).count
+
+    assert_equal count, Pet.left_joins(:toys).where(where_args).update_all(name: "Bob")
   end
 
   def test_update_all_with_non_standard_table_name
@@ -967,7 +989,7 @@ class PersistenceTest < ActiveRecord::TestCase
         self.table_name = :widgets
       end
 
-      instance  = widget.create!(
+      instance = widget.create!(
         name: "Bob",
         created_at: 1.day.ago,
         updated_at: 1.day.ago)

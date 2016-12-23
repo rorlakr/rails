@@ -179,7 +179,7 @@ module ActionDispatch
 
       # Returns a jar that'll automatically generate a signed representation of cookie value and verify it when reading from
       # the cookie again. This is useful for creating cookies with values that the user is not supposed to change. If a signed
-      # cookie was tampered with by the user (or a 3rd party), nil will be returned.
+      # cookie was tampered with by the user (or a 3rd party), +nil+ will be returned.
       #
       # If +secrets.secret_key_base+ and +secrets.secret_token+ (deprecated) are both set,
       # legacy cookies signed with the old key generator will be transparently upgraded.
@@ -202,7 +202,7 @@ module ActionDispatch
       end
 
       # Returns a jar that'll automatically encrypt cookie values before sending them to the client and will decrypt them for read.
-      # If the cookie was tampered with by the user (or a 3rd party), nil will be returned.
+      # If the cookie was tampered with by the user (or a 3rd party), +nil+ will be returned.
       #
       # If +secrets.secret_key_base+ and +secrets.secret_token+ (deprecated) are both set,
       # legacy cookies signed with the old key generator will be transparently upgraded.
@@ -332,13 +332,13 @@ module ActionDispatch
 
       def update_cookies_from_jar
         request_jar = @request.cookie_jar.instance_variable_get(:@cookies)
-        set_cookies = request_jar.reject { |k,_| @delete_cookies.key?(k) }
+        set_cookies = request_jar.reject { |k, _| @delete_cookies.key?(k) }
 
         @cookies.update set_cookies if set_cookies
       end
 
       def to_header
-        @cookies.map { |k,v| "#{escape(k)}=#{escape(v)}" }.join "; "
+        @cookies.map { |k, v| "#{escape(k)}=#{escape(v)}" }.join "; "
       end
 
       def handle_options(options) #:nodoc:
@@ -372,7 +372,7 @@ module ActionDispatch
 
         handle_options(options)
 
-        if @cookies[name.to_s] != value or options[:expires]
+        if @cookies[name.to_s] != value || options[:expires]
           @cookies[name.to_s] = value
           @set_cookies[name.to_s] = options
           @delete_cookies.delete(name.to_s)
@@ -576,7 +576,7 @@ module ActionDispatch
             "Read the upgrade documentation to learn more about this new config option."
         end
 
-        secret = key_generator.generate_key(request.encrypted_cookie_salt || "")
+        secret = key_generator.generate_key(request.encrypted_cookie_salt || "")[0, ActiveSupport::MessageEncryptor.key_len]
         sign_secret = key_generator.generate_key(request.encrypted_signed_cookie_salt || "")
         @encryptor = ActiveSupport::MessageEncryptor.new(secret, sign_secret, digest: digest, serializer: ActiveSupport::MessageEncryptor::NullSerializer)
       end

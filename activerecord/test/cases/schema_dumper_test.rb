@@ -51,6 +51,7 @@ class SchemaDumperTest < ActiveRecord::TestCase
     output = standard_dump
     assert_match %r{create_table "accounts"}, output
     assert_match %r{create_table "authors"}, output
+    assert_no_match %r{(?<=, ) do \|t\|}, output
     assert_no_match %r{create_table "schema_migrations"}, output
     assert_no_match %r{create_table "ar_internal_metadata"}, output
   end
@@ -70,38 +71,35 @@ class SchemaDumperTest < ActiveRecord::TestCase
     assert_match %r{create_table "CamelCase"}, output
   end
 
-  def assert_line_up(lines, pattern, required = false)
+  def assert_no_line_up(lines, pattern)
     return assert(true) if lines.empty?
     matches = lines.map { |line| line.match(pattern) }
-    assert matches.all? if required
     matches.compact!
     return assert(true) if matches.empty?
-    assert_equal 1, matches.map { |match| match.offset(0).first }.uniq.length
+    line_matches = lines.map { |line| [line, line.match(pattern)] }.select { |line, match| match }
+    assert line_matches.all? { |line, match|
+      start = match.offset(0).first
+      line[start - 2..start - 1] == ", "
+    }
   end
 
   def column_definition_lines(output = standard_dump)
     output.scan(/^( *)create_table.*?\n(.*?)^\1end/m).map { |m| m.last.split(/\n/) }
   end
 
-  def test_types_line_up
+  def test_types_no_line_up
     column_definition_lines.each do |column_set|
       next if column_set.empty?
 
-      lengths = column_set.map do |column|
-        if match = column.match(/\bt\.\w+\s+(?="\w+?")/)
-          match[0].length
-        end
-      end.compact
-
-      assert_equal 1, lengths.uniq.length
+      assert column_set.all? { |column| !column.match(/\bt\.\w+\s{2,}/) }
     end
   end
 
-  def test_arguments_line_up
+  def test_arguments_no_line_up
     column_definition_lines.each do |column_set|
-      assert_line_up(column_set, /default: /)
-      assert_line_up(column_set, /limit: /)
-      assert_line_up(column_set, /null: /)
+      assert_no_line_up(column_set, /default: /)
+      assert_no_line_up(column_set, /limit: /)
+      assert_no_line_up(column_set, /null: /)
     end
   end
 
@@ -150,12 +148,7 @@ class SchemaDumperTest < ActiveRecord::TestCase
       assert_match %r{c_int_4.*limit: 4}, output
     end
 
-    if current_adapter?(:SQLite3Adapter)
-      assert_match %r{c_int_5.*limit: 5}, output
-      assert_match %r{c_int_6.*limit: 6}, output
-      assert_match %r{c_int_7.*limit: 7}, output
-      assert_match %r{c_int_8.*limit: 8}, output
-    elsif current_adapter?(:OracleAdapter)
+    if current_adapter?(:SQLite3Adapter, :OracleAdapter)
       assert_match %r{c_int_5.*limit: 5}, output
       assert_match %r{c_int_6.*limit: 6}, output
       assert_match %r{c_int_7.*limit: 7}, output
@@ -186,8 +179,10 @@ class SchemaDumperTest < ActiveRecord::TestCase
 
   def test_schema_dumps_index_columns_in_right_order
     index_definition = standard_dump.split(/\n/).grep(/t\.index.*company_index/).first.strip
-    if current_adapter?(:Mysql2Adapter, :PostgreSQLAdapter)
-      assert_equal 't.index ["firm_id", "type", "rating"], name: "company_index", using: :btree', index_definition
+    if current_adapter?(:PostgreSQLAdapter)
+      assert_equal 't.index ["firm_id", "type", "rating"], name: "company_index", order: { rating: :desc }, using: :btree', index_definition
+    elsif current_adapter?(:Mysql2Adapter)
+      assert_equal 't.index ["firm_id", "type", "rating"], name: "company_index", length: { type: 10 }, using: :btree', index_definition
     else
       assert_equal 't.index ["firm_id", "type", "rating"], name: "company_index"', index_definition
     end
@@ -346,7 +341,7 @@ class SchemaDumperTest < ActiveRecord::TestCase
 
       create_table("dogs") do |t|
         t.column :name, :string
-        t.column :owner_id, :integer
+        t.column :owner_id, :bigint
         t.index [:name]
         t.foreign_key :dog_owners, column: "owner_id" if supports_foreign_keys?
       end
@@ -426,6 +421,13 @@ class SchemaDumperDefaultsTest < ActiveRecord::TestCase
       t.datetime :datetime_with_default, default: "2014-06-05 07:17:04"
       t.time     :time_with_default,     default: "07:17:04"
     end
+
+    if current_adapter?(:PostgreSQLAdapter)
+      @connection.create_table :infinity_defaults, force: true do |t|
+        t.float    :float_with_inf_default,    default: Float::INFINITY
+        t.float    :float_with_nan_default,    default: Float::NAN
+      end
+    end
   end
 
   teardown do
@@ -441,82 +443,11 @@ class SchemaDumperDefaultsTest < ActiveRecord::TestCase
     assert_match %r{t\.datetime\s+"datetime_with_default",\s+default: '2014-06-05 07:17:04'}, output
     assert_match %r{t\.time\s+"time_with_default",\s+default: '2000-01-01 07:17:04'}, output
   end
-end
 
-class SchemaDumperNoStandardizedArgumentWidthsTest < ActiveRecord::TestCase
-  include SchemaDumpingHelper
-
-  setup do
-    ActiveRecord::SchemaDumper.standardized_argument_widths = false
-    ActiveRecord::SchemaMigration.create_table
-  end
-
-  teardown do
-    ActiveRecord::SchemaDumper.standardized_argument_widths = true
-  end
-
-  def standard_dump
-    @@standard_dump ||= perform_schema_dump
-  end
-
-  def perform_schema_dump
-    dump_all_table_schema []
-  end
-
-  def assert_no_line_up(lines, pattern)
-    return assert(true) if lines.empty?
-    matches = lines.map { |line| line.match(pattern) }
-    matches.compact!
-    return assert(true) if matches.empty?
-    line_matches = lines.map { |line| [line, line.match(pattern)] }.select { |line, match| match }
-    assert line_matches.all? { |line, match|
-      start = match.offset(0).first
-      line[start - 2..start - 1] == ", "
-    }
-  end
-
-  def column_definition_lines(output = standard_dump)
-    output.scan(/^( *)create_table.*?\n(.*?)^\1end/m).map { |m| m.last.split(/\n/) }
-  end
-
-  def test_arguments_no_line_up
-    column_definition_lines.each do |column_set|
-      assert_no_line_up(column_set, /default: /)
-      assert_no_line_up(column_set, /limit: /)
-      assert_no_line_up(column_set, /null: /)
-    end
-  end
-end
-
-class SchemaDumperNoStandardizedTypeWidthsTest < ActiveRecord::TestCase
-  include SchemaDumpingHelper
-
-  setup do
-    ActiveRecord::SchemaDumper.standardized_type_widths = false
-    ActiveRecord::SchemaMigration.create_table
-  end
-
-  teardown do
-    ActiveRecord::SchemaDumper.standardized_type_widths = true
-  end
-
-  def standard_dump
-    @@standard_dump ||= perform_schema_dump
-  end
-
-  def perform_schema_dump
-    dump_all_table_schema []
-  end
-
-  def column_definition_lines(output = standard_dump)
-    output.scan(/^( *)create_table.*?\n(.*?)^\1end/m).map { |m| m.last.split(/\n/) }
-  end
-
-  def test_types_no_line_up
-    column_definition_lines.each do |column_set|
-      next if column_set.empty?
-
-      assert column_set.all? { |column| !column.match(/\bt\.\w+\s{2,}/) }
-    end
+  def test_schema_dump_with_float_column_infinity_default
+    skip unless current_adapter?(:PostgreSQLAdapter)
+    output = dump_table_schema("infinity_defaults")
+    assert_match %r{t\.float\s+"float_with_inf_default",\s+default: ::Float::INFINITY}, output
+    assert_match %r{t\.float\s+"float_with_nan_default",\s+default: ::Float::NAN}, output
   end
 end

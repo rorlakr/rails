@@ -86,11 +86,11 @@ module ActionView
 
         def tag_option(key, value, escape)
           if value.is_a?(Array)
-            value = escape ? safe_join(value, " ") : value.join(" ")
+            value = escape ? safe_join(value, " ".freeze) : value.join(" ".freeze)
           else
             value = escape ? ERB::Util.unwrapped_html_escape(value) : value.to_s
           end
-          %(#{key}="#{value.gsub(/"/, '&quot;'.freeze)}")
+          %(#{key}="#{value.gsub('"'.freeze, '&quot;'.freeze)}")
         end
 
         private
@@ -138,7 +138,7 @@ module ActionView
       #
       # ==== Options
       #
-      # Any passed options become attributes on the generated tag.
+      # Use symbol keyed options to add attributes to the generated tag.
       #
       #   tag.section class: %w( kitties puppies )
       #   # => <section class="kitties puppies"></section>

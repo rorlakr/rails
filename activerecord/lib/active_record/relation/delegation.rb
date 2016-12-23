@@ -1,6 +1,3 @@
-require "active_support/concern"
-require "active_support/core_ext/regexp"
-
 module ActiveRecord
   module Delegation # :nodoc:
     module DelegateCache # :nodoc:
@@ -108,7 +105,7 @@ module ActiveRecord
         end
     end
 
-    def respond_to?(method, include_private = false)
+    def respond_to_missing?(method, include_private = false)
       super || @klass.respond_to?(method, include_private) ||
         arel.respond_to?(method, include_private)
     end

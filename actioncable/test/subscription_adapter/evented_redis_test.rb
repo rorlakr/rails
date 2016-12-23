@@ -12,7 +12,41 @@ class EventedRedisAdapterTest < ActionCable::TestCase
   end
 
   def teardown
+    super
+
+    # Ensure EM is shut down before we re-enable warnings
+    EventMachine.reactor_thread.tap do |thread|
+      EventMachine.stop
+      thread.join
+    end
+
     $VERBOSE = @previous_verbose
+  end
+
+  def test_slow_eventmachine
+    require "eventmachine"
+    require "thread"
+
+    lock = Mutex.new
+
+    EventMachine.singleton_class.class_eval do
+      alias_method :delayed_initialize_event_machine, :initialize_event_machine
+      define_method(:initialize_event_machine) do
+        lock.synchronize do
+          sleep 0.5
+          delayed_initialize_event_machine
+        end
+      end
+    end
+
+    test_basic_broadcast
+  ensure
+    lock.synchronize do
+      EventMachine.singleton_class.class_eval do
+        alias_method :initialize_event_machine, :delayed_initialize_event_machine
+        remove_method :delayed_initialize_event_machine
+      end
+    end
   end
 
   def cable_config

@@ -20,7 +20,7 @@ class NumericalityValidationTest < ActiveModel::TestCase
   INTEGERS = [0, 10, -10] + INTEGER_STRINGS
   BIGDECIMAL = BIGDECIMAL_STRINGS.collect! { |bd| BigDecimal.new(bd) }
   JUNK = ["not a number", "42 not a number", "0xdeadbeef", "0xinvalidhex", "0Xdeadbeef", "00-1", "--3", "+-3", "+3-1", "-+019.0", "12.12.13.12", "123\nnot a number"]
-  INFINITY = [1.0/0.0]
+  INFINITY = [1.0 / 0.0]
 
   def test_default_validates_numericality_of
     Topic.validates_numericality_of :approved
@@ -33,6 +33,13 @@ class NumericalityValidationTest < ActiveModel::TestCase
 
     invalid!(JUNK + BLANK)
     valid!(NIL + FLOATS + INTEGERS + BIGDECIMAL + INFINITY)
+  end
+
+  def test_validates_numericality_of_with_blank_allowed
+    Topic.validates_numericality_of :approved, allow_blank: true
+
+    invalid!(JUNK)
+    valid!(NIL + BLANK + FLOATS + INTEGERS + BIGDECIMAL + INFINITY)
   end
 
   def test_validates_numericality_of_with_integer_only
@@ -75,7 +82,7 @@ class NumericalityValidationTest < ActiveModel::TestCase
     Topic.validates_numericality_of :approved, greater_than: BigDecimal.new("97.18")
 
     invalid!([-97.18, BigDecimal.new("97.18"), BigDecimal("-97.18")], "must be greater than 97.18")
-    valid!([97.18, 98, BigDecimal.new("98")]) # Notice the 97.18 as a float is greater than 97.18 as a BigDecimal due to floating point precision
+    valid!([97.19, 98, BigDecimal.new("98"), BigDecimal.new("97.19")])
   end
 
   def test_validates_numericality_with_greater_than_using_string_value
@@ -116,7 +123,7 @@ class NumericalityValidationTest < ActiveModel::TestCase
   def test_validates_numericality_with_equal_to_using_differing_numeric_types
     Topic.validates_numericality_of :approved, equal_to: BigDecimal.new("97.18")
 
-    invalid!([-97.18, 97.18], "must be equal to 97.18")
+    invalid!([-97.18], "must be equal to 97.18")
     valid!([BigDecimal.new("97.18")])
   end
 
@@ -158,7 +165,7 @@ class NumericalityValidationTest < ActiveModel::TestCase
   def test_validates_numericality_with_less_than_or_equal_to_using_differing_numeric_types
     Topic.validates_numericality_of :approved, less_than_or_equal_to: BigDecimal.new("97.18")
 
-    invalid!([97.18, 98], "must be less than or equal to 97.18")
+    invalid!([97.19, 98], "must be less than or equal to 97.18")
     valid!([-97.18, BigDecimal.new("-97.18"), BigDecimal.new("97.18")])
   end
 

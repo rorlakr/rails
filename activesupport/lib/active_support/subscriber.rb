@@ -1,4 +1,5 @@
 require "active_support/per_thread_registry"
+require "active_support/notifications"
 
 module ActiveSupport
   # ActiveSupport::Subscriber is an object set to consume
@@ -24,7 +25,7 @@ module ActiveSupport
   class Subscriber
     class << self
       # Attach the subscriber to a namespace.
-      def attach_to(namespace, subscriber=new, notifier=ActiveSupport::Notifications)
+      def attach_to(namespace, subscriber = new, notifier = ActiveSupport::Notifications)
         @namespace  = namespace
         @subscriber = subscriber
         @notifier   = notifier

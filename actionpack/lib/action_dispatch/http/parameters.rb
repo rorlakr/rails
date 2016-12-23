@@ -12,6 +12,14 @@ module ActionDispatch
         }
       }
 
+      # Raised when raw data from the request cannot be parsed by the parser
+      # defined for request's content mime type.
+      class ParseError < StandardError
+        def initialize
+          super($!.message)
+        end
+      end
+
       included do
         class << self
           attr_reader :parameter_parsers
@@ -37,7 +45,7 @@ module ActionDispatch
                    query_parameters.dup
                  end
         params.merge!(path_parameters)
-        params = set_custom_encoding(params)
+        params = set_binary_encoding(params)
         set_header("action_dispatch.request.parameters", params)
         params
       end
@@ -65,19 +73,14 @@ module ActionDispatch
 
       private
 
-        def set_custom_encoding(params)
+        def set_binary_encoding(params)
           action = params[:action]
-          params.each do |k, v|
-            if v.is_a?(String) && v.encoding != encoding_template(action, k)
-              params[k] = v.force_encoding(encoding_template(action, k))
+          if controller_class.binary_params_for?(action)
+            ActionDispatch::Request::Utils.each_param_value(params) do |param|
+              param.force_encoding ::Encoding::ASCII_8BIT
             end
           end
-
           params
-        end
-
-        def encoding_template(action, param)
-          controller_class.encoding_for_param(action, param)
         end
 
         def parse_formatted_parameters(parsers)
@@ -91,7 +94,7 @@ module ActionDispatch
             my_logger = logger || ActiveSupport::Logger.new($stderr)
             my_logger.debug "Error occurred while parsing request parameters.\nContents:\n\n#{raw_post}"
 
-            raise ParamsParser::ParseError
+            raise ParseError
           end
         end
 
@@ -99,5 +102,9 @@ module ActionDispatch
           ActionDispatch::Request.parameter_parsers
         end
     end
+  end
+
+  module ParamsParser
+    ParseError = ActiveSupport::Deprecation::DeprecatedConstantProxy.new("ActionDispatch::ParamsParser::ParseError", "ActionDispatch::Http::Parameters::ParseError")
   end
 end

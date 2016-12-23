@@ -40,9 +40,10 @@ module ActiveRecord
 
     def test_initialize_single_values
       relation = Relation.new(FakeKlass, :b, nil)
-      (Relation::SINGLE_VALUE_METHODS - [:create_with]).each do |method|
+      (Relation::SINGLE_VALUE_METHODS - [:create_with, :readonly]).each do |method|
         assert_nil relation.send("#{method}_value"), method.to_s
       end
+      assert_equal false, relation.readonly_value
       value = relation.create_with_value
       assert_equal({}, value)
       assert_predicate value, :frozen?
@@ -158,7 +159,7 @@ module ActiveRecord
       relation = Relation.new(Post, Post.arel_table, Post.predicate_builder)
       relation = relation.merge where: { name: :lol }, readonly: true
 
-      assert_equal({ "name"=>:lol }, relation.where_clause.to_h)
+      assert_equal({ "name" => :lol }, relation.where_clause.to_h)
       assert_equal true, relation.readonly_value
     end
 
@@ -223,7 +224,7 @@ module ActiveRecord
     def test_relation_merging_with_merged_joins_as_symbols
       special_comments_with_ratings = SpecialComment.joins(:ratings)
       posts_with_special_comments_with_ratings = Post.group("posts.id").joins(:special_comments).merge(special_comments_with_ratings)
-      assert_equal({ 2=>1, 4=>3, 5=>1 }, authors(:david).posts.merge(posts_with_special_comments_with_ratings).count)
+      assert_equal({ 2 => 1, 4 => 3, 5 => 1 }, authors(:david).posts.merge(posts_with_special_comments_with_ratings).count)
     end
 
     def test_relation_merging_with_joins_as_join_dependency_pick_proper_parent
@@ -273,7 +274,7 @@ module ActiveRecord
       join_string = "LEFT OUTER JOIN #{Rating.quoted_table_name} ON #{SpecialComment.quoted_table_name}.id = #{Rating.quoted_table_name}.comment_id"
       special_comments_with_ratings = SpecialComment.joins join_string
       posts_with_special_comments_with_ratings = Post.group("posts.id").joins(:special_comments).merge(special_comments_with_ratings)
-      assert_equal({ 2=>1, 4=>3, 5=>1 }, authors(:david).posts.merge(posts_with_special_comments_with_ratings).count)
+      assert_equal({ 2 => 1, 4 => 3, 5 => 1 }, authors(:david).posts.merge(posts_with_special_comments_with_ratings).count)
     end
 
     class EnsureRoundTripTypeCasting < ActiveRecord::Type::Value
@@ -309,10 +310,10 @@ module ActiveRecord
       def skip_if_sqlite3_version_includes_quoting_bug
         if sqlite3_version_includes_quoting_bug?
           skip <<-ERROR.squish
-          You are using an outdated version of SQLite3 which has a bug in
-          quoted column names. Please update SQLite3 and rebuild the sqlite3
-          ruby gem
-        ERROR
+            You are using an outdated version of SQLite3 which has a bug in
+            quoted column names. Please update SQLite3 and rebuild the sqlite3
+            ruby gem
+          ERROR
         end
       end
 

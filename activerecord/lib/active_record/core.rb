@@ -174,7 +174,7 @@ module ActiveRecord
                         columns_hash.include?(inheritance_column) ||
                         ids.first.kind_of?(Array)
 
-        id  = ids.first
+        id = ids.first
         if ActiveRecord::Base === id
           id = id.id
           ActiveSupport::Deprecation.warn(<<-MSG.squish)
@@ -194,7 +194,7 @@ module ActiveRecord
                                    name, primary_key, id)
         end
         record
-      rescue RangeError
+      rescue ::RangeError
         raise RecordNotFound.new("Couldn't find #{name} with an out of range value for '#{primary_key}'",
                                  name, primary_key)
       end
@@ -223,13 +223,13 @@ module ActiveRecord
           statement.execute(hash.values, self, connection).first
         rescue TypeError
           raise ActiveRecord::StatementInvalid
-        rescue RangeError
+        rescue ::RangeError
           nil
         end
       end
 
       def find_by!(*args) # :nodoc:
-        find_by(*args) or raise RecordNotFound.new("Couldn't find #{name}", name)
+        find_by(*args) || raise(RecordNotFound.new("Couldn't find #{name}", name))
       end
 
       def initialize_generated_modules # :nodoc:
@@ -330,8 +330,8 @@ module ActiveRecord
     #   # Instantiates a single new object
     #   User.new(first_name: 'Jamie')
     def initialize(attributes = nil)
-      @attributes = self.class._default_attributes.deep_dup
       self.class.define_attribute_methods
+      @attributes = self.class._default_attributes.deep_dup
 
       init_internals
       initialize_internals_callback
@@ -365,6 +365,8 @@ module ActiveRecord
       @new_record = coder["new_record"]
 
       self.class.define_attribute_methods
+
+      yield self if block_given?
 
       _run_find_callbacks
       _run_initialize_callbacks
@@ -450,7 +452,7 @@ module ActiveRecord
     #   [ Person.find(1), Person.find(2), Person.find(3) ] & [ Person.find(1), Person.find(4) ] # => [ Person.find(1) ]
     def hash
       if id
-        [self.class, id].hash
+        self.class.hash ^ self.id.hash
       else
         super
       end
@@ -498,7 +500,7 @@ module ActiveRecord
       # We check defined?(@attributes) not to issue warnings if the object is
       # allocated but not initialized.
       inspection = if defined?(@attributes) && @attributes
-        self.class.column_names.collect do |name|
+        self.class.attribute_names.collect do |name|
           if has_attribute?(name)
             "#{name}: #{attribute_for_inspect(name)}"
           end
@@ -536,20 +538,20 @@ module ActiveRecord
 
     # Returns a hash of the given methods with their names as keys and returned values as values.
     def slice(*methods)
-      Hash[methods.map! { |method| [method, public_send(method)] }].with_indifferent_access
+      Hash[methods.flatten.map! { |method| [method, public_send(method)] }].with_indifferent_access
     end
 
     private
 
-    # Under Ruby 1.9, Array#flatten will call #to_ary (recursively) on each of the elements
-    # of the array, and then rescues from the possible NoMethodError. If those elements are
-    # ActiveRecord::Base's, then this triggers the various method_missing's that we have,
-    # which significantly impacts upon performance.
-    #
-    # So we can avoid the method_missing hit by explicitly defining #to_ary as nil here.
-    #
-    # See also http://tenderlovemaking.com/2011/06/28/til-its-ok-to-return-nil-from-to_ary.html
-      def to_ary # :nodoc:
+      # +Array#flatten+ will call +#to_ary+ (recursively) on each of the elements of
+      # the array, and then rescues from the possible +NoMethodError+. If those elements are
+      # +ActiveRecord::Base+'s, then this triggers the various +method_missing+'s that we have,
+      # which significantly impacts upon performance.
+      #
+      # So we can avoid the +method_missing+ hit by explicitly defining +#to_ary+ as +nil+ here.
+      #
+      # See also http://tenderlovemaking.com/2011/06/28/til-its-ok-to-return-nil-from-to_ary.html
+      def to_ary
         nil
       end
 

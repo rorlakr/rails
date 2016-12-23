@@ -190,7 +190,7 @@ module ActiveRecord
       end
 
       def test_type_cast_should_not_mutate_encoding
-        name  = "hello".force_encoding(Encoding::ASCII_8BIT)
+        name = "hello".force_encoding(Encoding::ASCII_8BIT)
         Owner.create(name: name)
         assert_equal Encoding::ASCII_8BIT, name.encoding
       ensure
@@ -431,9 +431,9 @@ module ActiveRecord
 
         def with_example_table(definition = nil, table_name = "ex", &block)
           definition ||= <<-SQL
-          id integer PRIMARY KEY AUTOINCREMENT,
-          number integer
-        SQL
+            id integer PRIMARY KEY AUTOINCREMENT,
+            number integer
+          SQL
           super(@conn, table_name, definition, &block)
         end
     end

@@ -86,7 +86,7 @@ module ActiveRecord
             SELECT c.relname
             FROM pg_class c
             LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.relkind IN ('r', 'v','m') -- (r)elation/table, (v)iew, (m)aterialized view
+            WHERE c.relkind IN ('r','v','m') -- (r)elation/table, (v)iew, (m)aterialized view
             AND n.nspname = ANY (current_schemas(false))
           SQL
         end
@@ -108,13 +108,13 @@ module ActiveRecord
           name = Utils.extract_schema_qualified_name(name.to_s)
           return false unless name.identifier
 
-          select_value(<<-SQL, "SCHEMA").to_i > 0
-              SELECT COUNT(*)
+          select_values(<<-SQL, "SCHEMA").any?
+              SELECT c.relname
               FROM pg_class c
               LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
               WHERE c.relkind IN ('r','v','m') -- (r)elation/table, (v)iew, (m)aterialized view
-              AND c.relname = '#{name.identifier}'
-              AND n.nspname = #{name.schema ? "'#{name.schema}'" : 'ANY (current_schemas(false))'}
+              AND c.relname = #{quote(name.identifier)}
+              AND n.nspname = #{name.schema ? quote(name.schema) : "ANY (current_schemas(false))"}
           SQL
         end
 
@@ -137,8 +137,8 @@ module ActiveRecord
             FROM pg_class c
             LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind IN ('v','m') -- (v)iew, (m)aterialized view
-            AND c.relname = '#{name.identifier}'
-            AND n.nspname = #{name.schema ? "'#{name.schema}'" : 'ANY (current_schemas(false))'}
+            AND c.relname = #{quote(name.identifier)}
+            AND n.nspname = #{name.schema ? quote(name.schema) : "ANY (current_schemas(false))"}
           SQL
         end
 
@@ -221,25 +221,29 @@ module ActiveRecord
           end.compact
         end
 
-        # Returns the list of all column definitions for a table.
-        def columns(table_name) # :nodoc:
-          table_name = table_name.to_s
-          column_definitions(table_name).map do |column_name, type, default, notnull, oid, fmod, collation, comment|
-            oid = oid.to_i
-            fmod = fmod.to_i
-            type_metadata = fetch_type_metadata(column_name, type, oid, fmod)
-            default_value = extract_value_from_default(default)
-            default_function = extract_default_function(default_value, default)
-            new_column(column_name, default_value, type_metadata, !notnull, table_name, default_function, collation, comment: comment.presence)
-          end
-        end
-
-        def new_column(*args) # :nodoc:
-          PostgreSQLColumn.new(*args)
+        def new_column_from_field(table_name, field) # :nondoc:
+          column_name, type, default, notnull, oid, fmod, collation, comment = field
+          oid = oid.to_i
+          fmod = fmod.to_i
+          type_metadata = fetch_type_metadata(column_name, type, oid, fmod)
+          default_value = extract_value_from_default(default)
+          default_function = extract_default_function(default_value, default)
+          PostgreSQLColumn.new(
+            column_name,
+            default_value,
+            type_metadata,
+            !notnull,
+            table_name,
+            default_function,
+            collation,
+            comment: comment.presence
+          )
         end
 
         def table_options(table_name) # :nodoc:
-          { comment: table_comment(table_name) }
+          if comment = table_comment(table_name)
+            { comment: comment }
+          end
         end
 
         # Returns a comment stored in database for given table
@@ -360,7 +364,7 @@ module ActiveRecord
 
         # Resets the sequence of a table's primary key to the maximum value.
         def reset_pk_sequence!(table, pk = nil, sequence = nil) #:nodoc:
-          unless pk and sequence
+          unless pk && sequence
             default_pk, default_sequence = pk_and_sequence_for(table)
 
             pk ||= default_pk
@@ -403,7 +407,7 @@ module ActiveRecord
               AND dep.refobjid      = '#{quote_table_name(table)}'::regclass
           end_sql
 
-          if result.nil? or result.empty?
+          if result.nil? || result.empty?
             result = query(<<-end_sql, "SCHEMA")[0]
               SELECT attr.attname, nsp.nspname,
                 CASE
@@ -439,7 +443,7 @@ module ActiveRecord
             WITH pk_constraint AS (
               SELECT conrelid, unnest(conkey) AS connum FROM pg_constraint
               WHERE contype = 'p'
-                AND conrelid = '#{quote_table_name(table_name)}'::regclass
+                AND conrelid = #{quote(quote_table_name(table_name))}::regclass
             ), cons AS (
               SELECT conrelid, connum, row_number() OVER() AS rownum FROM pk_constraint
             )
@@ -625,31 +629,32 @@ module ActiveRecord
 
         # Maps logical Rails types to PostgreSQL-specific data types.
         def type_to_sql(type, limit = nil, precision = nil, scale = nil, array = nil)
-          sql = case type.to_s
-                when "binary"
-            # PostgreSQL doesn't support limits on binary (bytea) columns.
-            # The hard limit is 1GB, because of a 32-bit size field, and TOAST.
-                  case limit
-                  when nil, 0..0x3fffffff; super(type)
-                  else raise(ActiveRecordError, "No binary type has byte size #{limit}.")
-                  end
-                when "text"
-            # PostgreSQL doesn't support limits on text columns.
-            # The hard limit is 1GB, according to section 8.3 in the manual.
-                  case limit
-                  when nil, 0..0x3fffffff; super(type)
-                  else raise(ActiveRecordError, "The limit on text can be at most 1GB - 1byte.")
-                  end
-                when "integer"
-                  case limit
-                  when 1, 2; "smallint"
-                  when nil, 3, 4; "integer"
-                  when 5..8; "bigint"
-                  else raise(ActiveRecordError, "No integer type has byte size #{limit}. Use a numeric with scale 0 instead.")
-                  end
-          else
-                  super(type, limit, precision, scale)
-          end
+          sql = \
+            case type.to_s
+            when "binary"
+              # PostgreSQL doesn't support limits on binary (bytea) columns.
+              # The hard limit is 1GB, because of a 32-bit size field, and TOAST.
+              case limit
+              when nil, 0..0x3fffffff; super(type)
+              else raise(ActiveRecordError, "No binary type has byte size #{limit}.")
+              end
+            when "text"
+              # PostgreSQL doesn't support limits on text columns.
+              # The hard limit is 1GB, according to section 8.3 in the manual.
+              case limit
+              when nil, 0..0x3fffffff; super(type)
+              else raise(ActiveRecordError, "The limit on text can be at most 1GB - 1byte.")
+              end
+            when "integer"
+              case limit
+              when 1, 2; "smallint"
+              when nil, 3, 4; "integer"
+              when 5..8; "bigint"
+              else raise(ActiveRecordError, "No integer type has byte size #{limit}. Use a numeric with scale 0 instead.")
+              end
+            else
+              super(type, limit, precision, scale)
+            end
 
           sql << "[]" if array && type != :primary_key
           sql

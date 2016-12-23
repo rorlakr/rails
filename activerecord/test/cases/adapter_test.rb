@@ -33,17 +33,19 @@ module ActiveRecord
     def test_tables
       tables = nil
       ActiveSupport::Deprecation.silence { tables = @connection.tables }
-      assert tables.include?("accounts")
-      assert tables.include?("authors")
-      assert tables.include?("tasks")
-      assert tables.include?("topics")
+      assert_includes tables, "accounts"
+      assert_includes tables, "authors"
+      assert_includes tables, "tasks"
+      assert_includes tables, "topics"
     end
 
     def test_table_exists?
       ActiveSupport::Deprecation.silence do
         assert @connection.table_exists?("accounts")
-        assert !@connection.table_exists?("nonexistingtable")
-        assert !@connection.table_exists?(nil)
+        assert @connection.table_exists?(:accounts)
+        assert_not @connection.table_exists?("nonexistingtable")
+        assert_not @connection.table_exists?("'")
+        assert_not @connection.table_exists?(nil)
       end
     end
 
@@ -53,36 +55,32 @@ module ActiveRecord
 
     def test_data_sources
       data_sources = @connection.data_sources
-      assert data_sources.include?("accounts")
-      assert data_sources.include?("authors")
-      assert data_sources.include?("tasks")
-      assert data_sources.include?("topics")
+      assert_includes data_sources, "accounts"
+      assert_includes data_sources, "authors"
+      assert_includes data_sources, "tasks"
+      assert_includes data_sources, "topics"
     end
 
     def test_data_source_exists?
       assert @connection.data_source_exists?("accounts")
       assert @connection.data_source_exists?(:accounts)
       assert_not @connection.data_source_exists?("nonexistingtable")
+      assert_not @connection.data_source_exists?("'")
       assert_not @connection.data_source_exists?(nil)
     end
 
     def test_indexes
       idx_name = "accounts_idx"
 
-      if @connection.respond_to?(:indexes)
-        indexes = @connection.indexes("accounts")
-        assert indexes.empty?
+      indexes = @connection.indexes("accounts")
+      assert indexes.empty?
 
-        @connection.add_index :accounts, :firm_id, name: idx_name
-        indexes = @connection.indexes("accounts")
-        assert_equal "accounts", indexes.first.table
-        assert_equal idx_name, indexes.first.name
-        assert !indexes.first.unique
-        assert_equal ["firm_id"], indexes.first.columns
-      else
-        warn "#{@connection.class} does not respond to #indexes"
-      end
-
+      @connection.add_index :accounts, :firm_id, name: idx_name
+      indexes = @connection.indexes("accounts")
+      assert_equal "accounts", indexes.first.table
+      assert_equal idx_name, indexes.first.name
+      assert !indexes.first.unique
+      assert_equal ["firm_id"], indexes.first.columns
     ensure
       @connection.remove_index(:accounts, name: idx_name) rescue nil
     end
@@ -184,6 +182,14 @@ module ActiveRecord
       assert_not_nil error.cause
     end
 
+    def test_not_null_violations_are_translated_to_specific_exception
+      error = assert_raises(ActiveRecord::NotNullViolation) do
+        Post.create
+      end
+
+      assert_not_nil error.cause
+    end
+
     unless current_adapter?(:SQLite3Adapter)
       def test_foreign_key_violations_are_translated_to_specific_exception
         error = assert_raises(ActiveRecord::InvalidForeignKey) do
@@ -216,6 +222,14 @@ module ActiveRecord
       def test_value_limit_violations_are_translated_to_specific_exception
         error = assert_raises(ActiveRecord::ValueTooLong) do
           Event.create(title: "abcdefgh")
+        end
+
+        assert_not_nil error.cause
+      end
+
+      def test_numeric_value_out_of_ranges_are_translated_to_specific_exception
+        error = assert_raises(ActiveRecord::RangeError) do
+          Book.connection.create("INSERT INTO books(author_id) VALUES (2147483648)")
         end
 
         assert_not_nil error.cause
@@ -271,13 +285,13 @@ module ActiveRecord
 
     unless current_adapter?(:PostgreSQLAdapter)
       def test_log_invalid_encoding
-        error = assert_raise ActiveRecord::StatementInvalid do
+        error = assert_raises RuntimeError do
           @connection.send :log, "SELECT 'ы' FROM DUAL" do
             raise "ы".force_encoding(Encoding::ASCII_8BIT)
           end
         end
 
-        assert_not_nil error.cause
+        assert_not_nil error.message
       end
     end
 

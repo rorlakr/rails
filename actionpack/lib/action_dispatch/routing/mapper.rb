@@ -1,7 +1,6 @@
 require "active_support/core_ext/hash/slice"
 require "active_support/core_ext/enumerable"
 require "active_support/core_ext/array/extract_options"
-require "active_support/core_ext/regexp"
 require "action_dispatch/routing/redirection"
 require "action_dispatch/routing/endpoint"
 
@@ -568,7 +567,7 @@ module ActionDispatch
         # [:format]
         #   Allows you to specify the default value for optional +format+
         #   segment or disable it by supplying +false+.
-        def match(path, options=nil)
+        def match(path, options = nil)
         end
 
         # Mount a Rack-based application to be used within the application.
@@ -1245,11 +1244,11 @@ module ActionDispatch
         # the plural):
         #
         #   GET       /profile/new
-        #   POST      /profile
         #   GET       /profile
         #   GET       /profile/edit
         #   PATCH/PUT /profile
         #   DELETE    /profile
+        #   POST      /profile
         #
         # === Options
         # Takes same options as +resources+.
@@ -1267,15 +1266,15 @@ module ActionDispatch
 
               concerns(options[:concerns]) if options[:concerns]
 
-              collection do
-                post :create
-              end if parent_resource.actions.include?(:create)
-
               new do
                 get :new
               end if parent_resource.actions.include?(:new)
 
               set_member_mappings_for_resource
+
+              collection do
+                post :create
+              end if parent_resource.actions.include?(:create)
             end
           end
 
@@ -1558,11 +1557,7 @@ module ActionDispatch
             options  = path
             path, to = options.find { |name, _value| name.is_a?(String) }
 
-            if path.nil?
-              ActiveSupport::Deprecation.warn "Omitting the route path is deprecated. "\
-                "Specify the path with a String or a Symbol instead."
-              path = ""
-            end
+            raise ArgumentError, "Route path not specified" if path.nil?
 
             case to
             when Symbol
@@ -1607,7 +1602,7 @@ module ActionDispatch
         def root(path, options = {})
           if path.is_a?(String)
             options[:to] = path
-          elsif path.is_a?(Hash) and options.empty?
+          elsif path.is_a?(Hash) && options.empty?
             options = path
           else
             raise ArgumentError, "must be called with a path and/or options"
@@ -1844,18 +1839,7 @@ module ActionDispatch
             path_types.fetch(String, []).each do |_path|
               route_options = options.dup
               if _path && option_path
-                ActiveSupport::Deprecation.warn <<-eowarn
-Specifying strings for both :path and the route path is deprecated. Change things like this:
-
-  match #{_path.inspect}, :path => #{option_path.inspect}
-
-to this:
-
-  match #{option_path.inspect}, :as => #{_path.inspect}, :action => #{_path.inspect}
-                eowarn
-                route_options[:action] = _path
-                route_options[:as] = _path
-                _path = option_path
+                raise ArgumentError, "Ambigous route definition. Both :path and the route path where specified as strings."
               end
               to = get_to_from_path(_path, to, route_options[:action])
               decomposed_match(_path, controller, route_options, _path, to, via, formatted, anchor, options_constraints)
@@ -1927,7 +1911,7 @@ to this:
           end
 
           def match_root_route(options)
-            name = has_named_route?(:root) ? nil : :root
+            name = has_named_route?(name_for_action(:root, nil)) ? nil : :root
             args = ["/", { as: name, via: :get }.merge!(options)]
 
             match(*args)

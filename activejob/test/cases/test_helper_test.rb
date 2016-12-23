@@ -5,6 +5,7 @@ require "jobs/hello_job"
 require "jobs/logging_job"
 require "jobs/nested_job"
 require "jobs/rescue_job"
+require "jobs/inherited_job"
 require "models/person"
 
 class EnqueuedJobsTest < ActiveJob::TestCase
@@ -249,7 +250,7 @@ class EnqueuedJobsTest < ActiveJob::TestCase
       HelloJob.perform_later
     end
 
-    assert_equal 2, ActiveJob::Base.queue_adapter.enqueued_jobs.count
+    assert_equal 2, queue_adapter.enqueued_jobs.count
   end
 end
 
@@ -506,7 +507,7 @@ class PerformedJobsTest < ActiveJob::TestCase
       HelloJob.perform_later
     end
 
-    assert_equal 2, ActiveJob::Base.queue_adapter.performed_jobs.count
+    assert_equal 2, queue_adapter.performed_jobs.count
   end
 end
 
@@ -519,5 +520,11 @@ class OverrideQueueAdapterTest < ActiveJob::TestCase
 
   def test_assert_job_has_custom_queue_adapter_set
     assert_instance_of CustomQueueAdapter, HelloJob.queue_adapter
+  end
+end
+
+class InheritedJobTest < ActiveJob::TestCase
+  def test_queue_adapter_is_test_adapter
+    assert_instance_of ActiveJob::QueueAdapters::TestAdapter, InheritedJob.queue_adapter
   end
 end

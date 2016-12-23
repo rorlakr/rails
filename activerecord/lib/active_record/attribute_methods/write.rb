@@ -15,13 +15,13 @@ module ActiveRecord
             ActiveRecord::AttributeMethods::AttrNames.set_name_cache safe_name, name
 
             generated_attribute_methods.module_eval <<-STR, __FILE__, __LINE__ + 1
-            def __temp__#{safe_name}=(value)
-              name = ::ActiveRecord::AttributeMethods::AttrNames::ATTR_#{safe_name}
-              write_attribute(name, value)
-            end
-            alias_method #{(name + '=').inspect}, :__temp__#{safe_name}=
-            undef_method :__temp__#{safe_name}=
-          STR
+              def __temp__#{safe_name}=(value)
+                name = ::ActiveRecord::AttributeMethods::AttrNames::ATTR_#{safe_name}
+                write_attribute(name, value)
+              end
+              alias_method #{(name + '=').inspect}, :__temp__#{safe_name}=
+              undef_method :__temp__#{safe_name}=
+            STR
           end
       end
 
@@ -29,7 +29,13 @@ module ActiveRecord
       # specified +value+. Empty strings for Integer and Float columns are
       # turned into +nil+.
       def write_attribute(attr_name, value)
-        write_attribute_with_type_cast(attr_name, value, true)
+        name = if self.class.attribute_alias?(attr_name)
+          self.class.attribute_alias(attr_name).to_s
+        else
+          attr_name.to_s
+        end
+
+        write_attribute_with_type_cast(name, value, true)
       end
 
       def raw_write_attribute(attr_name, value) # :nodoc:
@@ -37,7 +43,7 @@ module ActiveRecord
       end
 
       private
-      # Handle *= for method_missing.
+        # Handle *= for method_missing.
         def attribute=(attribute_name, value)
           write_attribute(attribute_name, value)
         end

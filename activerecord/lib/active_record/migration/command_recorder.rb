@@ -92,7 +92,7 @@ module ActiveRecord
         send(method, args, &block)
       end
 
-      def respond_to?(*args) # :nodoc:
+      def respond_to_missing?(*args) # :nodoc:
         super || delegate.respond_to?(*args)
       end
 
@@ -125,10 +125,10 @@ module ActiveRecord
             }.each do |cmd, inv|
               [[inv, cmd], [cmd, inv]].uniq.each do |method, inverse|
                 class_eval <<-EOV, __FILE__, __LINE__ + 1
-              def invert_#{method}(args, &block)    # def invert_create_table(args, &block)
-                [:#{inverse}, args, block]          #   [:drop_table, args, block]
-              end                                   # end
-            EOV
+                  def invert_#{method}(args, &block)    # def invert_create_table(args, &block)
+                    [:#{inverse}, args, block]          #   [:drop_table, args, block]
+                  end                                   # end
+                EOV
               end
             end
         end
@@ -225,7 +225,7 @@ module ActiveRecord
           [:add_foreign_key, reversed_args]
         end
 
-      # Forwards any missing method call to the \target.
+        # Forwards any missing method call to the \target.
         def method_missing(method, *args, &block)
           if @delegate.respond_to?(method)
             @delegate.send(method, *args, &block)

@@ -227,7 +227,7 @@ class FlashTest < ActionController::TestCase
       add_flash_types :foo
     end
     subclass_controller_with_no_flash_type = Class.new(test_controller_with_flash_type_foo)
-    assert subclass_controller_with_no_flash_type._flash_types.include?(:foo)
+    assert_includes subclass_controller_with_no_flash_type._flash_types, :foo
   end
 
   def test_does_not_add_flash_type_to_parent_class
@@ -262,6 +262,13 @@ class FlashIntegrationTest < ActionDispatch::IntegrationTest
     def set_bar
       flash[:bar] = "for great justice"
       head :ok
+    end
+
+    def set_flash_optionally
+      flash.now.notice = params[:flash]
+      if stale? etag: "abe"
+        render inline: "maybe flash"
+      end
     end
   end
 
@@ -307,6 +314,28 @@ class FlashIntegrationTest < ActionDispatch::IntegrationTest
       get "/set_bar"
       assert_response :success
       assert_equal "for great justice", @controller.bar
+    end
+  end
+
+  def test_flash_factored_into_etag
+    with_test_route_set do
+      get "/set_flash_optionally"
+      no_flash_etag = response.etag
+
+      get "/set_flash_optionally", params: { flash: "hello!" }
+      hello_flash_etag = response.etag
+
+      assert_not_equal no_flash_etag, hello_flash_etag
+
+      get "/set_flash_optionally", params: { flash: "hello!" }
+      another_hello_flash_etag = response.etag
+
+      assert_equal another_hello_flash_etag, hello_flash_etag
+
+      get "/set_flash_optionally", params: { flash: "goodbye!" }
+      goodbye_flash_etag = response.etag
+
+      assert_not_equal another_hello_flash_etag, goodbye_flash_etag
     end
   end
 

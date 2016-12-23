@@ -151,8 +151,8 @@ module ActionView
     # This method is instrumented as "!render_template.action_view". Notice that
     # we use a bang in this instrumentation because you don't want to
     # consume this in production. This is only slow if it's being listened to.
-    def render(view, locals, buffer=nil, &block)
-      instrument("!render_template".freeze) do
+    def render(view, locals, buffer = nil, &block)
+      instrument_render_template do
         compile!(view)
         view.send(method_name, locals, buffer, &block)
       end
@@ -324,8 +324,13 @@ module ActionView
       end
 
       def locals_code #:nodoc:
+        # Only locals with valid variable names get set directly. Others will
+        # still be available in local_assigns.
+        locals = @locals - Module::RUBY_RESERVED_KEYWORDS
+        locals = locals.grep(/\A(?![A-Z0-9])(?:[[:alnum:]_]|[^\0-\177])+\z/)
+
         # Double assign to suppress the dreaded 'assigned but unused variable' warning
-        @locals.each_with_object("") { |key, code| code << "#{key} = #{key} = local_assigns[:#{key}];" }
+        locals.each_with_object("") { |key, code| code << "#{key} = #{key} = local_assigns[:#{key}];" }
       end
 
       def method_name #:nodoc:
@@ -341,13 +346,17 @@ module ActionView
       end
 
       def instrument(action, &block)
-        payload = { virtual_path: @virtual_path, identifier: @identifier }
-        case action
-        when "!render_template".freeze
-          ActiveSupport::Notifications.instrument("!render_template.action_view".freeze, payload, &block)
-        else
-          ActiveSupport::Notifications.instrument("#{action}.action_view".freeze, payload, &block)
-        end
+        ActiveSupport::Notifications.instrument("#{action}.action_view".freeze, instrument_payload, &block)
+      end
+
+    private
+
+      def instrument_render_template(&block)
+        ActiveSupport::Notifications.instrument("!render_template.action_view".freeze, instrument_payload, &block)
+      end
+
+      def instrument_payload
+        { virtual_path: @virtual_path, identifier: @identifier }
       end
   end
 end

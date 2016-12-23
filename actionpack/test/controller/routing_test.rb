@@ -91,7 +91,7 @@ class LegacyRouteSetTests < ActiveSupport::TestCase
     end
 
     hash = ActiveSupport::JSON.decode get(URI("http://example.org/journey/faithfully-omg"))
-    assert_equal({ "artist"=>"journey", "song"=>"faithfully" }, hash)
+    assert_equal({ "artist" => "journey", "song" => "faithfully" }, hash)
   end
 
   def test_id_with_dash
@@ -103,7 +103,7 @@ class LegacyRouteSetTests < ActiveSupport::TestCase
     end
 
     hash = ActiveSupport::JSON.decode get(URI("http://example.org/journey/faithfully-omg"))
-    assert_equal({ "id"=>"faithfully-omg" }, hash)
+    assert_equal({ "id" => "faithfully-omg" }, hash)
   end
 
   def test_dash_with_custom_regexp
@@ -115,7 +115,7 @@ class LegacyRouteSetTests < ActiveSupport::TestCase
     end
 
     hash = ActiveSupport::JSON.decode get(URI("http://example.org/journey/123-omg"))
-    assert_equal({ "artist"=>"journey", "song"=>"123" }, hash)
+    assert_equal({ "artist" => "journey", "song" => "123" }, hash)
     assert_equal "Not Found", get(URI("http://example.org/journey/faithfully-omg"))
   end
 
@@ -128,7 +128,7 @@ class LegacyRouteSetTests < ActiveSupport::TestCase
     end
 
     hash = ActiveSupport::JSON.decode get(URI("http://example.org/journey/omg-faithfully"))
-    assert_equal({ "artist"=>"journey", "song"=>"faithfully" }, hash)
+    assert_equal({ "artist" => "journey", "song" => "faithfully" }, hash)
   end
 
   def test_pre_dash_with_custom_regexp
@@ -140,7 +140,7 @@ class LegacyRouteSetTests < ActiveSupport::TestCase
     end
 
     hash = ActiveSupport::JSON.decode get(URI("http://example.org/journey/omg-123"))
-    assert_equal({ "artist"=>"journey", "song"=>"123" }, hash)
+    assert_equal({ "artist" => "journey", "song" => "123" }, hash)
     assert_equal "Not Found", get(URI("http://example.org/journey/omg-faithfully"))
   end
 
@@ -211,7 +211,7 @@ class LegacyRouteSetTests < ActiveSupport::TestCase
   def test_class_and_lambda_constraints
     subdomain = Class.new {
       def matches?(request)
-        request.subdomain.present? and request.subdomain != "clients"
+        request.subdomain.present? && request.subdomain != "clients"
       end
     }
 
@@ -229,7 +229,7 @@ class LegacyRouteSetTests < ActiveSupport::TestCase
   def test_lambda_constraints
     rs.draw do
       get "/", constraints: lambda { |req|
-        req.subdomain.present? and req.subdomain != "clients" },
+        req.subdomain.present? && req.subdomain != "clients" },
                  to: lambda { |env| [200, {}, %w{default}] }
 
       get "/", constraints: lambda { |req|
@@ -1931,7 +1931,7 @@ class RackMountIntegrationTests < ActiveSupport::TestCase
     get "clients" => "projects#index"
 
     get "ignorecase/geocode/:postalcode" => "geocode#show", :postalcode => /hx\d\d-\d[a-z]{2}/i
-    get "extended/geocode/:postalcode" => "geocode#show",:constraints => {
+    get "extended/geocode/:postalcode" => "geocode#show", :constraints => {
                   postalcode: /# Postcode format
                                   \d{5} #Prefix
                                   (-\d{4})? #Suffix

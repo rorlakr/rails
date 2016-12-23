@@ -133,7 +133,7 @@ module ActiveSupport
       period.zone_identifier.to_s
     end
 
-    # Returns a string of the object's date, time, zone and offset from UTC.
+    # Returns a string of the object's date, time, zone, and offset from UTC.
     #
     #   Time.zone.now.inspect # => "Thu, 04 Dec 2014 11:00:25 EST -05:00"
     def inspect
@@ -279,6 +279,7 @@ module ActiveSupport
       end
     end
     alias_method :since, :+
+    alias_method :in, :+
 
     # Returns a new TimeWithZone object that represents the difference between
     # the current object's time and the +other+ time.
@@ -406,7 +407,7 @@ module ActiveSupport
     #   Time.zone.now.to_datetime                         # => Tue, 18 Aug 2015 02:32:20 +0000
     #   Time.current.in_time_zone('Hawaii').to_datetime   # => Mon, 17 Aug 2015 16:32:20 -1000
     def to_datetime
-      utc.to_datetime.new_offset(Rational(utc_offset, 86_400))
+      @to_datetime ||= utc.to_datetime.new_offset(Rational(utc_offset, 86_400))
     end
 
     # So that +self+ <tt>acts_like?(:time)</tt>.
@@ -476,6 +477,8 @@ module ActiveSupport
       end
 
       def transfer_time_values_to_utc_constructor(time)
+        # avoid creating another Time object if possible
+        return time if time.instance_of?(::Time) && time.utc?
         ::Time.utc(time.year, time.month, time.day, time.hour, time.min, time.sec + time.subsec)
       end
 

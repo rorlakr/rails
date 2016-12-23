@@ -66,15 +66,6 @@ module ActiveSupport
     alias :assert_not_respond_to :refute_respond_to
     alias :assert_not_same :refute_same
 
-    # Assertion that the block should not raise an exception.
-    #
-    # Passes if evaluated code in the yielded block raises no exception.
-    #
-    #   assert_nothing_raised do
-    #     perform_service(param: 'no_exception')
-    #   end
-    def assert_nothing_raised
-      yield
-    end
+    ActiveSupport.run_load_hooks(:active_support_test_case, self)
   end
 end

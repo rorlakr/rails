@@ -294,7 +294,7 @@ class AttributeMethodsTest < ActiveRecord::TestCase
     topic = Topic.new(new_topic)
     assert_equal new_topic[:title], topic.title
 
-    topic.attributes= new_topic_values
+    topic.attributes = new_topic_values
     assert_equal new_topic_values[:title], topic.title
   end
 
@@ -319,6 +319,13 @@ class AttributeMethodsTest < ActiveRecord::TestCase
     assert_equal "Still another topic: part 4", topic.title
   end
 
+  test "write_attribute can write aliased attributes as well" do
+    topic = Topic.new(title: "Don't change the topic")
+    topic.write_attribute :heading, "New topic"
+
+    assert_equal "New topic", topic.title
+  end
+
   test "read_attribute" do
     topic = Topic.new
     topic.title = "Don't change the topic"
@@ -327,6 +334,16 @@ class AttributeMethodsTest < ActiveRecord::TestCase
 
     assert_equal "Don't change the topic", topic.read_attribute(:title)
     assert_equal "Don't change the topic", topic[:title]
+  end
+
+  test "read_attribute can read aliased attributes as well" do
+    topic = Topic.new(title: "Don't change the topic")
+
+    assert_equal "Don't change the topic", topic.read_attribute("heading")
+    assert_equal "Don't change the topic", topic["heading"]
+
+    assert_equal "Don't change the topic", topic.read_attribute(:heading)
+    assert_equal "Don't change the topic", topic[:heading]
   end
 
   test "read_attribute raises ActiveModel::MissingAttributeError when the attribute does not exist" do
@@ -609,7 +626,7 @@ class AttributeMethodsTest < ActiveRecord::TestCase
     utc_time = Time.utc(2008, 1, 1)
     cst_time = utc_time.in_time_zone("Central Time (US & Canada)")
     in_time_zone "Pacific Time (US & Canada)" do
-      record   = @target.new
+      record = @target.new
       record.written_on = cst_time
       assert_equal utc_time, record.written_on
       assert_equal ActiveSupport::TimeZone["Pacific Time (US & Canada)"], record.written_on.time_zone
@@ -633,7 +650,7 @@ class AttributeMethodsTest < ActiveRecord::TestCase
     (-11..13).each do |timezone_offset|
       time_string = utc_time.in_time_zone(timezone_offset).to_s
       in_time_zone "Pacific Time (US & Canada)" do
-        record   = @target.new
+        record = @target.new
         record.written_on = time_string
         assert_equal Time.zone.parse(time_string), record.written_on
         assert_equal ActiveSupport::TimeZone["Pacific Time (US & Canada)"], record.written_on.time_zone
@@ -654,7 +671,7 @@ class AttributeMethodsTest < ActiveRecord::TestCase
 
   test "setting a time zone-aware attribute to a blank string returns nil" do
     in_time_zone "Pacific Time (US & Canada)" do
-      record   = @target.new
+      record = @target.new
       record.written_on = " "
       assert_nil record.written_on
       assert_nil record[:written_on]
@@ -665,7 +682,7 @@ class AttributeMethodsTest < ActiveRecord::TestCase
     time_string = "Tue Jan 01 00:00:00 2008"
     (-11..13).each do |timezone_offset|
       in_time_zone timezone_offset do
-        record   = @target.new
+        record = @target.new
         record.written_on = time_string
         assert_equal Time.zone.parse(time_string), record.written_on
         assert_equal ActiveSupport::TimeZone[timezone_offset], record.written_on.time_zone
@@ -677,7 +694,7 @@ class AttributeMethodsTest < ActiveRecord::TestCase
   test "setting a time zone-aware datetime in the current time zone" do
     utc_time = Time.utc(2008, 1, 1)
     in_time_zone "Pacific Time (US & Canada)" do
-      record   = @target.new
+      record = @target.new
       record.written_on = utc_time.in_time_zone
       assert_equal utc_time, record.written_on
       assert_equal ActiveSupport::TimeZone["Pacific Time (US & Canada)"], record.written_on.time_zone
@@ -755,7 +772,7 @@ class AttributeMethodsTest < ActiveRecord::TestCase
     topic = @target.new(title: "The pros and cons of programming naked.")
     assert !topic.respond_to?(:title)
     exception = assert_raise(NoMethodError) { topic.title }
-    assert exception.message.include?("private method")
+    assert_includes exception.message, "private method"
     assert_equal "I'm private", topic.send(:title)
   end
 
@@ -765,7 +782,7 @@ class AttributeMethodsTest < ActiveRecord::TestCase
     topic = @target.new
     assert !topic.respond_to?(:title=)
     exception = assert_raise(NoMethodError) { topic.title = "Pants" }
-    assert exception.message.include?("private method")
+    assert_includes exception.message, "private method"
     topic.send(:title=, "Very large pants")
   end
 
@@ -775,7 +792,7 @@ class AttributeMethodsTest < ActiveRecord::TestCase
     topic = @target.new(title: "Isaac Newton's pants")
     assert !topic.respond_to?(:title?)
     exception = assert_raise(NoMethodError) { topic.title? }
-    assert exception.message.include?("private method")
+    assert_includes exception.message, "private method"
     assert topic.send(:title?)
   end
 
@@ -1003,10 +1020,10 @@ class AttributeMethodsTest < ActiveRecord::TestCase
 
     def privatize(method_signature)
       @target.class_eval(<<-private_method, __FILE__, __LINE__ + 1)
-      private
-      def #{method_signature}
-        "I'm private"
-      end
-    private_method
+        private
+        def #{method_signature}
+          "I'm private"
+        end
+      private_method
     end
 end

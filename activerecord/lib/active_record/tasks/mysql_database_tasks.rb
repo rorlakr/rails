@@ -14,7 +14,7 @@ module ActiveRecord
         connection.create_database configuration["database"], creation_options
         establish_connection configuration
       rescue ActiveRecord::StatementInvalid => error
-        if /database exists/ === error.message
+        if error.message.include?("database exists")
           raise DatabaseAlreadyExists
         else
           raise
@@ -105,7 +105,7 @@ module ActiveRecord
 GRANT ALL PRIVILEGES ON #{configuration['database']}.*
   TO '#{configuration['username']}'@'localhost'
 IDENTIFIED BY '#{configuration['password']}' WITH GRANT OPTION;
-        SQL
+          SQL
         end
 
         def root_configuration_without_database

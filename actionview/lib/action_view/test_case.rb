@@ -18,7 +18,7 @@ module ActionView
       end
 
       def controller_path=(path)
-        self.class.controller_path=(path)
+        self.class.controller_path = (path)
       end
 
       def initialize
@@ -152,6 +152,7 @@ module ActionView
 
       included do
         setup :setup_with_controller
+        ActiveSupport.run_load_hooks(:action_view_test_case, self)
       end
 
     private
@@ -269,8 +270,8 @@ module ActionView
         end
 
         if routes &&
-           ( routes.named_routes.route_defined?(selector) ||
-             routes.mounted_helpers.method_defined?(selector) )
+           (routes.named_routes.route_defined?(selector) ||
+             routes.mounted_helpers.method_defined?(selector))
           @controller.__send__(selector, *args)
         else
           super

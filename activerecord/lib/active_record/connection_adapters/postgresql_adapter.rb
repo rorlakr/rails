@@ -70,7 +70,7 @@ module ActiveRecord
       ADAPTER_NAME = "PostgreSQL".freeze
 
       NATIVE_DATABASE_TYPES = {
-        primary_key: "serial primary key",
+        primary_key: "bigserial primary key",
         string:      { name: "character varying" },
         text:        { name: "text" },
         integer:     { name: "integer" },
@@ -315,6 +315,10 @@ module ActiveRecord
         postgresql_version >= 90300
       end
 
+      def supports_pgcrypto_uuid?
+        postgresql_version >= 90400
+      end
+
       def get_advisory_lock(lock_id) # :nodoc:
         unless lock_id.is_a?(Integer) && lock_id.bit_length <= 63
           raise(ArgumentError, "Postgres requires advisory lock ids to be a signed 64 bit integer")
@@ -404,6 +408,8 @@ module ActiveRecord
 
         # See http://www.postgresql.org/docs/current/static/errcodes-appendix.html
         VALUE_LIMIT_VIOLATION = "22001"
+        NUMERIC_VALUE_OUT_OF_RANGE = "22003"
+        NOT_NULL_VIOLATION    = "23502"
         FOREIGN_KEY_VIOLATION = "23503"
         UNIQUE_VIOLATION      = "23505"
         SERIALIZATION_FAILURE = "40001"
@@ -419,6 +425,10 @@ module ActiveRecord
             InvalidForeignKey.new(message)
           when VALUE_LIMIT_VIOLATION
             ValueTooLong.new(message)
+          when NUMERIC_VALUE_OUT_OF_RANGE
+            RangeError.new(message)
+          when NOT_NULL_VIOLATION
+            NotNullViolation.new(message)
           when SERIALIZATION_FAILURE
             SerializationFailure.new(message)
           when DEADLOCK_DETECTED
@@ -437,7 +447,7 @@ module ActiveRecord
 
           type_map.fetch(oid, fmod, sql_type) {
             warn "unknown OID #{oid}: failed to recognize type of '#{column_name}'. It will be treated as String."
-            Type::Value.new.tap do |cast_type|
+            Type.default_value.tap do |cast_type|
               type_map.register_type(oid, cast_type)
             end
           }
@@ -527,7 +537,7 @@ module ActiveRecord
           case default
             # Quoted types
           when /\A[\(B]?'(.*)'.*::"?([\w. ]+)"?(?:\[\])?\z/m
-              # The default 'now'::date is CURRENT_DATE
+            # The default 'now'::date is CURRENT_DATE
             if $1 == "now".freeze && $2 == "date".freeze
               nil
             else
@@ -542,9 +552,9 @@ module ActiveRecord
             # Object identifier types
           when /\A-?\d+\z/
             $1
-            else
-              # Anything else is blank, some user type, or some function
-              # and we can't know the value of that, so return nil.
+          else
+            # Anything else is blank, some user type, or some function
+            # and we can't know the value of that, so return nil.
             nil
           end
         end
@@ -601,7 +611,11 @@ module ActiveRecord
 
         def exec_no_cache(sql, name, binds)
           type_casted_binds = type_casted_binds(binds)
-          log(sql, name, binds, type_casted_binds) { @connection.async_exec(sql, type_casted_binds) }
+          log(sql, name, binds, type_casted_binds) do
+            ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
+              @connection.async_exec(sql, type_casted_binds)
+            end
+          end
         end
 
         def exec_cache(sql, name, binds)
@@ -609,7 +623,9 @@ module ActiveRecord
           type_casted_binds = type_casted_binds(binds)
 
           log(sql, name, binds, type_casted_binds, stmt_key) do
-            @connection.exec_prepared(stmt_key, type_casted_binds)
+            ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
+              @connection.exec_prepared(stmt_key, type_casted_binds)
+            end
           end
         rescue ActiveRecord::StatementInvalid => e
           raise unless is_cached_plan_failure?(e)
@@ -750,7 +766,7 @@ module ActiveRecord
                      col_description(a.attrelid, a.attnum) AS comment
                 FROM pg_attribute a LEFT JOIN pg_attrdef d
                   ON a.attrelid = d.adrelid AND a.attnum = d.adnum
-               WHERE a.attrelid = '#{quote_table_name(table_name)}'::regclass
+               WHERE a.attrelid = #{quote(quote_table_name(table_name))}::regclass
                  AND a.attnum > 0 AND NOT a.attisdropped
                ORDER BY a.attnum
           end_sql
@@ -771,10 +787,14 @@ module ActiveRecord
             sql = <<-end_sql
               SELECT exists(
                 SELECT * FROM pg_proc
-                INNER JOIN pg_cast
-                  ON casttarget::text::oidvector = proargtypes
                 WHERE proname = 'lower'
-                  AND castsource = '#{column.sql_type}'::regtype::oid
+                  AND proargtypes = ARRAY[#{quote column.sql_type}::regtype]::oidvector
+              ) OR exists(
+                SELECT * FROM pg_proc
+                INNER JOIN pg_cast
+                  ON ARRAY[casttarget]::oidvector = proargtypes
+                WHERE proname = 'lower'
+                  AND castsource = #{quote column.sql_type}::regtype
               )
             end_sql
             execute_and_clear(sql, "SCHEMA", []) do |result|
@@ -788,7 +808,6 @@ module ActiveRecord
           map[Integer] = PG::TextEncoder::Integer.new
           map[TrueClass] = PG::TextEncoder::Boolean.new
           map[FalseClass] = PG::TextEncoder::Boolean.new
-          map[Float] = PG::TextEncoder::Float.new
           @connection.type_map_for_queries = map
         end
 
@@ -838,8 +857,8 @@ module ActiveRecord
         ActiveRecord::Type.register(:json, OID::Json, adapter: :postgresql)
         ActiveRecord::Type.register(:jsonb, OID::Jsonb, adapter: :postgresql)
         ActiveRecord::Type.register(:money, OID::Money, adapter: :postgresql)
-        ActiveRecord::Type.register(:point, OID::Rails51Point, adapter: :postgresql)
-        ActiveRecord::Type.register(:legacy_point, OID::Point, adapter: :postgresql)
+        ActiveRecord::Type.register(:point, OID::Point, adapter: :postgresql)
+        ActiveRecord::Type.register(:legacy_point, OID::LegacyPoint, adapter: :postgresql)
         ActiveRecord::Type.register(:uuid, OID::Uuid, adapter: :postgresql)
         ActiveRecord::Type.register(:vector, OID::Vector, adapter: :postgresql)
         ActiveRecord::Type.register(:xml, OID::Xml, adapter: :postgresql)

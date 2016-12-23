@@ -39,7 +39,7 @@ module ActionDispatch # :nodoc:
         super(header)
       end
 
-      def []=(k,v)
+      def []=(k, v)
         if @response.sending? || @response.sent?
           raise ActionDispatch::IllegalStateError, "header already sent"
         end
@@ -224,8 +224,12 @@ module ActionDispatch # :nodoc:
 
     # Sets the HTTP content type.
     def content_type=(content_type)
-      header_info = parse_content_type
-      set_content_type content_type.to_s, header_info.charset || self.class.default_charset
+      return unless content_type
+      new_header_info = parse_content_type(content_type.to_s)
+      prev_header_info = parsed_content_type_header
+      charset = new_header_info.charset || prev_header_info.charset
+      charset ||= self.class.default_charset unless prev_header_info.mime_type
+      set_content_type new_header_info.mime_type, charset
     end
 
     # Sets the HTTP response's content MIME type. For example, in the controller
@@ -238,7 +242,7 @@ module ActionDispatch # :nodoc:
     # information.
 
     def content_type
-      parse_content_type.mime_type
+      parsed_content_type_header.mime_type
     end
 
     def sending_file=(v)
@@ -247,13 +251,13 @@ module ActionDispatch # :nodoc:
       end
     end
 
-    # Sets the HTTP character set. In case of nil parameter
+    # Sets the HTTP character set. In case of +nil+ parameter
     # it sets the charset to utf-8.
     #
     #   response.charset = 'utf-16' # => 'utf-16'
     #   response.charset = nil      # => 'utf-8'
     def charset=(charset)
-      header_info = parse_content_type
+      header_info = parsed_content_type_header
       if false == charset
         set_header CONTENT_TYPE, header_info.mime_type
       else
@@ -265,7 +269,7 @@ module ActionDispatch # :nodoc:
     # The charset of the response. HTML wants to know the encoding of the
     # content you're giving them, so we need to send that along.
     def charset
-      header_info = parse_content_type
+      header_info = parsed_content_type_header
       header_info.charset || self.class.default_charset
     end
 
@@ -403,15 +407,20 @@ module ActionDispatch # :nodoc:
     ContentTypeHeader = Struct.new :mime_type, :charset
     NullContentTypeHeader = ContentTypeHeader.new nil, nil
 
-    def parse_content_type
-      content_type = get_header CONTENT_TYPE
+    def parse_content_type(content_type)
       if content_type
         type, charset = content_type.split(/;\s*charset=/)
-        type = nil if type.empty?
+        type = nil if type && type.empty?
         ContentTypeHeader.new(type, charset)
       else
         NullContentTypeHeader
       end
+    end
+
+    # Small internal convenience method to get the parsed version of the current
+    # content type header.
+    def parsed_content_type_header
+      parse_content_type(get_header(CONTENT_TYPE))
     end
 
     def set_content_type(content_type, charset)
@@ -450,7 +459,7 @@ module ActionDispatch # :nodoc:
     def assign_default_content_type_and_charset!
       return if content_type
 
-      ct = parse_content_type
+      ct = parsed_content_type_header
       set_content_type(ct.mime_type || Mime[:html].to_s,
                        ct.charset || self.class.default_charset)
     end

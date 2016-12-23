@@ -20,14 +20,14 @@ module Rails
       strict_args_position!
 
       # Returns the source root for this generator using default_source_root as default.
-      def self.source_root(path=nil)
+      def self.source_root(path = nil)
         @_source_root = path if path
         @_source_root ||= default_source_root
       end
 
       # Tries to get the description from a USAGE file one folder above the source
       # root otherwise uses a default description.
-      def self.desc(description=nil)
+      def self.desc(description = nil)
         return super if description
 
         @desc ||= if usage_path
@@ -40,7 +40,7 @@ module Rails
       # Convenience method to get the namespace from the class name. It's the
       # same as Thor default except that the Generator at the end of the class
       # is removed.
-      def self.namespace(name=nil)
+      def self.namespace(name = nil)
         return super if name
         @namespace ||= super.sub(/_generator$/, "").sub(/:generators:/, ":")
       end
@@ -195,7 +195,7 @@ module Rails
       end
 
       # Make class option aware of Rails::Generators.options and Rails::Generators.aliases.
-      def self.class_option(name, options={}) #:nodoc:
+      def self.class_option(name, options = {}) #:nodoc:
         options[:desc]    = "Indicates when to generate #{name.to_s.humanize.downcase}" unless options.key?(:desc)
         options[:aliases] = default_aliases_for_option(name, options)
         options[:default] = default_value_for_option(name, options)
@@ -273,7 +273,7 @@ module Rails
 
         # Use Rails default banner.
         def self.banner
-          "rails generate #{namespace.sub(/^rails:/,'')} #{arguments.map(&:usage).join(' ')} [options]".gsub(/\s+/, " ")
+          "rails generate #{namespace.sub(/^rails:/, '')} #{arguments.map(&:usage).join(' ')} [options]".gsub(/\s+/, " ")
         end
 
         # Sets the base_name taking into account the current class namespace.
@@ -310,9 +310,9 @@ module Rails
 
         # Returns default for the option name given doing a lookup in config.
         def self.default_for_option(config, name, options, default)
-          if generator_name and c = config[generator_name.to_sym] and c.key?(name)
+          if generator_name && (c = config[generator_name.to_sym]) && c.key?(name)
             c[name]
-          elsif base_name and c = config[base_name.to_sym] and c.key?(name)
+          elsif base_name && (c = config[base_name.to_sym]) && c.key?(name)
             c[name]
           elsif config[:rails].key?(name)
             config[:rails][name]

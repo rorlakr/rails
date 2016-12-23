@@ -1,14 +1,15 @@
 module ActiveModel
   module Type
-    module Helpers
-      module Numeric # :nodoc:
+    module Helpers # :nodoc: all
+      module Numeric
         def cast(value)
-          value = case value
-                  when true then 1
-                  when false then 0
-                  when ::String then value.presence
-                  else value
-                  end
+          value = \
+            case value
+            when true then 1
+            when false then 0
+            when ::String then value.presence
+            else value
+            end
           super(value)
         end
 
