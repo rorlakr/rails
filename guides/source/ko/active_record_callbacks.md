@@ -420,7 +420,7 @@ end
 
 ```ruby
 class PictureFile < ActiveRecord::Base
-  after_commit :delete_picture_file_from_disk, on: :destroy
+  after_commit :delete_picture_file_from_disk, on: [:destroy]
 
   def delete_picture_file_from_disk
     if File.exist?(filepath)
@@ -435,7 +435,7 @@ NOTE: 여기서 `:on` 옵션은 콜백이 호출되는 조건을 지정합니다
 
 WARNING: `after_commit` 콜백과 `after_rollback` 콜백은 1개의 트랜잭션에서
 발생한 어떤 모델의 생성, 갱신, 삭제 뒤에 호출됩니다. 이 콜백들 중 어떤 것
-하나라도 예외를 발생시키면, 실행되지 않은 나머지 콜백들은 실행되지 않습니다.
-따라서 만약 직접 만든 콜백이 예외를 발생시킬 가능성이 있는 경우에는 자신의
-콜백 내에서 rescue를 해서 적절한 예외 처리를 해야할 필요가 있습니다.
+하나가 예외를 발생시키더라도 실행되지 않은 나머지 콜백에 영향을 주지
+않습니다. 따라서 만약 직접 만든 콜백이 예외를 발생시킬 가능성이 있는 경우
+자신의 콜백 내에서 rescue를 해서 적절한 예외 처리를 해야할 필요가 있습니다.
 

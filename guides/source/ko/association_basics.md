@@ -633,7 +633,8 @@ author.books.empty?          # books 캐시가 사용된다
 ```ruby
 author.books                  # 데이터베이스에서 books를 얻어온다
 author.books.size             # books 캐시가 사용된다
-author.books.reload.empty?    # books 캐시를 삭제하고 데이터베이스에서 다시 읽어온다
+author.books.reload.empty?    # books 캐시를 삭제하고
+                              # 데이터베이스에서 다시 읽어온다
 ```
 
 ### 중복된 이름 사용 피하기

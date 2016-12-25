@@ -397,6 +397,7 @@ Person.human_attribute_name('name') # => "Nome"
     ```ruby
     class Person
       include ActiveModel::Model
+
     end
     ```
 
@@ -446,7 +447,7 @@ Finished in 0.024899s, 240.9735 runs/s, 1204.8677 assertions/s.
 `has_secure_password`는 `password` 접근자에 다음과 같은 검증을 추가합니다.
 
 1. 비밀번호는 반드시 존재해야 합니다.
-2. 비밀번호는 반드시 확인용 비밀번호와 동일해야 합니다(+password_confirmation이 제공됩니다+).
+2. 비밀번호는 반드시 확인용 비밀번호와 동일해야 합니다.
 3. 길이는 72자 이하여야 합니다.
 
 #### 예제
@@ -471,10 +472,6 @@ person.valid? # => false
 # 비밀번호의 길이가 72자보다 길 때
 person.password = person.password_confirmation = 'a' * 100
 person.valid? # => false
-
-# 확인용 비밀번호가 없을 때
-person.password = 'aditya'
-person.valid? # => true
 
 # 모든 검증을 통과할 때
 person.password = person.password_confirmation = 'aditya'

@@ -492,13 +492,7 @@ app/models/article.rb:
 
 NOTE: 특정 어노테이션만을 출력할 때나, 독자적인 어노테이션을 출력하는 경우에는 FIXME나 BUG같은 각 어노테이션의 이름은 출력되지 않습니다.
 
-`rails notes` 태스크는 기본으로 `app`, `config`, `lib`, `bin`, `test` 폴더를 대상으로 합니다. 다른 폴더도 탐색하고 싶은 경우에는 `config.annotations.register_directories` 옵션을 사용하여 설정할 수 있습니다.
-
-```ruby
-config.annotations.register_directories("spec", "vendor")
-```
-
-또는 이 목록을 쉼표로 구분지어 환경변수 `SOURCE_ANNOTATION_DIRECTORIES`를 통해서 넘겨줄 수도 있습니다.
+`rails notes` 태스크는 기본으로 `app`, `config`, `lib`, `bin`, `test` 폴더를 대상으로 합니다. 이 목록을 쉼표로 구분지어 환경변수 `SOURCE_ANNOTATION_DIRECTORIES`를 통해서 넘겨줄 수도 있습니다.
 
 ```bash
 $ export SOURCE_ANNOTATION_DIRECTORIES='spec,vendor'

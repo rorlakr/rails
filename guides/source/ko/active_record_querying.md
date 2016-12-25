@@ -340,9 +340,9 @@ Client.where(first_name: 'does not exist').take!
 이런 처리를 그대로 구현한다고 하면 아래와 같이 될 겁니다.
 
 ```ruby
-# 이러한 처리를 수천 건의 레코드에 대해서 실행하게 되면, 효율이 매우 떨어집니다.
+# 테이블이 클 경우 너무 많은 메모리를 사용하게 됩니다.
 User.all.each do |user|
-  NewsLetter.weekly_deliver(user)
+  NewsLetter.weekly(user).deliver_now
 end
 ```
 
@@ -363,10 +363,11 @@ TIP: `find_each` 메소드와 `find_in_batches` 메소드는 한번에 메모리
 
 #### `find_each`
 
-`find_each` 메소드는 레코드 뭉치를 하나 꺼내서, _각_ 레코드를 하나씩 객체로 만들어 개별적으로
-블록의 yield를 호출합니다. 아래의 예제에서는 `find_each`에서 1000건의 레코드를 꺼냅니다.
-이 숫자는 `find_each`와 `find_in_batches`에서 기본적으로 사용되는 값이며, 이어서 각 모델에
-대해서 개별적으로 yield를 호출합니다.
+`find_each` 메소드는 레코드 뭉치를 하나 꺼내서, _각_ 레코드를 하나씩 객체로
+만들어 개별적으로 블록의 yield를 호출합니다. 아래의 예제에서는 `find_each`에서
+1000건의 레코드를 꺼냅니다. 이 숫자는 `find_each`와 `find_in_batches`에서
+기본적으로 사용되는 값이며, 이어서 각 모델에 대해서 개별적으로 yield를
+호출합니다.
 
 ```ruby
 User.find_each do |user|
@@ -418,11 +419,12 @@ end
 
 **`:finish`**
 
-`:start` 옵션과 비슷하게 `:finish`는 배치로 처리할 마지막 레코드의 ID를 지정합니다. 이는
-`:start`부터 `:finish` 사이에 있는 레코드에 대해서만 배치 처리를 하고 싶은 경우에 유용합니다.
+`:start` 옵션과 비슷하게 `:finish`는 배치로 처리할 마지막 레코드의 ID를
+지정합니다. 이는 `:start`부터 `:finish` 사이에 있는 레코드에 대해서만
+배치 처리를 하고 싶은 경우에 유용합니다.
 
-예를 들어 기본키가 2000부터 10000까지인 사용자들에게만 뉴스 레터를 보내고 싶은 경우, 다음과 같이
-작성합니다.
+예를 들어 기본키가 2000부터 10000까지인 사용자들에게만 뉴스 레터를 보내고 싶은
+경우, 다음과 같이 작성합니다.
 
 ```ruby
 User.find_each(start: 2000, finish: 10000) do |user|
@@ -430,13 +432,13 @@ User.find_each(start: 2000, finish: 10000) do |user|
 end
 ```
 
-이외에도 같은 처리를 여러 곳에서 분산해서 작업하는 경우를 생각할 수 있습니다. `start`와 `:finish`
-옵션을 적절하게 사용해서, 각 처리 장소에서 10000개의 레코드씩을 처리하도록 만들 수도 있을 겁니다.
+이외에도 같은 처리를 여러 곳에서 분산해서 작업하는 경우를 생각할 수 있습니다.
+`start`와 `:finish` 옵션을 적절하게 사용해서, 각 처리 장소에서 10000개의
+레코드씩 처리하도록 만들 수도 있을 겁니다.
 
 **`:error_on_ignore`**
 
 관계에 정렬 순서가 지정되어 있는 경우 에러를 던질지 여부를 결정하는 애플리케이션 설정을 덮어씁니다.
-
 
 #### `find_in_batches`
 
@@ -646,9 +648,6 @@ Client.order("orders_count ASC", "created_at DESC")
 Client.order("orders_count ASC").order("created_at DESC")
 # SELECT * FROM clients ORDER BY orders_count ASC, created_at DESC
 ```
-WARNING: 만약 **MySQL 5.7.5** 이상에서 `order` 메소드와 함께 `select`, `pluck`,
-`ids`와 같은 메소드를 사용하고, 정렬시에 사용하는 메소드가 선택 목록에 포함되어 있지 않다면
-`ActiveRecord::StatementInvalid` 에러가 발생할 수 있습니다. 다음 절에서 결과 셋으로부터 필드를 선택하는 방법을 확인하세요.
 
 특정 필드만을 가져오기
 -------------------------
@@ -1321,10 +1320,6 @@ Article.includes(:comments).where("comments.visible = true").references(:comment
 이 `includes` 쿼리의 경우 덧글의 존재 여부에 관계 없이 모든 글을 읽어들일 것입니다. 반면
 `joins` (INNER JOIN)을 사용하는 경우, 결합조건을 **반드시** 만족해야 하므로 덧글이 없는 글은
 반환되지 않습니다.
-
-NOTE: 만약 관계 정보가 조인의 일부로 eager load된다면, 불러오는 모델에서는 별도의 선택 절이
-나타나지 않을 것입니다. 왜냐하면 그들이 부모 레코드의 것인지, 자식 레코드의 것인지 모호하기
-때문입니다.
 
 스코프
 ------

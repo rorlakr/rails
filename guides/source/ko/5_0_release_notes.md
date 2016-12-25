@@ -31,6 +31,7 @@ Rails 5.0로 업그레이드하기
 --------------
 
 ### 액션 케이블
+[Pull Request](https://github.com/rails/rails/pull/22586)
 
 액션 케이블은 Rails 5에서 새롭게 도입된 프레임워크로 Rails 애플리케이션에서
 [웹 소켓](https://en.wikipedia.org/wiki/WebSocket)과 관련된 부분을 부드럽게 통합합니다.
@@ -366,7 +367,7 @@ Action Pack
 *   `ActionController::TestCase`는 Rails 5.1에서 gem으로 추출될 예정. 앞으로는 `ActionDispatch::IntegrationTest`를 사용.
     ([commit](https://github.com/rails/rails/commit/4414c5d1795e815b102571425974a8b1d46d932d))
 
-*   Rails에서 생성하는 ETag이 '강한' 방식에서 '약한' 방식으로 변경됨.
+*   Rails에서 기본으로 '약한' ETag를 생성함.
     ([Pull Request](https://github.com/rails/rails/pull/17573))
 
 *   컨트롤러 액션에서 `render`가 명시적으로 호출되지 않고, 대응하는 템플릿도 없는 경우, 에러 대신에 `head :no_content`를 암묵적으로 호출하게 됨.
@@ -394,6 +395,9 @@ Action Pack
     이에 대응하기 위해 `Warden`/`Devise`의 인증 에러를 다루는 특수한 코드를 포함하는 별도의 모듈을 사용하는 개발자들이 있었음.
     ([이에 대한 자세한 설명이 포함된 이슈](https://github.com/rails/rails/issues/25581))
 
+*   `Response#strong_etag=`와 `#weak_etag=`와 `fresh_when`과 `stale?`에 관련된
+    옵션이 추가됨.
+    ([Pull Request](https://github.com/rails/rails/pull/24387))
 
 Action View
 -------------
@@ -706,15 +710,6 @@ Active Record
 *   `touch` 메소드에 `:time` 옵션을 추가. 레코드에 현재 시각 이외의 시각을 지정할 수 있음.
     ([Pull Request](https://github.com/rails/rails/pull/18956))
 
-*   얕은 에러가 발생하지 않도록 트랜잭션 콜백을 변경.
-    이전에는 트랜잭션 콜백 내부에서 발생한 어떤 에러든 (새로 제거 예정이 된)
-    `raise_in_transactional_callbacks = true`를
-    사용하지 않더라도 처리했음.
-
-    더이상 이 에러들은 자동으로 처리되지 않으며, 다른 콜백들과 마찬가지로 해당하는 에러를 처리해줄
-    때까지 거슬러 올라게 됨.
-    ([commit](https://github.com/rails/rails/commit/07d3d402341e81ada0214f2cb2be1da69eadfe72))
-
 Active Model
 ------------
 
@@ -877,7 +872,8 @@ Active Support
     ([commit](https://github.com/rails/rails/commit/5f777e4b5ee2e3e8e6fd0e2a208ec2a4d25a960d))
 
 *   `#on_weekend?`, `#on_weekday?`, `#next_weekday`, `#prev_weekday` 메소드가 `Date`, `Time`, `DateTime`에 추가됨.
-    ([Pull Request](https://github.com/rails/rails/pull/18335))
+    ([Pull Request](https://github.com/rails/rails/pull/18335),
+     [Pull Request](https://github.com/rails/rails/pull/23687))
 
 *  `Date`, `Time`, `DateTime`의 `#next_week`와 `#prev_week`에 `same_time`을 추가.
     ([Pull Request](https://github.com/rails/rails/pull/18335))
@@ -918,9 +914,6 @@ Active Support
 
 *   `Array#second_to_last`와 `Array#third_to_last` 메소드가 추가.
     ([Pull Request](https://github.com/rails/rails/pull/23583))
-
-*   `Date`, `Time`, `DateTime`에 `#on_weekday?` 메소드가 추가.
-    ([Pull Request](https://github.com/rails/rails/pull/23687))
 
 *   `ActiveSupport::Executor` API와 `ActiveSupport::Reloader` API를 공개.
     애플리케이션 코드 실행이나 애플리케이션의 리로딩 프로세스에서 컴포넌트나 라이브러리로 관리하거나 추가할 수 있게 됨.

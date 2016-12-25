@@ -241,12 +241,6 @@ config.middleware.use Magical::Unicorns
 config.middleware.insert_before Rack::Head, Magical::Unicorns
 ```
 
-또는 인덱스를 지정하여 특정 위치에 미들웨어를 추가할 수도 있습니다. 예를 들어, `Magical::Unicorns`를 미들웨어 스택의 맨 위에 추가하고 싶다면, 다음과 같이 지정하세요.
-
-```ruby
-config.middleware.insert_before 0, Magical::Unicorns
-```
-
 `insert_after`를 사용하여 특정 미들웨어의 뒤에 추가할 수도 있습니다.
 
 ```ruby
@@ -276,28 +270,6 @@ config.middleware.delete Rack::MethodOverride
 * `config.i18n.enforce_available_locales`이 활성화 되어 있으면 `available_locales` 목록에서 선언되어 있지 않은 로케일을 i18n에 넘길 수 없습니다. 이용할 수 없는 로케일이 있는 경우에는 `i18n::InvalidLocale` 예외가 발생합니다. 기본값은 `true`입니다. 이 옵션은 사용자 입력 로케일이 잘못되었을 경우에 보안 대책이므로, 특별한 이유가 없다면 끄지 말아 주세요.
 
 * `config.i18n.load_path`는 로케일 파일의 검색 경로를 지정합니다. 기본값은 `config/locales/*.{yml,rb}`입니다.
-
-* `config.i18n.fallbacks`는 해당하는 번역이 존재하지 않을 때의 동작을 지정합니다. 3개의 예제를 살펴봅시다.
-
-  * `true`를 설정하면 기본 로케일을 사용합니다.
-
-    ```ruby
-    config.i18n.fallbacks = true
-    ```
-
-  * 아니면 사용할 로케일의 목록을 넘겨줄 수도 있습니다.
-
-    ```ruby
-    config.i18n.fallbacks = [:tr, :en]
-    ```
-
-  * 마지막으로 로케일에 따라 다른 목록을 사용할 수도 있습니다. 예를 들어, `:az`와 `:de`일 때에는 `:tr`을, `:da`일 경우에는 `:en`을 사용해봅시다.
-
-    ```ruby
-    config.i18n.fallbacks = { az: :tr, da: [:de, :en] }
-    # 또는
-    config.i18n.fallbacks.map = { az: :tr, da: [:de, :en] }
-    ```
 
 ### Active Record 설정하기
 
@@ -384,21 +356,6 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
 
 * `config.action_controller.always_permitted_parameters`는 파라미터 필터링시에 사용할 화이트 리스트을 지정합니다. 기본값은 `['controller', 'action']`입니다.
 
-* `config.action_controller.enable_fragment_cache_logging`는 조각 캐시 읽기과 쓰기에 대한 출력을 좀 더 자세하게 할 지를 결정합니다.
-
-    ```
-    Read fragment views/v1/2914079/v1/2914079/recordings/70182313-20160225015037000000/d0bdf2974e1ef6d31685c3b392ad0b74 (0.6ms)
-    Rendered messages/_message.html.erb in 1.2 ms [cache hit]
-    Write fragment views/v1/2914079/v1/2914079/recordings/70182313-20160225015037000000/3b4e249ac9d168c617e32e84b99218b5 (1.1ms)
-    Rendered recordings/threads/_thread.html.erb in 1.5 ms [cache miss]
-    ```
-
-  기본값은 `false`이며 다음과 같은 출력을 내보냅니다.
-
-    ```
-    Rendered messages/_message.html.erb in 1.2 ms [cache hit]
-    Rendered recordings/threads/_thread.html.erb in 1.5 ms [cache miss]
-    ```
 ### Action Dispatch 설정하기
 
 * `config.action_dispatch.session_store`는 세션 데이터 저장소의 이름을 지정합니다. 기본값은 `:cookie_store`입니다. 그 외에도 `:active_record_store`, `:mem_cache_store`, 또는 커스텀 클래스 이름을 사용할 수 있습니다.
@@ -416,10 +373,6 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
 * `config.action_dispatch.default_charset`는 모든 랜더링에서 사용할 기본 문자열 형식을 지정합니다. 기본값은 `nil`입니다.
 
 * `config.action_dispatch.tld_length`는 애플리케이션에서 사용하는 탑 레벨 도메인(TLD)의 길이를 지정합니다. 기본값은 `1`입니다.
-
-* `config.action_dispatch.ignore_accept_header`는 요청에 포함된 accept 헤더를 무시할지 여부를 지정합니다. 기본값은 `false`입니다.
-
-* `config.action_dispatch.x_sendfile_header`는 서버 전용 X-Sendfile 헤더를 지정합니다. 이는 서버로부터의 파일 전송을 빠르게 만들 때 유용합니다. 예를 들어 Apache를 위해서는 'X-Sendfile'을 지정할 수 있습니다.
 
 * `config.action_dispatch.http_auth_salt`는 HTTP Auth의 salt값(역주: 해시의 안전성을 강화하기 위해서 추가되는 임의의 값)을 설정합니다. 기본값은 `'http authentication'`입니다.
 
@@ -531,9 +484,6 @@ MySQL 어댑터를 사용하면 아래의 옵션이 하나 추가됩니다.
     * `:user_name` - 메일 서버에서 인증이 요구되는 경우, 여기서 사용자 이름을 설정합니다.
     * `:password` - 메일 서버에서 인증이 요구되는 경우, 여기서 비밀번호를 설정합니다.
     * `:authentication` - 메일 서버에서 인증이 요구되는 경우, 여기서 그 종류를 지정합니다. `:plain`, `:login`, `:cram_md5` 중 하나를 사용할 수 있습니다.
-    * `:enable_starttls_auto` - STARTTLS이 SMTP 서버에서 사용중인지를 탐지하고, 이를 사용합니다. 기본값은 `true`입니다.
-    * `:openssl_verify_mode` - TLS를 사용할 때 OpenSSL이 어떻게 인증서를 확인할지를 지정할 수 있습니다. 이는 자기 서명하거나 와일드카드 인증서를 검증해야할 때에 유용합니다. `:none`나 `:peer`와 같은 OpenSSL 검증 상수를 사용하거나 직접 `OpenSSL::SSL::VERIFY_NONE`나 `OpenSSL::SSL::VERIFY_PEER`를 사용할 수 있습니다.
-    * `:ssl/:tls` - SMPT 연결이 SMTP/TLS(SMTPS: TLS로 SMTP를 사용하기)를 사용하도록 활성화합니다.
 
 * `config.action_mailer.sendmail_settings`를 통해 `:sendmail` 방식에 대해서 세밀하게 설정을 할 수 있습니다. 해시를 인수로 받으며, 아래의 옵션을 포함할 수 있습니다.
     * `:location` - sendmail 실행 파일의 위치. 기본값은 `/usr/sbin/sendmail`입니다.

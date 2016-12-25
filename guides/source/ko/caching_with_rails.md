@@ -500,29 +500,6 @@ class ProductsController < ApplicationController
 end
 ```
 
-때때로 캐시된 응답이 필요할 때가 있습니다. 예를 들어 정적인 페이지는 유효기간이
-필요하지 않습니다. 이를 위해서 `http_cache_forever` 헬퍼를 사용하여 프록시가
-이를 무기한으로 캐싱하도록 만들 수 있습니다.
-
-캐싱된 응답은 기본으로 공개되지 않으며, 사용자의 웹 브라우저에서만 캐시가
-유지됩니다. 프록시가 응답을 캐싱하길 원한다면 `public: true`를 통해 모든
-사용자에게 캐시된 응답을 넘겨주세요.
-
-이 헬퍼를 사용하면 `last_modified` 헤더가 `Time.new(2011, 1, 1).utc`로,
-`expires` 헤더가 100년으로 설정됩니다.
-
-WARNING: 브라우저 캐시를 강제로 무효화하지 않는 이상 이 캐시는 사라지지 않기 때문에 이 메소드는 주의해서 사용해주세요.
-
-```ruby
-class HomeController < ApplicationController
-  def index
-    http_cache_forever(public: true) do
-      render
-    end
-  end
-end
-```
-
 ### 강한 ETag와 약한 ETag
 
 레일스에서는 기본으로 약한 ETag를 사용합니다. 약한 ETag에서는 응답의 본문이

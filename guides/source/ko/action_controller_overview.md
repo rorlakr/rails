@@ -171,8 +171,8 @@ NOTE: `params`에 `[nil]`, `[nil, nil, ...]` 같은 값이 있으면 모두 자�
 
 웹 애플리케이션을 개발하다 보면, 매개 변수를 JSON 형식으로 받는다면 편리할텐데, 라고 생각할 때가 종종
 있습니다. Rails에서는 요청의 "Content-Type"에 "application/json"가 지정되어 있으면,
-자동적으로 매개 변수를 `params` 해시로 변환해줍니다. 그 이후로는 일반적인 `params` 해시를 조작하듯
-사용할 수 있습니다.
+자동적으로 매개 변수를 `params` 해시로 변환해줍니다. 그 이후로는 일반적인
+`params` 해시를 조작하듯 사용할 수 있습니다.
 
 예를 들어 아래의 JSON 데이터를 전송한다고 가정합시다.
 
@@ -186,7 +186,7 @@ NOTE: `params`에 `[nil]`, `[nil, nil, ...]` 같은 값이 있으면 모두 자�
 마찬가지로 initializer에서 `config.wrap_parameters`를 활성화했거나, 컨트롤러에서
 `wrap_parameters`를 호출했을 경우, JSON 매개 변수의 루트 요소를 안전하게 제거할 수 있습니다.
 이 경우, 매개 변수는 복사되고, 컨트롤러의 이름에 맞는 키로 감싸지게 됩니다.
-따라서 위의 JSON 요청은 아래와 같이 처리됩니다.
+따라서 위의 JSON POST 요청은 아래와 같이 처리됩니다.
 
 ```json
 { "name": "acme", "address": "123 Carrot Street" }
@@ -252,12 +252,12 @@ Active Model에 통째로 넘길 수 없게 됩니다. 이것은 여러 속성�
 갱신을 허가하고, 또다른 속성의 갱신을 금지할 지 명시적으로 결정해야 한다는 의미입니다. 이는 사용자가
 보안 상의 이유로 변경해서는 안되는 속성을 실수로 변경할 수 없게끔 방지하기 위한 방책입니다.
 
-나아가 매개 변수의 속성에는 '필수(required)'를 지정할 수 있으며, 사전에 정의해둔 raise/rescue를
-실행하여 400 Bad Request를 돌려줄 수도 있습니다.
+나아가 매개 변수의 속성에는 '필수(required)'를 지정할 수 있으며,
+사전에 정의해둔 raise/rescue를 실행하여 400 Bad Request를 돌려줄 수도 있습니다.
 
 ```ruby
 class PeopleController < ActionController::Base
-  # 이 코드는 ActiveModel::ForbiddenAttributesError 예외를 던집니다.
+  # 이 코드는 ActiveModel::ForbiddenAttributes 예외를 던집니다.
   # 명시적으로 검증을 하지 않고 매개 변수를 그냥 통째로 넘기고 있기 때문입니다.
   def create
     Person.create(params[:person])
@@ -412,7 +412,8 @@ CookieStore에는 약 4KB의 데이터를 저장할 수 있습니다. 다른 세
 
 세션 저장소에 대한 더 자세한 설명은 [보안 가이드](security.html)를 참조해주세요.
 
-다른 세션 저장 방식이 필요한 경우에는 initializer를 통해 변경할 수 있습니다.
+다른 세션 저장 방식이 필요한 경우에는 `config/initializers/session_store.rb`에서
+변경할 수 있습니다.
 
 ```ruby
 # 기본으로 사용하는 쿠키 기반 세션 대신에 데이터베이스 세션을 사용하는 경우에는,
@@ -421,7 +422,8 @@ CookieStore에는 약 4KB의 데이터를 저장할 수 있습니다. 다른 세
 # Rails.application.config.session_store :active_record_store
 ```
 
-Rails는 세션 데이터에 서명할 때에 세션 키(쿠키의 이름)를 생성합니다. 이 동작도 initializer에서 변경 가능합니다.
+Rails는 세션 데이터에 서명할 때에 세션 키(쿠키의 이름)를 생성합니다. 이 동작도
+`config/initializers/session_store.rb` 변경 가능합니다.
 
 ```ruby
 # 이 파일을 수정한 뒤에는 서버를 재시작해주세요.
@@ -916,9 +918,8 @@ Form 헬퍼를 사용하지 않고 직접 작성한 경우나, 다른 이유로 
 
 ### `request` 객체
 
-요청 객체에는 브라우저로부터 전송된 요청에 대한 유용한 정보가 다수 포함되어 있습니다. 사용 가능한 메소드를
-모두 알고 싶은 경우에는 [Rails API 문서](http://api.rubyonrails.org/classes/ActionDispatch/Request.html)와
-[Rack 문서](http://www.rubydoc.info/github/rack/rack/Rack/Request)를
+요청 객체에는 브라우저로부터 전송된 요청에 대한 유용한 정보가 다수 포함되어
+있습니다. 사용 가능한 메소드를 모두 알고 싶은 경우에는 [API 문서](http://api.rubyonrails.org/classes/ActionDispatch/Request.html)를
 참조해주세요. 여기에서는 그 중에서 몇 가지를 소개합니다.
 
 | `request`의 속성                            | 목적                                                                              |
@@ -945,13 +946,11 @@ Request 객체에는 3개의 접근자가 있으며 매개 변수의 출처에 �
 
 ### `response` 객체
 
-response 객체는 액션이 실행 될 때에 생성되며, 클라이언트에 돌려줄 데이터를 랜더링하기 위한 것이므로,
-response 객체를 직접 사용할 일은 그다지 없습니다. 하지만 때때로 (예를 들자면, after filter에서)
-response 객체를 직접 조작할 수 있다면 편리할 겁니다. response 객체의 접근 메소드들은
-세터(setter)도 가지고 있으므로, 이를 사용해서 response 객체의 값들을 직접 변경할 수 있습니다.
-사용 가능한 전체 메소드 목록을 확인하고 싶다면 [Rails API 문서](http://api.rubyonrails.org/classes/ActionDispatch/Response.html)와
-[Rack 문서](http://www.rubydoc.info/github/rack/rack/Rack/Response)를
-참조해주세요.
+response 객체는 액션이 실행 될 때에 생성되며, 클라이언트에 돌려줄 데이터를
+랜더링하기 위한 것이므로, response 객체를 직접 사용할 일은 그다지 없습니다.
+하지만 때때로 (예를 들자면, after filter에서) response 객체를 직접 조작할 수
+있다면 편리할 겁니다. response 객체의 접근 메소드들은 세터(setter)도 가지고
+있으므로, 이를 사용해서 response 객체의 값들을 직접 변경할 수 있습니다.
 
 | `response`의 속성        | 목적                                              |
 | ---------------------- | ------------------------------------------------ |
