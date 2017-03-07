@@ -46,6 +46,7 @@ module ActiveRecord
         float:       { name: "float" },
         decimal:     { name: "decimal" },
         datetime:    { name: "datetime" },
+        timestamp:   { name: "timestamp" },
         time:        { name: "time" },
         date:        { name: "date" },
         binary:      { name: "blob", limit: 65535 },
@@ -67,8 +68,8 @@ module ActiveRecord
 
         @statements = StatementPool.new(self.class.type_cast_config_to_integer(config[:statement_limit]))
 
-        if version < "5.0.0"
-          raise "Your version of MySQL (#{full_version.match(/^\d+\.\d+\.\d+/)[0]}) is too old. Active Record supports MySQL >= 5.0."
+        if version < "5.1.10"
+          raise "Your version of MySQL (#{full_version.match(/^\d+\.\d+\.\d+/)[0]}) is too old. Active Record supports MySQL >= 5.1.10."
         end
       end
 
@@ -86,15 +87,6 @@ module ActiveRecord
 
       def mariadb? # :nodoc:
         /mariadb/i.match?(full_version)
-      end
-
-      # Returns true, since this connection adapter supports migrations.
-      def supports_migrations?
-        true
-      end
-
-      def supports_primary_key?
-        true
       end
 
       def supports_bulk_alter? #:nodoc:
@@ -138,6 +130,14 @@ module ActiveRecord
           version >= "5.3.0"
         else
           version >= "5.6.4"
+        end
+      end
+
+      def supports_virtual_columns?
+        if mariadb?
+          version >= "5.2.0"
+        else
+          version >= "5.7.5"
         end
       end
 
@@ -310,45 +310,36 @@ module ActiveRecord
         show_variable "collation_database"
       end
 
-      def tables(name = nil) # :nodoc:
-        ActiveSupport::Deprecation.warn(<<-MSG.squish)
-          #tables currently returns both tables and views.
-          This behavior is deprecated and will be changed with Rails 5.1 to only return tables.
-          Use #data_sources instead.
-        MSG
+      def tables # :nodoc:
+        sql = "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE'"
+        sql << " AND table_schema = #{quote(@config[:database])}"
 
-        if name
-          ActiveSupport::Deprecation.warn(<<-MSG.squish)
-            Passing arguments to #tables is deprecated without replacement.
-          MSG
-        end
-
-        data_sources
+        select_values(sql, "SCHEMA")
       end
 
-      def data_sources
+      def views # :nodoc:
+        select_values("SHOW FULL TABLES WHERE table_type = 'VIEW'", "SCHEMA")
+      end
+
+      def data_sources # :nodoc:
         sql = "SELECT table_name FROM information_schema.tables "
         sql << "WHERE table_schema = #{quote(@config[:database])}"
 
         select_values(sql, "SCHEMA")
       end
 
-      def truncate(table_name, name = nil)
-        execute "TRUNCATE TABLE #{quote_table_name(table_name)}", name
+      def table_exists?(table_name) # :nodoc:
+        return false unless table_name.present?
+
+        schema, name = extract_schema_qualified_name(table_name)
+
+        sql = "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE'"
+        sql << " AND table_schema = #{quote(schema)} AND table_name = #{quote(name)}"
+
+        select_values(sql, "SCHEMA").any?
       end
 
-      def table_exists?(table_name)
-        # Update lib/active_record/internal_metadata.rb when this gets removed
-        ActiveSupport::Deprecation.warn(<<-MSG.squish)
-          #table_exists? currently checks both tables and views.
-          This behavior is deprecated and will be changed with Rails 5.1 to only check tables.
-          Use #data_source_exists? instead.
-        MSG
-
-        data_source_exists?(table_name)
-      end
-
-      def data_source_exists?(table_name)
+      def data_source_exists?(table_name) # :nodoc:
         return false unless table_name.present?
 
         schema, name = extract_schema_qualified_name(table_name)
@@ -357,10 +348,6 @@ module ActiveRecord
         sql << "WHERE table_schema = #{quote(schema)} AND table_name = #{quote(name)}"
 
         select_values(sql, "SCHEMA").any?
-      end
-
-      def views # :nodoc:
-        select_values("SHOW FULL TABLES WHERE table_type = 'VIEW'", "SCHEMA")
       end
 
       def view_exists?(view_name) # :nodoc:
@@ -374,8 +361,18 @@ module ActiveRecord
         select_values(sql, "SCHEMA").any?
       end
 
+      def truncate(table_name, name = nil)
+        execute "TRUNCATE TABLE #{quote_table_name(table_name)}", name
+      end
+
       # Returns an array of indexes for the given table.
       def indexes(table_name, name = nil) #:nodoc:
+        if name
+          ActiveSupport::Deprecation.warn(<<-MSG.squish)
+            Passing name to #indexes is deprecated without replacement.
+          MSG
+        end
+
         indexes = []
         current_index = nil
         execute_and_free("SHOW KEYS FROM #{quote_table_name(table_name)}", "SCHEMA") do |result|
@@ -530,6 +527,7 @@ module ActiveRecord
           WHERE fk.referenced_column_name IS NOT NULL
             AND fk.table_schema = #{quote(schema)}
             AND fk.table_name = #{quote(name)}
+            AND rc.table_name = #{quote(name)}
         SQL
 
         fk_info.map do |row|
@@ -568,7 +566,7 @@ module ActiveRecord
       end
 
       # Maps logical Rails types to MySQL-specific data types.
-      def type_to_sql(type, limit = nil, precision = nil, scale = nil, unsigned = nil)
+      def type_to_sql(type, limit: nil, precision: nil, scale: nil, unsigned: nil, **) # :nodoc:
         sql = \
           case type.to_s
           when "integer"
@@ -584,7 +582,7 @@ module ActiveRecord
               binary_to_sql(limit)
             end
           else
-            super(type, limit, precision, scale)
+            super
           end
 
         sql << " unsigned" if unsigned && type != :primary_key
@@ -613,9 +611,9 @@ module ActiveRecord
         SQL
       end
 
-      def case_sensitive_comparison(table, attribute, column, value)
+      def case_sensitive_comparison(table, attribute, column, value) # :nodoc:
         if column.collation && !column.case_sensitive?
-          table[attribute].eq(Arel::Nodes::Bin.new(Arel::Nodes::BindParam.new))
+          table[attribute].eq(Arel::Nodes::Bin.new(value))
         else
           super
         end
@@ -645,13 +643,13 @@ module ActiveRecord
         self.class.type_cast_config_to_boolean(@config.fetch(:strict, true))
       end
 
-      def valid_type?(type)
-        !native_database_types[type].nil?
+      def default_index_type?(index) # :nodoc:
+        index.using == :btree || super
       end
 
-      protected
+      private
 
-        def initialize_type_map(m) # :nodoc:
+        def initialize_type_map(m)
           super
 
           register_class_with_limit m, %r(char)i, MysqlString
@@ -691,7 +689,7 @@ module ActiveRecord
           end
         end
 
-        def register_integer_type(mapping, key, options) # :nodoc:
+        def register_integer_type(mapping, key, options)
           mapping.register_type(key) do |sql_type|
             if /\bunsigned\b/.match?(sql_type)
               Type::UnsignedInteger.new(options)
@@ -702,7 +700,7 @@ module ActiveRecord
         end
 
         def extract_precision(sql_type)
-          if /time/.match?(sql_type)
+          if /\A(?:date)?time(?:stamp)?\b/.match?(sql_type)
             super || 0
           else
             super
@@ -779,11 +777,11 @@ module ActiveRecord
         def change_column_sql(table_name, column_name, type, options = {})
           column = column_for(table_name, column_name)
 
-          unless options_include_default?(options)
+          unless options.key?(:default)
             options[:default] = column.default
           end
 
-          unless options.has_key?(:null)
+          unless options.key?(:null)
             options[:null] = column.null
           end
 
@@ -837,8 +835,6 @@ module ActiveRecord
           [remove_column_sql(table_name, :updated_at), remove_column_sql(table_name, :created_at)]
         end
 
-      private
-
         # MySQL is too stupid to create a temporary table for use subquery, so we have
         # to give it some prompting in the form of a subsubquery. Ugh!
         def subquery_for(key, select)
@@ -865,9 +861,9 @@ module ActiveRecord
           variables["sql_auto_is_null"] = 0
 
           # Increase timeout so the server doesn't disconnect us.
-          wait_timeout = @config[:wait_timeout]
+          wait_timeout = self.class.type_cast_config_to_integer(@config[:wait_timeout])
           wait_timeout = 2147483 unless wait_timeout.is_a?(Integer)
-          variables["wait_timeout"] = self.class.type_cast_config_to_integer(wait_timeout)
+          variables["wait_timeout"] = wait_timeout
 
           defaults = [":default", :default].to_set
 
@@ -908,7 +904,7 @@ module ActiveRecord
           end.compact.join(", ")
 
           # ...and send them all in one query
-          @connection.query "SET #{encoding} #{sql_mode_assignment} #{variable_assignments}"
+          execute "SET #{encoding} #{sql_mode_assignment} #{variable_assignments}"
         end
 
         def column_definitions(table_name) # :nodoc:

@@ -1,10 +1,341 @@
+*   Check whether `Rails.application` defined before calling it
+
+    In #27674 we changed the migration generator to generate migrations at the
+    path defined in `Rails.application.config.paths` however the code checked
+    for the presence of the `Rails` constant but not the `Rails.application`
+    method which caused problems when using Active Record and generators outside
+    of the context of a Rails application.
+
+    Fixes #28325.
+
+*   Fix `deserialize` with JSON array.
+
+    Fixes #28285.
+
+    *Ryuta Kamizono*
+
+*   Fix `rake db:schema:load` with subdirectories.
+
+    *Ryuta Kamizono*
+
+*   Fix `rake db:migrate:status` with subdirectories.
+
+    *Ryuta Kamizono*
+
+*   Don't share options between reference id and type columns
+
+    When using a polymorphic reference column in a migration, sharing options
+    between the two columns doesn't make sense since they are different types.
+    The `reference_id` column is usually an integer and the `reference_type`
+    column a string so options like `unsigned: true` will result in an invalid
+    table definition.
+
+    *Ryuta Kamizono*
+
+*   Use `max_identifier_length` for `index_name_length` in PostgreSQL adapter.
+
+    *Ryuta Kamizono*
+
+*   Deprecate `supports_migrations?` on connection adapters.
+
+    *Ryuta Kamizono*
+
+*   Fix regression of #1969 with SELECT aliases in HAVING clause.
+
+    *Eugene Kenny*
+
+*   Deprecate using `#quoted_id` in quoting.
+
+    *Ryuta Kamizono*
+
+*   Fix `wait_timeout` to configurable for mysql2 adapter.
+
+    Fixes #26556.
+
+    *Ryuta Kamizono*
+
+
+## Rails 5.1.0.beta1 (February 23, 2017) ##
+
+*   Correctly dump native timestamp types for MySQL.
+
+    The native timestamp type in MySQL is different from datetime type.
+    Internal representation of the timestamp type is UNIX time, This means
+    that timestamp columns are affected by time zone.
+
+        > SET time_zone = '+00:00';
+        Query OK, 0 rows affected (0.00 sec)
+
+        > INSERT INTO time_with_zone(ts,dt) VALUES (NOW(),NOW());
+        Query OK, 1 row affected (0.02 sec)
+
+        > SELECT * FROM time_with_zone;
+        +---------------------+---------------------+
+        | ts                  | dt                  |
+        +---------------------+---------------------+
+        | 2016-02-07 22:11:44 | 2016-02-07 22:11:44 |
+        +---------------------+---------------------+
+        1 row in set (0.00 sec)
+
+        > SET time_zone = '-08:00';
+        Query OK, 0 rows affected (0.00 sec)
+
+        > SELECT * FROM time_with_zone;
+        +---------------------+---------------------+
+        | ts                  | dt                  |
+        +---------------------+---------------------+
+        | 2016-02-07 14:11:44 | 2016-02-07 22:11:44 |
+        +---------------------+---------------------+
+        1 row in set (0.00 sec)
+
+    *Ryuta Kamizono*
+
+*   All integer-like PKs are autoincrement unless they have an explicit default.
+
+    *Matthew Draper*
+
+*   Omit redundant `using: :btree` for schema dumping.
+
+    *Ryuta Kamizono*
+
+*   Deprecate passing `default` to `index_name_exists?`.
+
+    *Ryuta Kamizono*
+
+*   PostgreSQL: schema dumping support for interval and OID columns.
+
+    *Ryuta Kamizono*
+
+*   Deprecate `supports_primary_key?` on connection adapters since it's
+    been long unused and unsupported.
+
+    *Ryuta Kamizono*
+
+*   Make `table_name=` reset current statement cache,
+    so queries are not run against the previous table name.
+
+    *namusyaka*
+
+*   Allow `ActiveRecord::Base#as_json` to be passed a frozen Hash.
+
+    *Isaac Betesh*
+
+*   Fix inspection behavior when the :id column is not primary key.
+
+    *namusyaka*
+
+*   Deprecate locking records with unpersisted changes.
+
+    *Marc Schütz*
+
+*   Remove deprecated behavior that halts callbacks when the return is false.
+
+    *Rafael Mendonça França*
+
+*   Deprecate `ColumnDumper#migration_keys`.
+
+    *Ryuta Kamizono*
+
+*   Fix `association_primary_key_type` for reflections with symbol primary key.
+
+    Fixes #27864.
+
+    *Daniel Colson*
+
+*   Virtual/generated column support for MySQL 5.7.5+ and MariaDB 5.2.0+.
+
+    MySQL generated columns: https://dev.mysql.com/doc/refman/5.7/en/create-table-generated-columns.html
+    MariaDB virtual columns: https://mariadb.com/kb/en/mariadb/virtual-computed-columns/
+
+    Declare virtual columns with `t.virtual name, type: …, as: "expression"`.
+    Pass `stored: true` to persist the generated value (false by default).
+
+    Example:
+
+        create_table :generated_columns do |t|
+          t.string  :name
+          t.virtual :upper_name,  type: :string,  as: "UPPER(name)"
+          t.virtual :name_length, type: :integer, as: "LENGTH(name)", stored: true
+          t.index :name_length  # May be indexed, too!
+        end
+
+    *Ryuta Kamizono*
+
+*   Deprecate `initialize_schema_migrations_table` and `initialize_internal_metadata_table`.
+
+    *Ryuta Kamizono*
+
+*   Support foreign key creation for SQLite3.
+
+    *Ryuta Kamizono*
+
+*   Place generated migrations into the path set by `config.paths["db/migrate"]`.
+
+    *Kevin Glowacz*
+
+*   Raise `ActiveRecord::InvalidForeignKey` when a foreign key constraint fails on SQLite3.
+
+    *Ryuta Kamizono*
+
+*   Add the touch option to `#increment!` and `#decrement!`.
+
+    *Hiroaki Izu*
+
+*   Deprecate passing a class to the `class_name` because it eagerloads more classes than
+    necessary and potentially creates circular dependencies.
+
+    *Kir Shatrov*
+
+*   Raise error when has_many through is defined before through association.
+
+    Fixes #26834.
+
+    *Chris Holmes*
+
+*   Deprecate passing `name` to `indexes`.
+
+    *Ryuta Kamizono*
+
+*   Remove deprecated tasks: `db:test:clone`, `db:test:clone_schema`, `db:test:clone_structure`.
+
+    *Rafel Mendonça França*
+
+*   Compare deserialized values for `PostgreSQL::OID::Hstore` types when
+    calling `ActiveRecord::Dirty#changed_in_place?`.
+
+    Fixes #27502.
+
+    *Jon Moss*
+
+*   Raise `ArgumentError` when passing an `ActiveRecord::Base` instance to `.find`,
+    `.exists?` and `.update`.
+
+    *Rafael Mendonça França*
+
+*   Respect precision option for arrays of timestamps.
+
+    Fixes #27514.
+
+    *Sean Griffin*
+
+*   Optimize slow model instantiation when using STI and `store_full_sti_class = false` option.
+
+    *Konstantin Lazarev*
+
+*   Add `touch` option to counter cache modifying methods.
+
+    Works when updating, resetting, incrementing and decrementing counters:
+
+        # Touches `updated_at`/`updated_on`.
+        Topic.increment_counter(:messages_count, 1, touch: true)
+        Topic.decrement_counter(:messages_count, 1, touch: true)
+
+        # Touches `last_discussed_at`.
+        Topic.reset_counters(18, :messages, touch: :last_discussed_at)
+
+        # Touches `updated_at` and `last_discussed_at`.
+        Topic.update_counters(18, messages_count: 5, touch: %i( updated_at last_discussed_at ))
+
+    Fixes #26724.
+
+    *Jarred Trost*
+
+*   Remove deprecated `#uniq`, `#uniq!`, and `#uniq_value`.
+
+    *Ryuta Kamizono*
+
+*   Remove deprecated `#insert_sql`, `#update_sql`, and `#delete_sql`.
+
+    *Ryuta Kamizono*
+
+*   Remove deprecated `#use_transactional_fixtures` configuration.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated `#raise_in_transactional_callbacks` configuration.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated `#load_schema_for`.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated conditions parameter from `#destroy_all` and `#delete_all`.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated support to passing arguments to `#select` when a block is provided.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated support to query using commas on LIMIT.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated support to passing a class as a value in a query.
+
+    *Rafael Mendonça França*
+
+*   Raise `ActiveRecord::IrreversibleOrderError` when using `last` with an irreversible
+    order.
+
+    *Rafael Mendonça França*
+
+*   Raise when a `has_many :through` association has an ambiguous reflection name.
+
+    *Rafael Mendonça França*
+
+*   Raise when `ActiveRecord::Migration` is inherited from directly.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated `original_exception` argument in `ActiveRecord::StatementInvalid#initialize`
+    and `ActiveRecord::StatementInvalid#original_exception`.
+
+    *Rafael Mendonça França*
+
+*   `#tables` and `#table_exists?` return only tables and not views.
+
+    All the deprecations on those methods were removed.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated `name` argument from `#tables`.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated support to passing a column to `#quote`.
+
+    *Rafael Mendonça França*
+
+*   Set `:time` as a timezone aware type and remove deprecation when
+    `config.active_record.time_zone_aware_types` is not explicitly set.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated force reload argument in singular and collection association readers.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated `activerecord.errors.messages.restrict_dependent_destroy.one` and
+    `activerecord.errors.messages.restrict_dependent_destroy.many` i18n scopes.
+
+    *Rafael Mendonça França*
+
+*   Allow passing extra flags to `db:structure:load` and `db:structure:dump`
+
+    Introduces `ActiveRecord::Tasks::DatabaseTasks.structure_(load|dump)_flags` to customize the
+    eventual commands run against the database, e.g. mysqldump/pg_dump.
+
+    *Kir Shatrov*
+
 *   Notifications see frozen SQL string.
 
-    Fixes #23774
+    Fixes #23774.
 
     *Richard Monette*
 
-*   RuntimeErrors are no longer translated to ActiveRecord::StatementInvalid.
+*   RuntimeErrors are no longer translated to `ActiveRecord::StatementInvalid`.
 
     *Richard Monette*
 
@@ -62,7 +393,7 @@
 
     *Sean Griffin*
 
-*   Fix that unsigned with zerofill is treated as signed.
+*   Don't treat unsigned integers with zerofill as signed.
 
     Fixes #27125.
 
@@ -268,7 +599,7 @@
 
     *Ryuta Kamizono*
 
-*   Sqlite3 migrations to add a column to an existing table can now be
+*   SQLite3 migrations to add a column to an existing table can now be
     successfully rolled back when the column was given and invalid column
     type.
 

@@ -193,7 +193,7 @@ module ActiveRecord
 
         # If #count is used with #distinct (i.e. `relation.distinct.count`) it is
         # considered distinct.
-        distinct = self.distinct_value
+        distinct = distinct_value
 
         if operation == "count"
           column_name ||= select_for_count
@@ -232,7 +232,7 @@ module ActiveRecord
           query_builder = build_count_subquery(spawn, column_name, distinct)
         else
           # PostgreSQL doesn't like ORDER BY when there are no GROUP BY
-          relation = unscope(:order)
+          relation = unscope(:order).distinct!(false)
 
           column = aggregate_column(column_name)
 
@@ -282,7 +282,7 @@ module ActiveRecord
             operation,
             distinct).as(aggregate_alias)
         ]
-        select_values += select_values unless having_clause.empty?
+        select_values += self.select_values unless having_clause.empty?
 
         select_values.concat group_columns.map { |aliaz, field|
           if field.respond_to?(:as)
@@ -292,7 +292,7 @@ module ActiveRecord
           end
         }
 
-        relation = except(:group)
+        relation = except(:group).distinct!(false)
         relation.group_values  = group_fields
         relation.select_values = select_values
 

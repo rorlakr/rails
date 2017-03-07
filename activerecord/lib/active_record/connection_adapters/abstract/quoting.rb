@@ -1,22 +1,18 @@
 require "active_support/core_ext/big_decimal/conversions"
+require "active_support/multibyte/chars"
 
 module ActiveRecord
   module ConnectionAdapters # :nodoc:
     module Quoting
       # Quotes the column value to help prevent
       # {SQL injection attacks}[http://en.wikipedia.org/wiki/SQL_injection].
-      def quote(value, column = nil)
-        # records are quoted as their primary key
-        return value.quoted_id if value.respond_to?(:quoted_id)
+      def quote(value)
+        value = id_value_for_database(value) if value.is_a?(Base)
 
-        if column
-          ActiveSupport::Deprecation.warn(<<-MSG.squish)
-            Passing a column to `quote` has been deprecated. It is only used
-            for type casting, which should be handled elsewhere. See
-            https://github.com/rails/arel/commit/6160bfbda1d1781c3b08a33ec4955f170e95be11
-            for more information.
-          MSG
-          value = type_cast_from_column(column, value)
+        if value.respond_to?(:quoted_id)
+          ActiveSupport::Deprecation.warn \
+            "Using #quoted_id is deprecated and will be removed in Rails 5.2."
+          return value.quoted_id
         end
 
         _quote(value)
@@ -26,6 +22,8 @@ module ActiveRecord
       # SQLite does not understand dates, so this method will convert a Date
       # to a String.
       def type_cast(value, column = nil)
+        value = id_value_for_database(value) if value.is_a?(Base)
+
         if value.respond_to?(:quoted_id) && value.respond_to?(:id)
           return value.id
         end
@@ -150,10 +148,20 @@ module ActiveRecord
         quoted_date(value).sub(/\A2000-01-01 /, "")
       end
 
+      def quoted_binary(value) # :nodoc:
+        "'#{quote_string(value.to_s)}'"
+      end
+
       private
 
         def type_casted_binds(binds)
           binds.map { |attr| type_cast(attr.value_for_database) }
+        end
+
+        def id_value_for_database(value)
+          if primary_key = value.class.primary_key
+            value.instance_variable_get(:@attributes)[primary_key].value_for_database
+          end
         end
 
         def types_which_need_no_typecasting
@@ -162,7 +170,7 @@ module ActiveRecord
 
         def _quote(value)
           case value
-          when String, ActiveSupport::Multibyte::Chars, Type::Binary::Data
+          when String, ActiveSupport::Multibyte::Chars
             "'#{quote_string(value.to_s)}'"
           when true       then quoted_true
           when false      then quoted_false
@@ -170,6 +178,7 @@ module ActiveRecord
           # BigDecimals need to be put in a non-normalized form and quoted.
           when BigDecimal then value.to_s("F")
           when Numeric, ActiveSupport::Duration then value.to_s
+          when Type::Binary::Data then quoted_binary(value)
           when Type::Time::Value then "'#{quoted_time(value)}'"
           when Date, Time then "'#{quoted_date(value)}'"
           when Symbol     then "'#{quote_string(value.to_s)}'"

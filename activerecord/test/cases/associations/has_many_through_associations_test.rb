@@ -28,6 +28,9 @@ require "models/member"
 require "models/membership"
 require "models/club"
 require "models/organization"
+require "models/user"
+require "models/family"
+require "models/family_tree"
 
 class HasManyThroughAssociationsTest < ActiveRecord::TestCase
   fixtures :posts, :readers, :people, :comments, :authors, :categories, :taggings, :tags,
@@ -402,7 +405,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
       end
     end
 
-    assert_equal nil, reference.reload.job_id
+    assert_nil reference.reload.job_id
   ensure
     Reference.make_comments = false
   end
@@ -423,7 +426,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     end
 
     # Check that the destroy callback on Reference did not run
-    assert_equal nil, person.reload.comments
+    assert_nil person.reload.comments
   ensure
     Reference.make_comments = false
   end
@@ -485,7 +488,7 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     end
 
     references.each do |reference|
-      assert_equal nil, reference.reload.job_id
+      assert_nil reference.reload.job_id
     end
   end
 
@@ -880,7 +883,6 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
       book.subscriber_ids = []
       assert_equal [], book.subscribers.reload
     end
-
   end
 
   def test_collection_singular_ids_setter_with_changed_primary_key
@@ -1204,12 +1206,6 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     assert_nil Club.new.special_favourites.distinct_value
   end
 
-  def test_association_force_reload_with_only_true_is_deprecated
-    post = Post.find(1)
-
-    assert_deprecated { post.people(true) }
-  end
-
   def test_has_many_through_do_not_cache_association_reader_if_the_though_method_has_default_scopes
     member = Member.create!
     club = Club.create!
@@ -1236,5 +1232,24 @@ class HasManyThroughAssociationsTest < ActiveRecord::TestCase
     assert_equal [other_club], tenant_clubs
   ensure
     TenantMembership.current_member = nil
+  end
+
+  def test_has_many_through_with_scope_should_respect_table_alias
+    family = Family.create!
+    users = 3.times.map { User.create! }
+    FamilyTree.create!(member: users[0], family: family)
+    FamilyTree.create!(member: users[1], family: family)
+    FamilyTree.create!(member: users[2], family: family, token: "wat")
+
+    assert_equal 2, users[0].family_members.to_a.size
+    assert_equal 0, users[2].family_members.to_a.size
+  end
+
+  def test_incorrectly_ordered_through_associations
+    assert_raises(ActiveRecord::HasManyThroughOrderError) do
+      DeveloperWithIncorrectlyOrderedHasManyThrough.create(
+        companies: [Company.create]
+      )
+    end
   end
 end

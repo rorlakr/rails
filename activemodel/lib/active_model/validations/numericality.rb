@@ -61,7 +61,7 @@ module ActiveModel
         end
       end
 
-    protected
+    private
 
       def is_number?(raw_value)
         !parse_raw_value_as_a_number(raw_value).nil?
@@ -94,12 +94,10 @@ module ActiveModel
         end
       end
 
-      private
-
-        def record_attribute_changed_in_place?(record, attr_name)
-          record.respond_to?(:attribute_changed_in_place?) &&
-            record.attribute_changed_in_place?(attr_name.to_s)
-        end
+      def record_attribute_changed_in_place?(record, attr_name)
+        record.respond_to?(:attribute_changed_in_place?) &&
+          record.attribute_changed_in_place?(attr_name.to_s)
+      end
     end
 
     module HelperMethods
@@ -136,7 +134,7 @@ module ActiveModel
       #
       # There is also a list of default options supported by every validator:
       # +:if+, +:unless+, +:on+, +:allow_nil+, +:allow_blank+, and +:strict+ .
-      # See <tt>ActiveModel::Validation#validates</tt> for more information
+      # See <tt>ActiveModel::Validations#validates</tt> for more information
       #
       # The following checks can also be supplied with a proc or a symbol which
       # corresponds to a method:

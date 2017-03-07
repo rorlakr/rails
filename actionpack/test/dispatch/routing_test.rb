@@ -1603,7 +1603,7 @@ class TestRoutingMapper < ActionDispatch::IntegrationTest
       get "account/login", to: redirect("/login")
     end
 
-    previous_host, self.host = self.host, "www.example.com:3000"
+    previous_host, self.host = host, "www.example.com:3000"
 
     get "/account/login"
     verify_redirect "http://www.example.com:3000/login"
@@ -4189,7 +4189,7 @@ class TestConstraintsAccessingParameters < ActionDispatch::IntegrationTest
 
   test "parameters are reset between constraint checks" do
     get "/bar"
-    assert_equal nil, @request.params[:foo]
+    assert_nil @request.params[:foo]
     assert_equal "bar", @request.params[:bar]
   end
 end
@@ -4911,5 +4911,54 @@ class TestInternalRoutingParams < ActionDispatch::IntegrationTest
       { controller: "internal", action: "internal", internal: "123" },
       request.path_parameters
     )
+  end
+end
+
+class FlashRedirectTest < ActionDispatch::IntegrationTest
+  SessionKey = "_myapp_session"
+  Generator  = ActiveSupport::LegacyKeyGenerator.new("b3c631c314c0bbca50c1b2843150fe33")
+
+  class KeyGeneratorMiddleware
+    def initialize(app)
+      @app = app
+    end
+
+    def call(env)
+      env["action_dispatch.key_generator"] ||= Generator
+      @app.call(env)
+    end
+  end
+
+  class FooController < ActionController::Base
+    def bar
+      render plain: (flash[:foo] || "foo")
+    end
+  end
+
+  Routes = ActionDispatch::Routing::RouteSet.new
+  Routes.draw do
+    get "/foo", to: redirect { |params, req| req.flash[:foo] = "bar"; "/bar" }
+    get "/bar", to: "flash_redirect_test/foo#bar"
+  end
+
+  APP = build_app Routes do |middleware|
+    middleware.use KeyGeneratorMiddleware
+    middleware.use ActionDispatch::Session::CookieStore, key: SessionKey
+    middleware.use ActionDispatch::Flash
+    middleware.delete ActionDispatch::ShowExceptions
+  end
+
+  def app
+    APP
+  end
+
+  include Routes.url_helpers
+
+  def test_block_redirect_commits_flash
+    get "/foo", env: { "action_dispatch.key_generator" => Generator }
+    assert_response :redirect
+
+    follow_redirect!
+    assert_equal "bar", response.body
   end
 end

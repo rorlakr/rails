@@ -32,6 +32,14 @@ module Rails
   # This allows you to override entire operations, like the creation of the
   # Gemfile, README, or JavaScript files, without needing to know exactly
   # what those operations do so you can create another template action.
+  #
+  #  class CustomAppBuilder < Rails::AppBuilder
+  #    def test
+  #      @generator.gem "rspec-rails", group: [:development, :test]
+  #      run "bundle install"
+  #      generate "rspec:install"
+  #    end
+  #  end
   class AppBuilder
     def rakefile
       template "Rakefile"
@@ -51,6 +59,12 @@ module Rails
 
     def gitignore
       template "gitignore", ".gitignore"
+    end
+
+    def version_control
+      if !options[:skip_git] && !options[:pretend]
+        run "git init"
+      end
     end
 
     def app
@@ -144,6 +158,12 @@ module Rails
       template "test/test_helper.rb"
     end
 
+    def system_test
+      empty_directory_with_keep_file "test/system"
+
+      template "test/application_system_test_case.rb"
+    end
+
     def tmp
       empty_directory_with_keep_file "tmp"
       empty_directory "tmp/cache"
@@ -154,7 +174,7 @@ module Rails
       empty_directory_with_keep_file "vendor"
 
       unless options[:skip_yarn]
-        template "package.json", "vendor/package.json"
+        template "package.json"
       end
     end
   end
@@ -175,12 +195,11 @@ module Rails
       class_option :api, type: :boolean,
                          desc: "Preconfigure smaller stack for API only apps"
 
+      class_option :skip_bundle, type: :boolean, aliases: "-B", default: false,
+                                 desc: "Don't run bundle install"
+
       def initialize(*args)
         super
-
-        unless app_path
-          raise Error, "Application name should be provided in arguments. For details run: rails --help"
-        end
 
         if !options[:skip_active_record] && !DATABASES.include?(options[:database])
           raise Error, "Invalid value for --database option. Supported for preconfiguration are: #{DATABASES.join(", ")}."
@@ -202,6 +221,7 @@ module Rails
         build(:configru)
         build(:gitignore)   unless options[:skip_git]
         build(:gemfile)     unless options[:skip_gemfile]
+        build(:version_control)
       end
 
       def create_app_files
@@ -256,6 +276,10 @@ module Rails
         build(:test) unless options[:skip_test]
       end
 
+      def create_system_test_files
+        build(:system_test) unless options[:skip_system_test] || options[:skip_test] || options[:api]
+      end
+
       def create_tmp_files
         build(:tmp)
       end
@@ -264,7 +288,7 @@ module Rails
         build(:vendor)
 
         if options[:skip_yarn]
-          remove_file "vendor/package.json"
+          remove_file "package.json"
         end
       end
 
@@ -320,7 +344,6 @@ module Rails
 
       def delete_action_mailer_files_skipping_action_mailer
         if options[:skip_action_mailer]
-          remove_file "app/mailers/application_mailer.rb"
           remove_file "app/views/layouts/mailer.html.erb"
           remove_file "app/views/layouts/mailer.text.erb"
           remove_dir "app/mailers"
@@ -348,8 +371,8 @@ module Rails
         end
       end
 
-      def delete_bin_yarn_if_api_option
-        remove_file "bin/yarn" if options[:api]
+      def delete_bin_yarn_if_skip_yarn_option
+        remove_file "bin/yarn" if options[:skip_yarn]
       end
 
       def finish_template
@@ -363,11 +386,11 @@ module Rails
         @after_bundle_callbacks.each(&:call)
       end
 
-    protected
-
       def self.banner
         "rails new #{arguments.map(&:usage).join(' ')} [options]"
       end
+
+    private
 
       # Define file as an alias to create_file for backwards compatibility.
       def file(*args, &block)

@@ -1,7 +1,6 @@
 # -*- frozen-string-literal: true -*-
 
 require "singleton"
-require "active_support/core_ext/module/attribute_accessors"
 require "active_support/core_ext/string/starts_ends_with"
 
 module Mime
@@ -278,6 +277,8 @@ module Mime
 
     def all?; false; end
 
+    # TODO Change this to private once we've dropped Ruby 2.2 support.
+    # Workaround for Ruby 2.2 "private attribute?" warning.
     protected
 
       attr_reader :string, :synonyms
@@ -295,8 +296,8 @@ module Mime
         end
       end
 
-      def respond_to_missing?(method, include_private = false) #:nodoc:
-        method.to_s.ends_with? "?"
+      def respond_to_missing?(method, include_private = false)
+        (method.to_s.ends_with? "?") || super
       end
   end
 

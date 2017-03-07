@@ -13,9 +13,9 @@ require "models/speedometer"
 require "models/ship_part"
 require "models/treasure"
 require "models/developer"
+require "models/post"
 require "models/comment"
 require "models/rating"
-require "models/post"
 
 class NumericData < ActiveRecord::Base
   self.table_name = "numeric_data"
@@ -166,14 +166,14 @@ class CalculationsTest < ActiveRecord::TestCase
   end
 
   def test_limit_should_apply_before_count
-    accounts = Account.limit(3).where("firm_id IS NOT NULL")
+    accounts = Account.limit(4)
 
     assert_equal 3, accounts.count(:firm_id)
     assert_equal 3, accounts.select(:firm_id).count
   end
 
   def test_limit_should_apply_before_count_arel_attribute
-    accounts = Account.limit(3).where("firm_id IS NOT NULL")
+    accounts = Account.limit(4)
 
     firm_id_attribute = Account.arel_table[:firm_id]
     assert_equal 3, accounts.count(firm_id_attribute)
@@ -227,6 +227,20 @@ class CalculationsTest < ActiveRecord::TestCase
     assert_match "credit_limit, firm_name", e.message
   end
 
+  def test_apply_distinct_in_count
+    queries = assert_sql do
+      Account.distinct.count
+      Account.group(:firm_id).distinct.count
+    end
+
+    queries.each do |query|
+      # `table_alias_length` in `column_alias_for` would execute
+      # "SHOW max_identifier_length" statement in PostgreSQL adapter.
+      next if query == "SHOW max_identifier_length"
+      assert_match %r{\ASELECT(?! DISTINCT) COUNT\(DISTINCT\b}, query
+    end
+  end
+
   def test_should_group_by_summed_field_having_condition
     c = Account.group(:firm_id).having("sum(credit_limit) > 50").sum(:credit_limit)
     assert_nil        c[1]
@@ -235,7 +249,8 @@ class CalculationsTest < ActiveRecord::TestCase
   end
 
   def test_should_group_by_summed_field_having_condition_from_select
-    c = Account.select("MIN(credit_limit) AS min_credit_limit").group(:firm_id).having("MIN(credit_limit) > 50").sum(:credit_limit)
+    skip unless current_adapter?(:Mysql2Adapter, :SQLite3Adapter)
+    c = Account.select("MIN(credit_limit) AS min_credit_limit").group(:firm_id).having("min_credit_limit > 50").sum(:credit_limit)
     assert_nil       c[1]
     assert_equal 60, c[2]
     assert_equal 53, c[9]
@@ -421,10 +436,6 @@ class CalculationsTest < ActiveRecord::TestCase
 
   def test_count_with_distinct
     assert_equal 4, Account.select(:credit_limit).distinct.count
-
-    assert_deprecated do
-      assert_equal 4, Account.select(:credit_limit).uniq.count
-    end
   end
 
   def test_count_with_aliased_attribute

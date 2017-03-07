@@ -49,22 +49,6 @@ module ActiveRecord
         end
       end
 
-      def test_valid_column
-        with_example_table do
-          column = @conn.columns("ex").find { |col| col.name == "id" }
-          assert @conn.valid_type?(column.type)
-        end
-      end
-
-      # sqlite3 databases should be able to support any type and not just the
-      # ones mentioned in the native_database_types.
-      #
-      # Therefore test_invalid column should always return true even if the
-      # type is not valid.
-      def test_invalid_column
-        assert @conn.valid_type?(:foobar)
-      end
-
       def test_column_types
         owner = Owner.create!(name: "hello".encode("ascii-8bit"))
         owner.reload
@@ -267,9 +251,9 @@ module ActiveRecord
 
       def test_tables
         with_example_table do
-          ActiveSupport::Deprecation.silence { assert_equal %w{ ex }, @conn.tables }
+          assert_equal %w{ ex }, @conn.tables
           with_example_table "id integer PRIMARY KEY AUTOINCREMENT, number integer", "people" do
-            ActiveSupport::Deprecation.silence { assert_equal %w{ ex people }.sort, @conn.tables.sort }
+            assert_equal %w{ ex people }.sort, @conn.tables.sort
           end
         end
       end
@@ -277,19 +261,17 @@ module ActiveRecord
       def test_tables_logs_name
         sql = <<-SQL
           SELECT name FROM sqlite_master
-          WHERE type IN ('table','view') AND name <> 'sqlite_sequence'
+          WHERE type = 'table' AND name <> 'sqlite_sequence'
         SQL
         assert_logged [[sql.squish, "SCHEMA", []]] do
-          ActiveSupport::Deprecation.silence do
-            @conn.tables("hello")
-          end
+          @conn.tables
         end
       end
 
       def test_indexes_logs_name
         with_example_table do
           assert_logged [["PRAGMA index_list(\"ex\")", "SCHEMA", []]] do
-            @conn.indexes("ex", "hello")
+            assert_deprecated { @conn.indexes("ex", "hello") }
           end
         end
       end
@@ -298,12 +280,10 @@ module ActiveRecord
         with_example_table do
           sql = <<-SQL
             SELECT name FROM sqlite_master
-            WHERE type IN ('table','view') AND name <> 'sqlite_sequence' AND name = 'ex'
+            WHERE type = 'table' AND name <> 'sqlite_sequence' AND name = 'ex'
           SQL
           assert_logged [[sql.squish, "SCHEMA", []]] do
-            ActiveSupport::Deprecation.silence do
-              assert @conn.table_exists?("ex")
-            end
+            assert @conn.table_exists?("ex")
           end
         end
       end

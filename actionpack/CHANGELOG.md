@@ -1,21 +1,113 @@
+*   Fix malformed URLS when using `ApplicationController.renderer`
+
+    The Rack environment variable `rack.url_scheme` was not being set so `scheme` was
+    returning `nil`. This caused URLs to be malformed with the default settings.
+    Fix this by setting `rack.url_scheme` when the environment is normalized.
+
+    Fixes #28151.
+
+    *George Vrettos*
+
+*   Commit flash changes when using a redirect route.
+
+    Fixes #27992.
+
+    *Andrew White*
+
+
+## Rails 5.1.0.beta1 (February 23, 2017) ##
+
+*   Prefer `remove_method` over `undef_method` when reloading routes
+
+    When `undef_method` is used it prevents access to other implementations of that
+    url helper in the ancestor chain so use `remove_method` instead to restore access.
+
+    *Andrew White*
+
+*   Add the `resolve` method to the routing DSL
+
+    This new method allows customization of the polymorphic mapping of models:
+
+    ``` ruby
+    resource :basket
+    resolve("Basket") { [:basket] }
+    ```
+
+    ``` erb
+    <%= form_for @basket do |form| %>
+    <!-- basket form -->
+    <% end %>
+    ```
+
+    This generates the correct singular URL for the form instead of the default
+    resources member url, e.g. `/basket` vs. `/basket/:id`.
+
+    Fixes #1769.
+
+    *Andrew White*
+
+*   Add the `direct` method to the routing DSL
+
+    This new method allows creation of custom url helpers, e.g:
+
+    ``` ruby
+    direct(:apple) { "http://www.apple.com" }
+
+    >> apple_url
+    => "http://www.apple.com"
+    ```
+
+    This has the advantage of being available everywhere url helpers are available
+    unlike custom url helpers defined in helper modules, etc.
+
+    *Andrew White*
+
+*   Add `ActionDispatch::SystemTestCase` to Action Pack
+
+    Adds Capybara integration directly into Rails through Action Pack!
+
+    See PR [#26703](https://github.com/rails/rails/pull/26703)
+
+    *Eileen M. Uchitelle*
+
+*   Remove deprecated `.to_prepare`, `.to_cleanup`, `.prepare!` and `.cleanup!` from `ActionDispatch::Reloader`.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated `ActionDispatch::Callbacks.to_prepare` and `ActionDispatch::Callbacks.to_cleanup`.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated `ActionController::Metal.call`.
+
+    *Rafael Mendonça França*
+
+*   Remove deprecated `ActionController::Metal#env`.
+
+    *Rafael Mendonça França*
+
+*   Make `with_routing` test helper work when testing controllers inheriting from `ActionController::API`
+
+    *Julia López*
+
 *   Use accept header in integration tests with `as: :json`
 
-    Instead of appending the `format` to the request path. Rails will figure
+    Instead of appending the `format` to the request path, Rails will figure
     out the format from the header instead.
 
     This allows devs to use `:as` on routes that don't have a format.
-    
+
     Fixes #27144.
 
     *Kasper Timm Hansen*
 
-*   Reset a new session directly after its creation in ActionDispatch::IntegrationTest#open_session.
+*   Reset a new session directly after its creation in `ActionDispatch::IntegrationTest#open_session`.
 
     Fixes #22742.
 
     *Tawan Sierek*
 
-*   Fixes incorrect output from rails routes when using singular resources.
+*   Fixes incorrect output from `rails routes` when using singular resources.
 
     Fixes #26606.
 

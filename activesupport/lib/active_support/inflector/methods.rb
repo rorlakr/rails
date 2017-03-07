@@ -161,7 +161,7 @@ module ActiveSupport
     #   titleize('TheManWithoutAPast')       # => "The Man Without A Past"
     #   titleize('raiders_of_the_lost_ark')  # => "Raiders Of The Lost Ark"
     def titleize(word)
-      humanize(underscore(word)).gsub(/\b(?<!['’`])[a-z]/) { |match| match.capitalize }
+      humanize(underscore(word)).gsub(/\b(?<!\w['’`])[a-z]/) { |match| match.capitalize }
     end
 
     # Creates the name of a table like Rails does for models to table names.
@@ -198,10 +198,10 @@ module ActiveSupport
 
     # Removes the module part from the expression in the string.
     #
-    #   demodulize('ActiveRecord::CoreExtensions::String::Inflections') # => "Inflections"
-    #   demodulize('Inflections')                                       # => "Inflections"
-    #   demodulize('::Inflections')                                     # => "Inflections"
-    #   demodulize('')                                                  # => ""
+    #   demodulize('ActiveSupport::Inflector::Inflections') # => "Inflections"
+    #   demodulize('Inflections')                           # => "Inflections"
+    #   demodulize('::Inflections')                         # => "Inflections"
+    #   demodulize('')                                      # => ""
     #
     # See also #deconstantize.
     def demodulize(path)
@@ -361,7 +361,7 @@ module ActiveSupport
       #
       #   const_regexp("Foo::Bar::Baz") # => "Foo(::Bar(::Baz)?)?"
       #   const_regexp("::")            # => "::"
-      def const_regexp(camel_cased_word) #:nodoc:
+      def const_regexp(camel_cased_word)
         parts = camel_cased_word.split("::".freeze)
 
         return Regexp.escape(camel_cased_word) if parts.blank?

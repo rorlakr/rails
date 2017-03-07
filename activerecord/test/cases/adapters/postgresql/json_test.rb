@@ -16,6 +16,7 @@ module PostgresqlJSONSharedTestCases
       @connection.create_table("json_data_type") do |t|
         t.public_send column_type, "payload", default: {} # t.json 'payload', default: {}
         t.public_send column_type, "settings"             # t.json 'settings'
+        t.public_send column_type, "objects", array: true # t.json 'objects', array: true
       end
     rescue ActiveRecord::StatementInvalid
       skip "do not test on PostgreSQL without #{column_type} type."
@@ -75,6 +76,15 @@ module PostgresqlJSONSharedTestCases
     assert_equal({ "string" => "foo", "symbol" => "bar" }, x.reload.payload)
   end
 
+  def test_deserialize_with_array
+    x = JsonDataType.new(objects: ["foo" => "bar"])
+    assert_equal ["foo" => "bar"], x.objects
+    x.save!
+    assert_equal ["foo" => "bar"], x.objects
+    x.reload
+    assert_equal ["foo" => "bar"], x.objects
+  end
+
   def test_type_cast_json
     type = JsonDataType.type_for_attribute("payload")
 
@@ -110,7 +120,7 @@ module PostgresqlJSONSharedTestCases
   def test_null_json
     @connection.execute "insert into json_data_type (payload) VALUES(null)"
     x = JsonDataType.first
-    assert_equal(nil, x.payload)
+    assert_nil(x.payload)
   end
 
   def test_select_nil_json_after_create
@@ -122,7 +132,7 @@ module PostgresqlJSONSharedTestCases
   def test_select_nil_json_after_update
     json = JsonDataType.create(payload: "foo")
     x = JsonDataType.where(payload: nil).first
-    assert_equal(nil, x)
+    assert_nil(x)
 
     json.update_attributes payload: nil
     x = JsonDataType.where(payload: nil).first

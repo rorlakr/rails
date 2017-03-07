@@ -60,7 +60,8 @@ module ActionController
     end
 
     # Accepts a custom Rack environment to render templates in.
-    # It will be merged with ActionController::Renderer.defaults
+    # It will be merged with the default Rack environment defined by
+    # +ActionController::Renderer::DEFAULTS+.
     def initialize(controller, env, defaults)
       @controller = controller
       @defaults = defaults
@@ -84,6 +85,7 @@ module ActionController
       def normalize_keys(env)
         new_env = {}
         env.each_pair { |k, v| new_env[rack_key_for(k)] = rack_value_for(k, v) }
+        new_env["rack.url_scheme"] = new_env["HTTPS"] == "on" ? "https" : "http"
         new_env
       end
 

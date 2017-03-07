@@ -1,3 +1,11 @@
+## Rails 5.1.0.beta1 (February 23, 2017) ##
+
+*   Redis subscription adapters now support `channel_prefix` option in `cable.yml`
+
+    Avoids channel name collisions when multiple apps use the same Redis server.
+
+    *Chad Ingram*
+
 *   Permit same-origin connections by default.
 
     Added new option `config.action_cable.allow_same_origin_as_host = false`
@@ -13,12 +21,12 @@
 
     *Vladimir Dementyev*
 
-*   Buffer now writes to websocket connections, to avoid blocking threads
+*   Buffer now writes to WebSocket connections, to avoid blocking threads
     that could be doing more useful things.
 
     *Matthew Draper*, *Tinco Andringa*
 
-*   Protect against concurrent writes to a websocket connection from
+*   Protect against concurrent writes to a WebSocket connection from
     multiple threads; the underlying OS write is not always threadsafe.
 
     *Tinco Andringa*
