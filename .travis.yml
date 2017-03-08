@@ -15,7 +15,7 @@ before_install:
 before_script:
   - echo -e "Host guides.rorlab.org\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - bundle update
-script: "cd guides && bundle exec rake guides:generate:html:ko:publish ALL=1"
+script: "cd guides && bundle exec rake guides:generate:html:ko:publish ALL=1 RAILS_VERSION=5.0.2"
 branches:
   only:
     - guides-ko
