@@ -40,15 +40,13 @@ controllers/    helpers/        mailers/        test_helper.rb
 fixtures/       integration/    models/
 ```
 
-`helpers`, `mailers`, `models` 폴더는 각각 뷰 헬퍼, 메일러, 모델에 대한
-테스트를 관리합니다. `controllers` 폴더는 컨트롤러, 라우트, 뷰에 대한 테스트를
-관리합니다. 그리고 `integration` 폴더는 컨트롤러 간의 동작에 대한 테스트를
-관리합니다.
+`models` 폴더는 각각 뷰 헬퍼, 메일러, 모델에 대한 테스트를 관리합니다.
+`controllers` 폴더는 컨트롤러, 라우트, 뷰에 대한 테스트를 관리합니다.
+그리고 `integration` 폴더는 컨트롤러 간의 동작에 대한 테스트를 관리합니다.
+마지막으로 메일러나, 뷰 헬퍼를 테스트하기 위한 폴더도 있습니다.
 
 픽스쳐는 테스트 데이터를 관리하는 방법의 하나입니다. `fixtures` 폴더에서
 관리합니다.
-
-`jobs` 폴더는 관련된 테스트가 생성되는 시점에서 생성됩니다.
 
 `test_helper.rb` 파일은 테스트에 대한 설정을 관리합니다.
 
@@ -264,8 +262,8 @@ Run options: --seed 1808
 
 Error:
 ArticleTest#test_should_report_error:
-NameError: undefined local variable or method 'some_undefined_variable' for #<ArticleTest:0x007fee3aa71798>
-    test/models/article_test.rb:11:in 'block in <class:ArticleTest>'
+NameError: undefined local variable or method `some_undefined_variable` for #<ArticleTest:0x007fee3aa71798>
+    test/models/article_test.rb:11:in `block in <class:ArticleTest>`
 
 
 bin/rails test test/models/article_test.rb:9
@@ -334,6 +332,7 @@ end
 | `assert_not_in_delta( expected, actual, [delta], [msg] )`        | 숫자 `expected`와 숫자 `actual`의 차이가 `delta` 이상이라고 보장함.|
 | `assert_throws( symbol, [msg] ) { block }`                       | 주어진 블록이 심볼을 던질 것이라고 보장함.|
 | `assert_raises( exception1, exception2, ... ) { block }`         | 주어진 블록이 주어진 예외를 발생시킬 것이라고 보장함.|
+| `assert_nothing_raised { block }`                                | 주어진 블록이 어떤 예외도 발생시키지 않을 것이라고 보장함.|
 | `assert_instance_of( class, obj, [msg] )`                        | `obj`는 `class`의 객체라고 보장함.|
 | `assert_not_instance_of( class, obj, [msg] )`                    | `obj`는 `class`의 객체가 아니라고 보장함.|
 | `assert_kind_of( class, obj, [msg] )`                            | `obj`는 `class`의 객체거나, 그로부터 상속되었다고 보장함.|
@@ -363,7 +362,6 @@ NOTE: 단언 만들기는 좀 더 어려운 주제이므로 이 가이드에서 
 | --------------------------------------------------------------------------------- | ------- |
 | [`assert_difference(expressions, difference = 1, message = nil) {...}`](http://api.rubyonrails.org/classes/ActiveSupport/Testing/Assertions.html#method-i-assert_difference) | 블록을 실행하기 전후에 평가한 표현식의 결과로 반환된 숫자의 차이를 테스트함.|
 | [`assert_no_difference(expressions, message = nil, &block)`](http://api.rubyonrails.org/classes/ActiveSupport/Testing/Assertions.html#method-i-assert_no_difference) | 블록을 실행하기 전후에 평가한 표현식의 결과로 반환된 숫자는 같다고 보장함.|
-| [`assert_nothing_raised { block }`](http://api.rubyonrails.org/classes/ActiveSupport/TestCase.html#method-i-assert_nothing_raised) | 주어진 블록에서 예외가 발생하지 않는다는 것을 보장함.|
 | [`assert_recognizes(expected_options, path, extras={}, message=nil)`](http://api.rubyonrails.org/classes/ActionDispatch/Assertions/RoutingAssertions.html#method-i-assert_recognizes) | 주어진 경로를 올바르게 라우팅하고, (expected_options 해시로 넘겨진) 해석 옵션이 경로와 일치할 것이라고 보장함. 레일스는 expected_options로 받은 라우팅을 인식한다는 것을 보장함.|
 | [`assert_generates(expected_path, options, defaults={}, extras = {}, message=nil)`](http://api.rubyonrails.org/classes/ActionDispatch/Assertions/RoutingAssertions.html#method-i-assert_generates) | 주어진 옵션은 주어진 경로를 생성할 때에 사용된다는 것을 보장함. 이는 assert_recognizes와 정 반대임. extra 매개변수는 쿼리 문자열에 추가 정보가 있는 경우 그 매개변수의 이름과 값을 요청에 넘기기 위해서 사용함.|
 | [`assert_response(type, message = nil)`](http://api.rubyonrails.org/classes/ActionDispatch/Assertions/ResponseAssertions.html#method-i-assert_response) | 응답이 특정 상태 코드와 함께 반환된다고 보장함. 200-299인 경우 `:success`, 300-399는 `:redirect`, 404는 `:missing`, 500-599는 `:error`로 표현할 수 있음. 또는 명시적으로 특정 상태 코드나 이를 가리키는 심볼을 넘길 수 있음. 더 많은 설명은 [상태 코드의 전체 목록](http://rubydoc.info/github/rack/rack/master/Rack/Utils#HTTP_STATUS_CODES-constant)과 어떻게 [맵핑](http://rubydoc.info/github/rack/rack/master/Rack/Utils#SYMBOL_TO_STATUS_CODE-constant)이 동작하는지 확인할 것.|
@@ -895,24 +893,11 @@ cookies["are_good_for_u"]     cookies[:are_good_for_u]
 
 ### 사용 가능한 인스턴스 변수
 
-기능 테스트에서 요청이 생성된 이후에 다음의 3개의 변수를 사용할 수 있습니다.
+기능 테스트에서는 다음의 3개의 변수를 사용할 수 있습니다.
 
 * `@controller` - 요청을 처리한 컨트롤러
 * `@request` - 요청 객체
 * `@response` - 응답 객체
-
-
-```ruby
-class ArticlesControllerTest < ActionDispatch::IntegrationTest
-  test "should get index" do
-    get articles_url
-        
-    assert_equal "index", @controller.action_name
-    assert_equal "application/x-www-form-urlencoded", @request.media_type
-    assert_match "Articles", @response.body    
-  end
-end
-```
 
 ### 헤더와 CGI 변수 설정하기
 
@@ -921,10 +906,10 @@ end
 
 ```ruby
 # HTTP 헤더 설정하기
-get articles_url, headers: { "Content-Type": "text/plain" } # 커스텀 헤더를 사용하는 요청을 흉내 낸다
+get articles_url, headers: "Content-Type" => "text/plain" # 커스텀 헤더를 사용하는 요청을 흉내 낸다
 
 # CGI 변수 사용하기
-get articles_url, headers: { "HTTP_REFERER": "http://example.com/home" } # 커스텀 환경 변수를 사용하는 요청을 흉내 낸다
+get articles_url, headers: "HTTP_REFERER": "http://example.com/home" # 커스텀 환경 변수를 사용하는 요청을 흉내 낸다
 ```
 
 ### `flash` 테스트하기
@@ -1131,7 +1116,7 @@ end
 라우팅 테스트하기
 --------------
 
-레일스 애플리케이션의 다른 모든 것들과 마찬가지로, 라우트도 테스트할 수 있습니다. 라우트 테스트는 `test/controllers/`나 컨트롤러 테스트의 일부로 포함할 수 있습니다.
+레일스 애플리케이션의 다른 모든 것들과 마찬가지로, 라우트도 테스트할 수 있습니다.
 
 NOTE: 애플리케이션이 복잡한 라우트를 가지고 있다면, 레일스는 이를 위한 유용한 헬퍼를 여럿 제공합니다.
 
@@ -1376,9 +1361,10 @@ end
 
 이 테스트는 꽤 간단합니다. 그리고 잡이 정상적으로 동작했는지 확인합니다.
 
-`ActiveJob::TestCase`는 큐 어댑터를 `:async`로 설정하여 잡이 비동기적으로 실행되도록 만듭니다.
-그리고 어떤 테스트가 실행되기 전에 이전에 실행되거나 등록된 잡들이 초기화되었을 거라고 보장합니다.
-이를 통해 각 테스트가 실행되는 시점에는 큐가 깨끗하며 아무런 잡도 실행되지 않았다고 가정할 수 있습니다.
+`ActiveJob::TestCase`는 큐 어댑터를 `:async`로 설정하여 잡이 비동기적으로
+실행되도록 만듭니다. 그리고 어떤 테스트가 실행되기 전에 이전에 실행되거나
+등록된 잡들이 초기화되었을 거라고 보장합니다. 이를 통해 각 테스트가 실행되는
+시점에는 큐가 깨끗하며 아무런 잡도 실행되지 않았다고 가정할 수 있습니다.
 
 ### 커스텀 단언과 다른 컴포넌트에서 잡 테스트하기
 
@@ -1421,4 +1407,4 @@ end
 assert_equal Date.new(2004, 10, 24), user.activation_date # 변경사항은 `travel_to` 블록 내에서만 적용됩니다.
 ```
 
-사용 가능한 시간 헬퍼에 대한 정보는 [`ActiveSupport::Testing::TimeHelpers` API 문서](http://api.rubyonrails.org/classes/ActiveSupport/Testing/TimeHelpers.html)에서 확인하세요.
+사용 가능한 시간 헬퍼에 대한 정보는 [`ActiveSupport::TimeHelpers` API 문서](http://api.rubyonrails.org/classes/ActiveSupport/Testing/TimeHelpers.html)에서 확인하세요.

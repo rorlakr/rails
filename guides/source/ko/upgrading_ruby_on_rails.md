@@ -48,7 +48,7 @@ TIP: 루비 1.8.7 p248과 p249에는 레일스의 작동을 중단시키는 치�
 
 ### Update 태스크
 
-Rails에는 `app:update`라는 태스크(4.2 버전 이하라면 `rake rails:update`)가 있습니다. Gemfile에 기재된 레일스의 버전을 변경한 뒤, 이 태스크를 실행해주세요.
+Rails에는 `app:update`라는 태스크(4.2 버전 이하라면 `rails:update`)가 있습니다. Gemfile에 기재된 레일스의 버전을 변경한 뒤, 이 태스크를 실행해주세요.
 이를 통해서, 새로운 버전에 필요한 파일 생성이나, 기존의 파일을 변경하는 것을 인터랙티브하게 진행할 수 있습니다.
 
 ```bash
@@ -1104,6 +1104,10 @@ config.middleware.insert_before(Rack::Lock, ActionDispatch::BestStandardsSupport
 ### Active Support
 
 레일스 4.0에서는 `ERB::Util#json_escape`의 별칭인 `j`가 폐기되었습니다. 이 별칭 `j`는 이미 `ActionView::Helpers::JavaScriptHelper#escape_javascript`에서 사용되고 있기 때문입니다.
+
+#### 캐시
+
+Rails 3.x와 4.0에서 캐싱 방법이 변경되었습니다. [캐시 네임 스페이스](http://guides.rubyonrails.org/caching_with_rails.html#activesupport-cache-store)를 변경하고, 캐시를 초기화해야 합니다.
 
 ### 헬퍼 로딩 순서
 

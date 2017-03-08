@@ -1,4 +1,3 @@
-
 Active Record Validation
 ==========================
 
@@ -247,7 +246,7 @@ end
 
 ```ruby
 class Person < ApplicationRecord
-  validates :terms_of_service, acceptance: { message: 'must be abided' }
+  validates :terms_of_service, acceptance: true, message: 'must be abided'
 end
 ```
 
@@ -343,8 +342,7 @@ end
 `exclusion` 헬퍼의 `:in` 옵션에는 검증시에 포함하면 안되는 값들의 집합을
 넘겨줍니다. `:in` 옵션에는 `:within`이라는 동의어도 있으므로, 편의에 맞춰서
 어느 쪽이든 사용할 수 있습니다. 위의 예제에서는 `:message` 옵션에서 속성 값을
-어떻게 사용하는지를 보여주고 있습니다. 메시지 인수에 대한 전체 설명은
-[메시지 문서](#message)를 참고하세요.
+어떻게 사용하는지를 보여주고 있습니다.
 
 기본 에러 메시지는 _"is reserved"_ 입니다.
 
@@ -378,8 +376,7 @@ end
 `inclusion` 헬퍼에는 `:in` 옵션이 있으며, 사용 가능한 값들을 지정합니다(화이트
 리스트). `:in` 옵션에는 `:within`이라는 동의어가 있으며, 편한 것을 사용하면
 됩니다. 위의 예제에서는 `:message` 옵션에서 어떻게 속성 값을 사용하는 지를
-보여주고 있습니다. 메시지 인수에 대한 전체 설명은 [메시지 문서](#message)를
-참고하세요.
+보여주고 있습니다.
 
 이 헬퍼의 기본 에러 메시지는 _"is not included in the list"_ 입니다.
 
@@ -691,8 +688,6 @@ class Coffee < ApplicationRecord
 end
 ```
 
-메시지 인수에 대한 전체 설명은 [메시지 문서](#message)를 참고하세요.
-
 ### `:allow_blank`
 
 `:allow_blank` 옵션은 `:allow_nil` 옵션과 비슷합니다. 이 옵션을 사용하면,
@@ -716,9 +711,7 @@ Active Record는 검증 헬퍼의 기본 에러 메시지를 사용합니다. `:
 `String`이나 `Proc`을 받습니다.
 
 문자열 `:message` 값은 `%{value}`, `%{attribute}`, `%{model}`를 받을 수 있으며
-이것들은 검증이 실패했을 때에 자동으로 각각의 값으로 대체됩니다. 이 대체는
-I18n 젬을 통해서 이루어지며, 이 플레이스 홀더들은 공백없이 반드시 일치해야
-합니다.
+이것들은 검증이 실패했을 때에 자동으로 각각의 값으로 대체됩니다.
 
 `Proc`을 `:message` 값으로 사용하는 경우 내부에 검증되는 객체와 `:model`,
 `:attribute`, `:value`가 들어 있는 해시 객체를 넘깁니다.

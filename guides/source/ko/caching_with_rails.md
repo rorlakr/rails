@@ -88,8 +88,8 @@ views/products/1-201505056193031061005000/bea67108094918eeba42cd4a6e786901
 이 방법을 '키 기반 유효기간'이라고 부릅니다.
 
 캐싱된 조각은 뷰의 조각이 변경된 경우(뷰의 HTML이 변경된 경우 등)에도 만료됩니다. 식별자 뒷부분의
-문자열은 '템플릿 트리 다이제스트'입니다. 이것은 캐싱된 뷰 조각의 내용으로부터 계산된 MD5 해시값입니다.
-뷰 조각이 변경되면 MD5 해시값도 변경되므로 기존의 캐시가 만료됩니다.
+문자열은 '템플릿 트리 다이제스트'입니다. 이것은 캐싱된 뷰 조각의 내용으로부터 계산된 md5 해시값입니다.
+뷰 조각이 변경되면 md5 해시값도 변경되므로 기존의 캐시가 만료됩니다.
 
 TIP: Memcached 등의 캐시 저장소에서는 오래된 캐시 파일을 자동으로 삭제합니다.
 
@@ -179,11 +179,11 @@ render "comments/comments"
 render "comments/comments"
 render("comments/comments")
 
-render "header" 는 render("comments/header") 가 됩니다.
+render "header" => render("comments/header")
 
-render(@topic)         는 render("topics/topic") 가 됩니다.
-render(topics)         는 render("topics/topic") 가 됩니다.
-render(message.topics) 는 render("topics/topic") 가 됩니다.
+render(@topic)         => render("topics/topic")
+render(topics)         => render("topics/topic")
+render(message.topics) => render("topics/topic")
 ```
 
 한편 일부는 호출할 때에 캐시가 적절하게 동작하도록 변경해야 합니다.
@@ -236,7 +236,7 @@ render partial: "documents/document", collection: @project.documents.where(publi
 #### 외부 의존성
 
 예를 들어, 캐싱된 블록 내에서 헬퍼 메소드가 있다고 가정합시다. 이 헬퍼를 변경한 뒤에 캐시가 사용되지 않도록,
-템플릿 파일의 MD5가 어떤 방식으로든 변경되게 만들 필요가 있습니다. 권장하는 방법중 하나는, 다음과 같이
+템플릿 파일의 md5가 어떤 방식으로든 변경되게 만들 필요가 있습니다. 권장하는 방법중 하나는, 다음과 같이
 주석을 통해 명시적으로 변경하는 것입니다.
 
 ```html+erb
@@ -247,14 +247,13 @@ render partial: "documents/document", collection: @project.documents.where(publi
 ### 저레벨 캐시
 
 뷰의 조각을 캐싱하는 것이 아니라 특정 값이나 쿼리의 결과만을 캐싱하고 싶은
-경우가 있습니다. 레일스의 캐싱 기법으로는 어떤 정보라도 캐시에 저장할 수
+경우가 있습니다. 레일스의 캐싱 기법으로는 __어떤__ 정보라도 캐시에 저장할 수
 있습니다.
 
 저레벨 캐시의 가장 효과적인 구현 방법은 `Rails.cache.fetch` 메소드를 사용하는
 것입니다. 이 메소드는 캐시 저장/읽기 모두에 대응합니다. 인수가 하나일 경우
-키를 사용해 캐시로부터 값을 반환합니다. 블록을 인수로 넘기면 해당 키의 캐시가
-없는 경우, 블록을 실행합니다. 그리고 블록의 실행 결과를 주어진 키에 저장합니다.
-해당하는 키의 캐시가 있는 경우, 블록은 실행되지 않습니다.
+키를 사용해 캐시로부터 값을 반환합니다. 블록을 인수로 넘기면 블록의 실행 결과가
+주어진 키에 대해서 캐싱되며, 이를 반환합니다.
 
 다음 예시를 보죠. 애플리케이션에 `Product` 모델이 있고, 여러 웹사이트의 제품
 가격을 검색하는 인스턴스 메소드가 구현되어 있다고 합시다. 저레벨 캐시를
@@ -362,10 +361,11 @@ initializer에 `:size` 옵션을 지정합니다(기본값은 32MB). 캐시가 �
 config.cache_store = :memory_store, { size: 64.megabytes }
 ```
 
-레일스 서버 프로세스를 복수 실행한다면(Phusion Passenger나 puma 클러스터를 사용하는 경우),
-캐시 데이터는 프로세스 간에 공유되지 않습니다. 이 캐시 저장소는 대규모로 배포되는 애플리케이션에는
-적당하지 않습니다. 단, 작은 규모의 트래픽이 적은 사이트에서 서버 프로세스를 몇 개 정도만 사용한다면
-문제 없이 동작합니다. 물론 개발 환경이나 테스트 환경에서도 동작합니다.
+레일스 서버 프로세스를 복수 실행한다면(mongrel_cluster나 Phusion Passenger를
+사용하는 경우), 캐시 데이터는 프로세스 간에 공유되지 않습니다. 이 캐시 저장소는
+대규모로 배포되는 애플리케이션에는 적당하지 않습니다. 단, 작은 규모의 트래픽이
+적은 사이트에서 서버 프로세스를 몇 개 정도만 사용한다면 문제 없이 동작합니다.
+물론 개발 환경이나 테스트 환경에서도 동작합니다.
 
 ### ActiveSupport::Cache::FileStore
 
@@ -496,29 +496,6 @@ class ProductsController < ApplicationController
   def show
     @product = Product.find(params[:id])
     fresh_when last_modified: @product.published_at.utc, etag: @product
-  end
-end
-```
-
-때때로 캐시된 응답이 필요할 때가 있습니다. 예를 들어 정적인 페이지는 유효기간이
-필요하지 않습니다. 이를 위해서 `http_cache_forever` 헬퍼를 사용하여 프록시가
-이를 무기한으로 캐싱하도록 만들 수 있습니다.
-
-캐싱된 응답은 기본으로 공개되지 않으며, 사용자의 웹 브라우저에서만 캐시가
-유지됩니다. 프록시가 응답을 캐싱하길 원한다면 `public: true`를 통해 모든
-사용자에게 캐시된 응답을 넘겨주세요.
-
-이 헬퍼를 사용하면 `last_modified` 헤더가 `Time.new(2011, 1, 1).utc`로,
-`expires` 헤더가 100년으로 설정됩니다.
-
-WARNING: 브라우저 캐시를 강제로 무효화하지 않는 이상 이 캐시는 사라지지 않기 때문에 이 메소드는 주의해서 사용해주세요.
-
-```ruby
-class HomeController < ApplicationController
-  def index
-    http_cache_forever(public: true) do
-      render
-    end
   end
 end
 ```

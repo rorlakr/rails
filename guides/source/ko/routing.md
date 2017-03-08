@@ -16,7 +16,9 @@ Rails 라우팅
 Rails 라우터의 목적
 -------------------------------
 
-Rails의 라우터는 요청받은 URL을 인식하고 적절한 컨트롤러의 액션이나 Rack 애플리케이션에 매칭합니다. 라우터는 뷰에서 이러한 경로나 URL을 직접 하드 코딩하는 것을 피하기 위한 경로나 URL도 제공합니다.
+Rails의 라우터는 요청받은 URL을 인식하고 적절한 컨트롤러의 액션에 매칭합니다.
+라우터는 뷰에서 이러한 경로나 URL을 직접 하드 코딩하는 것을 피하기 위한 경로나
+URL도 제공합니다.
 
 ### URL을 실제 코드와 연결하기
 
@@ -545,23 +547,43 @@ Rails에서는 리소스 라우팅을 사용할 때에 임의의 URL을 액션�
 
 ### 파라미터 나누기
 
-일반적인 라우팅을 설정하는 경우라면, Rails가 받은 HTTP 요청을 라우팅에 매칭하기 위한 심볼을 몇 개 넘깁니다. 아래의 예제를 보시죠.
+일반적인 라우팅을 설정하는 경우라면, Rails가 받은 HTTP 요청을 라우팅에 매칭하기
+위한 심볼을 몇 개 넘깁니다. 이러한 심볼중에 특별한 값이 2개 있습니다.
+`:controller`는 애플리케이션의 컨트롤러 이름과 매칭되며, `:action`은 컨트롤러에
+존재하는 액션의 이름과 매칭됩니다. 아래의 예제를 보시죠.
 
 ```ruby
-get 'photos(/:id)', to: :display
+get ':controller(/:action(/:id))'
 ```
 
-브라우저에서 보낸 `/photos/1` 요청은 위의 (이전에 이에 매칭되는 라우트가 없었기 때문에) 라우팅으로 처리하게 되며, `Photos` 컨트롤러의 `display` 액션이 호출됩니다. 그리고 URL의 마지막에 있는 `"1"`은 `params[:id]`를 통해 접근할 수 있습니다. `:id`가 필수가 아니라는 점을 ()로 표현하고 있으므로, 이 라우팅은 `/photos`를 `PhotosController#display`로 넘겨줄 수도 있습니다.
+브라우저에서 보낸 `/photos/show/1` 요청은 위의 (이전에 이에 매칭되는 라우트가
+없었기 때문에) 라우팅으로 처리하게 되며, `Photos` 컨트롤러의 `show` 액션이
+호출됩니다. 그리고 URL의 마지막에 있는 `"1"`은 `params[:id]`를 통해 접근할 수
+있습니다. 그리고 `:action`과 `:id`가 필수가 아니라는 점을 ()로 표현하고
+있으므로, 이 라우팅은 `/photos`로 들어오는 요청을 `PhotosController#index`로
+보낼수도 있습니다.
 
 ### 동적인 세그먼트
 
-일반 라우팅의 일부로서, 문자열을 고정하지 않는 동적인 세그먼트를 자유롭게 사용할 수 있습니다. 어떤 것이라도 `params`에 포함시켜 액션에 건네줄 수 있습니다. 아래와 같은 라우팅을 선언했다고 가정합시다.
+일반 라우팅의 일부로서, 문자열을 고정하지 않는 동적인 세그먼트를 자유롭게
+사용할 수 있습니다. `:controller`나 `:action`을 제외한 어떤 것이라도 `params`에
+포함시켜 액션에 건네줄 수 있습니다.  아래와 같은 라우팅을 선언했다고 가정합시다.
 
 ```ruby
-get 'photos/:id/:user_id', to: 'photos#show'
+get ':controller/:action/:id/:user_id'
 ```
 
-브라우저에서의 `/photos/1/2` 요청은 `Photos` 컨트롤러의 `show` 액션에 매칭됩니다. 이 경우에는 `params[:id]`에는 `"1"`, `params[:user_id]`에는 `"2"`가 저장됩니다.
+브라우저에서의 `/photos/show/1/2` 요청은 `Photos` 컨트롤러의 `show` 액션에
+매칭됩니다. 이 경우에는 `params[:id]`에는 `"1"`, `params[:user_id]`에는
+`"2"`가 저장됩니다.
+
+NOTE: `:controller` 경로 세그먼트와 함께 `:namespace`나 `:module`을 사용할 수
+없습니다. 이러한 기능이 필요하다면 :controller에 제한 조건을 사용하여 필요한
+네임스페이스를 매칭해야합니다.
+
+```ruby
+get ':controller(/:action(/:id))', controller: /admin\/[^\/]+/
+```
 
 TIP: 동적인 세그먼트 분할에서는 기본적으로 마침표(`.`)을 사용할 수 없습니다. 이는 마침표가 라우팅에서 포맷을 구분하기 위한 용도로 사용되고 있기 때문입니다. 반드시 동적 세그먼트 내에서 마침표를 쓰고 싶은 때에는 기본 설정을 덮어써야합니다. 예를 들어 `id: /[^\/]+/`라고 사용한다면 슬래시 이외의 모든 문자를 사용할 수 있습니다.
 
@@ -570,22 +592,32 @@ TIP: 동적인 세그먼트 분할에서는 기본적으로 마침표(`.`)을 �
 라우트 선언시에 콜론을 사용하지 않은 경우, 정적인 세그먼트가 되어 고정 문자열을 사용하게 됩니다.
 
 ```ruby
-get 'photos/:id/with_user/:user_id', to: 'photos#show'
+get ':controller/:action/:id/with_user/:user_id'
 ```
 
-이 라우팅에서는 `/photos/1/with_user/2`와 같은 경로가 매칭됩니다. `with_user`는 그대로 사용되고 있습니다. 이 때 액션에서 사용할 수 있는 `params`는 `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`가 됩니다.
+이 라우팅에서는 `/photos/show/1/with_user/2`와 같은 경로가 매칭됩니다. `with_user`는 그대로 사용되고 있습니다. 이 때 액션에서 사용할 수 있는 `params`는 `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`가 됩니다.
 
 ### 쿼리 문자열
 
 쿼리 문자열으로 지정되어있는 파라미터도 모두 `params`에 포함됩니다. 아래의 라우팅으로 예를 들어 보겠습니다.
 
 ```ruby
+get ':controller/:action/:id'
+```
+
+브라우저에서 `/photos/show/1?user_id=2`라는 경로를 요청받으면 `Photos` 컨트롤러의 `show` 액션에 매칭됩니다. 이 때 `params`는 `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`가 됩니다.
+
+### 기본 설정을 정의하기
+
+`:controller`와 `:action` 심볼을 라우트에서 명시적으로 지정할 필요는 없으며,
+이는 기본으로 받을 수 있습니다.
+
+```ruby
 get 'photos/:id', to: 'photos#show'
 ```
 
-브라우저에서 `/photos/1?user_id=2`라는 경로를 요청받으면 `Photos` 컨트롤러의 `show` 액션에 매칭됩니다. 이 때 `params`는 `{ controller: 'photos', action: 'show', id: '1', user_id: '2' }`가 됩니다.
-
-### 기본 설정을 정의하기
+이 라우팅을 사용하면 Rails는 `/photos/12`로 들어오는 요청을 `PhotosController`의
+`show`에 연결해줍니다.
 
 `:defaults` 옵션에 해시를 넘기는 것으로 추가 기본 설정을 정의할 수도 있습니다. 이 정의는 동적 세그먼트로서 지정하지 않은 파라미터에 대해서도 적용됩니다. 예를 들면,
 

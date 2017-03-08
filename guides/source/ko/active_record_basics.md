@@ -99,7 +99,7 @@ Active Record에서는 데이터베이스의 테이블에 사용하는 컬럼명
 
 * **Primary Keys** - 기본값으로 `id`라는 이름을 가지는 integer 형의 컬럼을
 테이블의 기본키로 사용합니다. 이 컬럼은
-[Active Record Migrations](active_record_migrations.html)을 사용해서
+[Active Record Migrations](migrations.html)을 사용해서
 테이블을 작성할 때에 자동으로 생성됩니다.
 
 이외에도, Active Record 인스턴스에 기능을 추가하는 컬럼이 더 있습니다. 
@@ -370,5 +370,5 @@ Rails는 어떤 마이그레이션 파일이 데이터베이스에 반영되어�
 위의 마이그레이션 코드는 데이터베이스에 의존하지 않는다는 점에 주목해주세요.
 MySQL, PostgreSQL, Oracle 등, 다수의 데이터베이스에 대해서 실행할 수 있습니다.
 마이그레이션에 대한 자세한 설명은
-[Active Record Migrations](active_record_migrations.html)을 참조해주세요.
+[Active Record Migrations](migrations.html)을 참조해주세요.
 

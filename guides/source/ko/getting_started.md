@@ -62,7 +62,7 @@ TIP: 이하의 예시에서는 Unix계열의 OS의 프롬프트라는 의미로 
 
 ```bash
 $ ruby -v
-ruby 2.3.1p112
+ruby 2.3.0p0
 ```
 
 TIP: 루비나 루비온레일스를 빠르게 설치하기 위한 도구가 다수 존재합니다. Windows 사용자의 경우에는 [Rails Installer](http://railsinstaller.org)를 사용해주세요. Mac OS X 사용자는 [Tokaido](https://github.com/tokaido/tokaidoapp)를 사용해 주세요. 그 이외의 OS에서의 설치 방법은 [ruby-lang.org](https://www.ruby-lang.org/ko/documentation/installation/)를 참고해주세요.
@@ -116,7 +116,7 @@ $ cd blog
 
 | 파일/폴더 | 목적 |
 | ----------- | ------- |
-|app/|여기에는 애플리케이션의 컨트롤러, 모델, 뷰, 헬퍼, 메일러, 채널, 잡, 애셋이 위치하고 있습니다. 이후, 가이드에서는 기본적으로 이 폴더를 중심으로 설명을 진행합니다.|
+|app/|여기에는 애플리케이션의 컨트롤러, 모델, 뷰, 헬퍼, 메일러, 애셋이 위치하고 있습니다. 이후, 가이드에서는 기본적으로 이 폴더를 중심으로 설명을 진행합니다.|
 |bin/|여기에는 애플리케이션을 기동하거나, 배포하기 위한 레일스 스크립트 등의 스크립트 파일들이 포함되어 있습니다.|
 |config/|애플리케이션의 설정 파일(라우팅, 데이터베이스 등)이 위치하고 있습니다. 자세한 내용은[레일스 애플리케이션 설정하기](configuring.html) 를 참조해주세요.|
 |config.ru|애플리케이션 기동시에 필요한 Rack 기반 서버 용 설정 파일입니다.|
@@ -130,7 +130,6 @@ $ cd blog
 |test/|Unit테스트, 픽스쳐 등의 테스트 관련 파일들을 가집니다. 테스트에 대해서는 [레일스 애플리케이션을 테스트하기](testing.html)를 참조해주세요.|
 |tmp/|캐시, pid, 세션 파일 등의 임시 파일이 포함되는 폴더입니다.|
 |vendor/|서드 파티에 의해 작성된 코드는 모두 이곳에 넣습니다. 일반적인 레일스 애플리케이션이라면 gem 파일도 이 곳에 두게 됩니다.|
-|.gitignore|이 파일은 git에게 관리하지 않을 파일 목록이나 패턴을 알려줍니다. [Github - 파일 무시하기](https://help.github.com/articles/ignoring-files) 문서를 읽어보세요.
 
 
 안녕, 레일스!
@@ -184,7 +183,6 @@ invoke  test_unit
 create    test/controllers/welcome_controller_test.rb
 invoke  helper
 create    app/helpers/welcome_helper.rb
-invoke    test_unit
 invoke  assets
 invoke    coffee
 create      app/assets/javascripts/welcome.coffee
@@ -248,8 +246,6 @@ TIP: 라우팅에 대한 자세한 내용은 [레일스 라우팅](routing.html)
 
 ```ruby
 Rails.application.routes.draw do
-  get 'welcome/index'
-
   resources :articles
 
   root 'welcome#index'
@@ -477,7 +473,7 @@ end
 
 이 마이그레이션 파일에는 `change`라는 이름의 메소드가 포함되어 있으며 마이그레이션의 실행시에 호출됩니다. 이 메소드에 정의된 조작은 취소할 수 있습니다. 다시 말해 레일스는 change 함수로 수행된 마이그레이션은 필요에 따라서 이전의 상태로 되돌릴 수 있습니다. 이 마이그레이션을 실행하면 `articles`라는 테이블이 생성되고, 문자열 컬럼과 텍스트 컬럼이 하나씩 추가됩니다. 마이그레이션 시에 레일스는 작성일과 변경일을 추적하기 위한 컬럼을 생성합니다. 이것들은 개발자가 지정하지 않아도 자동적으로 생성됩니다.
 
-TIP: 더 자세한 설명은 [레일스 데이터베이스 마이그레이션](active_record_migrations.html)을 참조해주세요.
+TIP: 더 자세한 설명은 [레일스 데이터베이스 마이그레이션]((migrations.html)을 참조해주세요.
 
 여기에서는 아래와 같은 bin/rails 명령으로 마이그레이션을 실행합니다.
 
@@ -824,7 +820,7 @@ end
 수정용 뷰에 포함되는 양식은 새 글을 작성할 때 사용하는 양식과 거의 동일합니다. `app/views/articles/edit.html.erb`라는 파일을 생성하고, 다음의 코드를 입력해주세요.
 
 ```html+erb
-<h1>Edit article</h1>
+<h1>Editing article</h1>
 
 <%= form_for :article, url: article_path(@article), method: :patch do |f| %>
 
