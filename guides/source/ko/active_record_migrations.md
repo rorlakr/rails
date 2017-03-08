@@ -216,7 +216,7 @@ $ bin/rails generate migration AddUserRefToProducts user:references
 ```ruby
 class AddUserRefToProducts < ActiveRecord::Migration[5.0]
   def change
-    add_reference :products, :user, foreign_key: true
+    add_reference :products, :user, index: true, foreign_key: true
   end
 end
 ```
@@ -285,7 +285,7 @@ $ bin/rails generate migration AddDetailsToProducts 'price:decimal{5,2}' supplie
 class AddDetailsToProducts < ActiveRecord::Migration[5.0]
   def change
     add_column :products, :price, :decimal, precision: 5, scale: 2
-    add_reference :products, :supplier, polymorphic: true
+    add_reference :products, :supplier, polymorphic: true, index: true
   end
 end
 ```

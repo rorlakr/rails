@@ -422,19 +422,6 @@ config.assets.raise_runtime_errors = false
 
 이 옵션이 true라면 애플리케이션의 애셋이 `config.assets.precompile`에 기술되어 있는 순서대로 모두 불러오는지를 확인합니다. `config.assets.digest`도 true인 경우, 애셋에 대한 요청에서는 다이제스트를 반드시 포함해야합니다.
 
-### 애셋을 찾을 수 없을 때 에러를 던지기
-
-sprockets-rails >= 3.2.0를 사용하고 있다면 애셋을 요청받고, 발견하지 못했을 때
-어떤 행동을 할지 설정할 수 있습니다. "asset fallback"을 끄고 있다면 애셋을
-발견하지 못했을 때 에러를 던집니다.
-
-```ruby
-config.assets.unknown_asset_fallback = false
-```
-
-만약 "asset fallback"이 활성화되어 있다면 애셋의 경로를 찾지 못했다는 메시지가
-에러를 던지는 대신 반환됩니다. 이 동작은 기본으로 활성화되어 있습니다.
-
 ### 다이제스트를 비활성화하기
 
 `config/environments/development.rb`를 다음과 같이 고쳐서 다이제스트를 비활성화할 수 있습니다.
@@ -568,7 +555,7 @@ NOTE: 이 매쳐(그리고 뒤에서 설명할 precompile 배열의 다른 멤�
 `config/initializers/assets.rb`의 `precompile`라는 배열을 사용하세요.
 
 ```ruby
-Rails.application.config.assets.precompile += %w( admin.js admin.css )
+Rails.application.config.assets.precompile += ['admin.js', 'admin.css', 'swfObject.js'
 ```
 
 NOTE: precompile 배열에 Sass나 CoffeeScript 파일등을 추가할 경우에도 반드시 `.js`, `.css`로 끝나는 파일명(다시 말해 컴파일이 끝난 시점의 파일명)으로 지정해주세요.
@@ -1025,12 +1012,12 @@ config.assets.js_compressor = :uglifier
 # 컴파일된 애셋이 발견되지 않는 경우에 애셋 파이프라인으로 돌아가지 않기
 config.assets.compile = false
 
-# 애셋 URL의 다이제스트를 생성하기
+# 애셋 URL의 다이제스트를 생성하기. 이 옵션은 제거 예정입니다.
 config.assets.digest = true
 
 # 추가 애셋을 미리 컴파일하기 (application.js, application.css, 그리고 모든
 # 비JS/CSS 파일이 추가되어 있음)
-# config.assets.precompile += %w( admin.js admin.css )
+# config.assets.precompile += %w( search.js )
 ```
 
 Rails는 Sprockets의 기본 설정값을 test 환경을 위한 `test.rb`에서 설정하지

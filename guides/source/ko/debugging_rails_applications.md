@@ -812,10 +812,16 @@ Valgrind의 설치 방법과 Ruby에서의 사용 방법에 대해서는 [Valgri
 * [Exception Notifier](https://github.com/smartinez87/exception_notification/tree/master): Rails 애플리케이션에서의 에러 발생시의 메일러 객체와 메일 통지 전송 템플릿의 기본 값을 제공합니다.
 * [Better Errors](https://github.com/charliesome/better_errors): Rails 표준 에러 페이지를 소스 코드나 변수 조사에 편리한 컨텍스트 정보를 추가하여 보여줍니다.
 * [RailsPanel](https://github.com/dejan/rails_panel): Rails 개발용의 Chrome 확장 기능입니다. 이것이 있으면 development.log에서 tail 명령을 실행할 필요가 없어집니다. Rails 애플리케이션의 요청에 대한 모든 정보를 브라우저 상(Developer Tools 패널)에서 볼 수 있습니다. db 시간, 랜더링 시간, 총 시간, 파라미터 리스트, 출력한 뷰 등을 볼 수 있습니다.
-* [Pry](https://github.com/pry/pry): IRB를 대체할 수 있는 구현체입니다.
 
 참고자료
 ----------
 
-* [byebug 홈페이지](https://github.com/deivid-rodriguez/byebug)(영어)
-* [web-console 홈페이지](https://github.com/rails/web-console)(영어)
+* [ruby-debug 홈페이지](http://bashdb.sourceforge.net/ruby-debug/home-page.html)
+* [debugger 홈페이지](https://github.com/cldwalker/debugger)
+* [byebug 홈페이지](https://github.com/deivid-rodriguez/byebug)
+* [web-console 홈페이지](https://github.com/rails/web-console)
+* [글: Debugging a Rails application with ruby-debug](http://www.sitepoint.com/debug-rails-app-ruby-debug/)
+* [Ryan Bates의 루비 디버깅하기 스크린캐스트](http://railscasts.com/episodes/54-debugging-ruby-revised)
+* [Ryan Bates의 스택 추적하기 스크린캐스트](http://railscasts.com/episodes/24-the-stack-trace)
+* [Ryan Bates의 로거 스크린캐스트](http://railscasts.com/episodes/56-the-logger)
+* [ruby-debug로 디버깅하기](http://bashdb.sourceforge.net/ruby-debug.html)

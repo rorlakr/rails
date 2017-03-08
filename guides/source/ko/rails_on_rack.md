@@ -61,7 +61,7 @@ Rails의 `rails server` 명령 대신에 `rackup` 명령을 사용할 때에는 
 
 ```ruby
 # Rails.root/config.ru
-require_relative 'config/environment'
+require ::File.expand_path('../config/environment', __FILE__)
 run Rails.application
 ```
 
@@ -102,18 +102,19 @@ $ bin/rails middleware
 use Rack::Sendfile
 use ActionDispatch::Static
 use ActionDispatch::Executor
-use ActiveSupport::Cache::Strategy::LocalCache::Middleware
+use #<ActiveSupport::Cache::Strategy::LocalCache::Middleware:0x000000029a0838>
 use Rack::Runtime
 use Rack::MethodOverride
 use ActionDispatch::RequestId
 use Rails::Rack::Logger
 use ActionDispatch::ShowExceptions
-use WebConsole::Middleware
 use ActionDispatch::DebugExceptions
 use ActionDispatch::RemoteIp
 use ActionDispatch::Reloader
 use ActionDispatch::Callbacks
 use ActiveRecord::Migration::CheckPending
+use ActiveRecord::ConnectionAdapters::ConnectionManagement
+use ActiveRecord::QueryCache
 use ActionDispatch::Cookies
 use ActionDispatch::Session::CookieStore
 use ActionDispatch::Flash
@@ -145,9 +146,9 @@ run Rails.application.routes
 # Rack::BounceFavicon를 가장 마지막에 추가한다
 config.middleware.use Rack::BounceFavicon
 
-# ActiveRecord::Executor의 뒤에 Lifo::Cache를 추가한다
+# ActiveRecord::QueryCache의 뒤에 Lifo::Cache를 추가한다
 # 그리고 Lifo::Cache에 { page_cache: false }를 넘긴다
-config.middleware.insert_after ActionDispatch::Executor, Lifo::Cache, page_cache: false
+config.middleware.insert_after ActiveRecord::QueryCache, Lifo::Cache, page_cache: false
 ```
 
 #### 미들웨어를 교체하기
@@ -261,6 +262,14 @@ Action Controller의 기능의 대부분은 미들웨어로서 구현되어 있�
 **`ActiveRecord::Migration::CheckPending`**
 
 * 적용되지 않은 마이그레이션이 있는지 확인합니다. 미실행된 것이 있으면 `ActiveRecord::PendingMigrationError`를 발생시킵니다.
+
+**`ActiveRecord::ConnectionAdapters::ConnectionManagement`**
+
+* 요청 환경의 `rack.test`가 `true`가 아니라면 각 요청이 끝나고 살아있는 연결을 전부 정리합니다.
+
+**`ActiveRecord::QueryCache`**
+
+* Active Record 쿼리 캐싱을 활성화합니다.
 
 **`ActionDispatch::Cookies`**
 

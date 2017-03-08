@@ -1,3 +1,5 @@
+**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
+
 Ruby on Rails 3.0 Release Notes
 ===============================
 
@@ -15,7 +17,7 @@ Even if you don't give a hoot about any of our internal cleanups, Rails 3.0 is g
 
 On top of all that, we've tried our best to deprecate the old APIs with nice warnings. That means that you can move your existing application to Rails 3 without immediately rewriting all your old code to the latest best practices.
 
-These release notes cover the major upgrades, but don't include every little bug fix and change. Rails 3.0 consists of almost 4,000 commits by more than 250 authors! If you want to see everything, check out the [list of commits](https://github.com/rails/rails/commits/master) in the main Rails repository on GitHub.
+These release notes cover the major upgrades, but don't include every little bug fix and change. Rails 3.0 consists of almost 4,000 commits by more than 250 authors! If you want to see everything, check out the [list of commits](https://github.com/rails/rails/commits/3-0-stable) in the main Rails repository on GitHub.
 
 --------------------------------------------------------------------------------
 
@@ -73,8 +75,6 @@ You can see an example of how that works at [Rails Upgrade is now an Official Pl
 
 Aside from Rails Upgrade tool, if you need more help, there are people on IRC and [rubyonrails-talk](http://groups.google.com/group/rubyonrails-talk) that are probably doing the same thing, possibly hitting the same issues. Be sure to blog your own experiences when upgrading so others can benefit from your knowledge!
 
-More information - [The Path to Rails 3: Approaching the upgrade](http://omgbloglol.com/post/353978923/the-path-to-rails-3-approaching-the-upgrade)
-
 Creating a Rails 3.0 application
 --------------------------------
 
@@ -86,9 +86,9 @@ $ cd myapp
 
 ### Vendoring Gems
 
-Rails now uses a `Gemfile` in the application root to determine the gems you require for your application to start. This `Gemfile` is processed by the [Bundler](https://github.com/carlhuda/bundler,) which then installs all your dependencies. It can even install all the dependencies locally to your application so that it doesn't depend on the system gems.
+Rails now uses a `Gemfile` in the application root to determine the gems you require for your application to start. This `Gemfile` is processed by the [Bundler](https://github.com/bundler/bundler) which then installs all your dependencies. It can even install all the dependencies locally to your application so that it doesn't depend on the system gems.
 
-More information: - [bundler homepage](http://gembundler.com)
+More information: - [bundler homepage](http://bundler.io/)
 
 ### Living on the Edge
 
@@ -140,7 +140,7 @@ More Information: - [Rails Edge Architecture](http://yehudakatz.com/2009/06/11/r
 
 [Arel](https://github.com/brynary/arel) (or Active Relation) has been taken on as the underpinnings of Active Record and is now required for Rails. Arel provides an SQL abstraction that simplifies out Active Record and provides the underpinnings for the relation functionality in Active Record.
 
-More information: - [Why I wrote Arel](http://magicscalingsprinkles.wordpress.com/2010/01/28/why-i-wrote-arel/.)
+More information: - [Why I wrote Arel](https://web.archive.org/web/20120718093140/http://magicscalingsprinkles.wordpress.com/2010/01/28/why-i-wrote-arel/)
 
 
 ### Mail Extraction
@@ -295,11 +295,11 @@ NOTE. The old style `map` commands still work as before with a backwards compati
 Deprecations
 
 * The catch all route for non-REST applications (`/:controller/:action/:id`) is now commented out.
-* Routes :path\_prefix no longer exists and :name\_prefix now automatically adds "\_" at the end of the given value.
+* Routes `:path_prefix` no longer exists and `:name_prefix` now automatically adds "_" at the end of the given value.
 
 More Information:
 * [The Rails 3 Router: Rack it Up](http://yehudakatz.com/2009/12/26/the-rails-3-router-rack-it-up/)
-* [Revamped Routes in Rails 3](http://rizwanreza.com/2009/12/20/revamped-routes-in-rails-3)
+* [Revamped Routes in Rails 3](https://medium.com/fusion-of-thoughts/revamped-routes-in-rails-3-b6d00654e5b0)
 * [Generic Actions in Rails 3](http://yehudakatz.com/2009/12/20/generic-actions-in-rails-3/)
 
 
@@ -309,7 +309,7 @@ More Information:
 
 Major re-write was done in the Action View helpers, implementing Unobtrusive JavaScript (UJS) hooks and removing the old inline AJAX commands. This enables Rails to use any compliant UJS driver to implement the UJS hooks in the helpers.
 
-What this means is that all previous `remote_<method>` helpers have been removed from Rails core and put into the [Prototype Legacy Helper](https://github.com/rails/prototype_legacy_helper.) To get UJS hooks into your HTML, you now pass `:remote => true` instead. For example:
+What this means is that all previous `remote_<method>` helpers have been removed from Rails core and put into the [Prototype Legacy Helper](https://github.com/rails/prototype_legacy_helper). To get UJS hooks into your HTML, you now pass `:remote => true` instead. For example:
 
 ```ruby
 form_for @post, :remote => true
@@ -341,7 +341,7 @@ Helpers that do something else, like `cache` or `content_for`, are not affected 
 * Helpers now output HTML 5 by default.
 * Form label helper now pulls values from I18n with a single value, so `f.label :name` will pull the `:name` translation.
 * I18n select label on should now be :en.helpers.select instead of :en.support.select.
-* You no longer need to place a minus sign at the end of a ruby interpolation inside an ERb template to remove the trailing carriage return in the HTML output.
+* You no longer need to place a minus sign at the end of a Ruby interpolation inside an ERB template to remove the trailing carriage return in the HTML output.
 * Added `grouped_collection_select` helper to Action View.
 * `content_for?` has been added allowing you to check for the existence of content in a view before rendering.
 * passing `:value => nil` to form helpers will set the field's `value` attribute to nil as opposed to using the default value
@@ -474,7 +474,7 @@ As well as the following deprecations:
 * `named_scope` in an Active Record class is deprecated and has been renamed to just `scope`.
 * In `scope` methods, you should move to using the relation methods, instead of a `:conditions => {}` finder method, for example `scope :since, lambda {|time| where("created_at > ?", time) }`.
 * `save(false)` is deprecated, in favor of `save(:validate => false)`.
-* I18n error messages for ActiveRecord should be changed from :en.activerecord.errors.template to `:en.errors.template`.
+* I18n error messages for Active Record should be changed from :en.activerecord.errors.template to `:en.errors.template`.
 * `model.errors.on` is deprecated in favor of `model.errors[]`
 * validates_presence_of => validates... :presence => true
 * `ActiveRecord::Base.colorize_logging` and `config.active_record.colorize_logging` are deprecated in favor of `Rails::LogSubscriber.colorize_logging` or `config.colorize_logging`
@@ -522,7 +522,7 @@ A large effort was made in Active Support to make it cherry pickable, that is, y
 These are the main changes in Active Support:
 
 * Large clean up of the library removing unused methods throughout.
-* Active Support no longer provides vendored versions of [TZInfo](http://tzinfo.rubyforge.org/), [Memcache Client](http://deveiate.org/projects/RMemCache/) and [Builder](http://builder.rubyforge.org/,) these are all included as dependencies and installed via the `bundle install` command.
+* Active Support no longer provides vendored versions of TZInfo, Memcache Client and Builder. These are all included as dependencies and installed via the `bundle install` command.
 * Safe buffers are implemented in `ActiveSupport::SafeBuffer`.
 * Added `Array.uniq_by` and `Array.uniq_by!`.
 * Removed `Array#rand` and backported `Array#sample` from Ruby 1.9.
@@ -546,7 +546,7 @@ These are the main changes in Active Support:
 * `String#to_time` and `String#to_datetime` handle fractional seconds.
 * Added support to new callbacks for around filter object that respond to `:before` and `:after` used in before and after callbacks.
 * The `ActiveSupport::OrderedHash#to_a` method returns an ordered set of arrays. Matches Ruby 1.9's `Hash#to_a`.
-* `MissingSourceFile` exists as a constant but it is now just equals to `LoadError`.
+* `MissingSourceFile` exists as a constant but it is now just equal to `LoadError`.
 * Added `Class#class_attribute`, to be able to declare a class-level attribute whose value is inheritable and overwritable by subclasses.
 * Finally removed `DeprecatedCallbacks` in `ActiveRecord::Associations`.
 * `Object#metaclass` is now `Kernel#singleton_class` to match Ruby.
@@ -575,11 +575,11 @@ The following methods have been removed because they are no longer used in the f
 Action Mailer
 -------------
 
-Action Mailer has been given a new API with TMail being replaced out with the new [Mail](https://github.com/mikel/mail) as the Email library. Action Mailer itself has been given an almost complete re-write with pretty much every line of code touched. The result is that Action Mailer now simply inherits from Abstract Controller and wraps the Mail gem in a Rails DSL. This reduces the amount of code and duplication of other libraries in Action Mailer considerably.
+Action Mailer has been given a new API with TMail being replaced out with the new [Mail](https://github.com/mikel/mail) as the email library. Action Mailer itself has been given an almost complete re-write with pretty much every line of code touched. The result is that Action Mailer now simply inherits from Abstract Controller and wraps the Mail gem in a Rails DSL. This reduces the amount of code and duplication of other libraries in Action Mailer considerably.
 
 * All mailers are now in `app/mailers` by default.
 * Can now send email using new API with three methods: `attachments`, `headers` and `mail`.
-* ActionMailer now has native support for inline attachments using the `attachments.inline` method.
+* Action Mailer now has native support for inline attachments using the `attachments.inline` method.
 * Action Mailer emailing methods now return `Mail::Message` objects, which can then be sent the `deliver` message to send itself.
 * All delivery methods are now abstracted out to the Mail gem.
 * The mail delivery method can accept a hash of all valid mail header fields with their value pair.
@@ -609,5 +609,4 @@ Credits
 
 See the [full list of contributors to Rails](http://contributors.rubyonrails.org/) for the many people who spent many hours making Rails 3. Kudos to all of them.
 
-Rails 3.0 Release Notes were compiled by [Mikel Lindsaar](http://lindsaar.net.)
-
+Rails 3.0 Release Notes were compiled by [Mikel Lindsaar](http://lindsaar.net).

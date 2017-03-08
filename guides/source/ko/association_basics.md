@@ -164,7 +164,7 @@ end
 class CreateSuppliers < ActiveRecord::Migration[5.0]
   def change
     create_table :suppliers do |t|
-      t.string :name
+      t.string  :name
       t.timestamps
     end
 
@@ -633,7 +633,8 @@ author.books.empty?          # books 캐시가 사용된다
 ```ruby
 author.books                  # 데이터베이스에서 books를 얻어온다
 author.books.size             # books 캐시가 사용된다
-author.books.reload.empty?    # books 캐시를 삭제하고 데이터베이스에서 다시 읽어온다
+author.books.reload.empty?    # books 캐시를 삭제하고 데이터베이스에서
+                              # 다시 읽어온다
 ```
 
 ### 중복된 이름 사용 피하기
@@ -2127,7 +2128,7 @@ WARNING: 이 메소드가 호출되더라도 조인 레코드의 콜백은 호�
 
 ##### `collection=(objects)`
 
-`collection=`는 지정된 객체로 컬렉션을 변경합니다. 원래의 컬렉션은 삭제됩니다.
+`collection=`는 지정된 객체로 컬렉션을 변경합니다.
 
 ##### `collection_singular_ids`
 
@@ -2139,7 +2140,8 @@ WARNING: 이 메소드가 호출되더라도 조인 레코드의 콜백은 호�
 
 ##### `collection_singular_ids=(ids)`
 
-`collection_singular_ids=`는 지정된 기본키를 가지는 객체들의 집합으로 컬렉션을 대체합니다. 원래의 컬렉션은 삭제됩니다.
+`collection_singular_ids=`는 지정된 기본키를 가지는 객체들의 집합으로 컬렉션을
+대체합니다.
 
 ##### `collection.clear`
 

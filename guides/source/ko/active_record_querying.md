@@ -68,7 +68,6 @@ Active Record에서는 아래의 메소드를 지원합니다.
 
 * `find`
 * `create_with`
-* `distinct`
 * `eager_load`
 * `extending`
 * `from`
@@ -87,11 +86,10 @@ Active Record에서는 아래의 메소드를 지원합니다.
 * `reorder`
 * `reverse_order`
 * `select`
+* `distinct`
 * `where`
 
-`where`나 `group`과 같은 검색 메소드들은 `ActiveRecord::Relation`의 인스턴스로
-컬렉션을 반환합니다. `find`나 `first`와 같은 단일 개체를 검색하는 메소드는
-모델 객체를 곧장 반환힙니다.
+이 모든 메소드는 `ActiveRecord::Relation` 객체를 반환합니다.
 
 `find(options)`의 동작을 간단하게 요약해보면 아래와 같습니다.
 
@@ -342,7 +340,7 @@ Client.where(first_name: 'does not exist').take!
 ```ruby
 # 이러한 처리를 수천 건의 레코드에 대해서 실행하게 되면, 효율이 매우 떨어집니다.
 User.all.each do |user|
-  NewsLetter.weekly_deliver(user)
+  NewsMailer.weekly(user).deliver_now
 end
 ```
 
@@ -363,20 +361,19 @@ TIP: `find_each` 메소드와 `find_in_batches` 메소드는 한번에 메모리
 
 #### `find_each`
 
-`find_each` 메소드는 레코드 뭉치를 하나 꺼내서, _각_ 레코드를 하나씩 객체로 만들어 개별적으로
-블록의 yield를 호출합니다. 아래의 예제에서는 `find_each`에서 1000건의 레코드를 꺼냅니다.
-이 숫자는 `find_each`와 `find_in_batches`에서 기본적으로 사용되는 값이며, 이어서 각 모델에
-대해서 개별적으로 yield를 호출합니다.
+`find_each` 메소드는 레코드 뭉치를 하나 꺼내서, _각_ 레코드를 하나씩 객체로
+만들어 개별적으로 블록의 yield를 호출합니다. 아래의 예제에서는 `find_each`에서
+1000건의 레코드를 꺼냅니다. 이 숫자는 `find_each`와 `find_in_batches`에서
+기본적으로 사용되는 값이며, 이어서 각 모델에 대해서 개별적으로 yield를
+호출합니다.
 
 ```ruby
 User.find_each do |user|
-  NewsLetter.weekly_deliver(user)
+  NewsMailer.weekly(user).deliver_now
 end
 ```
 
-필요한 데이터를 다 가져와서 처리할 때까지 이 반복 작업이 계속됩니다.
-
-`find_each`는 위에서 볼 수 있듯 모델 클래스와도 동작하지만, 관계와 함께 사용할 수도 있습니다.
+`find_each` 동작에 조건을 추가하려면 `where`과 같은 메소드처럼 연결하면 됩니다.
 
 ```ruby
 User.where(weekly_subscriber: true).find_each do |user|
@@ -384,17 +381,18 @@ User.where(weekly_subscriber: true).find_each do |user|
 end
 ```
 
-정렬 순서가 없는 한, 이 메소드는 내부적으로 순서를 정하기 위해서 강제적으로 정렬을 수행합니다.
-
-수신한 객체가 정렬 순서 여부에 따른 처리는 `config.active_record.error_on_ignored_order`에
-따라서 결정됩니다. 만약 true라면 `ArgumentError`가 발생하며, 그렇지 않다면 정렬 순서 정보가
-무시되고 경고가 발생합니다. 이는 아래에서 설명할 `:error_on_ignore` 옵션으로 무시할 수 있습니다.
-
 ##### `find_each`의 옵션
+
+`find_each` 메소드는 `find` 메소드에서 사용 가능한 옵션 중 내부적으로 사용하기
+위해 예약되어 있는 `:order`와 `:limit`을 제외한 모든 옵션을 사용할 수 있습니다.
+
+추가로 `:batch_size`, `:start`와 `:finish`를 사용할 수 있습니다.
 
 **`:batch_size`**
 
-`:batch_size` 옵션은 (블록에 개별적으로 넘겨지기 전에) 레코드 뭉치를 가져올 때에 몇 개를 가져올지를 지정합니다. 예를 들어서 매번 5000건씩을 처리하고 싶은 경우, 아래와 같이 하면 됩니다.
+`:batch_size` 옵션은 (블록에 개별적으로 넘겨지기 전에) 레코드 뭉치를 가져올
+때에 몇 개를 가져올지를 지정합니다. 예를 들어서 매번 5000건씩을 처리하고 싶은
+경우, 아래와 같이 하면 됩니다.
 
 ```ruby
 User.find_each(batch_size: 5000) do |user|
@@ -408,10 +406,11 @@ end
 몇몇 ID가 필요하지 않은 경우 `:start`를 사용해서 시퀀스의 시작 ID를 지정할 수 있습니다. 이
 옵션은 중단된 배치작업을 재개하는 경우 등에 유용합니다.
 
-예를 들어 기본키가 2000 이상인 사용자들에게만 뉴스 레터를 보내고 싶은 경우, 다음과 같이 작성합니다.
+예를 들어 기본키가 2000 이상인 사용자를 대상으로 5000명씩 가져와서 뉴스 레터를
+보내고 싶은 경우, 다음과 같이 작성합니다.
 
 ```ruby
-User.find_each(start: 2000) do |user|
+User.find_each(start: 2000, batch_size: 5000) do |user|
   NewsMailer.weekly(user).deliver_now
 end
 ```
@@ -421,22 +420,17 @@ end
 `:start` 옵션과 비슷하게 `:finish`는 배치로 처리할 마지막 레코드의 ID를 지정합니다. 이는
 `:start`부터 `:finish` 사이에 있는 레코드에 대해서만 배치 처리를 하고 싶은 경우에 유용합니다.
 
-예를 들어 기본키가 2000부터 10000까지인 사용자들에게만 뉴스 레터를 보내고 싶은 경우, 다음과 같이
-작성합니다.
+예를 들어 기본키가 2000부터 10000까지인 사용자를 대상으로 5000명씩 가져와서
+뉴스 레터를 보내고 싶은 경우, 다음과 같이 작성합니다.
 
 ```ruby
-User.find_each(start: 2000, finish: 10000) do |user|
+User.find_each(start: 2000, finish: 10000, batch_size: 5000) do |user|
   NewsMailer.weekly(user).deliver_now
 end
 ```
 
 이외에도 같은 처리를 여러 곳에서 분산해서 작업하는 경우를 생각할 수 있습니다. `start`와 `:finish`
 옵션을 적절하게 사용해서, 각 처리 장소에서 10000개의 레코드씩을 처리하도록 만들 수도 있을 겁니다.
-
-**`:error_on_ignore`**
-
-관계에 정렬 순서가 지정되어 있는 경우 에러를 던질지 여부를 결정하는 애플리케이션 설정을 덮어씁니다.
-
 
 #### `find_in_batches`
 
@@ -452,20 +446,10 @@ Invoice.find_in_batches do |invoices|
 end
 ```
 
-`find_in_batches`는 위에서 볼 수 있듯 모델 클래스와도 동작하지만,
-관계와 함께 사용할 수도 있습니다.
-
-```ruby
-Invoice.pending.find_in_batches do |invoice|
-  pending_invoices_export.add_invoices(invoices)
-end
-```
-
-정렬 순서가 없는 한, 이 메소드는 내부적으로 순서를 정하기 위해서 강제적으로 정렬을 수행합니다.
-
 ##### `find_in_batches`의 옵션
 
-`find_in_batches`는 `find_each`와 동일한 옵션을 사용할 수 있습니다.
+`find_in_batches`는 `find_each`와 마찬가지로 `:batch_size`, `:start`, `:finish`를
+사용할 수 있습니다.
 
 조건
 ----------
@@ -646,9 +630,6 @@ Client.order("orders_count ASC", "created_at DESC")
 Client.order("orders_count ASC").order("created_at DESC")
 # SELECT * FROM clients ORDER BY orders_count ASC, created_at DESC
 ```
-WARNING: 만약 **MySQL 5.7.5** 이상에서 `order` 메소드와 함께 `select`, `pluck`,
-`ids`와 같은 메소드를 사용하고, 정렬시에 사용하는 메소드가 선택 목록에 포함되어 있지 않다면
-`ActiveRecord::StatementInvalid` 에러가 발생할 수 있습니다. 다음 절에서 결과 셋으로부터 필드를 선택하는 방법을 확인하세요.
 
 특정 필드만을 가져오기
 -------------------------
@@ -1079,7 +1060,7 @@ Author.joins("INNER JOIN posts ON posts.author_id = authors.id AND posts.publish
 이 코드는 아래와 같은 SQL을 생성합니다.
 
 ```sql
-SELECT authors.* FROM authors INNER JOIN posts ON posts.author_id = authors.id AND posts.published = 't'
+SELECT clients.* FROM clients INNER JOIN posts ON posts.author_id = authors.id AND posts.published = 't'
 ```
 
 #### Rails의 관계 배열/해시를 사용하기
@@ -1321,10 +1302,6 @@ Article.includes(:comments).where("comments.visible = true").references(:comment
 이 `includes` 쿼리의 경우 덧글의 존재 여부에 관계 없이 모든 글을 읽어들일 것입니다. 반면
 `joins` (INNER JOIN)을 사용하는 경우, 결합조건을 **반드시** 만족해야 하므로 덧글이 없는 글은
 반환되지 않습니다.
-
-NOTE: 만약 관계 정보가 조인의 일부로 eager load된다면, 불러오는 모델에서는 별도의 선택 절이
-나타나지 않을 것입니다. 왜냐하면 그들이 부모 레코드의 것인지, 자식 레코드의 것인지 모호하기
-때문입니다.
 
 스코프
 ------

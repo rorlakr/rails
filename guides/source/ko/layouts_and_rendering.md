@@ -591,8 +591,6 @@ redirect_to photos_url
 redirect_back(fallback_location: root_path)
 ```
 
-NOTE: `redirect_to`와 `redirect_back`은 메소드 실행 중에 즉시 반환되거나 종료되지 않고, 그저 HTTP 응답을 설정하기만 합니다. 메소드에서 이들 뒤에 있는 코드들은 모두 실행됩니다. 필요하다면 명시적으로 `return`을 호출하거나 다른 종료 방식을 제공할 수 있습니다.
-
 #### 리다이렉트 상태 코드를 변경하기
 
 `redirect_to`를 호출하면 일시적인 페이지 이동을 의미하는 HTTP 상태 코드인 302가 브라우저로 전송되며, 브라우저는 그 정보를 바탕으로 페이지 이동을 합니다. 다른 상태 코드(301: 영구적인 재전송이 자주 쓰입니다)로 변경하기 위해서는 `:status` 옵션을 사용하세요.
@@ -1108,7 +1106,7 @@ TIP: 모든 페이지에서 공유되는 컨텐츠라면 파셜을 레이아웃�
   <%= render article, full: true %>
   ```
 
-* `_articles.html.erb`
+* `_article.html.erb`
 
   ```erb
   <h2><%= article.title %></h2>

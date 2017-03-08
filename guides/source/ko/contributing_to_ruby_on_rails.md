@@ -38,9 +38,7 @@ issue 보고에는 적어도 제목과 issue에 대한 명쾌한 설명이 필�
 자신의 issue를 재현하는 방법을 준비하는 것은 다른 개발자가 issue를 확인, 조사, 그리고 수정할 때에 무척 도움이 됩니다. 이를 위한 방법으로, 실행 가능한 테스트 케이스를 제공하는 법이 있습니다. 이 작업을 조금이라도 간단하게 만들기 위해서 Rails 팀은 버그 레포트의 템플릿을 여러가지 준비해두고 있습니다. 이를 바탕으로 작업을 시작할 수 있습니다.
 
 * Active Record (모델, 데이터베이스) issue용 템플릿: [gem](https://github.com/rails/rails/blob/master/guides/bug_report_templates/active_record_gem.rb) / [master](https://github.com/rails/rails/blob/master/guides/bug_report_templates/active_record_master.rb)
-* Active Record (마이그레이션) issue용 템플릿: [gem](https://github.com/rails/rails/blob/master/guides/bug_report_templates/active_record_migrations_gem.rb) / [master](https://github.com/rails/rails/blob/master/guides/bug_report_templates/active_record_migrations_master.rb)
 * Action Pack (컨트롤러, 라우팅) issue용 템플릿: [gem](https://github.com/rails/rails/blob/master/guides/bug_report_templates/action_controller_gem.rb) / [master](https://github.com/rails/rails/blob/master/guides/bug_report_templates/action_controller_master.rb)
-* Active Job issue용 템플릿: [gem](https://github.com/rails/rails/blob/master/guides/bug_report_templates/active_job_gem.rb) / [master](https://github.com/rails/rails/blob/master/guides/bug_report_templates/active_job_master.rb)
 * 그 외의 일반적인  issue용 템플릿: [gem](https://github.com/rails/rails/blob/master/guides/bug_report_templates/generic_gem.rb) / [master](https://github.com/rails/rails/blob/master/guides/bug_report_templates/generic_master.rb)
 
 템플릿에는 '보일러플레이트(boilerplate)'라고 불리는 일종의 기본 코드가 포함되어 있으며, 이를 사용해서 Rails의 릴리스 버전(`*_gem.rb`)이나 edge Rails(`*_master.rb`)에 대한 테스트 케이스를 설정할 수 있습니다.
@@ -112,8 +110,8 @@ Ruby on Rails에는 2 종류의 문서가 있습니다. 하나는 이 가이드�
 
 누구라도 Rails 가이드에 기여할 수 있습니다. Rails 가이드에 요구되는 개선 사항은 '일관될 것', '모순이 없을 것', '읽기 쉬울 것', '정보의 추가', '사실과 다른 부분을 수정', '오타 수정', '최신 edge Rails를 반영할것' 등입니다.
 
-[Rails](https://github.com/rails/rails)에 풀 리퀘스트를 보내거나 정기적으로 기여를 하고 싶다면 [Rails 코어 팀](http://rubyonrails.org/community/#core)에게 
-docrails에 대한 커밋 권한을 요청해도 좋습니다. 단 docrails에 직접 풀 리퀘스트를 보내지 말아주세요. 자신이 작성한 변경사항에 의견을 묻고 싶은 경우에는 [Rails](https://github.com/rails/rails)에서 부탁드립니다.
+[Rails](http://github.com/rails/rails)에 풀 리퀘스트를 보내거나 정기적으로 기여를 하고 싶다면 [Rails 코어 팀](http://rubyonrails.org/core)에게 
+docrails에 대한 커밋 권한을 요청해도 좋습니다. 단 docrails에 직접 풀 리퀘스트를 보내지 말아주세요. 자신이 작성한 변경사항에 의견을 묻고 싶은 경우에는 [Rails](http://github.com/rails/rails)에서 부탁드립니다.
 
 docrails는 정기적으로 master에 병합되므로 Ruby on Rails 문서의 편집을 효율적으로 수행할 수 있습니다.
 
@@ -153,8 +151,8 @@ NOTE: 이 설명은 Rails 4 이상을 위한 것입니다. 그리고 Redcarpet g
 
 * **Italian**: [https://github.com/rixlabs/docrails](https://github.com/rixlabs/docrails)
 * **Spanish**: [http://wiki.github.com/gramos/docrails](http://wiki.github.com/gramos/docrails)
-* **Polish**: [https://github.com/apohllo/docrails/tree/master](https://github.com/apohllo/docrails/tree/master)
-* **French** : [https://github.com/railsfrance/docrails](https://github.com/railsfrance/docrails)
+* **Polish**: [http://github.com/apohllo/docrails/tree/master](http://github.com/apohllo/docrails/tree/master)
+* **French** : [http://github.com/railsfrance/docrails](http://github.com/railsfrance/docrails)
 * **Czech** : [https://github.com/rubyonrails-cz/docrails/tree/czech](https://github.com/rubyonrails-cz/docrails/tree/czech)
 * **Turkish** : [https://github.com/ujk/docrails/tree/master](https://github.com/ujk/docrails/tree/master)
 * **Korean** : [https://github.com/rorlakr/rails-guides](https://github.com/rorlakr/rails-guides)
@@ -246,27 +244,41 @@ Rails에서 코딩을 하는 경우에는 다음의 간단한 스타일 가이�
 
 ### 벤치마킹하기
 
-성능에 영향이 있는 변경인 경우에는 코드를 벤치마킹하고 그 영향을 측정해주세요.
-결과와 함께 벤치마크에 사용한 스크립트를 공유해주세요. 미래의 기여자들이 쉽게
-이에 대한 정보를 얻을 수 있도록 커밋 메시지에는 이 정보를 반드시 포함해주세요.
-(예를 들어, 미래의 Ruby VM 최적화 덕분에 해당 최적화가 없어질지도 모릅니다.)
+제안하려는 변경사항이 Rails의 성능에 영향을 줄 가능성이 있다면
+[benchmark-ips](https://github.com/evanphx/benchmark-ips) gem을 사용하여
+비교를 위해 벤치마크의 결과를 공유해주세요.
 
-생각하고 있는 특정 시나리오에 대한 성능을 향상시키는 최적화를 만드는 것은
-무척 쉽지만, 일반적인 경우에 대해서는 그렇지 않을 수 있습니다. 그러므로
-대표적인 시나리오들에 대해서 테스트를 해야합니다. 이상적으로는 실제 환경에서
-있었던 실제 시나리오를 기반으로 하는 것이 좋습니다.
+benchmark-ips를 사용하는 간단한 예시입니다.
 
-[벤치마칭 템플릿](https://github.com/rails/rails/blob/master/guides/bug_report_templates/benchmark.rb)으로부터
-시작하는 것도 좋습니다. 이는 [benchmark-ips](https://github.com/evanphx/benchmark-ips) 젬을
-사용하는 벤치마킹 코드의 간단한 구현이 포함되어 있습니다. 이 템플릿은
-스크립트에 변경 사항을 추가하여 테스트할 수 있도록 디자인되어 있습니다.
+```ruby
+require 'benchmark/ips'
+
+Benchmark.ips do |x|
+  x.report('addition') { 1 + 2 }
+  x.report('addition with send') { 1.send(:+, 2) }
+end
+```
+
+이는 다음과 같은 정보를 포함하는 레포트를 생성합니다.
+
+```
+Calculating -------------------------------------
+            addition   132.013k i/100ms
+  addition with send   125.413k i/100ms
+-------------------------------------------------
+            addition      9.677M (± 1.7%) i/s -     48.449M
+  addition with send      6.794M (± 1.1%) i/s -     33.987M
+```
+
+더 자세한 설명은 benchmark/ips [README](https://github.com/evanphx/benchmark-ips/blob/master/README.md)를 참고해주세요.
 
 ### 테스트 실행하기
 
 Rails에서는 변경을 올릴 때마다 모든 테스트를 전부 실행해야한다는 관례가 있는
-것은 아닙니다. 추천하는 작업 순서는 [rails-dev-box](https://github.com/rails/rails-dev-box)에서
+것은 아닙니다. 추천하는 작업 순서는
+[rails-dev-box](https://github.com/rails/rails-dev-box)에서
 설명했듯이 railites의 테스트가 특히 시간이 걸리며, 소스코드를 `/vagrant`에
-마운트 시키면 더욱 그렇습니다.
+마운트하면 더욱 그렇습니다.
 
 현실적인 타협안으로서 작성한 코드에 의해 영향이 발생하는지 아닌지를 테스트해주세요. 그리고 변경이 railties에서 발생한 것이 아니라면, 영향을 받는 컴포넌트의 모든 테스트를 실행해주세요. 테스트를 모두 통과한다면 이 패치를 제안할 준비가 완료됩니다. Rails에서는 다른 장소에서 발생할지 모를 예상외의 에러가 발생하는 것을 검출하기 위해 [Travis CI](https://travis-ci.org/rails/rails)를 사용하고 있습니다.
 
@@ -587,7 +599,7 @@ $ git format-patch master --stdout > ~/my_changes.patch
 대상 브랜치로 넘어가서 변경사항을 적용합니다.
 
 ```bash
-$ git checkout -b my_backport_branch 4-2-stable
+$ git checkout -b my_backport_branch 3-2-stable
 $ git apply ~/my_changes.patch
 ```
 

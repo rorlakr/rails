@@ -159,36 +159,51 @@ NOTE: `active_support/core_ext/object/blank.rb`에 정의되어 있습니다.
 
 ### `duplicable?`
 
-Ruby에 존재하는 기본적인 객체들의 몇몇은 singleton 객체 입니다. 예를 들자면, 프로그램의 생애 주기 동안에 정수 1은 항상 같은 같은 인스턴스를 참조합니다.
+루비 2.4의 메소드나 특정 숫자들을 제외한 대부분의 객체들은 `dup`나 `clone`로
+복사할 수 있습니다. 반면 루비 2.2와 2.3은 `nil`, `false`, `true`, 심볼과
+`Float`, `Fixnum`, `Bignum` 객체를 복사할 수 없습니다.
 
 ```ruby
-1.object_id                 # => 3
-Math.cos(0).to_i.object_id  # => 3
+"foo".dup           # => "foo"
+"".dup              # => ""
+1.method(:+).dup    # => TypeError: allocator undefined for Method
+Complex(0).dup      # => TypeError: can't copy Complex
 ```
 
-따라서, 이러한 객체는 `dup` 메소드나, `clone` 메소드로 복사할 수 없습니다.
+Active Support는 이 정보를 확인하기 위해서 `duplicable?`를 제공합니다.
 
 ```ruby
-true.dup  # => TypeError: can't dup TrueClass
+"foo".duplicable?           # => true
+"".duplicable?              # => true
+Rational(1).duplicable?     # => false
+Complex(1).duplicable?      # => false
+1.method(:+).duplicable?    # => false
 ```
 
-singleton이 아닌 숫자에도 복사가 불가능한 것들이 있습니다.
+`duplicable?`는 루비의 버전에 따라서 동작이 변합니다.
+그러므로 2.4에서는 다음과 같이 동작합니다.
 
 ```ruby
-0.0.clone        # => allocator undefined for Float
-(2**1024).clone  # => allocator undefined for Bignum
+nil.dup                 # => nil
+:my_symbol.dup          # => :my_symbol
+1.dup                   # => 1
+
+nil.duplicable?         # => true
+:my_symbol.duplicable?  # => true
+1.duplicable?           # => true
 ```
 
-Active Support에는 객체가 프로그램 상에서 복사 가능한지 아닌지 확인하기 위한 `duplicable?` 메소드가 존재합니다..
+반면, 2.2와 2.3에서는 다음과 같이 동작합니다.
 
 ```ruby
-"foo".duplicable? # => true
-"".duplicable?    # => true
-0.0.duplicable?  # => false
-false.duplicable? # => false
-```
+nil.dup                 # => TypeError: can't dup NilClass
+:my_symbol.dup          # => TypeError: can't dup Symbol
+1.dup                   # => TypeError: can't dup Fixnum
 
-기본으로 `nil`, `false`, `true`, 심볼, 숫자, 클래스, 모듈, 메소드 객체를 제외한 모든 객체가 `duplicable?` #=> true입니다.
+nil.duplicable?         # => false
+:my_symbol.duplicable?  # => false
+1.duplicable?           # => false
+```
 
 WARNING: 어떤 클래스라도 `dup` 메소드와 `clone` 메소드를 삭제하여 이 메소드들을 사용할 수 없게 만들 수 있습니다. 이때 이 메소드들을 실행하면 예외가 발생합니다. 이런 경우에는 어떤 객체에서든 그 객체가 복사 가능한지 아닌지를 확인하기 위해 `rescue`를 사용해야하는 상황이 생깁니다. `duplicable?` 메소드는 위처럼 고정된 목록에 의존합니다만, 그 대신 `rescue`보다 빠르게 동작합니다. 실제로 사용하는 경우에 저 목록으로 충분하다고 판단되는 경우에는 `duplicable?`를 사용해주세요.
 
@@ -406,7 +421,7 @@ account.to_query('company[name]')
 따라서 이 결과값은 그대로 쿼리 문자열로 사용할 수 있습니다.
 
 배열에 `to_query` 메소드를 사용한 경우 `to_query`를 배열의 각 요소에 호출하여
-`key[]`를 키로 추가하고, 그 값들을 "&"로 연결한 결과를 반환합니다.
+`_key[]`를 키로 추가하고, 그 값들을 "&"로 연결한 결과를 반환합니다.
 
 ```ruby
 [3.4, -45.6].to_query('sample')
@@ -718,6 +733,7 @@ WARNING: `parent_name`는 그 경우 `nil`을 돌려줍니다.
 
 NOTE: `active_support/core_ext/module/introspection.rb`에 정의되어 있습니다.
 
+
 #### `parent_name`
 
 `parent_name` 메소드는 이름을 가지는 모듈들이 중첩되어 있는 경우에 실행할 수 있으며, 대응하는 상수를 가지는 모듈의 이름을 반환합니다.
@@ -759,6 +775,63 @@ M.parents       # => [X::Y, X, Object]
 ```
 
 NOTE: `active_support/core_ext/module/introspection.rb`에 정의되어 있습니다.
+
+#### 상대 경로를 포함하는 상수명
+
+표준 메소드인 `const_defined?`, `const_get`, `const_set`는 순수한 상수 이름을
+사용합니다. Active Support는 이 API들이 상대 경로를 포함하는 상수명을 사용할
+수 있도록 해줍니다.
+
+이 함수들의 이름은 `qualified_const_defined?`, `qualified_const_get`,
+`qualified_const_set`입니다. 각각의 인수들은 수신자를 기준으로 하는 상대 경로를
+포함한 상수 이름이라고 가정합니다.
+
+```ruby
+Object.qualified_const_defined?("Math::PI")       # => true
+Object.qualified_const_get("Math::PI")            # => 3.141592653589793
+Object.qualified_const_set("Math::Phi", 1.618034) # => 1.618034
+```
+
+인수들은 순수한 상수명을 사용할 수도 있습니다.
+
+```ruby
+Math.qualified_const_get("E") # => 2.718281828459045
+```
+
+이 메소드들은 내장된 원래의 메소드들과 비슷한 동작을 수행합니다. 특히,
+`qualified_constant_defined?`는 조건부로 부모를 탐색할지 여부를 지정하는
+두번째 인수를 넘길 수 있습니다. 이 플래그는 표현식 내부의 각 상수의 내부를
+탐색할지 여부를 결정합니다.
+
+예를 들어, 다음과 같은 코드를 보세요.
+
+```ruby
+module M
+  X = 1
+end
+
+module N
+  class C
+    include M
+  end
+end
+```
+
+`qualified_const_defined?`는 이와 같이 동작합니다.
+
+```ruby
+N.qualified_const_defined?("C::X", false) # => false
+N.qualified_const_defined?("C::X", true)  # => true
+N.qualified_const_defined?("C::X")        # => true
+```
+
+마지막 예제는 `const_defined?`의 두번째 인수의 기본값이 true라는 것을 암시하고
+있습니다.
+
+내장 메소드들과의 조화를 위하여 상대 경로만을 받도록 되어있습니다.
+절대 경로를 사용하는 `::Math::PI`와 같은 상수명은 `NameError`를 던집니다.
+
+NOTE: `active_support/core_ext/module/qualified_const.rb`에 정의되어 있습니다.
 
 ### 도달 가능
 
@@ -1007,8 +1080,7 @@ class A
   class_attribute :x, instance_reader: false
 end
 
-A.new.x = 1
-A.new.x # NoMethodError
+A.new.x = 1 # NoMethodError
 ```
 
 편의를 위해서 `class_attribute`는 인스턴스의 reader가 돌려주는 값을 '이중부정'하는 인스턴스 존재 확인 메소드도 정의합니다. 위의 예제로 설명하자면, `x?`가 바로 그것입니다.
@@ -1654,6 +1726,20 @@ NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니�
 "Product".deconstantize                        # => ""
 "Backoffice::UsersController".deconstantize    # => "Backoffice"
 "Admin::Hotel::ReservationUtils".deconstantize # => "Admin::Hotel"
+```
+
+예를 들어, Active Support는 이 메소드를 `Module#qualified_const_set`에서
+사용하고 있습니다.
+
+```ruby
+def qualified_const_set(path, value)
+  QualifiedConstUtils.raise_if_absolute(path)
+
+  const_name = path.demodulize
+  mod_name = path.deconstantize
+  mod = mod_name.empty? ? self : qualified_const_get(mod_name)
+  mod.const_set(const_name, value)
+end
 ```
 
 NOTE: `active_support/core_ext/string/inflections.rb`에 정의되어 있습니다.
@@ -2691,7 +2777,7 @@ NOTE: `active_support/core_ext/hash/except.rb`에 정의되어 있습니다.
 
 ```ruby
 {nil => nil, 1 => 1, a: :a}.transform_keys { |key| key.to_s.upcase }
-# => {"" => nil, "1" => 1, "A" => :a}
+# => {"" => nil, "A" => :a, "1" => 1}
 ```
 
 키가 중복되는 경우에는 그중 하나의 값이 우선됩니다. 우선되는 값은 같은 해시가 주어진 경우라도 같은 결과를 준다고 보장하지 않습니다.
@@ -2733,7 +2819,7 @@ NOTE: `active_support/core_ext/hash/keys.rb`에 정의되어 있습니다.
 
 ```ruby
 {nil => nil, 1 => 1, a: :a}.stringify_keys
-# => {"" => nil, "1" => 1, "a" => :a}
+# => {"" => nil, "a" => :a, "1" => 1}
 ```
 
 키가 중복되는 경우, 한 쪽의 값이 우선됩니다. 우선되는 값은 같은 해시가 주어진 경우에도 항상 같다고 보장하지 않습니다.
@@ -2775,7 +2861,7 @@ NOTE: `active_support/core_ext/hash/keys.rb`에 정의되어 있습니다.
 
 ```ruby
 {nil => nil, 1 => 1, "a" => "a"}.symbolize_keys
-# => {nil=>nil, 1=>1, :a=>"a"}
+# => {1=>1, nil=>nil, :a=>"a"}
 ```
 
 WARNING: 이 예제에서는 3개의 키중 마지막 하나만 심볼로 변환되지 않았다는 점에 주목하세요. 숫자와 nil은 심볼로 변환할 수 없습니다.
@@ -2853,7 +2939,7 @@ Ruby에는 문자열이나 배열을 나누어 일부를 꺼내는 내장 메소
 
 ```ruby
 {a: 1, b: 2, c: 3}.slice(:a, :c)
-# => {:a=>1, :c=>3}
+# => {:c=>3, :a=>1}
 
 {a: 1, b: 2, c: 3}.slice(:b, :X)
 # => {:b=>2} # 존재하지 않는 키는 무시
@@ -2946,25 +3032,6 @@ end
 ```
 
 NOTE: `active_support/core_ext/regexp.rb`에 정의되어 있습니다.
-
-### `match?`
-
-Rails는 `Regexp#match?`를 Ruby 2.4에 앞서 구현했습니다.
-
-```ruby
-/oo/.match?('foo')    # => true
-/oo/.match?('bar')    # => false
-/oo/.match?('foo', 1) # => true
-```
-
-백포트는 동일한 인터페이스를 가지고 있으며, `$1`과 같은 값들을 설정하지
-않는다는 차이점이 있습니다만, 성능적인 차이는 없습니다. 이는 Ruby 2.4에
-적응하기 유리한 코드를 작성할 수 있도록 돕기 위함입니다. 예를 들어 Rails는
-내부적으로 이를 이미 사용하고 있습니다.
-
-Active Support는 `Regexp#match?`가 존재하지 않는 경우에만 정의하며, 따라서
-Ruby 2.4 이후의 코드를 사용하는 경우 본래의 코드를 사용하여 성능 향상을
-얻을 수 있도록 하고 있습니다.
 
 `Range` 확장
 ---------------------

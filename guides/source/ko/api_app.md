@@ -158,7 +158,6 @@ API 애플리케이션에서는 기본으로 다음의 미들웨어를 사용합
 - `ActionDispatch::RemoteIp`
 - `ActionDispatch::Reloader`
 - `ActionDispatch::Callbacks`
-- `ActiveRecord::Migration::CheckPending`
 - `Rack::Head`
 - `Rack::ConditionalGet`
 - `Rack::ETag`
@@ -306,16 +305,19 @@ API 애플리케이션(`ActionController::API`를 사용)에는 다음과 같은
 
 - `ActionController::UrlFor`: `url_for` 등의 헬퍼 제공
 - `ActionController::Redirecting`: `redirect_to` 제공
-- `AbstractController::Rendering`와 `ActionController::ApiRendering`: 기본적인 랜더링을 제공
+- `AbstractController::Rendering`와 `ActionController::ApiRendering`: 기본적인
+  랜더링을 제공
 - `ActionController::Renderers::All`: `render :json` 등을 제공
 - `ActionController::ConditionalGet`: `stale?`을 제공
 - `ActionController::BasicImplicitRender`: 명시적인 응답이 없으면 빈 응답을 반환
-- `ActionController::StrongParameters`: 매개변수를 위한 화이트리스트를 제공(액티브 모델의 대량 할당과 함께 동작)
+- `ActionController::StrongParameters`: 매개변수를 위한 화이트리스트를
+  제공(액티브 모델의 대량 할당과 함께 동작)
 - `ActionController::ForceSSL`: `force_ssl`을 제공
 - `ActionController::DataStreaming`: `send_file`이나 `send_data`를 제공
 - `AbstractController::Callbacks`: `before_action` 등의 헬퍼를 제공
 - `ActionController::Rescue`: `rescue_from`을 제공
-- `ActionController::Instrumentation`: 액션 컨트롤러에서 정의하는 계측 훅을 제공([계측 가이드](active_support_instrumentation.html#action-controller)를 참조)
+- `ActionController::Instrumentation`: 액션 컨트롤러에서 정의하는 계측 훅을
+  제공([계측 가이드](active_support_instrumentation.html#action-controller)를 참조)
 - `ActionController::ParamsWrapper`: 매개변수 해시를 감싸서 중첩된 해시로 만듦. 이를 통해서 POST 요청을 전송하는 경우에도 최상위 요소를 지정하지 않도록 해줌
 
 다른 플러그인을 통해 모듈이 추가되는 경우도 있습니다.
@@ -324,13 +326,6 @@ API 애플리케이션(`ActionController::API`를 사용)에는 다음과 같은
 ```bash
 $ bin/rails c
 >> ActionController::API.ancestors - ActionController::Metal.ancestors
-=> [ActionController::API, 
-    ActiveRecord::Railties::ControllerRuntime, 
-    ActionDispatch::Routing::RouteSet::MountedHelpers, 
-    ActionController::ParamsWrapper, 
-    ... , 
-    AbstractController::Rendering, 
-    ActionView::ViewPaths]
 ```
 
 ### 그 외의 모듈 추가하기

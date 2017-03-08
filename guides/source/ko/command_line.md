@@ -208,7 +208,7 @@ Description:
     Create rails files for model generator.
 ```
 
-NOTE: 사용가능한 필드 타입(field types)에 대해서는 [API 문서](http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_column)에 있는 `SchemaStatements` 모듈의 add_column 메소드를 참조해주세요. `index` 파라미터는 컬럼에 대응하는 인덱스를 생성합니다.
+NOTE: 사용가능한 필드 타입(field types)에 대해서는 `TableDefinition`의 컬럼 메소드를 [API 문서](http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html#method-i-column)를 참조해주세요.
 
 여기에서는 직접 모델을 만드는 대신에(모델을 생성하는 방법은 나중에 설명하겠습니다), scaffold를 생성해봅시다. Rails에서의 **scaffold**란 모델, 모델을 위한 마이그레이션, 모델을 조작하기 위한 컨트롤러, 모델을 조작, 표시하기 위한 뷰, 이 모두를 위한 테스트 코드를 포함한 것을 가리킵니다.
 
@@ -428,7 +428,7 @@ Ruby version              2.2.2 (x86_64-linux)
 RubyGems version          2.4.6
 Rack version              1.6
 JavaScript Runtime        Node.js (V8)
-Middleware                Rack::Sendfile, ActionDispatch::Static, ActionDispatch::Executor, #<ActiveSupport::Cache::Strategy::LocalCache::Middleware:0x007ffd131a7c88>, Rack::Runtime, Rack::MethodOverride, ActionDispatch::RequestId, Rails::Rack::Logger, ActionDispatch::ShowExceptions, ActionDispatch::DebugExceptions, ActionDispatch::RemoteIp, ActionDispatch::Reloader, ActionDispatch::Callbacks, ActiveRecord::Migration::CheckPending, ActionDispatch::Cookies, ActionDispatch::Session::CookieStore, ActionDispatch::Flash, Rack::Head, Rack::ConditionalGet, Rack::ETag
+Middleware                Rack::Sendfile, ActionDispatch::Static, ActionDispatch::Executor, #<ActiveSupport::Cache::Strategy::LocalCache::Middleware:0x007ffd131a7c88>, Rack::Runtime, Rack::MethodOverride, ActionDispatch::RequestId, Rails::Rack::Logger, ActionDispatch::ShowExceptions, ActionDispatch::DebugExceptions, ActionDispatch::RemoteIp, ActionDispatch::Reloader, ActionDispatch::Callbacks, ActiveRecord::Migration::CheckPending, ActiveRecord::ConnectionAdapters::ConnectionManagement, ActiveRecord::QueryCache, ActionDispatch::Cookies, ActionDispatch::Session::CookieStore, ActionDispatch::Flash, Rack::Head, Rack::ConditionalGet, Rack::ETag
 Application root          /home/foobar/commandsapp
 Environment               development
 Database adapter          sqlite3
@@ -492,13 +492,9 @@ app/models/article.rb:
 
 NOTE: 특정 어노테이션만을 출력할 때나, 독자적인 어노테이션을 출력하는 경우에는 FIXME나 BUG같은 각 어노테이션의 이름은 출력되지 않습니다.
 
-`rails notes` 태스크는 기본으로 `app`, `config`, `lib`, `bin`, `test` 폴더를 대상으로 합니다. 다른 폴더도 탐색하고 싶은 경우에는 `config.annotations.register_directories` 옵션을 사용하여 설정할 수 있습니다.
-
-```ruby
-config.annotations.register_directories("spec", "vendor")
-```
-
-또는 이 목록을 쉼표로 구분지어 환경변수 `SOURCE_ANNOTATION_DIRECTORIES`를 통해서 넘겨줄 수도 있습니다.
+기본으로 `rails notes`는 `app`, `config`, `db`, `lib`, `test` 폴더를 확인합니다.
+다른 폴더들에 대해서도 탐색하고 싶다면 쉼표로 구분된 목록을
+`SOURCE_ANNOTATION_DIRECTORIES` 환경 변수에 넘겨주세요.
 
 ```bash
 $ export SOURCE_ANNOTATION_DIRECTORIES='spec,vendor'
