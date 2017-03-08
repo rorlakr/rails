@@ -268,6 +268,8 @@ GEM
       loofah (~> 2.0)
     rainbow (2.2.1)
     rake (12.0.0)
+    rake-contrib (1.0.0)
+      rake
     rb-fsevent (0.9.8)
     rdoc (5.0.0)
     redcarpet (3.2.3)
@@ -409,6 +411,7 @@ DEPENDENCIES
   rack-cache (~> 1.2)
   rails!
   rake (>= 11.1)
+  rake-contrib
   rb-inotify!
   redcarpet (~> 3.2.3)
   redis
