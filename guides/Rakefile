@@ -30,8 +30,8 @@ namespace :guides do
 
           mkdir_p 'pkg'
           `tar -czf pkg/guides_ko.gz output/ko`
-          Rake::SshFilePublisher.new("deployer@guides.rorlab.org", "/home/deployer", "pkg", "guides_ko.gz").upload
-          `ssh deployer@guides.rorlab.org 'rm -rf /home/deployer/guides/* && mkdir -p /home/deployer/guides && cd /home/deployer && tar -xvzf guides_ko.gz -C guides --strip-components=2 && rm guides_ko.gz'`
+          Rake::SshFilePublisher.new("deployer@guides.rorlab.org", "/home/deployer/www", "pkg", "guides_ko.gz").upload
+          `ssh deployer@guides.rorlab.org 'rm -rf /home/deployer/www/guides/* && mkdir -p /home/deployer/www/guides && cd /home/deployer/www && tar -xvzf guides_ko.gz -C guides --strip-components=2 && rm guides_ko.gz'`
         end
       end
     end
