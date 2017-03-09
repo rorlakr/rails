@@ -9,7 +9,7 @@ cache:
     - /tmp/beanstalkd-1.10
 bundler_args: --without test --jobs 3 --retry 3
 before_install:
-  - openssl aes-256-cbc -K $encrypted_452262c28521_key -iv $encrypted_452262c28521_iv -in id_rsa_rorlakr_rrails_guides_travis.enc -out ~/.ssh/id_rsa -d
+  - openssl aes-256-cbc -K $encrypted_40020334322c_key -iv $encrypted_40020334322c_iv -in id_rsa_rorlakr_rrails_guides_travis.enc -out ~/.ssh/id_rsa -d
   - chmod 600 ~/.ssh/id_rsa
   - gem install bundler
 before_script:
