@@ -118,7 +118,7 @@ Rails.logger = Logger.new(STDOUT)
 Rails.logger = Log4r::Logger.new("Application Log")
 ```
 
-또는 `Initializer`에 _다음 중 하나_를 추가합니다.を追加します。
+또는 `Initializer`에 _다음 중 하나_를 추가합니다.
 
 ```ruby
 config.logger = Logger.new(STDOUT)
