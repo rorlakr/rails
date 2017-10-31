@@ -203,7 +203,7 @@ $ ->
 
 ```html
 <form action="/articles/1" class="button_to" data-remote="true" method="post">
-  <div><input type="submit" value="An article"></div>
+  <input type="submit" value="An article">
 </form>
 ```
 
