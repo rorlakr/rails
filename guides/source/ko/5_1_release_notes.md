@@ -51,9 +51,9 @@ Rails 5.1 앱과 원활하게 작동합니다
 [Pull Request](https://github.com/rails/rails/pull/27288)
 
 Rails 응용 프로그램은 JavaScript asset bundler인 [Webpack](https://webpack.js.org/)과 
-새로운 [Webpacker](https://github.com/rails/webpacker) 젬 사용을보다 쉽게   통합 할 수 있습니다.
+새로운 [Webpacker](https://github.com/rails/webpacker) 젬 사용을보다 쉽게 통합 할 수 있습니다.
 Webpack 통합이 가능한 새로운 응용 프로그램을 생성 할 때 
---webpack 플래그 사용합니다.
+`--webpack` 플래그 사용합니다.
 
 이는 에셋 파이프라인과 완벽하게 호환되며 이미지, 폰트, 사운드 및 기타 자산에 대해 계속 사용할 수 있습니다. 
 에셋 파이프라인에 의해 관리되는 일부 JavaScript 코드 및 
@@ -390,7 +390,8 @@ Action View
 HTML-safe 문자열들을 출력.
     ([commit](https://github.com/rails/rails/commit/1de0df86695f8fa2eeae6b8b46f9b53decfa6ec8))
 
-*   `datatime-local`필드를 생성하기 위해 `datetime_field`와 `datetime_field_tag`를 변경.
+*   `datatime-local`필드를 생성하기 위해 `datetime_field`와 `datetime_field_tag`를 
+변경.
     ([Pull Request](https://github.com/rails/rails/pull/28061))
 
 *   HTML 태그들(`tag.div`, `tag.br`, etc.)를 위한 새로운 Builder-style 문법.
