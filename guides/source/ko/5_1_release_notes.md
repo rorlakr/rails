@@ -51,23 +51,23 @@ Rails 5.1 앱과 원활하게 작동합니다
 [Pull Request](https://github.com/rails/rails/pull/27288)
 
 Rails 응용 프로그램은 JavaScript asset bundler인 [Webpack](https://webpack.js.org/)과 
-새로운 [Webpacker](https://github.com/rails/webpacker) 젬 사용을보다 쉽게 ​​통합 할 수 있습니다.
+새로운 [Webpacker](https://github.com/rails/webpacker) 젬 사용을보다 쉽게   통합 할 수 있습니다.
 Webpack 통합이 가능한 새로운 응용 프로그램을 생성 할 때 
-`--webpack` 플래그 사용합니다.
+--webpack 플래그 사용합니다.
 
 이는 에셋 파이프라인과 완벽하게 호환되며 이미지, 폰트, 사운드 및 기타 자산에 대해 계속 사용할 수 있습니다. 
 에셋 파이프라인에 의해 관리되는 일부 JavaScript 코드 및 
-Webpack을 통해 처리되는 기타 코드를 가질 수도 있습니다.
+ Webpack을 통해 처리되는 기타 코드를 가질 수도 있습니다.
 이 모든 것은 Yarn에 의해 관리됩니다, default로 활성화되어 있습니다.
 
 ### jQuery는 더이상 기본 의존성이 아닙니다
 
 [Pull Request](https://github.com/rails/rails/pull/27113)
 
-jQuery는 이전 버전의 Rails에서 `data-remote`,`data-confirm` 및 
+jQuery는 이전 버전의 Rails에서 `data-remote`, `data-confirm` 및 
 기타 Rails의 겸손한 JavaScript 제공과 같은 기능을 제공하기 위해 
 기본적으로 필요했습니다. 하지만 더이상 요구되지 않는다,
-plain, vanilla JavaScript를 사용하기 위해 UJS가 재작성 되었기 때문이다 
+ plain, vanilla JavaScript를 사용하기 위해 UJS가 재작성 되었기 때문이다 
 이 코드는 이제 Action View 내부에서 `rails-ujs`로 제공된다.
 
 필요한다면 jquery를 사용해도 되지만, 이것은 더이상 default로 요구되지 않는다.
@@ -86,7 +86,7 @@ Rails 5.1은 크롬에서 실패 테스트 스크린 샷과 같은 추가 기능
 
 [Pull Request](https://github.com/rails/rails/pull/28038)
 
-Rails는 이제[sekrets](https://github.com/ahoward/sekrets) gem에서 영감을 얻은 안전한 방법으로 애플리케이션 비밀 정보를 관리 할 수 있다.
+Rails는 이제 [sekrets](https://github.com/ahoward/sekrets) gem에서 영감을 얻은 안전한 방법으로 애플리케이션 비밀 정보를 관리 할 수 있다.
 새로운 보안 비밀 파일을 설치하기 위해 `bin/rails secrets:setup`를 실행한다. 
 
 이것은 또한 저장소 외부에 저장되어야하는 
@@ -243,22 +243,22 @@ Transactional test들은 데이터베이스 transaction에서
 연결될 때의 연결들은 이제 특별하게 처리됩니다:
 
 이 스레드들은 Managed Transaction 내에 있는 하나의 연결을 공유할 것입니다.
-모든 스레드들이 가장 바깥 쪽의 transaction을 무시하면서, 
+모든 스레드들이 가장 바깥 쪽의 Transaction을 무시하면서, 
 동일한 상태의 데이터베이스를 볼 수 있도록 보장해줍니다.
 이전에, 이러한 추가적인 연결들은 고정 줄로 보는 것이 불가능했습니다, 예를 들면.
 
-스레드가 중첩된 transaction에 들어갈 때, 독립을 유지하기 위해, 
+스레드가 중첩된 Transaction에 들어갈 때, 독립을 유지하기 위해, 
 일시적으로 연결의 독점적인 사용을 얻을것입니다.
 
-테스트가 생성된 스레드에서 별도의 transaction 
+테스트가 생성된 스레드에서 별도의 Transaction 
 외부 연결을 얻는 데 의존하는 경우,
 보다 명확한 연결 관리자로 전환할 필요가 있습니다.
 
-당신의 테스트에서 스레드를 생성하고 이 스레드들이 명시적 데이터베이스 transaction을 사용하면서 
+당신의 테스트에서 스레드를 생성하고 이 스레드들이 명시적 데이터베이스 Transaction을 사용하면서 
 상호 작용하는 경우, 이 변화로 데드락이 발생할 수 있습니다.
 
 이런 새로운 동작을 거부하는 쉬운 방법은 영향을 미치는 모든 테스트 케이스에서 
-transaction test를 비활성화하는 것입니다.
+Transaction test를 비활성화하는 것입니다.
 
 Railties
 --------
@@ -296,7 +296,7 @@ Railties
     ([Pull Request](https://github.com/rails/rails/pull/26929))
 
 *   기본 스택에서 jquery-rails를 제거함. 
-Action View와 함께 제공되는 rails-ujs는 기본 UJS 어댑터로 포함.
+ Action View와 함께 제공되는 rails-ujs는 기본 UJS 어댑터로 포함.
     ([Pull Request](https://github.com/rails/rails/pull/27113))
 
 *   yarn binstub과  package.json. 으로 새로운 앱에서 Yarn 지원을 추가. 
@@ -390,8 +390,7 @@ Action View
 HTML-safe 문자열들을 출력.
     ([commit](https://github.com/rails/rails/commit/1de0df86695f8fa2eeae6b8b46f9b53decfa6ec8))
 
-*   `datatime-local`필드를 생성하기 위해 
-`datetime_field`와 `datetime_field_tag`를 변경.
+*   `datatime-local`필드를 생성하기 위해 `datetime_field`와 `datetime_field_tag`를 변경.
     ([Pull Request](https://github.com/rails/rails/pull/28061))
 
 *   HTML 태그들(`tag.div`, `tag.br`, etc.)를 위한 새로운 Builder-style 문법.
@@ -436,7 +435,7 @@ Active Record
 `ActiveRecord::QueryMethods#select`에 전달하는 지원을 제거.
     ([Commit](https://github.com/rails/rails/commit/4fc3366d9d99a0eb19e45ad2bf38534efbf8c8ce))
 
-*   제거 예정이었던  i18n스코프에서 `activerecord.errors.messages.restrict_dependent_destroy.one`과 
+*   제거 예정이었던  i18n 스코프에서 `activerecord.errors.messages.restrict_dependent_destroy.one`과 
 `activerecord.errors.messages.restrict_dependent_destroy.many`가 제거.
     ([Commit](https://github.com/rails/rails/commit/00e3973a311))
 
@@ -490,7 +489,7 @@ Active Record
 *   `supports_migrations?`에 연결된 어탭터는 제거 예정
     ([Pull Request](https://github.com/rails/rails/pull/28172))
 
-*   `Migrator.schema_migrations_table_name`는 제거 예정, 대신에`SchemaMigration.table_name`를 사용.
+*   `Migrator.schema_migrations_table_name`는 제거 예정, 대신에 `SchemaMigration.table_name`를 사용.
     ([Pull Request](https://github.com/rails/rails/pull/28351))
 
 *   인용 및 타입캐스팅에서 `#quoted_id`사용을 제거 예정.
@@ -538,7 +537,7 @@ Active Record connections를 데이터베이스 transactions로 감싼다.
 Active Model
 ------------
 
-자세한 변경사항은[Changelog][active-model]를 참고해주세요.
+자세한 변경사항은 [Changelog][active-model]를 참고해주세요.
 
 ### 제거된 것들
 
@@ -560,14 +559,14 @@ Active Model
 Active Job
 -----------
 
-자세한 변경사항은[Changelog][active-job]를 참고해주세요.
+자세한 변경사항은 [Changelog][active-job]를 참고해주세요.
 
 ### 제거된 것들
 
 *   제거 예정이었던 어댑터 클래스를 `.queue_adapter`에 넘기는 지원을 제거.
     ([commit](https://github.com/rails/rails/commit/d1fc0a5eb286600abf8505516897b96c2f1ef3f6))
 
-*   제거 예정이었던`ActiveJob::DeserializationError`안에 `#original_exception` 제거.
+*   제거 예정이었던 `ActiveJob::DeserializationError`안에 `#original_exception` 제거.
     ([commit](https://github.com/rails/rails/commit/d861a1fcf8401a173876489d8cee1ede1cecde3b))
 
 ### 주요 변경점
@@ -582,7 +581,7 @@ Active Job
 Active Support
 --------------
 
-자세한 변경사항은[Changelog][active-support]를 참고해주세요.
+자세한 변경사항은 [Changelog][active-support]를 참고해주세요.
 
 ### 제거된 것들
 
@@ -613,7 +612,7 @@ Active Support
 *   유니코드 버전을 9.0.0으로 업데이트 됨.
     ([Pull Request](https://github.com/rails/rails/pull/27822))
 
-*   Duration#before과 #after를 #ago와 #since의 별칭으로 추가.
+*   Duration #before과 #after를 #ago와 #since의 별칭으로 추가.
     ([Pull Request](https://github.com/rails/rails/pull/27721))
 
 *   현재 객체에 대해 정의되지 않은 메서드호출을 프록시 객체에 위임하기 위해
