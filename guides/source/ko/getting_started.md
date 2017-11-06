@@ -451,7 +451,8 @@ end
 ArticlesController 컨트롤러에 new 메소드를 만들고 브라우저에서 
 <http://localhost:3000/articles/new>를 다시 열어보면 이번에는 또다른 에러가 발생합니다.
 
-![articles/new 템플릿을 찾을 수 없습니다!](images/getting_started/template_is_missing_articles_new.png)
+![articles/new 템플릿을 찾을 수 없습니다!]
+(images/getting_started/template_is_missing_articles_new.png)
 
 레일스는 이 심플한 액션에 연결되는 뷰가 있으며,
  거기에서 정보를 출력할 것을 기대합니다.
@@ -584,7 +585,8 @@ edit_article GET    /articles/:id/edit(.:format) articles#edit
  새로운 글 생성 프로세스가 시작되게 됩니다.
  이 상태에서 폼을 전송하면, 이미 익숙하실 에러가 나타납니다.
 
-![ArticlesController의 존재하지 않는 액션 create](images/getting_started/unknown_action_create_for_articles.png)
+![ArticlesController의 존재하지 않는 액션 create]
+(images/getting_started/unknown_action_create_for_articles.png)
 
 이제 `ArticlesController` 컨트롤러에
  `create` 액션을 작성하고 폼이 동작하도록 만듭시다.
@@ -758,7 +760,8 @@ TIP: 나중에 설명합니다만,
 이제 브라우저에서 <http://localhost:3000/articles/new> 에 접속하면 
 글을 작성하는 것이 *거의* 가능한 상태가 되어있습니다. 실제로 한번 해보죠. 그러면 아래와 같은 에러가 발생합니다.
 
-![새 article을 위한 속성 사용이 금지됨](images/getting_started/forbidden_attributes_for_new_article.png)
+![새 article을 위한 속성 사용이 금지됨]
+(images/getting_started/forbidden_attributes_for_new_article.png)
 
 레일스에는 보안성이 높은 애플리케이션을 편리하게 개발하기 위한 기능들이 여럿 있으며, 
 여기에서는 그 기능 때문에 에러가 발생한 것입니다. 
