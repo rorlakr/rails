@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-<title><%= yield(:page_title) || 'Ruby on Rails Guides' %></title>
+<title><%= yield(:page_title) || '루비 온 레일스 가이드' %></title>
 <link rel="stylesheet" type="text/css" href="stylesheets/style.css" />
 <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
 
@@ -24,26 +24,28 @@
   <% end %>
   <div id="topNav">
     <div class="wrapper">
-      <strong class="more-info-label">More at <a href="http://rubyonrails.org/">rubyonrails.org:</a> </strong>
+      <strong class="more-info-label">더보기 <a href="http://rubyonrails.org/">rubyonrails.org:</a> </strong>
       <span class="red-button more-info-button">
-        More Ruby on Rails
+        루비 온 레일스
       </span>
       <ul class="more-info-links s-hidden">
-        <li class="more-info"><a href="http://weblog.rubyonrails.org/">Blog</a></li>
-        <li class="more-info"><a href="http://guides.rubyonrails.org/">Guides</a></li>
+        <li class="more-info"><a href="http://weblog.rubyonrails.org/">블로그</a></li>
+        <li class="more-info"><a href="http://guides.rubyonrails.org/">가이드(영어)</a></li>
         <li class="more-info"><a href="http://api.rubyonrails.org/">API</a></li>
-        <li class="more-info"><a href="http://stackoverflow.com/questions/tagged/ruby-on-rails">Ask for help</a></li>
-        <li class="more-info"><a href="https://github.com/rails/rails">Contribute on GitHub</a></li>
+        <li class="more-info"><a href="http://stackoverflow.com/questions/tagged/ruby-on-rails">물어보기</a></li>
+        <li class="more-info"><a href="https://github.com/rails/rails">레일스 저장소</a></li>
+        <li class="more-info"><a href="https://github.com/rorlakr/rails-guides">번역 저장소</a></li>
+        <li class="more-info"><a href="http://rorlab.org">RORLAB</a></li>
       </ul>
     </div>
   </div>
   <div id="header">
     <div class="wrapper clearfix">
-      <h1><a href="index.html" title="Return to home page">Guides.rubyonrails.org</a></h1>
+      <h1><a href="index.html" title="홈페이지로 돌아가기">Guides.rubyonrails.org</a></h1>
       <ul class="nav">
-        <li><a class="nav-item" href="index.html">Home</a></li>
+        <li><a class="nav-item" href="index.html">홈</a></li>
         <li class="guides-index guides-index-large">
-          <a href="index.html" id="guidesMenu" class="guides-index-item nav-item">Guides Index</a>
+          <a href="index.html" id="guidesMenu" class="guides-index-item nav-item">가이드 목차</a>
           <div id="guides" class="clearfix" style="display: none;">
             <hr />
             <% ['L', 'R'].each do |position| %>
@@ -58,11 +60,11 @@
             <% end %>
           </div>
         </li>
-        <li><a class="nav-item" href="contributing_to_ruby_on_rails.html">Contribute</a></li>
-        <li><a class="nav-item" href="credits.html">Credits</a></li>
+        <li><a class="nav-item" href="contributing_to_ruby_on_rails.html">기여하기</a></li>
+        <li><a class="nav-item" href="credits.html">도와주신 분들</a></li>
         <li class="guides-index guides-index-small">
           <select class="guides-index-item nav-item">
-            <option value="index.html">Guides Index</option>
+            <option value="index.html">가이드 목차</option>
             <% docs_for_menu.each do |section| %>
               <optgroup label="<%= section['name'] %>">
                 <% finished_documents(section['documents']).each do |document| %>
@@ -90,28 +92,27 @@
       <div id="mainCol">
         <%= yield %>
 
-        <h3>Feedback</h3>
+        <h3>피드백</h3>
         <p>
-          You're encouraged to help improve the quality of this guide.
+          여러분의 참여가 가이드 수준을 높입니다.
         </p>
         <p>
-          Please contribute if you see any typos or factual errors.
-          To get started, you can read our <%= link_to 'documentation contributions', 'http://edgeguides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation' %> section.
+          오자와 탈자 또는 확인할 수 있는 에러를 발견하면 기여해보기를 바랍니다.
+          기여하기 전에, <%= link_to '문서 기여 방법', 'http://edgeguides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation' %> 부분을 읽기 바랍니다.
         </p>
         <p>
-          You may also find incomplete content, or stuff that is not up to date.
-          Please do add any missing documentation for master. Make sure to check
-          <%= link_to 'Edge Guides','http://edgeguides.rubyonrails.org' %> first to verify
-          if the issues are already fixed or not on the master branch.
-          Check the <%= link_to 'Ruby on Rails Guides Guidelines', 'ruby_on_rails_guides_guidelines.html' %>
-          for style and conventions.
+          내용이 부족하거나 최신 글이 아닐 수도 있습니다.
+          마스터 브랜치에 빠진 문서를 넣어주기를 바랍니다. 먼저 
+          <%= link_to '엣지 가이드','http://edgeguides.rubyonrails.org' %>에서 
+          해당 이슈를 이미 수정하여 마스터 브랜치에 반영하였는지 확인하기 바랍니다.
+          <%= link_to '루비 온 레일스 가이드 지침', 'ruby_on_rails_guides_guidelines.html' %>에서 
+          스타일과 관례를 확인합니다.
         </p>
         <p>
-          If for whatever reason you spot something to fix but cannot patch it yourself, please
-          <%= link_to 'open an issue', 'https://github.com/rails/rails/issues' %>.
+          고쳐야 할 것을 찾았으나 직접 수정할 수 없다면,
+          <%= link_to '이슈로 올리기', 'https://github.com/rails/rails/issues' %> 바랍니다.
         </p>
-        <p>And last but not least, any kind of discussion regarding Ruby on Rails
-          documentation is very welcome in the <%= link_to 'rubyonrails-docs mailing list', 'https://groups.google.com/forum/#!forum/rubyonrails-docs' %>.
+        <p>그리고 마지막으로, 루비 온 레일스 문서에 대한 어떤 토론이라도 <%= link_to 'rubyonrails-docs 메일링 리스트', 'https://groups.google.com/forum/#!forum/rubyonrails-docs' %>에서 환영합니다.
         </p>
       </div>
     </div>
