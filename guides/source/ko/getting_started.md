@@ -10,7 +10,7 @@
 * 레일스 설치 방법, 새로운 레일스 애플리케이션의 작성법, 
 애플리케이션을 데이터베이스에 연결하는 방법
 * 레일스 애플리케이션의 일반적인 구조.
-* MVC (모델, 뷰, 컨트롤러) 그리고 RESTful한 디자인 기초.
+* MVC (모델, 뷰, 컨트롤러) 그리고 RESTful.
 * 레일스 애플리케이션의 첫 구조를 빠르게 생성하는 방법.
 
 --------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ RubyGems에 대한 자세한 설명은 [RubyGems 가이드](http://guides.rubyge
 그 중에서 아래의 몇 가지를 소개합니다.
 
 * [루비 프로그래밍 언어 공식 웹사이트의 정보](https://www.ruby-lang.org/en/documentation/)
-* [선택한 무료 프로그래밍 서적 일람(영어)](https://github.com/vhf/free-programming-books/blob/master/free-programming-books.md#ruby)
+* [무료 프로그래밍 서적 일람(영어)](https://github.com/vhf/free-programming-books/blob/master/free-programming-books.md#ruby)
 
 이것들은 어느 것이든 잘 구성되어있습니다만, 
 그 중에는 루비 1.6 버전 등으로 설명하는 오래된 것들도 있으므로 주의해주세요. 
@@ -50,7 +50,7 @@ RubyGems에 대한 자세한 설명은 [RubyGems 가이드](http://guides.rubyge
 레일스는 개발자가 웹 애플리케이션을 개발하기 시작할 때 필요할 것으로 생각되는 작업이나 리소스를 가정하고 미리 준비하여 웹 애플리케이션을 쉽게 작성할 수 있도록 설계되어 있습니다. 
 다른 언어로 작성된 수많은 웹애플리케이션 프레임워크와 비교해서, 
 애플리케이션을 작성할 때 상대적으로 더 적은 코드로, 더 많은 기능을 구현할 수 있습니다. 
-레일스 경험이 긴 개발자들에게서, 
+레일스를 오랫동안 사용한 개발자들에게서, 
 레일스 덕분에 웹애플리케이션의 개발이 무척 편해졌다는 많은 의견을 받고 있습니다.
 
 레일스는 최선의 개발 방법을 하나로 가정하는, 어떤 의미에서는 대담한 결정을 기반으로 설계되어 있습니다. 
@@ -66,7 +66,7 @@ RubyGems에 대한 자세한 설명은 [RubyGems 가이드](http://guides.rubyge
 명확하고, 신뢰할 수 있는 형태로 표현하지 않으면 안된다' 라는 의미입니다. 
 반복적인 코드를 철저하게 피하는 것으로, 코드를 유지보수하기 쉽게하고, 
 간단히 확장할 수 있게 되며, 무엇보다 버그를 줄일 수 있습니다.
-* **설정보다 규정을 우선한다(Convention Over Configuration):** 레일스에서는 웹 애플리케이션에서 실행될 다양한 기능들을 실현하기 위한 최선의 방법을 명확히 구상하고 있으며, 
+* **설정보다 Convention을 우선한다(Convention Over Configuration):** 레일스에서는 웹 애플리케이션에서 실행될 다양한 기능들을 실현하기 위한 최선의 방법을 명확히 구상하고 있으며, 
 웹 애플리케이션의 각종 설정에 대해서도 기존의 경험이나 관습에 기초해, 각 설정들의 기본값을 정해두고 있습니다.
  이렇듯 어떤 의미로는 독단적으로 결정된 기본값 덕분에, 개발자의 모든 의견을 반영하기 위해서 너무 자유롭게 되어있는 웹 애플리케이션처럼, 개발자가 설정파일을 설정하느라 끝없이 고생할 필요가 없습니다.
 
@@ -87,7 +87,7 @@ TIP: 이하의 예시에서는 Unix계열의 OS의 프롬프트라는 의미로 
 ### 레일스 설치
 
 터미널(커맨드 프롬프트라고도 부릅니다) 창을 열어주세요.
- Mac OS X의 경우, 터미널(Terminal.app)이라는 이름의 애플리케이션을 실행합니다. 윈도우의 경우 [시작] 메뉴에서 [파일명을 지정해서 실행] 을 클릭하고 'cmd.exe'를 입력합니다.
+ Mac OS X의 경우, 터미널(Terminal.app)이라는 이름의 애플리케이션을 실행합니다. 윈도우의 경우 [시작] 메뉴에서 [실행] 을 클릭하고 'cmd.exe'를 입력합니다.
  `$`로 시작하는 부분은 커맨드 명령이므로 이것들을 커맨드 라인에 입력해서 실행해주세요.
  계속해서 현재 설치되어있는 루비의 버전이 최신인지를 확인해주세요.
 
@@ -334,7 +334,7 @@ welcome 컨트롤러의 index 액션으로 보내라고 지시할 수 있습니�
 `WelcomeController`의 `index`액션으로 라우팅이 수행되어
  뷰가 정상적으로 출력되는 것을 확인할 수 있습니다.
 
-TIP: 라우팅에 대한 자세한 내용은 [레일스 라우팅](routing.html).
+TIP: 라우팅에 대한 자세한 내용은 [레일스 라우팅](routing.html)을 참조해 주세요.
 
 애플리케이션의 구현과 실행
 ----------------------
@@ -363,7 +363,7 @@ end
 ```
 
 커맨드 라인에서 `bin/rails routes` 명령을 실행하면 
-표준적인 RESTful 액션에 필요한 라우팅이 모두 정의되어 있는 것을 확인할 수 있습니다. 이하 출력의 자세한 내용에 대해서는 나중에 설명할 것입니다만, 우선 주목해야하는 부분은 레일스는 `articles`라는 리소스명으로부터 단수형인 `article`을 추측하고, 
+표준 RESTful 액션에 필요한 라우팅이 모두 정의되어 있는 것을 확인할 수 있습니다. 이하 출력의 자세한 내용에 대해서는 나중에 설명할 것입니다만, 우선 주목해야하는 부분은 레일스는 `articles`라는 리소스명으로부터 단수형인 `article`을 추측하고, 
 각각을 그 의미에 맞게 사용하고 있다는 점입니다. 
 prefix에서 단일 항목을 가리킬 때에는 단수형 article, 복수 항목을 다뤄야 하는 경우에는 복수형 articles가 사용되고 있습니다.
 
@@ -421,7 +421,7 @@ end
 `ApplicationController` 를 상속해서 정의된 간단한 클래스입니다.
  컨트롤러에서 정의된 메소드는 컨트롤러의 액션이 됩니다. 
 제작 중인 블로그 애플리케이션에서는 이 액션들이 article에 대한
- CRUD 조작을 담당하게 됩니다.
+ CRUD 동작을 담당하게 됩니다.
 
 NOTE: 루비의 메소드는 `public`, `private`, `protected`로 구분할 수 있습니다만,
  컨트롤러의 액션이 될 수 있는 것은 `public` 메소드 뿐입니다.
@@ -480,8 +480,8 @@ ArticlesController 컨트롤러에 new 메소드를 만들고 브라우저에서
 
 이 경우, 템플릿을 `app/views/articles/new.html.erb`에 두는 것이 가장 간단합니다.
  템플릿의 파일명에서 확장자에 주의해주세요. 
-첫번째 확장자는 템플릿의 형식 을 나타내고,
- 두번째 확장자는 사용되는 핸들러 를 나타냅니다.
+첫번째 확장자는 템플릿의 `_형식_` 을 나타내고,
+ 두번째 확장자는 사용되는 `_핸들러_` 를 나타냅니다.
  레일스는 `articles/new`라는 템플릿을 애플리케이션의 
 `app/views`에서 찾으려 합니다.
  여기서 템플릿의 형식은 `HTML`이어야 하며, 
@@ -493,14 +493,14 @@ ArticlesController 컨트롤러에 new 메소드를 만들고 브라우저에서
 그러므로 템플릿의 파일명은 `articles/new.html.erb`이어야 하고, 
 애플리케이션의 `app/views` 폴더 밑에 존재해야만 합니다.
 
-그러면 `app/views/articles/new.html.erb1`를 만들고, 
+그러면 `app/views/articles/new.html.erb`를 만들고, 
 다음의 내용을 추가합시다.
 
 ```html
 <h1>New Article</h1>
 ```
 
-이제 http://localhost:3000/articles/new를 브라우저에서 열면,
+이제 <http://localhost:3000/articles/new>를 브라우저에서 열면,
  페이지의 제목이 표시됩니다. 드디어 라우팅과 컨트롤러, 뷰가 협조해서 동작할 수 있게 되었습니다. 
 그럼 새 글을 작성하기 위한 폼을 만들어보도록 하죠.
 
@@ -659,7 +659,7 @@ $ bin/rails generate model Article title:string text:text
 ```
 
 이 명령을 실행하면 `Article` 모델이 생성됩니다. 
-내부에는 문자열 형식의 title 속성과 텍스트 형식의 text 속성이 포함되어 있습니다. 이 속성들은 데이터베이스의 `articles` 테이블에 자동적으로 추가되며,
+내부에는 문자열 형식의 _title_ 속성과 텍스트 형식의 _text_ 속성이 포함되어 있습니다. 이 속성들은 데이터베이스의 `articles` 테이블에 자동적으로 추가되며,
  `Article` 모델과 대응하게 됩니다
 (역주: 실제로는 아래에서 설명할 마이그레이션을 해야 데이터베이스의 설정이 완료됩니다).
 
@@ -765,7 +765,7 @@ TIP: 나중에 설명합니다만,
 
 레일스에는 보안성이 높은 애플리케이션을 편리하게 개발하기 위한 기능들이 여럿 있으며, 
 여기에서는 그 기능 때문에 에러가 발생한 것입니다. 
-이것은  `[strong parameters]`(action_controller_overview.html#strong-parameters), 
+이것은 [strong parameters](action_controller_overview.html#strong-parameters), 
 라고 불리는 것으로, 컨트롤러의 액션에서 실제로 사용할 매개변수만을 지정하도록 강제합니다.
 
 어째서 그런 귀찮은 작업을 하지 않으면 안될까요?
@@ -806,7 +806,7 @@ private
 
 TIP: 자세한 내용에 대해서는 
 위에서 언급한 참고 자료와 
-[String Parameters에 대한 공식 블로그의 글(영어)](http://weblog.rubyonrails.org/2012/3/21/strong-parameters/)를 참조해주세.
+[String Parameters에 대한 공식 블로그의 글(영어)](http://weblog.rubyonrails.org/2012/3/21/strong-parameters/)를 참조해주세요.
 
 ### 글 보여주기
 
@@ -830,7 +830,7 @@ new에서 이미 했었던 방식과 같은 요령으로
 NOTE: 관습적으로 많이 쓰이는 CRUD 액션들의 위치 순서는
  `index`, `show`, `new`, `edit`, `create`, `update`
 그리고 `destroy`입니다. 원하는 대로 순서를 정해도 좋습니다만
- 공개 메소드인 채로 두어야 한다는 점을 명심하세요. 이 가이드의 앞 부분에서 이야기했듯, 
+ `public` 메소드인 채로 두어야 한다는 점을 명심하세요. 이 가이드의 앞 부분에서 이야기했듯, 
 동작하기 위해서는 `private`나 `protected` 메소드여서는 안됩니다.
 
 이제 `show` 액션을 추가합시다
@@ -946,7 +946,7 @@ class ArticlesController < ApplicationController
 
 다른 뷰로 이동할 수 있는 링크도 만들어 봅시다. 
 "New Article" 링크를 `app/views/articles/index.html.erb`의 
-`<table>` 위에 추가합니다.
+`<table>` tag 위에 추가합니다.
 
 ```erb
 <%= link_to 'New article', new_article_path %>
@@ -1202,7 +1202,7 @@ end
 글을 메소드에 전달하는것은 수정된 글 양식을 전달하기위해 승인된 url을 자동적으로 생성합니다. 
 이  옵션이 지정되어있으므로 `PATCH`라는 HTTP 메소드를 사용해서 
 이 폼을 제출하겠다고 레일스에게 알립니다. 
-PATCH 메소드는 REST 프로토콜에서 리소스를 **변경**하기 위해 사용됩니다.
+PATCH 메소드는 REST 프로토콜에서 리소스를 **수정**하기 위해 사용됩니다.
 
 `form_with`의 인자로 헬퍼가 양식을 채우도록 야기하는 `model: @article`과 같은 
 모델 객체를 사용할 수 있습니다.
@@ -2039,7 +2039,7 @@ class CommentsController < ApplicationController
 레일스에는 다양한 인증 시스템이 있습니다만, 
 그중에서 가장 인기가 높은 인증 시스템은 
 [Devise](https://github.com/plataformatec/devise)와 [Authlogic](https://github.com/binarylogic/authlogic) 
-잼입니다.
+젬입니다.
 
 
 ### 그 이외의 보안 대책
