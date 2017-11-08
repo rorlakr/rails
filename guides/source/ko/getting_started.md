@@ -97,7 +97,7 @@ ruby 2.3.1p112
 ```
 
 TIP: 루비나 루비온레일스를 빠르게 설치하기 위한 도구가 다수 존재합니다. 
-Windows 사용자의 경우에는 [Rails Installer](http://railsinstaller.org)를 사용해주세요.
+Windows 사용자의 경우에는 [Rails Installer](http://railsinstaller.org) 또는 [choco](https://chocolatey.org/)를 사용해주세요.
  Mac OS X 사용자는 [Tokaido](https://github.com/tokaido/tokaidoapp)를 사용해 주세요. 
 그 이외의 OS에서의 설치 방법은
  [ruby-lang.org](https://www.ruby-lang.org/en/documentation/installation/)를 참고해주세요.
@@ -308,7 +308,7 @@ end
 ```
 
 위는 애플리케이션의 라우팅 파일 의 내용입니다. 외부에서의 요청을 어떻게 각 컨트롤러와 액션에 보낼 것인지를
-[DSL (domain-specific language)](http://en.wikipedia.org/wiki/Domain-specific_language)
+[DSL (domain-specific language) 영문 ](http://en.wikipedia.org/wiki/Domain-specific_language) [DSL (domain-specific language) 한글 ](https://ko.wikipedia.org/wiki/%EB%8F%84%EB%A9%94%EC%9D%B8_%ED%8A%B9%ED%99%94_%EC%96%B8%EC%96%B4)
 라는 특수한 언어를 
 사용해서 기술합니다.
  이 파일에서 
