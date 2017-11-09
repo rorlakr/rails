@@ -171,4 +171,3 @@ Kindle 용 가이드를 생성하기 위해서 다음의 rake 태스크를 실�
 ```
 bundle exec rake guides:generate:kindle
 ```
-
