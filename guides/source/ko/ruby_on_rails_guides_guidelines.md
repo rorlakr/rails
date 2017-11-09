@@ -25,9 +25,7 @@ Ruby on Rails 가이드를 위한 가이드라인
 제목
 ------
 
-가이드의 제목에는 `h1`, 가이드의 절에는 `h2`, 작은 절에는 `h3`를 각각 사용해주세요. 
-그리고 실제로 생성된 HTML에서는 
-`<h2>`부터 시작됩니다.
+가이드의 제목에는 `h1`, 가이드의 절에는 `h2`, 작은 절에는 `h3`를 각각 사용해주세요. 그리고 실제로 생성된 HTML에서는 `<h2>`부터 시작됩니다.
 
 ```
 가이드의 제목
@@ -65,8 +63,7 @@ http://api.rubyonrails.org/v5.0.1/classes/ActiveRecord/Attributes/ClassMethods.h
 
 수정되지 않습니다.
 
-생성된 문서에 상관없이 동일한 버전을 가리켜야 하기 때문에, 
-릴리즈 노트에 있는 링크들을 사용해주세요.
+생성된 문서에 상관없이 동일한 버전을 가리켜야 하기 때문에, 릴리즈 노트에 있는 링크들을 사용해주세요.
 
 릴리즈 태그와 edge 가이드를 포함하고 있지 않은 링크가 만약 생성 된다면, 도메인은 `edgeapi.rubyonrails.org`로 수정됩니다. 예를 들면
 
@@ -80,8 +77,7 @@ http://api.rubyonrails.org/classes/ActionDispatch/Response.html
 http://edgeapi.rubyonrails.org/classes/ActionDispatch/Response.html
 ```
 
-릴리즈 태그와 릴리즈 가이드를 포함하고 있지 않는 링크가 생성되면 레일즈 버젼이 추가됩니다 
-예를 들어 v5.1.0 버젼 가이드를 생성하면
+릴리즈 태그와 릴리즈 가이드를 포함하고 있지 않는 링크가 생성되면 레일즈 버젼이 추가됩니다. 예를 들어 v5.1.0 버젼 가이드를 생성하면
 
 ```
 http://api.rubyonrails.org/classes/ActionDispatch/Response.html
@@ -139,8 +135,7 @@ touch my_guide.md
 bundle exec rake guides:generate ONLY=my_guide
 ```
 
-기본적으로는 변경이 없는 가이드의 생성은 생략되므로 `ONLY`를 사용할 
-기회는 많지 않을 것입니다.
+기본적으로는 변경이 없는 가이드의 생성은 생략되므로 `ONLY`를 사용할 기회는 많지 않을 것입니다.
 
 모든 가이드를 강제적으로 생성하려면 `ALL=1`를 추가 됩니다
 
@@ -150,8 +145,7 @@ bundle exec rake guides:generate ONLY=my_guide
 bundle exec rake guides:generate GUIDES_LANGUAGE=es
 ```
 
-생성 스크립트의 설정에 사용할 수 있는 환경변수를 모두 알고 싶은 경우에는 
-다음을 실행하면 됩니다.
+생성 스크립트의 설정에 사용할 수 있는 환경변수를 모두 알고 싶은 경우에는 다음을 실행하면 됩니다.
 
 ```
 rake
@@ -165,9 +159,7 @@ rake
 bundle exec rake guides:validate
 ```
 
-콘텐츠에서 생성된 아이디로 얻은 제목은 종종 중복이 발생합니다.
- 중복을 찾기 위해서는 가이드를 생성할 때에 `WARNINGS=1`를 지정해주세요. 경고와 함께 해결할 방법을 
-제안합니다.
+콘텐츠에서 생성된 아이디로 얻은 제목은 종종 중복이 발생합니다. 중복을 찾기 위해서는 가이드를 생성할 때에 `WARNINGS=1`를 지정해주세요. 경고와 함께 해결할 방법을 제안합니다.
 
 Kindle 가이드
 -------------
