@@ -1,173 +1,182 @@
 **DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
 
-Ruby on Rails Guides Guidelines
+Ruby on Rails 가이드를 위한 가이드라인
 ===============================
 
-This guide documents guidelines for writing Ruby on Rails Guides. This guide follows itself in a graceful loop, serving itself as an example.
+이 가이드는 Ruby on Rails 가이드를 작성하기 위한 가이드라인 입니다. 이 가이드 자체가 이 가이드에 따라서 작성되었으며, 바람직한 가이드라인의 예가 됨과 동시에 우아한 루프를 형성하고 있습니다.
 
-After reading this guide, you will know:
+이 가이드의 내용:
 
-* About the conventions to be used in Rails documentation.
-* How to generate guides locally.
+* Rails 문서의 기술
+* 가이드를 로컬에서 생성하기
 
 --------------------------------------------------------------------------------
 
-Markdown
+마크다운(Markdown)
 -------
 
-Guides are written in [GitHub Flavored Markdown](https://help.github.com/articles/github-flavored-markdown). There is comprehensive [documentation for Markdown](http://daringfireball.net/projects/markdown/syntax), as well as a [cheatsheet](http://daringfireball.net/projects/markdown/basics).
+가이드는 [GitHub Flavored Markdown](https://help.github.com/articles/github-flavored-markdown)으로 작성되어 있습니다. 이 가이드는 [Markdown 문서](http://daringfireball.net/projects/markdown/syntax) 뿐만 아니라, [치트 시트](http://daringfireball.net/projects/markdown/basics)의 내용도 포함하고 있습니다.
 
-Prologue
+프롤로그(Prologue)
 --------
 
-Each guide should start with motivational text at the top (that's the little introduction in the blue area). The prologue should tell the reader what the guide is about, and what they will learn. As an example, see the [Routing Guide](routing.html).
+가이드의 시작 부분에는 독자들의 동기부여를 위한 내용을 기술해주세요. 가이드의 파란색 부분이 이에 해당합니다. 프롤로그에서는 그 가이드의 개요와 가이드에서 배울 수 있는 것들에 대해서 설명해주세요. 예제로서 [rails 라우팅](routing.html)을 참고해주세요.
 
-Headings
+제목
 ------
 
-The title of every guide uses an `h1` heading; guide sections use `h2` headings; subsections use `h3` headings; etc. Note that the generated HTML output will use heading tags starting with `<h2>`.
+가이드의 제목에는 `h1`, 가이드의 절에는 `h2`, 작은 절에는 `h3`를 각각 사용해주세요. 
+그리고 실제로 생성된 HTML에서는 
+`<h2>`부터 시작됩니다.
 
 ```
-Guide Title
+가이드의 제목
 ===========
 
-Section
+절
 -------
 
-### Sub Section
+### 작은 절
 ```
 
-When writing headings, capitalize all words except for prepositions, conjunctions, internal articles, and forms of the verb "to be":
+제목을 작성할 때 관사, 전치사, 접속사, be동사 이외의 단어는 모두 대문자로 시작해주세요.
 
 ```
 #### Middleware Stack is an Array
 #### When are Objects Saved?
 ```
 
-Use the same inline formatting as regular text:
+일반 텍스트와 같은 스타일을 사용해주세요.
 
 ```
-##### The `:content_type` Option
+##### `:content_type` 옵션
 ```
 
-Linking to the API
+API에 링크
 ------------------
 
-Links to the API (`api.rubyonrails.org`) are processed by the guides generator in the following manner:
+가이드 제너레이터로 API(`api.rubyonrails.org`) 링크는 다음과 같은 방법으로 처리됩니다.
 
-Links that include a release tag are left untouched. For example
+릴리즈 태그를 포함하지 않은 링크들은 그대로 유지됩니다. 예를 들면
 
 ```
 http://api.rubyonrails.org/v5.0.1/classes/ActiveRecord/Attributes/ClassMethods.html
 ```
 
-is not modified.
+수정되지 않습니다.
 
-Please use these in release notes, since they should point to the corresponding version no matter the target being generated.
+생성된 문서에 상관없이 동일한 버전을 가리켜야 하기 때문에, 
+릴리즈 노트에 있는 링크들을 사용해주세요.
 
-If the link does not include a release tag and edge guides are being generated, the domain is replaced by `edgeapi.rubyonrails.org`. For example,
+릴리즈 태그와 edge 가이드를 포함하고 있지 않은 링크가 만약 생성 된다면, 도메인은 `edgeapi.rubyonrails.org`로 수정됩니다. 예를 들면
 
 ```
 http://api.rubyonrails.org/classes/ActionDispatch/Response.html
 ```
 
-becomes
+위 링크가 아래와 같이 됩니다.
 
 ```
 http://edgeapi.rubyonrails.org/classes/ActionDispatch/Response.html
 ```
 
-If the link does not include a release tag and release guides are being generated, the Rails version is injected. For example, if we are generating the guides for v5.1.0 the link
+릴리즈 태그와 릴리즈 가이드를 포함하고 있지 않는 링크가 생성되면 레일즈 버젼이 추가됩니다 
+예를 들어 v5.1.0 버젼 가이드를 생성하면
 
 ```
 http://api.rubyonrails.org/classes/ActionDispatch/Response.html
 ```
 
-becomes
+위 링크가 아래와 같이 됩니다.
 
 ```
 http://api.rubyonrails.org/v5.1.0/classes/ActionDispatch/Response.html
 ```
 
-Please don't link to `edgeapi.rubyonrails.org` manually.
+`edgeapi.rubyonrails.org`를 수동적으로 링크하는것을 지양합니다.
 
 
-API Documentation Guidelines
+API 문서의 작성법
 ----------------------------
 
-The guides and the API should be coherent and consistent where appropriate. In particular, these sections of the [API Documentation Guidelines](api_documentation_guidelines.html) also apply to the guides:
+가이드와 API는 적절한 일관성이 있어야 합니다. [API 문서 작성 가이드라인](api_documentation_guidelines.html)의 다음 절을 참고해주세요. 이 절은 가이드에서도 적용됩니다.
 
-* [Wording](api_documentation_guidelines.html#wording)
+* [어조](api_documentation_guidelines.html#wording)
 * [English](api_documentation_guidelines.html#english)
-* [Example Code](api_documentation_guidelines.html#example-code)
-* [Filenames](api_documentation_guidelines.html#file-names)
-* [Fonts](api_documentation_guidelines.html#fonts)
+* [예제 코드](api_documentation_guidelines.html#example-code)
+* [파일명](api_documentation_guidelines.html#file-names)
+* [폰트](api_documentation_guidelines.html#fonts)
 
-HTML Guides
+HTML 가이드
 -----------
 
-Before generating the guides, make sure that you have the latest version of
-Bundler installed on your system. As of this writing, you must install Bundler
-1.3.5 or later on your device.
+가이드를 생성하기 전에 시스템에 최신 Bundler가 설치되었는지 확인하세요.
+ 현시점에서는 1.3.5 이상이 설치되어있어야 
+합니다.
 
-To install the latest version of Bundler, run `gem install bundler`.
+최신 Bundler를 설치하려면 `gem install bundler`를 실행해주세요.
 
-### Generation
+### 생성
 
-To generate all the guides, just `cd` into the `guides` directory, run `bundle install`, and execute:
+모든 가이드를 생성하려면 `cd` 명령으로 `guides` 폴더에 이동하여 `bundle install`를 실행한 뒤에 다음 중 하나를 실행합니다.
 
 ```
 bundle exec rake guides:generate
 ```
 
-or
+또는
 
 ```
 bundle exec rake guides:generate:html
 ```
 
-Resulting HTML files can be found in the `./output` directory.
+HTML파일의 결과는 `./output`폴더에서 찾을 수 있습니다.
 
-To process `my_guide.md` and nothing else use the `ONLY` environment variable:
+`my_guide.md` 파일만을 생성하고 싶은 경우에는 환경변수 `ONLY`를 사용합니다.
 
 ```
 touch my_guide.md
 bundle exec rake guides:generate ONLY=my_guide
 ```
 
-By default, guides that have not been modified are not processed, so `ONLY` is rarely needed in practice.
+기본적으로는 변경이 없는 가이드의 생성은 생략되므로 `ONLY`를 사용할 
+기회는 많지 않을 것입니다.
 
-To force processing all the guides, pass `ALL=1`.
+모든 가이드를 강제적으로 생성하려면 `ALL=1`를 추가 됩니다
 
-If you want to generate guides in a language other than English, you can keep them in a separate directory under `source` (eg. `source/es`) and use the `GUIDES_LANGUAGE` environment variable:
+영어 이외의 언어에서 생성하고 싶은 경우에는 `source` 폴더 밑의 `source/es`와 같이 해당 언어의 폴더를 생성하고 `GUIDES_LANGUAGE` 환경변수를 설정해주세요.
 
 ```
 bundle exec rake guides:generate GUIDES_LANGUAGE=es
 ```
 
-If you want to see all the environment variables you can use to configure the generation script just run:
+생성 스크립트의 설정에 사용할 수 있는 환경변수를 모두 알고 싶은 경우에는 
+다음을 실행하면 됩니다.
 
 ```
 rake
 ```
 
-### Validation
+### 검증
 
-Please validate the generated HTML with:
+생성된 HTML을 검증하기 위해 다음을 실행하세요.
 
 ```
 bundle exec rake guides:validate
 ```
 
-Particularly, titles get an ID generated from their content and this often leads to duplicates. Please set `WARNINGS=1` when generating guides to detect them. The warning messages suggest a solution.
+콘텐츠에서 생성된 아이디로 얻은 제목은 종종 중복이 발생합니다.
+ 중복을 찾기 위해서는 가이드를 생성할 때에 `WARNINGS=1`를 지정해주세요. 경고와 함께 해결할 방법을 
+제안합니다.
 
-Kindle Guides
+Kindle 가이드
 -------------
 
-### Generation
+### 생성
 
-To generate guides for the Kindle, use the following rake task:
+Kindle 용 가이드를 생성하기 위해서 다음의 rake 태스크를 실행해주세요.
 
 ```
 bundle exec rake guides:generate:kindle
 ```
+
