@@ -61,7 +61,7 @@ API에 링크
 http://api.rubyonrails.org/v5.0.1/classes/ActiveRecord/Attributes/ClassMethods.html
 ```
 
-수정되지 않습니다.
+는 수정되지 않습니다.
 
 생성된 문서에 상관없이 동일한 버전을 가리켜야 하기 때문에, 릴리즈 노트에 있는 링크들을 사용해주세요.
 
@@ -89,19 +89,19 @@ http://api.rubyonrails.org/classes/ActionDispatch/Response.html
 http://api.rubyonrails.org/v5.1.0/classes/ActionDispatch/Response.html
 ```
 
-`edgeapi.rubyonrails.org`를 직접 링크하는것은 되도록 멀리합니다.
+`edgeapi.rubyonrails.org`를 직접 링크하지 마세요.
 
 
-API 문서의 가이드라인
+API 문서 가이드라인
 ----------------------------
 
-가이드와 API는 적절한 일관성이 있어야 합니다. [API 문서 작성 가이드라인](api_documentation_guidelines.html)의 다음 절을 참고해주세요. 이 절은 가이드에서도 적용됩니다.
+가이드와 API는 적절한 일관성이 있어야 합니다. [API 문서 가이드라인](api_documentation_guidelines.html)의 다음 절을 참고해주세요. 이 절은 가이드에서도 적용됩니다.
 
 * [Wording](api_documentation_guidelines.html#wording)
 * [English](api_documentation_guidelines.html#english)
-* [예제 코드](api_documentation_guidelines.html#example-code)
-* [파일명](api_documentation_guidelines.html#file-names)
-* [폰트](api_documentation_guidelines.html#fonts)
+* [Example Code](api_documentation_guidelines.html#example-code)
+* [Filenames](api_documentation_guidelines.html#file-names)
+* [Fonts](api_documentation_guidelines.html#fonts)
 
 HTML 가이드
 -----------
@@ -114,7 +114,7 @@ HTML 가이드
 
 ### 생성
 
-모든 가이드를 생성하려면 `cd` 명령으로 `guides` 폴더에 이동하여 `bundle install`를 실행한 뒤에 다음 중 하나를 실행합니다.
+모든 가이드를 생성하려면 `cd` 명령으로 `guides` 디렉토리에 이동하여 `bundle install`를 실행한 뒤에 다음 중 하나를 실행합니다.
 
 ```
 bundle exec rake guides:generate
@@ -137,7 +137,7 @@ bundle exec rake guides:generate ONLY=my_guide
 
 기본적으로는 변경이 없는 가이드의 생성은 생략되므로 `ONLY`를 사용할 기회는 많지 않을 것입니다.
 
-모든 가이드를 강제적으로 생성하려면 `ALL=1`를 추가 됩니다
+모든 가이드를 강제적으로 생성하려면 `ALL=1`를 추가하면 됩니다
 
 영어 이외의 언어에서 생성하고 싶은 경우에는 `source` 폴더 밑의 `source/es`와 같이 해당 언어의 폴더를 생성하고 `GUIDES_LANGUAGE` 환경변수를 설정해주세요.
 
