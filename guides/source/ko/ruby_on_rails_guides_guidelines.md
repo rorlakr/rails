@@ -12,15 +12,15 @@ Ruby on Rails 가이드를 위한 가이드라인
 
 --------------------------------------------------------------------------------
 
-마크다운(Markdown)
+마크다운
 -------
 
-가이드는 [GitHub Flavored Markdown](https://help.github.com/articles/github-flavored-markdown)으로 작성되어 있습니다. 이 가이드는 [Markdown 문서](http://daringfireball.net/projects/markdown/syntax) 뿐만 아니라, [치트 시트](http://daringfireball.net/projects/markdown/basics)의 내용도 포함하고 있습니다.
+가이드는 [GitHub Flavored Markdown](https://help.github.com/articles/github-flavored-markdown)으로 작성되어 있습니다. 이 가이드는 [마크다운 문서](http://daringfireball.net/projects/markdown/syntax) 뿐만 아니라, [치트시트](http://daringfireball.net/projects/markdown/basics)의 내용도 포함하고 있습니다.
 
-프롤로그(Prologue)
+프롤로그
 --------
 
-가이드의 시작 부분에는 독자들의 동기부여를 위한 내용을 기술해주세요. 가이드의 파란색 부분이 이에 해당합니다. 프롤로그에서는 그 가이드의 개요와 가이드에서 배울 수 있는 것들에 대해서 설명해주세요. 예제로서 [rails 라우팅](routing.html)을 참고해주세요.
+가이드의 시작 부분에는 독자들의 동기부여를 위한 내용을 기술해주세요. 가이드의 파란색 부분이 이에 해당합니다. 프롤로그에서는 그 가이드의 개요와 가이드에서 배울 수 있는 것들에 대해서 설명해주세요. 예제로서 [라우팅 가이드](routing.html)을 참고해주세요.
 
 제목
 ------
@@ -89,15 +89,15 @@ http://api.rubyonrails.org/classes/ActionDispatch/Response.html
 http://api.rubyonrails.org/v5.1.0/classes/ActionDispatch/Response.html
 ```
 
-`edgeapi.rubyonrails.org`를 수동적으로 링크하는것을 지양합니다.
+`edgeapi.rubyonrails.org`를 직접 링크하는것은 되도록 멀리합니다.
 
 
-API 문서의 작성법
+API 문서의 가이드라인
 ----------------------------
 
 가이드와 API는 적절한 일관성이 있어야 합니다. [API 문서 작성 가이드라인](api_documentation_guidelines.html)의 다음 절을 참고해주세요. 이 절은 가이드에서도 적용됩니다.
 
-* [어조](api_documentation_guidelines.html#wording)
+* [Wording](api_documentation_guidelines.html#wording)
 * [English](api_documentation_guidelines.html#english)
 * [예제 코드](api_documentation_guidelines.html#example-code)
 * [파일명](api_documentation_guidelines.html#file-names)
@@ -126,7 +126,7 @@ bundle exec rake guides:generate
 bundle exec rake guides:generate:html
 ```
 
-HTML파일의 결과는 `./output`폴더에서 찾을 수 있습니다.
+HTML파일의 결과는 `./output`디렉토리에서 찾을 수 있습니다.
 
 `my_guide.md` 파일만을 생성하고 싶은 경우에는 환경변수 `ONLY`를 사용합니다.
 
