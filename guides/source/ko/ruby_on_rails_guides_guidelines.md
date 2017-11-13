@@ -1,13 +1,13 @@
 **DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
 
-Ruby on Rails 가이드를 위한 가이드라인
+루비 온 레일스 가이드를 위한 가이드라인
 ===============================
 
-이 가이드는 Ruby on Rails 가이드를 작성하기 위한 가이드라인 입니다. 이 가이드 자체가 이 가이드에 따라서 작성되었으며, 바람직한 가이드라인의 예가 됨과 동시에 우아한 루프를 형성하고 있습니다.
+이 가이드는 루비 온 레일스 가이드를 작성하기 위한 가이드라인 입니다. 이 가이드 자체가 이 가이드에 따라서 작성되었으며, 바람직한 가이드라인의 예가 됨과 동시에 우아한 루프를 형성하고 있습니다.
 
 이 가이드의 내용:
 
-* Rails 문서의 기술
+* 레일스 문서에서 사용되는 규칙
 * 가이드를 로컬에서 생성하기
 
 --------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ Ruby on Rails 가이드를 위한 가이드라인
 마크다운
 -------
 
-가이드는 [GitHub Flavored Markdown](https://help.github.com/articles/github-flavored-markdown)으로 작성되어 있습니다. 이 가이드는 [마크다운 문서](http://daringfireball.net/projects/markdown/syntax) 뿐만 아니라, [치트시트](http://daringfireball.net/projects/markdown/basics)의 내용도 포함하고 있습니다.
+가이드는 [GitHub Flavored Markdown](https://help.github.com/articles/github-flavored-markdown)으로 작성되어 있습니다. [GitHub Flavored Markdown](https://help.github.com/articles/github-flavored-markdown)을 참고할 [마크다운 문서](http://daringfireball.net/projects/markdown/syntax), [치트시트](http://daringfireball.net/projects/markdown/basics)가 있습니다.
 
 프롤로그
 --------
@@ -44,10 +44,10 @@ Ruby on Rails 가이드를 위한 가이드라인
 #### When are Objects Saved?
 ```
 
-일반 텍스트와 같은 스타일을 사용해주세요.
+일반 텍스트와 같은 인라인 포맷을 사용해주세요.
 
 ```
-##### `:content_type` 옵션
+##### The `:content_type` Option
 ```
 
 API에 링크
@@ -55,7 +55,7 @@ API에 링크
 
 가이드 제너레이터로 API(`api.rubyonrails.org`) 링크는 다음과 같은 방법으로 처리됩니다.
 
-릴리즈 태그를 포함하지 않은 링크들은 그대로 유지됩니다. 예를 들면
+릴리스 태그를 포함하는 링크들은 그대로 유지됩니다. 예를 들면
 
 ```
 http://api.rubyonrails.org/v5.0.1/classes/ActiveRecord/Attributes/ClassMethods.html
@@ -63,9 +63,9 @@ http://api.rubyonrails.org/v5.0.1/classes/ActiveRecord/Attributes/ClassMethods.h
 
 는 수정되지 않습니다.
 
-생성된 문서에 상관없이 동일한 버전을 가리켜야 하기 때문에, 릴리즈 노트에 있는 링크들을 사용해주세요.
+생성된 문서에 상관없이 동일한 버전을 가리켜야 하기 때문에, 릴리스 태그가 있는 링크들을 사용해주세요.
 
-릴리즈 태그와 edge 가이드를 포함하고 있지 않은 링크가 만약 생성 된다면, 도메인은 `edgeapi.rubyonrails.org`로 수정됩니다. 예를 들면
+링크가 릴리스 태그를 포함하지 않고 엣지 가이드를 생성하면, 도메인은 `edgeapi.rubyonrails.org`로 수정됩니다. 예를 들면
 
 ```
 http://api.rubyonrails.org/classes/ActionDispatch/Response.html
@@ -77,7 +77,7 @@ http://api.rubyonrails.org/classes/ActionDispatch/Response.html
 http://edgeapi.rubyonrails.org/classes/ActionDispatch/Response.html
 ```
 
-릴리즈 태그와 릴리즈 가이드를 포함하고 있지 않는 링크가 생성되면 레일즈 버젼이 추가됩니다. 예를 들어 v5.1.0 버젼 가이드를 생성하면
+릴리스 태그와 릴리스 가이드를 포함하고 있지 않는 링크가 생성되면 레일스 버젼이 추가됩니다. 예를 들어 v5.1.0 버젼 가이드를 생성하면
 
 ```
 http://api.rubyonrails.org/classes/ActionDispatch/Response.html
@@ -139,7 +139,7 @@ bundle exec rake guides:generate ONLY=my_guide
 
 모든 가이드를 강제적으로 생성하려면 `ALL=1`를 추가하면 됩니다
 
-영어 이외의 언어에서 생성하고 싶은 경우에는 `source` 폴더 밑의 `source/es`와 같이 해당 언어의 폴더를 생성하고 `GUIDES_LANGUAGE` 환경변수를 설정해주세요.
+영어 이외의 언어에서 생성하고 싶은 경우에는 `source` 디렉토리 밑의 `source/es`와 같이 해당 언어의 디렉토리를 생성하고 `GUIDES_LANGUAGE` 환경변수를 설정해주세요.
 
 ```
 bundle exec rake guides:generate GUIDES_LANGUAGE=es
@@ -161,12 +161,12 @@ bundle exec rake guides:validate
 
 콘텐츠에서 생성된 아이디로 얻은 제목은 종종 중복이 발생합니다. 중복을 찾기 위해서는 가이드를 생성할 때에 `WARNINGS=1`를 지정해주세요. 경고와 함께 해결할 방법을 제안합니다.
 
-Kindle 가이드
+킨들 가이드
 -------------
 
 ### 생성
 
-Kindle 용 가이드를 생성하기 위해서 다음의 rake 태스크를 실행해주세요.
+킨들용 가이드를 생성하기 위해서 다음의 rake 태스크를 실행해주세요.
 
 ```
 bundle exec rake guides:generate:kindle
