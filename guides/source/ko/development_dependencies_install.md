@@ -1,238 +1,252 @@
 **DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
 
-Development Dependencies Install
+개발 의존성 설치하기
 ================================
 
-This guide covers how to setup an environment for Ruby on Rails core development.
+이 가이드는 루비 온 레일스 개발을 위한 환경을 설치하는 방법을 설명합니다.
 
-After reading this guide, you will know:
+이 가이드에서 다루는 내용:
 
-* How to set up your machine for Rails development
-* How to run specific groups of unit tests from the Rails test suite
-* How the Active Record portion of the Rails test suite operates
+* 레일스 개발 환경 설정하기
+* 레일스 테스트에서 특정 그룹의 유닛 테스트를 실행하기
+* 레일스 테스트의 Active Record의 일부를 실행하기
 
 --------------------------------------------------------------------------------
 
-The Easy Way
+쉬운 방법
 ------------
 
-The easiest and recommended way to get a development environment ready to hack is to use the [Rails development box](https://github.com/rails/rails-dev-box).
+개발 환경을 설정하는 가장 쉬운 방법은 [레일스 개발 도구](https://github.com/rails/rails-dev-box)
+를 사용하는 것입니다.
 
-The Hard Way
+어려운 방법
 ------------
 
-In case you can't use the Rails development box, see section below, these are the steps to manually build a development box for Ruby on Rails core development.
+레일스 개발 도구를 사용할 수 없는 경우라면, 아래에서 루비 온 레일스 개발 환경을 직접 만드는 방법을 
+확인하세요.
 
-### Install Git
+### Git 설치하기
+루비 온 레일스는 소스 코드 관리를 위해서 Git을 사용하고 있습니다. 
+[Git 홈페이지](http://git-scm.com/)에서 설치하는 방법을 확인하세요. 
+인터넷 상에는 Git에 익숙해지는데 도움을 줄 수 있는 다양한 자료가 있습니다.
 
-Ruby on Rails uses Git for source code control. The [Git homepage](http://git-scm.com/) has installation instructions. There are a variety of resources on the net that will help you get familiar with Git:
+* [Try Git course](http://try.github.io/)는 기초적인 사용법을 인터랙티브하게 알려줍니다.
+* [official Documentation](http://git-scm.com/documentation)는 포괄적이며 Git의 기초를 설명하는 몇몇 
+동영상을 포함하고 있습니다.
+* [Everyday Git](http://schacon.github.io/git/everyday.html)는 Git을 사용하기에 
+충분한 내용을 가르쳐줍니다.
+* [GitHub](http://help.github.com)는 다양한 Git 자료에 대한 링크 목록을 제공합니다.
+* [Pro Git](http://git-scm.com/book)는 Creative Commons license로 Git에 대한 책 전체를 제공합니다.
 
-* [Try Git course](http://try.github.io/) is an interactive course that will teach you the basics.
-* The [official Documentation](http://git-scm.com/documentation) is pretty comprehensive and also contains some videos with the basics of Git.
-* [Everyday Git](http://schacon.github.io/git/everyday.html) will teach you just enough about Git to get by.
-* [GitHub](http://help.github.com) offers links to a variety of Git resources.
-* [Pro Git](http://git-scm.com/book) is an entire book about Git with a Creative Commons license.
+### 루비 온 레일스 저장소 복제하기
 
-### Clone the Ruby on Rails Repository
-
-Navigate to the folder where you want the Ruby on Rails source code (it will create its own `rails` subdirectory) and run:
+루비 온 레일스 소스 코드를 저장하고 싶은 디렉토리로 이동하세요(그 디렉토리에 `rails`라는 디렉토리를 생성할 
+것입니다). 그리고 다음을 실행하세요.
 
 ```bash
 $ git clone git://github.com/rails/rails.git
 $ cd rails
 ```
 
-### Set up and Run the Tests
+### 설정과 테스트 실행하기
 
-The test suite must pass with any submitted code. No matter whether you are writing a new patch, or evaluating someone else's, you need to be able to run the tests.
+모든 제출된 코드는 테스트를 통과해야 합니다. 새 패치를 추가하든, 다른 사람의 코드를 평가하든, 테스트를 
+실행할 수 있어야 합니다.
 
-Install first SQLite3 and its development files for the `sqlite3` gem. On macOS
-users are done with:
+우선 SQLite3과 `sqlite3` 젬을 위한 개발용 파일을 설치하세요. Mac OS X 사용자라면 
+다음을 실행하세요.
 
 ```bash
 $ brew install sqlite3
 ```
 
-In Ubuntu you're done with just:
+Ubuntu 사용자라면 apt-get을 사용하세요.
 
 ```bash
 $ sudo apt-get install sqlite3 libsqlite3-dev
 ```
 
-If you are on Fedora or CentOS, you're done with
+Fedora나 CentOS 사용자라면 yum을 사용하세요.
 
 ```bash
 $ sudo yum install sqlite3 sqlite3-devel
 ```
 
-If you are on Arch Linux, you will need to run:
+Arch Linux 사용자라면 다음을 실행하세요.
 
 ```bash
 $ sudo pacman -S sqlite
 ```
 
-For FreeBSD users, you're done with:
+FreeBSD 사용자라면 다음을 실행하세요.
 
 ```bash
 # pkg install sqlite3
 ```
 
-Or compile the `databases/sqlite3` port.
+또는 `databases/sqlite3` 포트를 컴파일하세요.
 
-Get a recent version of [Bundler](http://bundler.io/)
+[Bundler](http://bundler.io/)의 최신 버전을 설치하세요.
 
 ```bash
 $ gem install bundler
 $ gem update bundler
 ```
 
-and run:
+그리고 다음을 실행하세요.
 
 ```bash
 $ bundle install --without db
 ```
 
-This command will install all dependencies except the MySQL and PostgreSQL Ruby drivers. We will come back to these soon.
+이 명령을 통해서 MySQL과 PostgreSQL 드라이버를 제외한 모든 
+의존성이 설치됩니다.
 
-NOTE: If you would like to run the tests that use memcached, you need to ensure that you have it installed and running.
+NOTE: memcached를 사용하는 테스트를 실행하고 싶다면 
+미리 이를 설치해야 합니다.
 
-You can use [Homebrew](http://brew.sh/) to install memcached on OS X:
+OS X 사용자는 [Homebrew](http://brew.sh/)를 사용하여 memcached를 설치할 수 있습니다.
 
 ```bash
 $ brew install memcached
 ```
 
-On Ubuntu you can install it with apt-get:
+Ubuntu 사용자라면 apt-get을 사용하세요.
 
 ```bash
 $ sudo apt-get install memcached
 ```
 
-Or use yum on Fedora or CentOS:
+Fadora나 CentOS라면 yum을 사용하세요.
 
 ```bash
 $ sudo yum install memcached
 ```
 
-If you are running on Arch Linux:
+Arch Linux 사용자라면 다음을 실행하세요.
 
 ```bash
 $ sudo pacman -S memcached
 ```
 
-For FreeBSD users, you're done with:
+FreeBSD 사용자라면 다음을 실행하세요.
 
 ```bash
 # pkg install memcached
 ```
 
-Alternatively, you can compile the `databases/memcached` port.
+또는 `databases/memcached` 포트를 컴파일하세요.
 
-With the dependencies now installed, you can run the test suite with:
+이제 의존성을 모두 설치하였으니 다음의 명령으로 테스트를 실행할 수 있습니다.
 
 ```bash
 $ bundle exec rake test
 ```
 
-You can also run tests for a specific component, like Action Pack, by going into its directory and executing the same command:
+Action Pack과 같은 특정 컴포넌트의 테스트만을 실행할 수도 있습니다. 해당 디렉토리로 이동하여 같은 명령을 
+실행하세요.
 
 ```bash
 $ cd actionpack
 $ bundle exec rake test
 ```
 
-If you want to run the tests located in a specific directory use the `TEST_DIR` environment variable. For example, this will run the tests in the `railties/test/generators` directory only:
+`TEST_DIR` 환경 변수를 사용하여 특정 디렉토리에 있는 테스트만을 실행하고 싶을 수도 있습니다. 예를 들어 
+다음 명령은 `railties/test/generators` 디렉토리에 있는 테스트만을 실행합니다.
 
 ```bash
 $ cd railties
 $ TEST_DIR=generators bundle exec rake test
 ```
 
-You can run the tests for a particular file by using:
+다음처럼 특정 파일만을 실행할 수도 있습니다.
 
 ```bash
 $ cd actionpack
 $ bundle exec ruby -Itest test/template/form_helper_test.rb
 ```
 
-Or, you can run a single test in a particular file:
+또는 특정 파일의 한 테스트만을 실행할 수도 있습니다.
 
 ```bash
 $ cd actionpack
 $ bundle exec ruby -Itest path/to/test.rb -n test_name
 ```
 
-### Railties Setup
+### Railties 설정하기
 
-Some Railties tests depend on a JavaScript runtime environment, such as having [Node.js](https://nodejs.org/) installed.
+[Node.js](https://nodejs.org/)가 설치되는 것과 같이 일부 Railties 테스트는  Javascript 런타임 환경에 
+따라 달라집니다.
 
-### Active Record Setup
+### Active Record 설정하기
 
-Active Record's test suite runs three times: once for SQLite3, once for MySQL, and once for PostgreSQL. We are going to see now how to set up the environment for them.
+Active Record의 테스트는 3번 동작합니다. 한 번은 SQLite3으로, 또 한 번은 MySQL로, 나머지 한 번은 PostgreSQL로 동작합니다. 이들을 위한 환경을 구성하는 방법에 대해서 알아보겠습니다.
 
-WARNING: If you're working with Active Record code, you _must_ ensure that the tests pass for at least MySQL, PostgreSQL, and SQLite3. Subtle differences between the various adapters have been behind the rejection of many patches that looked OK when tested only against MySQL.
+WARNING: 만약 Active Record 코드 상에서 작업을 하고 있다면 _반드시_ 적어도 MySQL, PostgreSQL, SQLite3 환경에서 테스트가 성공해야 합니다. 다양한 어댑터간의 사소한 차이가 MySQL에서만 테스트되었던 많은 패치들이 거절된 이유입니다.
 
-#### Database Configuration
+#### 데이터베이스 설정하기
 
-The Active Record test suite requires a custom config file: `activerecord/test/config.yml`. An example is provided in `activerecord/test/config.example.yml` which can be copied and used as needed for your environment.
+Active Record 테스트는 커스텀 설정 파일(`activerecord/test/config.yml`)을 요구합니다. 
+`activerecord/test/config.example.yml`에 샘플이 제공되고 있으므로 환경에 
+맞게 변경하여 사용하세요.
 
-#### MySQL and PostgreSQL
+#### MySQL과 PostgreSQL
 
-To be able to run the suite for MySQL and PostgreSQL we need their gems. Install
-first the servers, their client libraries, and their development files.
+MySQL과 PostgreSQL에서 테스트를 실행하려면 필요한 젬을 설치해야 합니다. 서버와 클라이언트 라이브러리, 그리고 개발용 파일들을 설치하세요.
 
-On OS X, you can run:
+OS X 사용자는 다음을 실행하세요.
 
 ```bash
 $ brew install mysql
 $ brew install postgresql
 ```
 
-Follow the instructions given by Homebrew to start these.
+그리고 Homebrew가 제공하는 설명을 따라가세요.
 
-In Ubuntu just run:
+Ubuntu 사용자라면 다음을 실행하세요.
 
 ```bash
 $ sudo apt-get install mysql-server libmysqlclient-dev
 $ sudo apt-get install postgresql postgresql-client postgresql-contrib libpq-dev
 ```
 
-On Fedora or CentOS, just run:
+Fedora나 CentOS 사용자라면 다음을 실행하세요.
 
 ```bash
 $ sudo yum install mysql-server mysql-devel
 $ sudo yum install postgresql-server postgresql-devel
 ```
 
-If you are running Arch Linux, MySQL isn't supported anymore so you will need to
-use MariaDB instead (see [this announcement](https://www.archlinux.org/news/mariadb-replaces-mysql-in-repositories/)):
+만약 Arch Linux 사용자라면 MySQL이 더 이상 지원되지 않으며, MariaDB를 사용해야한다는 점을 알려드립니다([이 공지](https://www.archlinux.org/news/mariadb-replaces-mysql-in-repositories/)를 참고하세요).
 
 ```bash
 $ sudo pacman -S mariadb libmariadbclient mariadb-clients
 $ sudo pacman -S postgresql postgresql-libs
 ```
 
-FreeBSD users will have to run the following:
+FreeBSD 사용자라면 다음을 실행하세요.
 
 ```bash
 # pkg install mysql56-client mysql56-server
 # pkg install postgresql94-client postgresql94-server
 ```
 
-Or install them through ports (they are located under the `databases` folder).
-If you run into troubles during the installation of MySQL, please see
-[the MySQL documentation](http://dev.mysql.com/doc/refman/5.1/en/freebsd-installation.html).
+또는, 포트를 통해 젬을 설치해주세요(그것들은 `databases` 하위 디렉토리에 있습니다). 
+만약 MySQL을 설치하는 동안 문제가 발생한다면, 
+[MySQL 문서](http://dev.mysql.com/doc/refman/5.1/en/freebsd-installation.html)를 참조해주세요.
 
-After that, run:
+그리고 다음을 실행하세요.
 
 ```bash
 $ rm .bundle/config
 $ bundle install
 ```
 
-First, we need to delete `.bundle/config` because Bundler remembers in that file that we didn't want to install the "db" group (alternatively you can edit the file).
+우선 Bundler가 "db" 그룹을 설치하지 않았다는 사실을 기억하고 있기 때문에 `.bundle/config`를 지웁니다
+(또는 변경해도 좋습니다).
 
-In order to be able to run the test suite against MySQL you need to create a user named `rails` with privileges on the test databases:
+MySQL에 대한 테스트를 실행하려면 `rails`라는 사용자를 만들고 테스트 데이터베이스에 접근할 수 있는 권한을 
+부여해야 합니다.
 
 ```bash
 $ mysql -uroot -p
@@ -246,92 +260,96 @@ mysql> GRANT ALL PRIVILEGES ON inexistent_activerecord_unittest.*
        to 'rails'@'localhost';
 ```
 
-and create the test databases:
+그리고 테스트 데이터베이스를 생성합니다.
 
 ```bash
 $ cd activerecord
 $ bundle exec rake db:mysql:build
 ```
 
-PostgreSQL's authentication works differently. To setup the development environment
-with your development account, on Linux or BSD, you just have to run:
+PostgreSQL의 인증은 조금 다르게 동작합니다. Linux나 BSD일 
+경우에 개발용 계정과 개발용 환경을 설정하려면 다음을 실행하세요.
 
 ```bash
 $ sudo -u postgres createuser --superuser $USER
 ```
 
-and for OS X:
+OS X 사용자는 다음을 실행하세요.
 
 ```bash
 $ createuser --superuser $USER
 ```
 
-Then you need to create the test databases with
+그리고 테스트 데이터베이스를 생성하세요.
 
 ```bash
 $ cd activerecord
 $ bundle exec rake db:postgresql:build
 ```
 
-It is possible to build databases for both PostgreSQL and MySQL with
+그러면 이제 PostgreSQL과 MySQL에서 데이터베이스를 구성할 수 있습니다.
 
 ```bash
 $ cd activerecord
 $ bundle exec rake db:create
 ```
 
-You can cleanup the databases using
+다음을 통해서 데이터베이스를 제거할 수도 있습니다.
 
 ```bash
 $ cd activerecord
 $ bundle exec rake db:drop
 ```
 
-NOTE: Using the rake task to create the test databases ensures they have the correct character set and collation.
+NOTE: rake 명령을 사용하여 테스트 데이터베이스를 만들면, 올바른 문자 형식과 
+collation으로 생성할 수 있습니다.
 
-NOTE: You'll see the following warning (or localized warning) during activating HStore extension in PostgreSQL 9.1.x or earlier: "WARNING: => is deprecated as an operator".
+NOTE: PostgreSQL 9.1.x 이하에서 HStore 익스텐션을 활성화하는 도중에 "WARNING: => is deprecated as an operator"와 같은 경고를 볼 수 있습니다.
 
-If you're using another database, check the file `activerecord/test/config.yml` or `activerecord/test/config.example.yml` for default connection information. You can edit `activerecord/test/config.yml` to provide different credentials on your machine if you must, but obviously you should not push any such changes back to Rails.
+만약 다른 데이터베이스를 사용하고 있다면 `activerecord/test/config.yml`나 `activerecord/test/config.example.yml`를 확인하고 기본 연결 설정에 대해서 확인하세요. 필요하다면 컴퓨터에 있는 별도의 자격 인증을 `activerecord/test/config.yml`에 추가해도 좋습니다. 하지만 이러한 변경사항들을 레일스에 커밋해서는 안됩니다.
 
-### Action Cable Setup
+### Action Cable 설정하기
 
-Action Cable uses Redis as its default subscriptions adapter ([read more](action_cable_overview.html#broadcasting)). Thus, in order to have Action Cable's tests passing you need to install and have Redis running.
+Action Cable은 기본 구독 어댑터로서 Redis를 사용합니다 ([더 많은 정보](action_cable_overview.html#broadcasting)). 그러므로, Action Cable의 테스트가 통과되려면 Redis를 설치하고 실행해야 합니다.
 
-#### Install Redis From Source
+#### 소스로 Redis 설치하기
 
-Redis' documentation discourage installations with package managers as those are usually outdated. Installing from source and bringing the server up is straight forward and well documented on [Redis' documentation](http://redis.io/download#installation).
+Redis의 문서는 업데이트되지 않은 패키지 매니저와의 설치를 권장하지 않습니다. 
+소스를 통한 설치와 서버 연결은 [Redis' 문서](http://redis.io/download#installation)에 자세하게 
+설명돼 있습니다.
 
-#### Install Redis From Package Manager
+#### 패키지 매니저로 Redis 설치하기
 
-On OS X, you can run:
+OS X 사용자는 다음을 실행하세요.
 
 ```bash
 $ brew install redis
 ```
 
-Follow the instructions given by Homebrew to start these.
+그리고 Homebrew가 제공하는 설명을 따라가세요.
 
-In Ubuntu just run:
+Ubuntu 사용자라면 다음을 실행하세요.
 
 ```bash
 $ sudo apt-get install redis-server
 ```
 
-On Fedora or CentOS (requires EPEL enabled), just run:
+Fedora나 CentOS(EPEL을 요구합니다)사용자라면 다음을 실행하세요,
 
 ```bash
 $ sudo yum install redis
 ```
 
-If you are running Arch Linux just run:
+Arch Linux 사용자라면 다음을 실행하세요.
 
 ```bash
 $ sudo pacman -S redis
 $ sudo systemctl start redis
 ```
 
-FreeBSD users will have to run the following:
+FreeBSD 사용자라면 다음을 실행하세요.
 
 ```bash
 # portmaster databases/redis
 ```
+
