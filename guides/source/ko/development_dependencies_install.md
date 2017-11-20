@@ -46,7 +46,7 @@ $ cd rails
 
 모든 제출된 코드는 테스트를 통과해야 합니다. 새 패치를 추가하든, 다른 사람의 코드를 평가하든, 테스트를 실행할 수 있어야 합니다.
 
-우선 SQLite3과 `sqlite3` 젬을 위한 개발용 파일을 설치하세요. macOS 애플코리아 사용자라면 
+우선 SQLite3과 `sqlite3` 젬을 위한 개발용 파일을 설치하세요. macOS 사용자라면 
 다음을 실행하세요.
 
 ```bash
@@ -92,7 +92,7 @@ $ gem update bundler
 $ bundle install --without db
 ```
 
-이 명령을 통해서 MySQL과 PostgreSQL 루비 드라이버를 제외한 모든 의존성이 설치합니다. MySQL과 PostgreSQL를 설정하는 방법은 곧 나올 것입니다.
+이 명령을 통해서 MySQL과 PostgreSQL 루비 드라이버를 제외한 모든 의존성을 설치합니다. MySQL과 PostgreSQL를 설정하는 방법은 곧 나올 것입니다.
 
 NOTE: memcached를 사용하는 테스트를 실행하고 싶다면 미리 이를 설치하고 실행해야 합니다.
 
@@ -291,7 +291,7 @@ NOTE: rake 명령을 사용하여 테스트 데이터베이스를 만들면, 올
 
 NOTE: PostgreSQL 9.1.x 이하에서 HStore 익스텐션을 활성화하는 도중에 "WARNING: => is deprecated as an operator"와 같은 경고를 볼 수 있습니다.
 
-만약 다른 데이터베이스를 사용한다면 기본연결에 대해 `activerecord/test/config.yml`나 `activerecord/test/config.example.yml`를 확인합니다.`activerecord/test/config.yml`파일을 수정하여 다른 데이터베이스 인증 정보를 사용할 수 있지만, 당연히 데이터베이스 인증 정보를 포함한 `activerecord/test/config.yml`파일을 레일스에 넣어서는 안됩니다.
+만약 다른 데이터베이스를 사용한다면 기본연결에 대해 `activerecord/test/config.yml`나 `activerecord/test/config.example.yml`를 확인합니다.`activerecord/test/config.yml` 파일을 수정하여 다른 데이터베이스 인증 정보를 사용할 수 있지만, 당연히 데이터베이스 인증 정보를 포함한 `activerecord/test/config.yml` 파일을 레일스에 넣어서는 안됩니다.
 
 ### Action Cable 설정하기
 
@@ -299,7 +299,7 @@ Action Cable은 기본 구독 어댑터로서 Redis를 사용합니다 ([더 많
 
 #### 소스로 Redis 설치하기
 
-Redis의 문서는 패키지 매니저가 대체로 최신버전이 아니기 때문에 패키지 매니저로 설치를 권장하지 않습니다. 소스를 받아서 설치하고 서버를 띄우는 방법이 ['Redis 문서'](http://redis.io/download#installation)에 간결하게 나와있습니다.
+Redis 문서는 패키지 매니저가 대체로 최신버전이 아니기 때문에 패키지 매니저로 설치를 권장하지 않습니다. 소스를 받아서 설치하고 서버를 띄우는 방법이 [Redis 문서](http://redis.io/download#installation)에 간결하게 나와있습니다.
 
 #### 패키지 매니저로 Redis 설치하기
 
