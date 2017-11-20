@@ -1,6 +1,6 @@
 **DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
 
-개발 의존성 설치하기
+개발에 필요한 프로그램 설치
 ================================
 
 이 가이드는 루비 온 레일스 개발을 위한 환경을 설치하는 방법을 설명합니다.
@@ -31,7 +31,7 @@
 * [official Documentation](http://git-scm.com/documentation)는 포괄적이며 Git의 기초를 설명하는 몇몇 동영상을 포함하고 있습니다.
 * [Everyday Git](http://schacon.github.io/git/everyday.html)는 Git을 사용하기에 충분한 내용을 가르쳐줍니다.
 * [GitHub](http://help.github.com)는 다양한 Git 자료에 대한 링크 목록을 제공합니다.
-* [Pro Git](http://git-scm.com/book)는 Creative Commons license로 Git에 대한 책 전체를 제공합니다.
+* [Pro Git](http://git-scm.com/book)는 크리에이티브 커먼즈 라이선스로 Git에 대한 책 전체를 제공합니다.
 
 ### 루비 온 레일스 저장소 복제하기
 
@@ -46,20 +46,20 @@ $ cd rails
 
 모든 제출된 코드는 테스트를 통과해야 합니다. 새 패치를 추가하든, 다른 사람의 코드를 평가하든, 테스트를 실행할 수 있어야 합니다.
 
-우선 SQLite3과 `sqlite3` 젬을 위한 개발용 파일을 설치하세요. Mac OS X 사용자라면 
+우선 SQLite3과 `sqlite3` 젬을 위한 개발용 파일을 설치하세요. macOS 애플코리아 사용자라면 
 다음을 실행하세요.
 
 ```bash
 $ brew install sqlite3
 ```
 
-Ubuntu 사용자라면 apt-get을 사용하세요.
+Ubuntu 사용자라면 apt-get을 실행하세요.
 
 ```bash
 $ sudo apt-get install sqlite3 libsqlite3-dev
 ```
 
-Fedora나 CentOS 사용자라면 yum을 사용하세요.
+Fedora나 CentOS 사용자라면 yum을 실행하세요.
 
 ```bash
 $ sudo yum install sqlite3 sqlite3-devel
@@ -92,9 +92,9 @@ $ gem update bundler
 $ bundle install --without db
 ```
 
-이 명령을 통해서 MySQL과 PostgreSQL 드라이버를 제외한 모든 의존성이 설치됩니다.
+이 명령을 통해서 MySQL과 PostgreSQL 루비 드라이버를 제외한 모든 의존성이 설치합니다. MySQL과 PostgreSQL를 설정하는 방법은 곧 나올 것입니다.
 
-NOTE: memcached를 사용하는 테스트를 실행하고 싶다면 미리 이를 설치해야 합니다.
+NOTE: memcached를 사용하는 테스트를 실행하고 싶다면 미리 이를 설치하고 실행해야 합니다.
 
 OS X 사용자는 [Homebrew](http://brew.sh/)를 사용하여 memcached를 설치할 수 있습니다.
 
@@ -102,13 +102,13 @@ OS X 사용자는 [Homebrew](http://brew.sh/)를 사용하여 memcached를 설�
 $ brew install memcached
 ```
 
-Ubuntu 사용자라면 apt-get을 사용하세요.
+Ubuntu 사용자라면 apt-get을 실행하세요.
 
 ```bash
 $ sudo apt-get install memcached
 ```
 
-Fadora나 CentOS라면 yum을 사용하세요.
+Fadora나 CentOS라면 yum을 실행하세요.
 
 ```bash
 $ sudo yum install memcached
@@ -155,7 +155,7 @@ $ cd actionpack
 $ bundle exec ruby -Itest test/template/form_helper_test.rb
 ```
 
-또는 특정 파일의 한 테스트만을 실행할 수도 있습니다.
+또는 특정 파일의 한개의 테스트만을 실행할 수도 있습니다.
 
 ```bash
 $ cd actionpack
@@ -230,7 +230,7 @@ $ rm .bundle/config
 $ bundle install
 ```
 
-우선 Bundler가 "db" 그룹을 설치하지 않았다는 사실을 기억하고 있기 때문에 `.bundle/config`를 지웁니다(또는 변경해도 좋습니다).
+우선 `.bundle/config`파일을 지워야 합니다. 왜냐하면 번들러가 "db" 그룹을 설치하고 싶지 않다고 기억하기 때문입니다.(파일 내용을 수정할 수 있습니다.)
 
 MySQL에 대한 테스트를 실행하려면 `rails`라는 사용자를 만들고 테스트 데이터베이스에 접근할 수 있는 권한을 부여해야 합니다.
 
@@ -287,11 +287,11 @@ $ cd activerecord
 $ bundle exec rake db:drop
 ```
 
-NOTE: rake 명령을 사용하여 테스트 데이터베이스를 만들면, 올바른 문자 형식과 collation으로 생성할 수 있습니다.
+NOTE: rake 명령을 사용하여 테스트 데이터베이스를 만들면, 올바른 캐릭터 셋과 콜레이션으로 생성할 수 있습니다.
 
 NOTE: PostgreSQL 9.1.x 이하에서 HStore 익스텐션을 활성화하는 도중에 "WARNING: => is deprecated as an operator"와 같은 경고를 볼 수 있습니다.
 
-만약 다른 데이터베이스를 사용하고 있다면 `activerecord/test/config.yml`나 `activerecord/test/config.example.yml`를 확인하고 기본 연결 설정에 대해서 확인하세요. 필요하다면 컴퓨터에 있는 별도의 자격 인증을 `activerecord/test/config.yml`에 추가해도 좋습니다. 하지만 이러한 변경사항들을 레일스에 커밋해서는 안됩니다.
+만약 다른 데이터베이스를 사용한다면 기본연결에 대해 `activerecord/test/config.yml`나 `activerecord/test/config.example.yml`를 확인합니다.`activerecord/test/config.yml`파일을 수정하여 다른 데이터베이스 인증 정보를 사용할 수 있지만, 당연히 데이터베이스 인증 정보를 포함한 `activerecord/test/config.yml`파일을 레일스에 넣어서는 안됩니다.
 
 ### Action Cable 설정하기
 
@@ -299,7 +299,7 @@ Action Cable은 기본 구독 어댑터로서 Redis를 사용합니다 ([더 많
 
 #### 소스로 Redis 설치하기
 
-Redis의 문서는 업데이트되지 않은 패키지 매니저와의 설치를 권장하지 않습니다. 소스를 통한 설치와 서버 연결은 [Redis' 문서](http://redis.io/download#installation)에 자세하게 설명돼 있습니다.
+Redis의 문서는 패키지 매니저가 대체로 최신버전이 아니기 때문에 패키지 매니저로 설치를 권장하지 않습니다. 소스를 받아서 설치하고 서버를 띄우는 방법이 ['Redis 문서'](http://redis.io/download#installation)에 간결하게 나와있습니다.
 
 #### 패키지 매니저로 Redis 설치하기
 
