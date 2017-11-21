@@ -291,7 +291,7 @@ NOTE: rake 명령을 사용하여 테스트 데이터베이스를 만들면, 올
 
 NOTE: PostgreSQL 9.1.x 이하에서 HStore 익스텐션을 활성화하는 도중에 "WARNING: => is deprecated as an operator"와 같은 경고를 볼 수 있습니다.
 
-만약 다른 데이터베이스를 사용한다면 기본연결에 대해 `activerecord/test/config.yml`나 `activerecord/test/config.example.yml`를 확인합니다.`activerecord/test/config.yml` 파일을 수정하여 다른 데이터베이스 인증 정보를 사용할 수 있지만, 당연히 데이터베이스 인증 정보를 포함한 `activerecord/test/config.yml` 파일을 레일스에 넣어서는 안됩니다.
+만약 다른 데이터베이스를 사용한다면 기본연결에 대해 `activerecord/test/config.yml`나 `activerecord/test/config.example.yml`를 확인합니다. `activerecord/test/config.yml` 파일을 수정하여 다른 데이터베이스 인증 정보를 사용할 수 있지만, 당연히 데이터베이스 인증 정보를 포함한 `activerecord/test/config.yml` 파일을 레일스에 넣어서는 안됩니다.
 
 ### Action Cable 설정하기
 
