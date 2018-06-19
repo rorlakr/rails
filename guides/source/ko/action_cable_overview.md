@@ -1,6 +1,6 @@
 **DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON http://guides.rubyonrails.org.**
 
-Action Cable Overview
+액션 케이블 시작하기
 =====================
 
 In this guide, you will learn how Action Cable works and how to use WebSockets to
