@@ -17,14 +17,13 @@
 들어가며
 ------------
 
-Action Cable seamlessly integrates
-[WebSockets](https://en.wikipedia.org/wiki/WebSocket) with the rest of your
-Rails application. It allows for real-time features to be written in Ruby in the
-same style and form as the rest of your Rails application, while still being
-performant and scalable. It's a full-stack offering that provides both a
-client-side JavaScript framework and a server-side Ruby framework. You have
-access to your full domain model written with Active Record or your ORM of
-choice.
+액션케이블은
+[웹소켓](https://en.wikipedia.org/wiki/WebSocket) 과 레일스의 다른 부분을 매끄럽게 통합합니다. 액션케이블을 통해 일반 레일스 애플리케이션과 같은 형태와 스타일로
+효율성과 확장성을 계속해서 보장하는 동시에 실시간 기능을 루비로 구현할 수 있습니다.
+이는 클라이언트의 자바스크립트 프레임워크와 서버의 루비 프레임워크를 동시에 제공하는
+풀스택 프레임워크입니다.
+그러므로 액티브레코드 등의 선택하고자 하는 ORM으로 작성된
+모든 도메인 모델에 접근할 수 있습니다.
 
 Pub/Sub에 대하여
 ---------------
