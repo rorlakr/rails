@@ -17,22 +17,22 @@
 들어가며
 ------------
 
-액션케이블은
-[웹소켓](https://en.wikipedia.org/wiki/WebSocket) 과 레일스의 다른 부분을 매끄럽게 통합합니다. 액션케이블을 통해 일반 레일스 애플리케이션과 같은 형태와 스타일로
-효율성과 확장성을 계속해서 보장하는 동시에 실시간 기능을 루비로 구현할 수 있습니다.
-이는 클라이언트의 자바스크립트 프레임워크와 서버의 루비 프레임워크를 동시에 제공하는
-풀스택 프레임워크입니다.
-그러므로 액티브레코드 등의 선택하고자 하는 ORM으로 작성된
-모든 도메인 모델에 접근할 수 있습니다.
+액션케이블은 [웹소켓](https://en.wikipedia.org/wiki/WebSocket)
+과 레일스의 다른 부분을 매끄럽게 통합합니다. 액션케이블을 통해
+일반 레일스 애플리케이션과 같은 형태와 스타일로 효율성과 확장성을
+계속해서 보장하는 동시에 실시간 기능을 루비로 구현할 수 있습니다.
+이는 클라이언트의 자바스크립트 프레임워크와 서버의 루비 프레임워크를
+동시에 제공하는풀스택 프레임워크입니다. 그러므로 액티브레코드 등의
+선택하고자 하는 ORM으로 작성된 모든 도메인 모델에 접근할 수 있습니다.
 
 Pub/Sub에 대하여
 ---------------
 
-[Pub/Sub](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern), or
-Publish-Subscribe, refers to a message queue paradigm whereby senders of
-information (publishers), send data to an abstract class of recipients
-(subscribers), without specifying individual recipients. Action Cable uses this
-approach to communicate between the server and many clients.
+[Pub/Sub](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern),
+또는 발행-구독은 정보를 보낸이(이하 '발신자')으로부터
+특정되지 않은 받는이(이하 '수신자')의 추상 클래스로
+정보를 보내는 메시지 큐 패러다임을 말합니다. 액션케이블은
+이러한 접근법으로 서버와 여러 클라이언트 간의 통신을 구현합니다.
 
 ## 서버측 컴포넌트
 
