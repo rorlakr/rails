@@ -38,17 +38,17 @@ Pub/Sub에 대하여
 
 ### 커넥션
 
-*커넥션(Connections)* form the foundation of the client-server relationship. For every
-WebSocket accepted by the server, a connection object is instantiated. This
-object becomes the parent of all the *channel subscriptions* that are created
-from there on. The connection itself does not deal with any specific application
-logic beyond authentication and authorization. The client of a WebSocket
-connection is called the connection *consumer*. An individual user will create
-one consumer-connection pair per browser tab, window, or device they have open.
+*커넥션(Connections)* 은 클라이언트와 서버 간의 관계의 기반이 됩니다.
+서버에서 웹소켓이 요청을 받을 때마다 커넥션 객체가 생성됩니다.
+이 객체는 앞으로 생성되는 모든 *채널 구독* 의 부모가 됩니다.
+이 커넥션 자체는 인증이나 권한 이외의 어떠한 특정 애플리케이션
+로직도 다루지 않습니다. 웹소켓의 커넥션 클라이언트는 커넥션
+*소비자* 라고도 불립니다. 사용자 개인이 여는 브라우저 탭, 윈도우,
+기기마다 소비자-커넥션 쌍을 하나씩 생성하게 됩니다.
 
-Connections are instances of `ApplicationCable::Connection`. In this class, you
-authorize the incoming connection, and proceed to establish it if the user can
-be identified.
+커넥션은 `ApplicationCable::Connection` 의 객체 입니다.
+이 클래스에서는 들어온 커넥션 요청을 승인하고 인증된 사용자인 경우에
+커넥션을 성립시킵니다.
 
 #### 커넥션 설정
 
@@ -74,25 +74,25 @@ module ApplicationCable
 end
 ```
 
-Here `identified_by` is a connection identifier that can be used to find the
-specific connection later. Note that anything marked as an identifier will automatically
-create a delegate by the same name on any channel instances created off the connection.
+`identified_by` 는 커넥션 ID이며, 나중에 특정 커넥션을
+탐색하는 경우에도 사용할 수 있습니다. ID로 선언된 정보는 그 커넥션
+이외에도 생성된 모든 채널 인스턴스에 같은 이름이 자동으로 위임됩니다.
 
-This example relies on the fact that you will already have handled authentication of the user
-somewhere else in your application, and that a successful authentication sets a signed
-cookie with the user ID.
+이 예제는 이미 이 애플리케이션의 다른 곳 어딘가에서 사용자의 인증을
+다루고 있으며, 그것이 성공적으로 인증 되면 사용자 ID 로서 쿠키를
+내려주고 있다는 사실이 전제되어 있습니다.
 
-The cookie is then automatically sent to the connection instance when a new connection
-is attempted, and you use that to set the `current_user`. By identifying the connection
-by this same current user, you're also ensuring that you can later retrieve all open
-connections by a given user (and potentially disconnect them all if the user is deleted
-or unauthorized).
+이 쿠키는 새로운 커넥션이 시도되었을 때 자동적으로 커넥션 인스턴스로
+전송되고, 이를 통해 `current_user` 를 설정하게 됩니다. 현재
+사용자와 같은 커넥션이라고 확인되면 그 사용자가 열어둔 모든 커넥션을
+가지게 되며, 사용자가 삭제되었거나 인증이 불가능한 경우에는 잠정적으로
+커넥션을 종료시킬 수도 있습니다.
 
 ### 채널
 
-A *채널(channel)* encapsulates a logical unit of work, similar to what a controller does in a
-regular MVC setup. By default, Rails creates a parent `ApplicationCable::Channel` class
-for encapsulating shared logic between your channels.
+*채널(channel)* 일반적인 MVC에서 컨트롤러가 하는 일과 마찬가지로, 작업을 논리적인
+단위로 캡슐화합니다. 레일스는 캡슐화하여 채널 간에 공유되는 로직을 위해
+기본적으로 `ApplicationCable::Channel` 이라는 부모 클래스를 생성합니다.
 
 #### 부모 채널 설정
 
@@ -104,8 +104,8 @@ module ApplicationCable
 end
 ```
 
-Then you would create your own channel classes. For example, you could have a
-`ChatChannel` and an `AppearanceChannel`:
+이제 여러분이 사용할 자신의 Channel 클래스를 정의합니다. 예를 들어,
+`ChatChannel` 이나 `AppearanceChannel` 은 다음과 같이 정의할 수 있겠습니다:
 
 ```ruby
 # app/channels/chat_channel.rb
@@ -117,19 +117,19 @@ class AppearanceChannel < ApplicationCable::Channel
 end
 ```
 
-A consumer could then be subscribed to either or both of these channels.
+이로써 소비자는 이러한 채널을 구독할 수 있게 됩니다.
 
 #### 구독
 
-Consumers subscribe to channels, acting as *구독자(subscribers)*. Their connection is
-called a *구독(subscription)*. Produced messages are then routed to these channel
-subscriptions based on an identifier sent by the cable consumer.
+소비자는 *구독자(subscribers)* 처럼 활동하며 채널을 구독합니다.
+그리고 이러한 소비자의 커넥션을 *구독(subscription)* 이라고 합니다.
+생성된 메시지들은 케이블 소비자가 전송한 ID를 기반으로 채널 구독에 라우팅 됩니다.
 
 ```ruby
 # app/channels/chat_channel.rb
 class ChatChannel < ApplicationCable::Channel
-  # Called when the consumer has successfully
-  # become a subscriber to this channel.
+  # 소비자가 성공적으로 이 채널의
+  # 구독자가 되었을 때 호출됨.
   def subscribed
   end
 end
