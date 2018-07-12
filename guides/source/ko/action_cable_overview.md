@@ -200,9 +200,9 @@ class ChatChannel < ApplicationCable::Channel
 end
 ```
 
-If you have a stream that is related to a model, then the broadcasting used
-can be generated from the model and channel. The following example would
-subscribe to a broadcasting like `comments:Z2lkOi8vVGVzdEFwcC9Qb3N0LzE`
+어떤 모델에 관련된 스트림을 생성하면, 그 모델과 채널로부터 브로드캐스트가
+생성됩니다. 다음 예제에서는 `comments:Z2lkOi8vVGVzdEFwcC9Qb3N0LzE`
+와 같은 브로드캐스트를 구독합니다.
 
 ```ruby
 class CommentsChannel < ApplicationCable::Channel
@@ -213,7 +213,7 @@ class CommentsChannel < ApplicationCable::Channel
 end
 ```
 
-You can then broadcast to this channel like this:
+이것으로 이 채널에 다음과 같이 브로드캐스트를 할 수 있게 됩니다:
 
 ```ruby
 CommentsChannel.broadcast_to(@post, @comment)
@@ -221,15 +221,15 @@ CommentsChannel.broadcast_to(@post, @comment)
 
 ### 브로드캐스팅
 
-A *브로드캐스팅(broadcasting)* is a pub/sub link where anything transmitted by a publisher
-is routed directly to the channel subscribers who are streaming that named
-broadcasting. Each channel can be streaming zero or more broadcastings.
+*브로드캐스트(broadcasting)* 는 발행자가 채널의 구독자들에게
+어떤 것이든 전송할 수 있는 pub/sub 연결입니다. 각 채널은
+여러 개의 브로드캐스트를 스트리밍할 수 있습니다.
 
-Broadcastings are purely an online queue and time-dependent. If a consumer is
-not streaming (subscribed to a given channel), they'll not get the broadcast
-should they connect later.
+브로드캐스트는 순수한 온라인 큐이며, 시간에 의존합니다.
+스트리밍(한 채널에 대한 구독)하고 있지 않은 소비자는
+나중에 접속할 경우 브로드캐스트를 얻을 수 없습니다.
 
-Broadcasts are called elsewhere in your Rails application:
+브로드캐스트는 레일스 애플리케이션의 다른 장소에서도 호출할 수 있습니다:
 
 ```ruby
 WebNotificationsChannel.broadcast_to(
@@ -239,24 +239,24 @@ WebNotificationsChannel.broadcast_to(
 )
 ```
 
-The `WebNotificationsChannel.broadcast_to` call places a message in the current
-subscription adapter (by default `redis` for production and `async` for development and
-test environments)'s pubsub queue under a separate broadcasting name for each user.
-For a user with an ID of 1, the broadcasting name would be `web_notifications:1`.
+`WebNotificationsChannel.broadcast_to` 호출에서는 사용자마다 다른
+브로드캐스트 이름으로 현재 구독 어댑터(production에서의 기본값은 redis이며,
+개발환경과 테스트 환경에서는 async입니다) pubsub 큐에 메시지를 저장합니다.
+ID가 1인 사용자라면 브로드캐스트의 이름은 `web_notifications:1` 이 사용됩니다.
 
-The channel has been instructed to stream everything that arrives at
-`web_notifications:1` directly to the client by invoking the `received`
-callback.
+received 콜백을 호출하면 이 채널은 `web_notifications:1`
+이 수신하는 모든 것을 클라이언트에 직접
+스트리밍하게 됩니다.
 
 ### 구독
 
-When a consumer is subscribed to a channel, they act as a subscriber. This
-connection is called a subscription. Incoming messages are then routed to
-these channel subscriptions based on an identifier sent by the cable consumer.
+채널을 구독한 사용자는 구독자로서 행동합니다. 이 커넥션은
+구독이라 불립니다. 메시지를 받으면 사용자가 전송한 ID에
+기반하여 이러한 채널로 전송합니다.
 
 ```coffeescript
 # app/assets/javascripts/cable/subscriptions/chat.coffee
-# Assumes you've already requested the right to send web notifications
+# 웹 알림을 보낼 수 있는 권한을 이미 요청했다고 가정
 App.cable.subscriptions.create { channel: "ChatChannel", room: "Best Room" },
   received: (data) ->
     @appendLine(data)
@@ -276,8 +276,8 @@ App.cable.subscriptions.create { channel: "ChatChannel", room: "Best Room" },
 
 ### 채널에 매개변수 넘기기
 
-You can pass parameters from the client side to the server side when creating a
-subscription. For example:
+구독을 생성할 때 클라이언트 측에서 서버 측으로
+매개 변수를 전달할 수 있습니다. 다음의 예제를 보시죠:
 
 ```ruby
 # app/channels/chat_channel.rb
@@ -288,8 +288,8 @@ class ChatChannel < ApplicationCable::Channel
 end
 ```
 
-An object passed as the first argument to `subscriptions.create` becomes the
-params hash in the cable channel. The keyword `channel` is required:
+`subscriptions.create` 에 첫번째 인자로 넘겨진 객체는
+params 해시가 됩니다. `channel` 키워드는 생략할 수 없습니다.
 
 ```coffeescript
 # app/assets/javascripts/cable/subscriptions/chat.coffee
@@ -311,8 +311,8 @@ App.cable.subscriptions.create { channel: "ChatChannel", room: "Best Room" },
 ```
 
 ```ruby
-# Somewhere in your app this is called, perhaps
-# from a NewCommentJob.
+# NewCommentJob 과 같은 애플리케이션 어딘가에서
+# 다음 처럼 호출됩니다.
 ActionCable.server.broadcast(
   "chat_#{room}",
   sent_by: 'Paul',
@@ -322,8 +322,8 @@ ActionCable.server.broadcast(
 
 ### 메시지를 재전송하기
 
-A common use case is to *재전송(rebroadcast)* a message sent by one client to any
-other connected clients.
+한 클라이언트로부터 받은 메시지를 접속하고 있는 다른
+클라이언트에게 *재전송(rebroadcast)* 하는 경우도 많습니다.
 
 ```ruby
 # app/channels/chat_channel.rb
@@ -347,9 +347,9 @@ App.chatChannel = App.cable.subscriptions.create { channel: "ChatChannel", room:
 App.chatChannel.send({ sent_by: "Paul", body: "This is a cool chat app." })
 ```
 
-The rebroadcast will be received by all connected clients, _including_ the
-client that sent the message. Note that params are the same as they were when
-you subscribed to the channel.
+재전송을 하게 되면 접속 중인 모든 클라이언트에게 전송됩니다.
+이는 전송을 요청한 클라이언트 자신도 *포함합니다*.
+사용하는 매개 변수들은 채널에 구독할 때와 같습니다.
 
 ## 풀 스택 예제
 
