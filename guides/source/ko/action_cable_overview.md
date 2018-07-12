@@ -667,24 +667,24 @@ authentication. You can see one way of doing that with Devise in this [article](
 
 ## 의존성
 
-Action Cable provides a subscription adapter interface to process its
-pubsub internals. By default, asynchronous, inline, PostgreSQL, and Redis
-adapters are included. The default adapter
-in new Rails applications is the asynchronous (`async`) adapter.
+액션케이블은 pubsub을 처리하기 위한 구독 어댑터 인터페이스를 제공합니다.
+기본 사항으로 비동기, 인라인, PostgreSQL, Evented Redis,
+Non-evented Redis 등의 어댑터를 탑재하고 있습니다. 새 레일스
+애플리케이션의 기본 어댑터는 비동기(`async`) 어댑터입니다.
 
-The Ruby side of things is built on top of [websocket-driver](https://github.com/faye/websocket-driver-ruby),
-[nio4r](https://github.com/celluloid/nio4r), and [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby).
+구현된 루비 코드는 [websocket-driver](https://github.com/faye/websocket-driver-ruby),
+[nio4r](https://github.com/celluloid/nio4r), [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby) 에 있습니다.
 
 ## 배포
 
-Action Cable is powered by a combination of WebSockets and threads. Both the
-framework plumbing and user-specified channel work are handled internally by
-utilizing Ruby's native thread support. This means you can use all your regular
-Rails models with no problem, as long as you haven't committed any thread-safety sins.
+액션케이블은 웹소켓과 스레드의 조합으로 제작되어 있습니다. 두
+프레임워크 내부의 흐름과 사용자 지정 채널의 동작은 루비의 기본
+스레드를 통해 처리됩니다. 즉 스레드에 안전한 코드를 유지하는
+한, 모든 레일즈의 정규 모델을 문제 없이 사용할 수 있습니다.
 
-The Action Cable server implements the Rack socket hijacking API,
-thereby allowing the use of a multithreaded pattern for managing connections
-internally, irrespective of whether the application server is multi-threaded or not.
+액션케이블 서버에는 Rack 소켓을 탈취(hijacking)하는 API가
+구현되어 있습니다. 이를 통해서, 애플리케이션 서버의 멀티 스레드
+사용 여부와 관계없이 내부의 커넥션을 멀티 스레드 패턴으로 관리합니다.
 
-Accordingly, Action Cable works with popular servers like Unicorn, Puma, and
-Passenger.
+따라서 액션케이블은 Unicorn, Puma, Passenger 등의
+인기 있는 서버와 문제없이 연동될 수 있습니다.
