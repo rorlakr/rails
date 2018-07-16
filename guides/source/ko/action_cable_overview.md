@@ -353,19 +353,19 @@ App.chatChannel.send({ sent_by: "Paul", body: "This is a cool chat app." })
 
 ## 풀 스택 예제
 
-The following setup steps are common to both examples:
+다음의 설정 순서는 두 가지 예시에서 공통적으로 해당됩니다:
 
-  1. [Setup your connection](#connection-setup).
-  2. [Setup your parent channel](#parent-channel-setup).
-  3. [Connect your consumer](#connect-consumer).
+  1. [커넥션 설정](#connection-setup).
+  2. [부모 채널 설정](#parent-channel-setup).
+  3. [소비자를 연결](#connect-consumer).
 
 ### 예제 1: 사용자 접속을 표시하기
 
-Here's a simple example of a channel that tracks whether a user is online or not
-and what page they're on. (This is useful for creating presence features like showing
-a green dot next to a user name if they're online).
+이는 사용자가 온라인인지 아닌지, 사용자가 어떤 페이지를 보고 있는지
+추적하는 간단한 예제입니다. (이는 사용자들이 접속 중일 때에 그 사람
+이름의 옆에 녹색 점을 표시하는 기능 등을 구현할 때에 유용합니다)
 
-Create the server-side appearance channel:
+서버 측에 나타낼 채널을 생성하세요:
 
 ```ruby
 # app/channels/appearance_channel.rb
@@ -388,34 +388,34 @@ class AppearanceChannel < ApplicationCable::Channel
 end
 ```
 
-When a subscription is initiated the `subscribed` callback gets fired and we
-take that opportunity to say "the current user has indeed appeared". That
-appear/disappear API could be backed by Redis, a database, or whatever else.
+구독이 시작되면 `subscribed` 콜백이 시작되고, "현재 사용자가 접속중"
+이라고 알려줄 수 있게 됩니다. 이 표시 API를 Redis나 데이터베이스
+등과 연동할 수 있습니다.
 
-Create the client-side appearance channel subscription:
+클라이언트 측에 나타낼 채널 구독을 생성하세요:
 
 ```coffeescript
 # app/assets/javascripts/cable/subscriptions/appearance.coffee
 App.cable.subscriptions.create "AppearanceChannel",
-  # Called when the subscription is ready for use on the server.
+  # 구독이 가능해지면 호출됨.
   connected: ->
     @install()
     @appear()
 
-  # Called when the WebSocket connection is closed.
+  # 웹소켓 연결이 닫히면 호출됨.
   disconnected: ->
     @uninstall()
 
-  # Called when the subscription is rejected by the server.
+  # 구독이 서버로부터 거부되는 경우 호출됨.
   rejected: ->
     @uninstall()
 
   appear: ->
-    # Calls `AppearanceChannel#appear(data)` on the server.
+    # 서버의 `AppearanceChannel#appear(data)`를 호출.
     @perform("appear", appearing_on: $("main").data("appearing-on"))
 
   away: ->
-    # Calls `AppearanceChannel#away` on the server.
+    # 서버의 `AppearanceChannel#away`를 호출.
     @perform("away")
 
 
@@ -438,42 +438,42 @@ App.cable.subscriptions.create "AppearanceChannel",
 
 ##### 클라이언트-서버간 상호작용
 
-1. **Client** connects to the **Server** via `App.cable =
-ActionCable.createConsumer("ws://cable.example.com")`. (`cable.js`). The
-**Server** identifies this connection by `current_user`.
+1. **클라이언트** 는 **서버** 에 `App.cable =
+ActionCable.createConsumer("ws://cable.example.com")` 를 경유하여 연결됩니다.
+**서버** 는 이 연결을 `current_user` 로 인식합니다. (위치: cable.js)
 
-2. **Client** subscribes to the appearance channel via
-`App.cable.subscriptions.create(channel: "AppearanceChannel")`. (`appearance.coffee`)
+2. **클라이언트** 는 `App.cable.subscriptions.create(channel: "AppearanceChannel")`
+을 경유하여 채널을 구독합니다. (위치: appearance.coffee)
 
-3. **Server** recognizes a new subscription has been initiated for the
-appearance channel and runs its `subscribed` callback, calling the `appear`
-method on `current_user`. (`appearance_channel.rb`)
+3. **서버** 는 표시 채널에 새 구독이 시작된 것을
+인식하고 서버의 `subscribed` 콜백을 통해 `current_user`의
+`appear` 메소드를 호출합니다. (위치: appearance_channel.rb)
 
-4. **Client** recognizes that a subscription has been established and calls
-`connected` (`appearance.coffee`) which in turn calls `@install` and `@appear`.
-`@appear` calls `AppearanceChannel#appear(data)` on the server, and supplies a
-data hash of `{ appearing_on: $("main").data("appearing-on") }`. This is
-possible because the server-side channel instance automatically exposes all
-public methods declared on the class (minus the callbacks), so that these can be
-reached as remote procedure calls via a subscription's `perform` method.
+4. **클라이언트** 는 구독이 성립된 것을 인식하고 `connected` 를 호출합니다 (위치:
+appearance.coffee). 이를 통해 @install과 @appear가 호출됩니다. @appear는
+서버의 `AppearanceChannel#appear(data)` 를 통해서 데이터 해시
+`{ appearing_on: $("main").data("appearing-on") }` 를
+넘겨줍니다. 서버의 클래스에 선언되어 있는 (콜백을 제외한) 모든 퍼블릭
+메소드가 자동적으로 노출되기 때문에 가능합니다. 공개된 퍼블릭 메소드는
+perform 메소드를 사용하여 원격 프로시저로서 사용할 수 있습니다.
 
-5. **Server** receives the request for the `appear` action on the appearance
-channel for the connection identified by `current_user`
-(`appearance_channel.rb`). **Server** retrieves the data with the
-`:appearing_on` key from the data hash and sets it as the value for the `:on`
-key being passed to `current_user.appear`.
+5. **서버** 는 `current_user` 로 확인한 커넥션의
+채널에서 appear 액션에 대한 요청을 수신합니다.
+(위치: appearance_channel.rb) 서버는 데이터 해시에서
+`:appearing_on` 키를 사용하여 값을 꺼내어 `current_user.appear`
+에 넘겨진 `:on` 키의 값으로 설정합니다.
 
 ### 예제 2: 새로운 알림을 수신하기
 
-The appearance example was all about exposing server functionality to
-client-side invocation over the WebSocket connection. But the great thing
-about WebSockets is that it's a two-way street. So now let's show an example
-where the server invokes an action on the client.
+이 예제에서는 웹소켓을 사용하여 서버로부터 클라이언트의
+기능을 원격으로 실행하는 동작을 다룹니다. 그런데
+웹소켓의 멋진 점은 양방향 통신이라는 것입니다.
+이번에는 서버에서 클라이언트의 액션을 호출해봅시다.
 
-This is a web notification channel that allows you to trigger client-side
-web notifications when you broadcast to the right streams:
+이 알림 채널은 올바른 스트림에 브로드캐스트를
+할 때 클라이언트에 알림을 표시합니다.
 
-Create the server-side web notifications channel:
+서버의 알림 채널을 만듭니다:
 
 ```ruby
 # app/channels/web_notifications_channel.rb
@@ -484,22 +484,22 @@ class WebNotificationsChannel < ApplicationCable::Channel
 end
 ```
 
-Create the client-side web notifications channel subscription:
+구독을 위한 클라이언트의 알림 채널을 만듭니다:
 
 ```coffeescript
 # app/assets/javascripts/cable/subscriptions/web_notifications.coffee
-# Client-side which assumes you've already requested
-# the right to send web notifications.
+# 클라이언트 쪽으로 알림을 보낼 수 있는 권한을
+# 서버가 이미 가지고 있다고 가정합니다.
 App.cable.subscriptions.create "WebNotificationsChannel",
   received: (data) ->
     new Notification data["title"], body: data["body"]
 ```
 
-Broadcast content to a web notification channel instance from elsewhere in your
-application:
+알림 채널 인스턴스로 어떤 내용을 브로드캐스트하는 것은
+애플리케이션의 어디에서라도 가능합니다:
 
 ```ruby
-# Somewhere in your app this is called, perhaps from a NewCommentJob
+# 이 코드는 애플리케이션의 어딘가(ex: NewCommentJob)에서 호출됨
 WebNotificationsChannel.broadcast_to(
   current_user,
   title: 'New things!',
@@ -507,21 +507,21 @@ WebNotificationsChannel.broadcast_to(
 )
 ```
 
-The `WebNotificationsChannel.broadcast_to` call places a message in the current
-subscription adapter's pubsub queue under a separate broadcasting name for each
-user. For a user with an ID of 1, the broadcasting name would be
-`web_notifications:1`.
+`WebNotificationsChannel.broadcast_to` 호출에서는
+현재 구독 어댑터의 pubsub 큐에 메시지를 추가합니다.
+이 때 사용자마다 서로 다른 브로드캐스트 이름이 사용됩니다.
+ID가 1인 사용자라면 브로드캐스트의 이름은 web_notifications:1이 됩니다.
 
-The channel has been instructed to stream everything that arrives at
-`web_notifications:1` directly to the client by invoking the `received`
-callback. The data passed as argument is the hash sent as the second parameter
-to the server-side broadcast call, JSON encoded for the trip across the wire
-and unpacked for the data argument arriving as `received`.
+`received` 콜백이 호출되면, 이 채널은 `web_notifications:1`
+에 도착한 것을 모두 클라이언트에게 전송합니다. 인자로서 넘겨진 데이터는
+서버의 브로드캐스트 호출의 두번째 인수로 넘겨지는 해시입니다.
+이 해시는 JSON으로 인코딩되어 전송되며, `received` 로 수신할 때
+데이터 인자로부터 복원됩니다.
 
 ### 더 자세한 예시
 
-See the [rails/actioncable-examples](https://github.com/rails/actioncable-examples)
-repository for a full example of how to setup Action Cable in a Rails app and adding channels.
+레일스 애플리케이션에 액션 케이블을 설정하는 방법이나 채널을 추가하는 방법에 대해서는
+[rails/actioncable-examples](https://github.com/rails/actioncable-examples) 에서 전체 예시를 볼 수 있습니다.
 
 ## 설정
 
