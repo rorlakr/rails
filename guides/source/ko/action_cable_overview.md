@@ -616,9 +616,9 @@ that means you have to make at least that available. You can change that in
 
 ### 애플리케이션에서 실행하기
 
-Action Cable can run alongside your Rails application. For example, to
-listen for WebSocket requests on `/websocket`, specify that path to
-`config.action_cable.mount_path`:
+액션케이블은 레일스 애플리케이션과 함께 실행할 수 있습니다.
+예를 들어, `/websocket` 에서 웹소켓 요청을 수신하는 경우에는
+`config.action_cable.mount_path` 로 경로를 지정할 수 있습니다:
 
 ```ruby
 # config/application.rb
@@ -627,20 +627,20 @@ class Application < Rails::Application
 end
 ```
 
-You can use `App.cable = ActionCable.createConsumer()` to connect to the cable
-server if `action_cable_meta_tag` is invoked in the layout. A custom path is
-specified as first argument to `createConsumer` (e.g. `App.cable =
-ActionCable.createConsumer("/websocket")`).
+레이아웃에서 `action_cable_meta_tag`가 호출되고 있으면, 케이블 서버에 연결하기 위해
+`App.cable = ActionCable.createConsumer()` 를 사용할 수 있습니다.
+`createConsumer`의 첫 번째 인자를 통해 path를 커스텀하여 지정 할 수 있습니다.
+(예시. `App.cable = ActionCable.createConsumer("/websocket")` )
 
-For every instance of your server you create and for every worker your server
-spawns, you will also have a new instance of Action Cable, but the use of Redis
-keeps messages synced across connections.
+생성한 서버의 모든 인스턴스와 서버가 생성한 모든 워커
+인스턴스에는 액션케이블의 새로운 인스턴스도 포함됩니다.
+커넥션 간의 메시지 동기화는 Redis를 통해서 이루어집니다.
 
 ### 독립된 서버에서 실행하기
 
-The cable servers can be separated from your normal application server. It's
-still a Rack application, but it is its own Rack application. The recommended
-basic setup is as follows:
+애플리케이션 서버와 액션케이블 서버를 나눌 수도 있습니다.
+액션케이블 서버는 Rack 애플리케이션입니다만, 독립된
+애플리케이션이기도 합니다. 추천하는 기본 설정은 다음과 같습니다.
 
 ```ruby
 # cable/config.ru
@@ -650,20 +650,20 @@ Rails.application.eager_load!
 run ActionCable.server
 ```
 
-Then you start the server using a binstub in `bin/cable` ala:
+이어서, `bin/cable` 의 binstub을 사용하여 서버를 시작합니다:
 
 ```
 #!/bin/bash
 bundle exec puma -p 28080 cable/config.ru
 ```
 
-The above will start a cable server on port 28080.
+위 코드는 28080 포트에서 액션케이블 서버를 실행시킵니다.
 
 ### 메모
 
-The WebSocket server doesn't have access to the session, but it has
-access to the cookies. This can be used when you need to handle
-authentication. You can see one way of doing that with Devise in this [article](http://www.rubytutorial.io/actioncable-devise-authentication).
+웹소켓 서버로부터 세션에 접근할 수 없습니다만, 쿠키에는 접근할 수 있습니다. 이를 사용해서 인증을 처리할
+수 있습니다. [이 글](http://www.rubytutorial.io/actioncable-devise-authentication)에서
+Devise와 함께 사용하는 방법을 확인할 수 있습니다.
 
 ## 의존성
 
