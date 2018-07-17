@@ -525,13 +525,13 @@ ID가 1인 사용자라면 브로드캐스트의 이름은 web_notifications:1�
 
 ## 설정
 
-Action Cable has two required configurations: a subscription adapter and allowed request origins.
+액션케이블에는 구독 어댑터와 허가된 요청 호스트라는 두 개의 필수 설정이 있습니다.
 
 ### 구독 어댑터
 
-By default, Action Cable looks for a configuration file in `config/cable.yml`.
-The file must specify an adapter for each Rails environment. See the
-[Dependencies](#dependencies) section for additional information on adapters.
+기본적으로, 액션케이블은 `config/cable.yml`을 설정 파일로 인식합니다.
+이 파일은 각각의 레일스 환경마다 특정 어댑터를 지정해야고 있어야 합니다.
+어댑터에 관한 추가적인 정보는 [의존성](#dependencies) 부분을 참고해주세요.
 
 ```yaml
 development:
@@ -547,54 +547,54 @@ production:
 ```
 #### 어댑터 설정
 
-Below is a list of the subscription adapters available for end users.
+아래는 최종사용자가 구독할 때에 사용할 수 있는 어댑터 목록입니다.
 
 ##### Async 어댑터
 
-The async adapter is intended for development/testing and should not be used in production.
+async 어댑터는 개발/테스트 환경을 위한 것으로, 실제 배포 환경에서는 사용자지 마세요.
 
 ##### Redis 어댑터
 
-The Redis adapter requires users to provide a URL pointing to the Redis server.
-Additionally, a `channel_prefix` may be provided to avoid channel name collisions
-when using the same Redis server for multiple applications. See the [Redis PubSub documentation](https://redis.io/topics/pubsub#database-amp-scoping) for more details.
+Redis 어댑터를 사용하려면 Redis 서버를 가리키는 URL을 사용자가 지정해주어야 합니다. 추가적으로, 다수의 애플리케이션이 같은
+Redis 서버를 사용할 때에 채널 이름이 충돌하는 것을 방지하기 위해 `channel_prefix` 가 제공됩니다. 보다 자세한 내용은
+[Redis PubSub documentation](https://redis.io/topics/pubsub#database-amp-scoping)을 참고해주세요.
 
 ##### PostgreSQL 어댑터
 
-The PostgreSQL adapter uses Active Record's connection pool, and thus the
-application's `config/database.yml` database configuration, for its connection.
-This may change in the future. [#27214](https://github.com/rails/rails/issues/27214)
+PostgreSQL 어댑터는 액티브레코드의 connection pool 을 사용합니다.
+따라서 애플리케이션의 `config/database.yml`에서 데이터베이스를 설정해야 합니다.
+이 부분은 가까운 시일 내에 변경이 있을 수도 있습니다. [#27214](https://github.com/rails/rails/issues/27214)
 
 ### 허가된 요청 호스트
 
-Action Cable will only accept requests from specified origins, which are
-passed to the server config as an array. The origins can be instances of
-strings or regular expressions, against which a check for the match will be performed.
+액션케이블은 허가된 곳으로부터의 요청만을 받습니다.
+이 호스트 목록은 배열의 형태로 서버 설정에 넘깁니다.
+각 호스트는 문자열이나 정규 표현식을 사용할 수 있습니다.
 
 ```ruby
 config.action_cable.allowed_request_origins = ['http://rubyonrails.com', %r{http://ruby.*}]
 ```
 
-To disable and allow requests from any origin:
+모든 요청을 허가하려면 다음을 설정하세요:
 
 ```ruby
 config.action_cable.disable_request_forgery_protection = true
 ```
 
-By default, Action Cable allows all requests from localhost:3000 when running
-in the development environment.
+development 환경에서 실행 중일 때, 액션케이블은 기본적으로
+localhost:3000 로부터의 요청을 모두 허가합니다.
 
 ### 소비자 설정
 
-To configure the URL, add a call to `action_cable_meta_tag` in your HTML layout
-HEAD. This uses a URL or path typically set via `config.action_cable.url` in the
-environment configuration files.
+URL을 설정하기 위해서, HTML 레이아웃의 HEAD 태그 내에 `action_cable_meta_tag` 을 추가하세요.
+이렇게 하면 URL이나 경로를 보통의 방식처럼 환경 설정 파일에서 `config.action_cable.url`
+을 통해 설정된 것으로 간주하여 사용하게 됩니다.
 
 ### 기타 설정
 
-The other common option to configure is the log tags applied to the
-per-connection logger. Here's an example that uses
-the user account id if available, else "no-account" while tagging:
+설정을 위한 그 밖의 다른 공통 옵션은 커넥션별 로거에 적용되는 로그 태그 입니다.
+사용자 계정 ID를 사용할 수 있는 경우 사용 예시는 다음과 같습니다.
+사용자 계정 ID를 사용할 수 없다면, 태깅 중에는 "no-account" 를 사용하세요:
 
 ```ruby
 config.action_cable.log_tags = [
@@ -604,13 +604,13 @@ config.action_cable.log_tags = [
 ]
 ```
 
-For a full list of all configuration options, see the
-`ActionCable::Server::Configuration` class.
+설정 옵션의 전체 목록을 보려면,
+`ActionCable::Server::Configuration` 클래스를 확인하세요.
 
-Also, note that your server must provide at least the same number of database
-connections as you have workers. The default worker pool size is set to 4, so
-that means you have to make at least that available. You can change that in
-`config/database.yml` through the `pool` attribute.
+또한, 서버는 가지고 있는 worker의 개수와 동일한 수의 데이터베이스 연결을 제공해야 합니다.
+기본 worker의 pool 사이즈는 4 로 설정되어 있기 때문에,
+최소한 같은 수의 사용 가능한 연결을 확보해주어야 합니다.
+이는 `config/database.yml`의 `pool` 속성을 통해 변경할 수 있습니다.
 
 ## 독립 케이블 서버 실행하기
 
