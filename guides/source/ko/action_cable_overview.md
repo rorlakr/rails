@@ -31,8 +31,8 @@ Pub/Sub에 대하여
 ---------------
 
 [Pub/Sub](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern),
-또는 발행-구독은 정보를 보낸이(이하 '발신자')으로부터
-특정되지 않은 받는이(이하 '수신자')의 추상 클래스로
+또는 발행-구독은 정보를 보낸이(이하 '발행자')으로부터
+특정되지 않은 받는이(이하 '구독자')의 추상 클래스로
 정보를 보내는 메시지 큐 패러다임을 말합니다. 액션케이블은
 이러한 접근법으로 서버와 여러 클라이언트 간의 통신을 구현합니다.
 
@@ -42,13 +42,13 @@ Pub/Sub에 대하여
 
 *커넥션(Connections)* 은 클라이언트와 서버 간의 관계의 기반이 됩니다.
 서버에서 웹소켓이 요청을 받을 때마다 커넥션 객체가 생성됩니다.
-이 객체는 앞으로 생성되는 모든 *채널 구독* 의 부모가 됩니다.
+이 객체는 앞으로 생성되는 모든 *채널 구독*의 부모가 됩니다.
 이 커넥션 자체는 인증이나 권한 이외의 어떠한 특정 애플리케이션
 로직도 다루지 않습니다. 웹소켓의 커넥션 클라이언트는 커넥션
-*소비자* 라고도 불립니다. 사용자 개인이 여는 브라우저 탭, 윈도우,
+*소비자*라고도 불립니다. 사용자 개인이 여는 브라우저 탭, 윈도우,
 기기마다 소비자-커넥션 쌍을 하나씩 생성하게 됩니다.
 
-커넥션은 `ApplicationCable::Connection` 의 객체 입니다.
+커넥션은 `ApplicationCable::Connection`의 객체 입니다.
 이 클래스에서는 들어온 커넥션 요청을 승인하고 인증된 사용자인 경우에
 커넥션을 성립시킵니다.
 
@@ -76,25 +76,25 @@ module ApplicationCable
 end
 ```
 
-`identified_by` 는 커넥션 ID이며, 나중에 특정 커넥션을
-탐색하는 경우에도 사용할 수 있습니다. ID로 선언된 정보는 그 커넥션
+`identified_by`는 커넥션 ID입니다. 이는 나중에 특정 커넥션을
+탐색하는 경우에도 사용될 수 있습니다. ID로 선언된 정보는 그 커넥션
 이외에도 생성된 모든 채널 인스턴스에 같은 이름이 자동으로 위임됩니다.
 
-이 예제는 이미 이 애플리케이션의 다른 곳 어딘가에서 사용자의 인증을
+예제는 이미 애플리케이션의 다른 곳 어딘가에서 사용자의 인증을
 다루고 있으며, 그것이 성공적으로 인증 되면 사용자 ID 로서 쿠키를
 내려주고 있다는 사실이 전제되어 있습니다.
 
 이 쿠키는 새로운 커넥션이 시도되었을 때 자동적으로 커넥션 인스턴스로
-전송되고, 이를 통해 `current_user` 를 설정하게 됩니다. 현재
+전송되고, 이를 통해 `current_user`를 설정하게 됩니다. 현재
 사용자와 같은 커넥션이라고 확인되면 그 사용자가 열어둔 모든 커넥션을
 가지게 되며, 사용자가 삭제되었거나 인증이 불가능한 경우에는 잠정적으로
 커넥션을 종료시킬 수도 있습니다.
 
 ### 채널
 
-*채널(channel)* 일반적인 MVC에서 컨트롤러가 하는 일과 마찬가지로, 작업을 논리적인
+*채널(channel)*은 일반적인 MVC에서 컨트롤러가 하는 일과 마찬가지로, 작업을 논리적인
 단위로 캡슐화합니다. 레일스는 캡슐화하여 채널 간에 공유되는 로직을 위해
-기본적으로 `ApplicationCable::Channel` 이라는 부모 클래스를 생성합니다.
+기본적으로 `ApplicationCable::Channel`이라는 부모 클래스를 생성합니다.
 
 #### 부모 채널 설정
 
@@ -106,8 +106,8 @@ module ApplicationCable
 end
 ```
 
-이제 여러분이 사용할 자신의 Channel 클래스를 정의합니다. 예를 들어,
-`ChatChannel` 이나 `AppearanceChannel` 은 다음과 같이 정의할 수 있겠습니다:
+이제 여러분이 사용할 Channel 클래스를 정의합니다. 예를 들어,
+`ChatChannel` 및 `AppearanceChannel`은 다음과 같이 정의할 수 있겠습니다:
 
 ```ruby
 # app/channels/chat_channel.rb
@@ -123,8 +123,8 @@ end
 
 #### 구독
 
-소비자는 *구독자(subscribers)* 처럼 활동하며 채널을 구독합니다.
-그리고 이러한 소비자의 커넥션을 *구독(subscription)* 이라고 합니다.
+소비자는 *구독자(subscribers)*처럼 행동하며 채널을 구독합니다.
+그리고 이러한 소비자의 커넥션을 *구독(subscription)*이라고 합니다.
 생성된 메시지들은 케이블 소비자가 전송한 ID를 기반으로 채널 구독에 라우팅 됩니다.
 
 ```ruby
@@ -159,7 +159,7 @@ end
 }).call(this);
 ```
 
-이로써 서버의 `/cable` 에 대응해 접속하게 될 소비자가
+이로써 서버의 `/cable`에 대응해 접속하게 될 소비자가
 준비되었습니다. 단, 채널을 적어도 하나 이상 구독하기
 전에는 커넥션이 성립되지 않습니다.
 
@@ -190,7 +190,7 @@ App.cable.subscriptions.create { channel: "ChatChannel", room: "2nd Room" }
 
 ### 스트림
 
-*스트림(Streams)* 은 브로드캐스트나 발행하는 내용을
+*스트림(Streams)*은 브로드캐스트나 발행하는 내용을
 구독자에게 라우팅하는 기능을 제공합니다.
 
 ```ruby
@@ -203,8 +203,8 @@ end
 ```
 
 어떤 모델에 관련된 스트림을 생성하면, 그 모델과 채널로부터 브로드캐스트가
-생성됩니다. 다음 예제에서는 `comments:Z2lkOi8vVGVzdEFwcC9Qb3N0LzE`
-와 같은 브로드캐스트를 구독합니다.
+생성됩니다. 다음 예제에서는 `comments:Z2lkOi8vVGVzdEFwcC9Qb3N0LzE`와
+같은 브로드캐스트를 구독합니다.
 
 ```ruby
 class CommentsChannel < ApplicationCable::Channel
@@ -223,7 +223,7 @@ CommentsChannel.broadcast_to(@post, @comment)
 
 ### 브로드캐스팅
 
-*브로드캐스트(broadcasting)* 는 발행자가 채널의 구독자들에게
+*브로드캐스팅(broadcasting)*은 발행자가 채널의 구독자들에게
 어떤 것이든 전송할 수 있는 pub/sub 연결입니다. 각 채널은
 여러 개의 브로드캐스트를 스트리밍할 수 있습니다.
 
@@ -242,19 +242,19 @@ WebNotificationsChannel.broadcast_to(
 ```
 
 `WebNotificationsChannel.broadcast_to` 호출에서는 사용자마다 다른
-브로드캐스트 이름으로 현재 구독 어댑터(production에서의 기본값은 redis이며,
-개발환경과 테스트 환경에서는 async입니다) pubsub 큐에 메시지를 저장합니다.
-ID가 1인 사용자라면 브로드캐스트의 이름은 `web_notifications:1` 이 사용됩니다.
+브로드캐스트 이름으로 현재 구독 어댑터(프로덕션 환경에서의 기본값은 `redis`이며,
+개발 환경과 테스트 환경에서는 `async`입니다) pubsub 큐에 메시지를 저장합니다.
+ID가 1인 사용자라면 브로드캐스트 이름은 `web_notifications:1`입니다.
 
-received 콜백을 호출하면 이 채널은 `web_notifications:1`
-이 수신하는 모든 것을 클라이언트에 직접
+received 콜백을 호출하면 이 채널은 `web_notifications:1`이
+수신하는 모든 것을 클라이언트에 직접
 스트리밍하게 됩니다.
 
 ### 구독
 
 채널을 구독한 사용자는 구독자로서 행동합니다. 이 커넥션은
-구독이라 불립니다. 메시지를 받으면 사용자가 전송한 ID에
-기반하여 이러한 채널로 전송합니다.
+구독이라 불립니다. 사용자가 전송한 ID에 기반하여
+구독 채널로 들어오는 메시지를 전송합니다.
 
 ```coffeescript
 # app/assets/javascripts/cable/subscriptions/chat.coffee
@@ -290,8 +290,8 @@ class ChatChannel < ApplicationCable::Channel
 end
 ```
 
-`subscriptions.create` 에 첫번째 인자로 넘겨진 객체는
-params 해시가 됩니다. `channel` 키워드는 생략할 수 없습니다.
+`subscriptions.create`에 첫번째 인자로 넘겨진 객체는
+params 해시이어야 합니다. `channel` 키워드는 생략할 수 없습니다.
 
 ```coffeescript
 # app/assets/javascripts/cable/subscriptions/chat.coffee
@@ -350,7 +350,7 @@ App.chatChannel.send({ sent_by: "Paul", body: "This is a cool chat app." })
 ```
 
 재전송을 하게 되면 접속 중인 모든 클라이언트에게 전송됩니다.
-이는 전송을 요청한 클라이언트 자신도 *포함합니다*.
+이는 전송을 요청한 클라이언트 자신도 _포함합니다_.
 사용하는 매개 변수들은 채널에 구독할 때와 같습니다.
 
 ## 풀 스택 예제
@@ -440,30 +440,30 @@ App.cable.subscriptions.create "AppearanceChannel",
 
 ##### 클라이언트-서버간 상호작용
 
-1. **클라이언트** 는 **서버** 에 `App.cable =
-ActionCable.createConsumer("ws://cable.example.com")` 를 경유하여 연결됩니다.
-**서버** 는 이 연결을 `current_user` 로 인식합니다. (위치: cable.js)
+1. **클라이언트**는 **서버**에 `App.cable =
+ActionCable.createConsumer("ws://cable.example.com")`를 경유하여 연결됩니다.
+**서버**는 이 연결을 `current_user`로 인식합니다. (위치: `cable.js`)
 
-2. **클라이언트** 는 `App.cable.subscriptions.create(channel: "AppearanceChannel")`
-을 경유하여 채널을 구독합니다. (위치: appearance.coffee)
+2. **클라이언트**는 `App.cable.subscriptions.create(channel: "AppearanceChannel")`
+을 경유하여 채널을 구독합니다. (위치: `appearance.coffee`)
 
-3. **서버** 는 표시 채널에 새 구독이 시작된 것을
+3. **서버**는 표시 채널에 새 구독이 시작된 것을
 인식하고 서버의 `subscribed` 콜백을 통해 `current_user`의
-`appear` 메소드를 호출합니다. (위치: appearance_channel.rb)
+`appear` 메소드를 호출합니다. (위치: `appearance_channel.rb`)
 
-4. **클라이언트** 는 구독이 성립된 것을 인식하고 `connected` 를 호출합니다 (위치:
-appearance.coffee). 이를 통해 @install과 @appear가 호출됩니다. @appear는
-서버의 `AppearanceChannel#appear(data)` 를 통해서 데이터 해시
-`{ appearing_on: $("main").data("appearing-on") }` 를
+4. **클라이언트**는 구독이 성립된 것을 인식하고 `connected`를 호출합니다 (위치:
+`appearance.coffee`). 이를 통해 @install과 @appear가 호출됩니다. @appear는
+서버의 `AppearanceChannel#appear(data)`를 통해서 데이터 해시
+`{ appearing_on: $("main").data("appearing-on") }`를
 넘겨줍니다. 서버의 클래스에 선언되어 있는 (콜백을 제외한) 모든 퍼블릭
 메소드가 자동적으로 노출되기 때문에 가능합니다. 공개된 퍼블릭 메소드는
 perform 메소드를 사용하여 원격 프로시저로서 사용할 수 있습니다.
 
-5. **서버** 는 `current_user` 로 확인한 커넥션의
+5. **서버**는 `current_user`로 확인한 커넥션의
 채널에서 appear 액션에 대한 요청을 수신합니다.
-(위치: appearance_channel.rb) 서버는 데이터 해시에서
-`:appearing_on` 키를 사용하여 값을 꺼내어 `current_user.appear`
-에 넘겨진 `:on` 키의 값으로 설정합니다.
+(위치: `appearance_channel.rb`) 서버는 데이터 해시에서
+`:appearing_on` 키를 사용하여 값을 꺼내어 `current_user.appear`에
+넘겨진 `:on` 키의 값으로 설정합니다.
 
 ### 예제 2: 새로운 알림을 수신하기
 
@@ -512,18 +512,18 @@ WebNotificationsChannel.broadcast_to(
 `WebNotificationsChannel.broadcast_to` 호출에서는
 현재 구독 어댑터의 pubsub 큐에 메시지를 추가합니다.
 이 때 사용자마다 서로 다른 브로드캐스트 이름이 사용됩니다.
-ID가 1인 사용자라면 브로드캐스트의 이름은 web_notifications:1이 됩니다.
+ID가 1인 사용자라면 브로드캐스트의 이름은 `web_notifications:1`입니다.
 
-`received` 콜백이 호출되면, 이 채널은 `web_notifications:1`
-에 도착한 것을 모두 클라이언트에게 전송합니다. 인자로서 넘겨진 데이터는
+`received` 콜백이 호출되면, 이 채널은 `web_notifications:1`에
+도착한 것을 모두 클라이언트에게 전송합니다. 인자로서 넘겨진 데이터는
 서버의 브로드캐스트 호출의 두번째 인수로 넘겨지는 해시입니다.
-이 해시는 JSON으로 인코딩되어 전송되며, `received` 로 수신할 때
+이 해시는 JSON으로 인코딩되어 전송되며, `received`로 수신할 때
 데이터 인자로부터 복원됩니다.
 
 ### 더 자세한 예시
 
-레일스 애플리케이션에 액션 케이블을 설정하는 방법이나 채널을 추가하는 방법에 대해서는
-[rails/actioncable-examples](https://github.com/rails/actioncable-examples) 에서 전체 예시를 볼 수 있습니다.
+레일스 애플리케이션에 액션 케이블을 설정하는 방법과 채널을 추가하는 방법에 대해서는
+[rails/actioncable-examples](https://github.com/rails/actioncable-examples)에서 전체 예시를 볼 수 있습니다.
 
 ## 설정
 
@@ -553,23 +553,23 @@ production:
 
 ##### Async 어댑터
 
-async 어댑터는 개발/테스트 환경을 위한 것으로, 실제 배포 환경에서는 사용자지 마세요.
+async 어댑터는 개발/테스트 환경을 위한 것으로, 실제 프로덕션 환경에서는 사용하지 마세요.
 
 ##### Redis 어댑터
 
 Redis 어댑터를 사용하려면 Redis 서버를 가리키는 URL을 사용자가 지정해주어야 합니다. 추가적으로, 다수의 애플리케이션이 같은
-Redis 서버를 사용할 때에 채널 이름이 충돌하는 것을 방지하기 위해 `channel_prefix` 가 제공됩니다. 보다 자세한 내용은
+Redis 서버를 사용할 때에 채널 이름이 충돌하는 것을 방지하기 위해 `channel_prefix`가 제공됩니다. 보다 자세한 내용은
 [Redis PubSub documentation](https://redis.io/topics/pubsub#database-amp-scoping)을 참고해주세요.
 
 ##### PostgreSQL 어댑터
 
-PostgreSQL 어댑터는 액티브레코드의 connection pool 을 사용합니다.
+PostgreSQL 어댑터는 액티브레코드의 커넥션 풀 을 사용합니다.
 따라서 애플리케이션의 `config/database.yml`에서 데이터베이스를 설정해야 합니다.
 이 부분은 가까운 시일 내에 변경이 있을 수도 있습니다. [#27214](https://github.com/rails/rails/issues/27214)
 
 ### 허가된 요청 호스트
 
-액션케이블은 허가된 곳으로부터의 요청만을 받습니다.
+액션케이블은 지정한 호스트의 요청만 수락합니다.
 이 호스트 목록은 배열의 형태로 서버 설정에 넘깁니다.
 각 호스트는 문자열이나 정규 표현식을 사용할 수 있습니다.
 
@@ -583,20 +583,20 @@ config.action_cable.allowed_request_origins = ['http://rubyonrails.com', %r{http
 config.action_cable.disable_request_forgery_protection = true
 ```
 
-development 환경에서 실행 중일 때, 액션케이블은 기본적으로
-localhost:3000 로부터의 요청을 모두 허가합니다.
+개발 환경에서 실행 중일 때, 액션케이블은 기본적으로
+localhost:3000으로부터의 요청을 모두 허가합니다.
 
 ### 소비자 설정
 
-URL을 설정하기 위해서, HTML 레이아웃의 HEAD 태그 내에 `action_cable_meta_tag` 을 추가하세요.
-이렇게 하면 URL이나 경로를 보통의 방식처럼 환경 설정 파일에서 `config.action_cable.url`
-을 통해 설정된 것으로 간주하여 사용하게 됩니다.
+URL을 설정하기 위해서, HTML 레이아웃의 HEAD 태그 내에 `action_cable_meta_tag`을 추가하세요.
+이렇게 하면 URL이나 경로를 보통의 방식처럼 환경 설정 파일에서 `config.action_cable.url`을
+통해 설정된 것으로 간주하여 사용하게 됩니다.
 
 ### 기타 설정
 
 설정을 위한 그 밖의 다른 공통 옵션은 커넥션별 로거에 적용되는 로그 태그 입니다.
 사용자 계정 ID를 사용할 수 있는 경우 사용 예시는 다음과 같습니다.
-사용자 계정 ID를 사용할 수 없다면, 태깅 중에는 "no-account" 를 사용하세요:
+사용자 계정 ID를 사용할 수 없다면, 태깅 중에는 "no-account"를 사용하세요:
 
 ```ruby
 config.action_cable.log_tags = [
@@ -619,8 +619,8 @@ config.action_cable.log_tags = [
 ### 애플리케이션에서 실행하기
 
 액션케이블은 레일스 애플리케이션과 함께 실행할 수 있습니다.
-예를 들어, `/websocket` 에서 웹소켓 요청을 수신하는 경우에는
-`config.action_cable.mount_path` 로 경로를 지정할 수 있습니다:
+예를 들어, `/websocket`에서 웹소켓 요청을 수신하는 경우에는
+`config.action_cable.mount_path`로 경로를 지정할 수 있습니다:
 
 ```ruby
 # config/application.rb
@@ -630,7 +630,7 @@ end
 ```
 
 레이아웃에서 `action_cable_meta_tag`가 호출되고 있으면, 케이블 서버에 연결하기 위해
-`App.cable = ActionCable.createConsumer()` 를 사용할 수 있습니다.
+`App.cable = ActionCable.createConsumer()`를 사용할 수 있습니다.
 `createConsumer`의 첫 번째 인자를 통해 path를 커스텀하여 지정 할 수 있습니다.
 (예시. `App.cable = ActionCable.createConsumer("/websocket")` )
 
@@ -640,7 +640,7 @@ end
 
 ### 독립된 서버에서 실행하기
 
-애플리케이션 서버와 액션케이블 서버를 나눌 수도 있습니다.
+레일스 애플리케이션 서버와 액션케이블 서버를 나눌 수도 있습니다.
 액션케이블 서버는 Rack 애플리케이션입니다만, 독립된
 애플리케이션이기도 합니다. 추천하는 기본 설정은 다음과 같습니다.
 
@@ -652,7 +652,7 @@ Rails.application.eager_load!
 run ActionCable.server
 ```
 
-이어서, `bin/cable` 의 binstub을 사용하여 서버를 시작합니다:
+이어서, `bin/cable`의 binstub을 사용하여 서버를 시작합니다:
 
 ```
 #!/bin/bash
@@ -670,16 +670,16 @@ Devise와 함께 사용하는 방법을 확인할 수 있습니다.
 ## 의존성
 
 액션케이블은 pubsub을 처리하기 위한 구독 어댑터 인터페이스를 제공합니다.
-기본 사항으로 비동기, 인라인, PostgreSQL, Evented Redis,
-Non-evented Redis 등의 어댑터를 탑재하고 있습니다. 새 레일스
+기본 사항으로 비동기, 인라인, PostgreSQL, Redis
+등의 어댑터가 탑재되어 있습니다. 새 레일스
 애플리케이션의 기본 어댑터는 비동기(`async`) 어댑터입니다.
 
-구현된 루비 코드는 [websocket-driver](https://github.com/faye/websocket-driver-ruby),
-[nio4r](https://github.com/celluloid/nio4r), [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby) 에 있습니다.
+루비 코드 구현체는 [websocket-driver](https://github.com/faye/websocket-driver-ruby),
+[nio4r](https://github.com/celluloid/nio4r), [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby)에 기반해 작성되었습니다.
 
 ## 배포
 
-액션케이블은 웹소켓과 스레드의 조합으로 제작되어 있습니다. 두
+액션케이블은 웹소켓과 스레드의 조합으로 제작되어 있습니다.
 프레임워크 내부의 흐름과 사용자 지정 채널의 동작은 루비의 기본
 스레드를 통해 처리됩니다. 즉 스레드에 안전한 코드를 유지하는
 한, 모든 레일스의 정규 모델을 문제 없이 사용할 수 있습니다.
@@ -688,5 +688,5 @@ Non-evented Redis 등의 어댑터를 탑재하고 있습니다. 새 레일스
 구현되어 있습니다. 이를 통해서, 애플리케이션 서버의 멀티 스레드
 사용 여부와 관계없이 내부의 커넥션을 멀티 스레드 패턴으로 관리합니다.
 
-따라서 액션케이블은 Unicorn, Puma, Passenger 등의
+따라서 액션케이블은 Unicorn, Puma, Passenger 의
 인기 있는 서버와 문제없이 연동될 수 있습니다.
