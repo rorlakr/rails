@@ -118,24 +118,24 @@ $ cd blog
 
 | 파일/폴더 | 용도 |
 | ----------- | ------- |
-|app/|Contains the controllers, models, views, helpers, mailers, channels, jobs, and assets for your application. You'll focus on this folder for the remainder of this guide.|
-|bin/|Contains the rails script that starts your app and can contain other scripts you use to setup, update, deploy, or run your application.|
-|config/|Configure your application's routes, database, and more. This is covered in more detail in [Configuring Rails Applications](configuring.html).|
-|config.ru|Rack configuration for Rack based servers used to start the application. For more information about Rack, see the [Rack website](https://rack.github.io/).|
-|db/|Contains your current database schema, as well as the database migrations.|
-|Gemfile<br>Gemfile.lock|These files allow you to specify what gem dependencies are needed for your Rails application. These files are used by the Bundler gem. For more information about Bundler, see the [Bundler website](https://bundler.io).|
-|lib/|Extended modules for your application.|
-|log/|Application log files.|
-|package.json|This file allows you to specify what npm dependencies are needed for your Rails application. This file is used by Yarn. For more information about Yarn, see the [Yarn website](https://yarnpkg.com/lang/en/).|
-|public/|The only folder seen by the world as-is. Contains static files and compiled assets.|
-|Rakefile|This file locates and loads tasks that can be run from the command line. The task definitions are defined throughout the components of Rails. Rather than changing `Rakefile`, you should add your own tasks by adding files to the `lib/tasks` directory of your application.|
-|README.md|This is a brief instruction manual for your application. You should edit this file to tell others what your application does, how to set it up, and so on.|
-|storage/|Active Storage files for Disk Service. This is covered in [Active Storage Overview](active_storage_overview.html).|
-|test/|Unit tests, fixtures, and other test apparatus. These are covered in [Testing Rails Applications](testing.html).|
-|tmp/|Temporary files (like cache and pid files).|
-|vendor/|A place for all third-party code. In a typical Rails application this includes vendored gems.|
-|.gitignore|This file tells git which files (or patterns) it should ignore. See [GitHub - Ignoring files](https://help.github.com/articles/ignoring-files) for more info about ignoring files.
-|.ruby-version|This file contains the default Ruby version.|
+|app/|애플리케이션의 컨트롤러, 모델, 뷰, 헬퍼, 메일러, 채널, 작업 및 애셋을 포함한다. 본 가이드의 나머지 부분에서는 이 폴더에 중점을 둘 것이다.|
+|bin/|앱을 시작하는 레일스 스크립트를 포함하며 애플리케이션 설정, 업데이트, 배포 또는 실행하는 데 사용하는 스크립트를 포함 할 수 있다.|
+|config/|애플리케이션의 라우트, 데이터베이스 등을 구성한다. [Configuring Rails Applications](configuring.html)에 자세히 설명되어 있다.|
+|config.ru|애플리케이션을 시작하는 데 사용되는 랙(Rack) 기반 서버의 랙 구성. 랙에 대한 자세한 내용은 [Rack 웹 사이트](https://rack.github.io/)를 참조한다.|
+|db/|현재 데이터베이스 스키마와 데이터베이스 마이그레이션이 포함되어 있다.|
+|Gemfile<br>Gemfile.lock|이 파일을 사용하면 레일스 애플리케이션에 필요한 젬(gem) 의존성을 지정할 수 있다. 이 파일은 Bundler 젬에서 사용한다. Bundler에 대한 자세한 내용은 [Bundler 웹 사이트](https://bundler.io)를 참조한다.|
+|lib/|애플리케이션을 위한 확장 모듈.|
+|log/|애플리케이션 로그 파일|
+|package.json|이 파일을 사용하면 레일스 애플리케이션에 필요한 npm 종속성을 지정할 수 있다. 이 파일은 Yarn에서 사용한다. Yarn에 대한 자세한 내용은 [Yarn 웹 사이트](https://yarnpkg.com/lang/en/)를 참조한다.|
+|public/|누구라도 접급할 수 있는 유일한 폴더이다. 정적 파일 및 컴파일 된 애셋을 포함한다.|
+|Rakefile|이 파일은 커맨드 라인에서 실행할 수 있는 태스크(task)를 찾아서 로드한다. 태스크 정의는 레일스의 구성 요소 전체에 걸쳐 정의된다. `Rakefile`을 변경하는 대신 애플리케이션의 `lib/tasks` 디렉토리에 파일을 추가한 후 자신의 태스크를 추가해야 한다.|
+|README.md|애플리케이션에 대한 간단한 사용 설명서이다. 이 파일을 편집하여 다른 사용자에게 애플리케이션의 기능, 설정 방법 등을 알려 주어야 한다.|
+|storage/|디스크 서비스용 액티브 스토리지 파일. 이에 대해서는 [Active Storage Overview](active_storage_overview.html)에서 다룬다.|
+|test/|유닛 테스트, 픽스쳐(fixtures, 테스트 데이터) 및 기타 테스트 장치. 이것들은 [Testing Rails Applications](testing.html)에서 다룬다.|
+|tmp/|임시 파일 (캐시(cache)와 pid 파일).|
+|vendor/|모든 벤더(타사) 코드를 위한 장소이다. 전형적인 레일스 애플리케이션에서는 벤더에서 제공하는 젬을 여기에 포함한다.|
+|.gitignore|이 파일은 git에게 무시해야 할 파일 (또는 패턴)을 알려준다. 파일 무시에 대한 자세한 내용은 [GitHub - Ignoring files](https://help.github.com/articles/ignoring-files)를 참조한다.
+|.ruby-version|이 파일에는 기본 루비 버전이 포함되어 있다.|
 
 Hello, Rails!
 -------------
@@ -1122,46 +1122,39 @@ end
 ```
 
 여기서는 다른 방식으로 `link_to`를 사용할 것이다. 네임드 라우트(named route, prefix가 있는 라우트)를 두 번째 인수로, 다른 옵션을 또 다른 인수로 전달한다.
-`method: :delete` 및 `data: {confirm : 'Are you sure?' }` 옵션은 HTML5 속성으로 사용되기 때문에, 링크를 클릭할 경우 레일스는 먼저 사용자에게 챙ㄷ .This is done via the JavaScript file `rails-ujs` which is automatically included in your application's layout (`app/views/layouts/application.html.erb`) when you generated the application. Without this file, the confirmation dialog box won't appear.
+`method: :delete` 및 `data: { confirm : 'Are you sure?' }` 옵션은 HTML5 속성으로 사용되기 때문에, 링크를 클릭할 경우 레일스는 먼저 사용자에게 확인창을 보여 준 다음, `delete` 메소드를 사용하여 링크를 서밋한다. 이것은 애플리케이션을 생성 할 때 애플리케이션 레이아웃 (`app/views/layouts/application.html.erb`)에 자동으로 포함되는 자바스크립트 파일 `rails-ujs`를 통해 수행된다. 이 파일이 없으면 확인창이 나타나지 않을 것이다.
 
 ![Confirm Dialog](images/getting_started/confirm_dialog.png)
 
-TIP: Learn more about Unobtrusive JavaScript on
-[Working With JavaScript in Rails](working_with_javascript_in_rails.html) guide.
+TIP: [Working With JavaScript in Rails](working_with_javascript_in_rails.html) 가이드에서 unobtrusive 자바스크립트에 대해 자세히 알 수 있다.
 
-Congratulations, you can now create, show, list, update, and destroy
-articles.
+축하한다. 이제 기사를 작성, 보여주기, 리스트보기, 업데이트 및 삭제할 수 있게 되었다.
 
-TIP: In general, Rails encourages using resources objects instead of
-declaring routes manually. For more information about routing, see
-[Rails Routing from the Outside In](routing.html).
+TIP: 일반적으로 레일스는 라우트를 수동으로 선언하는 대신 리소스 객체를 사용하도록 권장한다. 라우팅에 대한 자세한 내용은 [Rails Routing from the Outside In](routing.html)을 참조하기 바란다.
 
-Adding a Second Model
+두번째 모델 추가하기
 ---------------------
 
-It's time to add a second model to the application. The second model will handle
-comments on articles.
+이제 애플리케이션에 두 번째 모델을 추가할 때가 되었다. 두 번째 모델은 기사에 대한 댓글을 처리할 것이다.
 
-### Generating a Model
+### 모델 생성하기
 
-We're going to see the same generator that we used before when creating
-the `Article` model. This time we'll create a `Comment` model to hold a
-reference to an article. Run this command in your terminal:
+`Article` 모델을 생성할 때 전에 사용했던 것과 같은 생성자를 사용할 것이다. 이번에는 기사에 대한 참조를 담는 `Comment` 모델을 생성할 것이다. 터미널에서 아래의 명령을 실행한다.
 
 ```bash
 $ rails generate model Comment commenter:string body:text article:references
 ```
 
-This command will generate four files:
+이 명령은 4 개의 파일을 생성할 것이다.
 
-| File                                         | Purpose                                                                                                |
+| 파일                                         | 용도                                                                                                |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| db/migrate/20140120201010_create_comments.rb | Migration to create the comments table in your database (your name will include a different timestamp) |
-| app/models/comment.rb                        | The Comment model                                                                                      |
-| test/models/comment_test.rb                  | Testing harness for the comment model                                                                 |
-| test/fixtures/comments.yml                   | Sample comments for use in testing                                                                     |
+| db/migrate/20140120201010_create_comments.rb | 데이터베이스에 comments 테이블을 작성하기 위한 마이그레이션 (파일명에 각기 다른 타임스탬프가 포함됨) |
+| app/models/comment.rb                        | Comment 모델                                                                                      |
+| test/models/comment_test.rb                  | comment 모델의 기능 테스트하기                                                                 |
+| test/fixtures/comments.yml                   | 테스트에 사용할 샘플 댓글                                                                     |
 
-First, take a look at `app/models/comment.rb`:
+먼저, `app/models/comment.rb` 파일 내용을 살펴 본다.
 
 ```ruby
 class Comment < ApplicationRecord
@@ -1169,17 +1162,13 @@ class Comment < ApplicationRecord
 end
 ```
 
-This is very similar to the `Article` model that you saw earlier. The difference
-is the line `belongs_to :article`, which sets up an Active Record _association_.
-You'll learn a little about associations in the next section of this guide.
+이것은 앞서 본 `Article` 모델과 매우 유사하다. 차이점은 `belongs_to: article`이며, 액티브레코드 _association(관계)_ 을 설정한다.
+본 가이드의 다음 섹션에서 관계에 대해 약간 배우게 된다.
 
-The (`:references`) keyword used in the bash command is a special data type for models.
-It creates a new column on your database table with the provided model name appended with an `_id`
-that can hold integer values. To get a better understanding, analyze the
-`db/schema.rb` file after running the migration.
+bash 명령에 사용 된 (`:references`) 키워드는 모델의 특수 데이터 유형이다.
+지정된 모델 이름 끝에 정수 값을 보유할 수 있는 `_id`를 추가하여 데이터베이스 테이블에 컬럼으로 추가한다. 이해를 돕기 위해 마이그레이션을 실행 한 후 `db/schema.rb` 파일을 분석해 보기 바란다.
 
-In addition to the model, Rails has also made a migration to create the
-corresponding database table:
+모델 외에도 레일스는 해당 데이터베이스 테이블을 생성하기 위한 마이그레이션을 작성했다.
 
 ```ruby
 class CreateComments < ActiveRecord::Migration[6.0]
@@ -1195,16 +1184,13 @@ class CreateComments < ActiveRecord::Migration[6.0]
 end
 ```
 
-The `t.references` line creates an integer column called `article_id`, an index
-for it, and a foreign key constraint that points to the `id` column of the `articles`
-table. Go ahead and run the migration:
+`t.references` 줄은 `article_id`라는 정수 컬럼, 이 컬럼에 대한 인덱스, articles 테이블의 `id` 컬럼을 가리키는 외래 키 제약 조건을 만든다. 이제 아랭와 같이 마이그레이션을 실행한다.
 
 ```bash
 $ rails db:migrate
 ```
 
-Rails is smart enough to only execute the migrations that have not already been
-run against the current database, so in this case you will just see:
+레일스는 현재 데이터베이스에 대해 아직 실행되지 않은 마이그레이션만 실행하기 때문에 이 경우에는 아래과 같은 결과를 보게 될 것이다.
 
 ```bash
 ==  CreateComments: migrating =================================================
@@ -1213,18 +1199,14 @@ run against the current database, so in this case you will just see:
 ==  CreateComments: migrated (0.0119s) ========================================
 ```
 
-### Associating Models
+### 모델 관계 선언하기
 
-Active Record associations let you easily declare the relationship between two
-models. In the case of comments and articles, you could write out the
-relationships this way:
+액티브레코드 관계를 사용하면 두 모델 간의 관계를 쉽게 선언 할 수 있다. 댓글과 기사의 경우 다음과 같이 관계를 작성할 수 있다.
 
-* Each comment belongs to one article.
-* One article can have many comments.
+* 각 댓글은 하나의 기사에 속한다.
+* 하나의 기사는 다수의 댓글을 가질 수 있다.
 
-In fact, this is very close to the syntax that Rails uses to declare this
-association. You've already seen the line of code inside the `Comment` model
-(app/models/comment.rb) that makes each comment belong to an Article:
+실제로 이것은 레일스가 이 관계를 선언하는 데 사용하는 문법과 매우 유사하다. `Comment` 모델 (app/models/comment.rb)에서 각 댓글이 기사에 속하도록 하는 코드 라인을 이미 보았고 아래와 같다.
 
 ```ruby
 class Comment < ApplicationRecord
@@ -1232,8 +1214,7 @@ class Comment < ApplicationRecord
 end
 ```
 
-You'll need to edit `app/models/article.rb` to add the other side of the
-association:
+관계의 다른 쪽을 추가하려면 `app/models/article.rb`를 수정해야 한다.
 
 ```ruby
 class Article < ApplicationRecord
@@ -1243,19 +1224,13 @@ class Article < ApplicationRecord
 end
 ```
 
-These two declarations enable a good bit of automatic behavior. For example, if
-you have an instance variable `@article` containing an article, you can retrieve
-all the comments belonging to that article as an array using
-`@article.comments`.
+이 두 가지 선언을 통해서 몇가지 작업을 자동화할 수 있다. 예를 들어 기사를 포함하는 인스턴스 변수 '@article'가 있는 경우 `@ article.comments`를 사용하여 해당 기사에 속하는 모든 댓글을 배열로 검색 할 수 있다.
 
-TIP: For more information on Active Record associations, see the [Active Record
-Associations](association_basics.html) guide.
+TIP: 액티브 레코드 연결에 대한 자세한 내용은 [Active Record Associations](association_basics.html) 안내서를 참조한다.
 
-### Adding a Route for Comments
+### 댓글에 대한 라우트 추가하기
 
-As with the `welcome` controller, we will need to add a route so that Rails
-knows where we would like to navigate to see `comments`. Open up the
-`config/routes.rb` file again, and edit it as follows:
+`welcome` 컨트롤러와 마찬가지로 `comments` 리소스에 대한 라우트를 추가해야 할 것이다. `config/routes.rb` 파일을 다시 열고 아래와 같이 수정한다.
 
 ```ruby
 resources :articles do
@@ -1263,40 +1238,31 @@ resources :articles do
 end
 ```
 
-This creates `comments` as a _nested resource_ within `articles`. This is
-another part of capturing the hierarchical relationship that exists between
-articles and comments.
+이것은 `articles` 내에서 `comments`를 _nested resource_ 상태로 생성한다. 이것은 기사와 댓글 사이에 존재하는 계층적 관계를 적용하는 또 다른 부분이다.
 
-TIP: For more information on routing, see the [Rails Routing](routing.html)
-guide.
+TIP: 라우팅에 대한 자세한 내용은 [Rails Routing](routing.html) 안내서를 참조한다.
 
-### Generating a Controller
+### 컨트롤러 생성하기
 
-With the model in hand, you can turn your attention to creating a matching
-controller. Again, we'll use the same generator we used before:
+모델이 준비된 상태에서 다음으로 연관 컨트롤러를 만드는 데 집중해야 한다. 이 때 전에 사용했던 것과 동일한 생성자를 사용할 것이다.
 
 ```bash
 $ rails generate controller Comments
 ```
 
-This creates four files and one empty directory:
+이것은 4개의 파일과 하나의 빈 디렉토리를 생성한다.
 
-| File/Directory                               | Purpose                                  |
+| 파일/디렉토리                               | 용도                                  |
 | -------------------------------------------- | ---------------------------------------- |
-| app/controllers/comments_controller.rb       | The Comments controller                  |
-| app/views/comments/                          | Views of the controller are stored here  |
-| test/controllers/comments_controller_test.rb | The test for the controller              |
-| app/helpers/comments_helper.rb               | A view helper file                       |
-| app/assets/stylesheets/comments.scss         | Cascading style sheet for the controller |
+| app/controllers/comments_controller.rb       | Comments 컨트롤러                  |
+| app/views/comments/                          | 해당 컨트롤러에 대한 뷰 파일들이 여기에 저장된다.  |
+| test/controllers/comments_controller_test.rb | 해당 컨트롤러에 대한 테스트              |
+| app/helpers/comments_helper.rb               | 뷰 헬퍼 파일                       |
+| app/assets/stylesheets/comments.scss         | 해당 컨트롤러에 대한 CSS 파일 |
 
-Like with any blog, our readers will create their comments directly after
-reading the article, and once they have added their comment, will be sent back
-to the article show page to see their comment now listed. Due to this, our
-`CommentsController` is there to provide a method to create comments and delete
-spam comments when they arrive.
+다른 블로그와 마찬가지로 독자들이 기사를 읽은 직후에 댓글을 작성할 것이며 일단 댓글이 추가되면 기사 보기 페이지로 되돌아가서 해당 기사에 달린 댓글 목록을 보게 될 것이다. 이로 인해 `CommentsController`는 댓글을 작성하고 스팸 댓글이 달리면 삭제하는 메소드를 제공한다.
 
-So first, we'll wire up the Article show template
-(`app/views/articles/show.html.erb`) to let us make a new comment:
+먼저, 기사 보기 템플릿 (`app/views/articles/show.html.erb`)을 연결하여 새로운 댓글을 작성할 수 있도록 한다.
 
 ```html+erb
 <p>
@@ -1328,11 +1294,9 @@ So first, we'll wire up the Article show template
 <%= link_to 'Back', articles_path %>
 ```
 
-This adds a form on the `Article` show page that creates a new comment by
-calling the `CommentsController` `create` action. The `form_with` call here uses
-an array, which will build a nested route, such as `/articles/1/comments`.
+이것은 `Article` 보기 페이지에 `CommentsController` `create` 액션을 호출하여 새로운 댓글을 작성하는 폼을 추가한다. 여기서 `form_with` 메소드 호출할 때 배열을 인수로 사용하는데, `/articles/1/comments`와 같은 중첩 라우트를 생성해 줄 것이다.
 
-Let's wire up the `create` in `app/controllers/comments_controller.rb`:
+`app/controllers/comments_controller.rb`에서 `create` 액션을 아래와 같이 작성하여 연결한다.
 
 ```ruby
 class CommentsController < ApplicationController
@@ -1349,22 +1313,11 @@ class CommentsController < ApplicationController
 end
 ```
 
-You'll see a bit more complexity here than you did in the controller for
-articles. That's a side-effect of the nesting that you've set up. Each request
-for a comment has to keep track of the article to which the comment is attached,
-thus the initial call to the `find` method of the `Article` model to get the
-article in question.
+기사 컨트롤러에서 보다 약간 더 복잡해지는 것을 알게 될 것이다. 이것은 중첩 라우팅으로 인한 부작용이다. 댓글에 대한 요청시 마다 댓글이 달린 기사를 기억해 두어야 하므로 `Article` 모델의 `find` 메소드를 초기에 호출하여 해당 기사를 확보해 두어야 한다.
 
-In addition, the code takes advantage of some of the methods available for an
-association. We use the `create` method on `@article.comments` to create and
-save the comment. This will automatically link the comment so that it belongs to
-that particular article.
+또한 코드 작성시 모델 관계에서 사용할 수 있는 메소드를 활용한다. `@article.comments`에서 `create` 메소드를 사용하여 댓글을 작성하고 저장한다. 이렇게 하므로써 댓글이 해당 특정 기사에 속하도록 자동 링크된다.
 
-Once we have made the new comment, we send the user back to the original article
-using the `article_path(@article)` helper. As we have already seen, this calls
-the `show` action of the `ArticlesController` which in turn renders the
-`show.html.erb` template. This is where we want the comment to show, so let's
-add that to the `app/views/articles/show.html.erb`.
+새로운 댓글을 작성하면 `article_path (@article)` 헬퍼를 사용하여 사용자를 원래 기사로 돌려 보낸다. 이미 보았 듯이, 이것은 `ArticlesController`의`show` 액션을 호출하여`show.html.erb` 템플릿을 렌더링한다. 이것은 댓글을 보여줄 위치이므로 `app/views/articles/show.html.erb`에 댓글을 추가해 보자.
 
 ```html+erb
 <p>
@@ -1409,17 +1362,14 @@ add that to the `app/views/articles/show.html.erb`.
 <%= link_to 'Back', articles_path %>
 ```
 
-Now you can add articles and comments to your blog and have them show up in the
-right places.
+이제 블로그에 기사와 댓글을 추가하고 재위치에 보여 줄 수 있게 되었다.
 
 ![Article with Comments](images/getting_started/article_with_comments.png)
 
-Refactoring
+리팩토링하기
 -----------
 
-Now that we have articles and comments working, take a look at the
-`app/views/articles/show.html.erb` template. It is getting long and awkward. We
-can use partials to clean it up.
+이제 기사와 댓글이 작성되었으므로 `app/views/articles/show.html.erb` 템플릿을 살펴 보도록 한다. 코드가 길어지면서 점점 어색해지고 있다. 파셜을 사용하면 깨끗하게 정리할 수 있다.
 
 ### Rendering Partial Collections
 

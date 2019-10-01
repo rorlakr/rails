@@ -162,3 +162,5 @@ end
 gem "ibm_db" if ENV["IBM_DB"]
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem "wdm", ">= 0.1.0", platforms: [:mingw, :mswin, :x64_mingw, :mswin64]
+
+gem 'guard-shell' # 번역 작업시 자동으로 html 파일 빌드하기
