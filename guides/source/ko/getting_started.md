@@ -1,4 +1,4 @@
-**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+**GITHUB 온라인에서 이 파일을 읽으면 제대로 보이지 않을 수 있다. 공식 가이드는 https://guides.rubyonrails.org 상에 게시되어 있다.**
 
 레일스로 시작하기
 ==========================
@@ -27,7 +27,7 @@
 
 주의할 것은 위에서 소개한 서적 중에는, 그 내용이 아주 훌륭한 것이지만, 오래된 버전인 루비 1.6과 주로 1.8 버전에 대한 것들이 있어서 레일스로 개발할 때 주로 접하게 되는 루비 문법들이 포함되지 않을 수 있다는 것이다.
 
-레일스란 무엇인가?
+레일스란 무엇인가
 --------------
 
 레일스란 루비 언어로 작성된 웹애플리케이션 개발 프레임워크이다.
@@ -39,8 +39,8 @@
 
 레일스 철학은 두 개의 중요한 가이드 원칙을 포함한다.
 
-* **Don't Repeat Yourself:** DRY란 하나의 소프트웨어 개발 원칙으로 "모든 지식은 하나의 시스템 내에서 유일해야 하고 모호성이 없어야 하며 권위를 가져야 한다"는 내용을 의미한다. 같은 내용의 정보를 반복해서 작성하지 않으므로써 코드를 더 잘 유지할 수 있고 더 많은 확장성을 부여할 수 있으며 버그를 줄일 수 있게 되는 것이다.
-* **Convention Over Configuration:** 레일스는 웹애플리케이션에서 발생할 수 있는 다양한 작업들에 대한 최선의 방법을 알고 있기 때문에, 한없이 이어지는 설정파일들을 사용해서 상세한 설정 내용을 명시하는 대신에 이런 것들에 대한 일련의 사전 정의된 설정을 기본 규칙으로 지정해 준다.
+* **Don't Repeat Yourself(같은 내용의 정보를 반복하지 말 것):** DRY란 하나의 소프트웨어 개발 원칙으로 "모든 지식은 하나의 시스템 내에서 유일해야 하고 모호성이 없어야 하며 권위를 가져야 한다"는 내용을 의미한다. 같은 내용의 정보를 반복해서 작성하지 않으므로써 코드를 더 잘 유지할 수 있고 더 많은 확장성을 부여할 수 있으며 버그를 줄일 수 있게 되는 것이다.
+* **Convention Over Configuration(설정보다는 관례를 우선시 함):** 레일스는 웹애플리케이션에서 발생할 수 있는 다양한 작업들에 대한 최선의 방법을 알고 있기 때문에, 한없이 이어지는 설정파일들을 사용해서 상세한 설정 내용을 명시하는 대신에 이런 것들에 대한 일련의 사전 정의된 설정을 기본 규칙으로 지정해 준다.
 
 레일스 프로젝트 생성하기
 ----------------------------
@@ -1371,11 +1371,9 @@ end
 
 이제 기사와 댓글이 작성되었으므로 `app/views/articles/show.html.erb` 템플릿을 살펴 보도록 한다. 코드가 길어지면서 점점 어색해지고 있다. 파셜을 사용하면 깨끗하게 정리할 수 있다.
 
-### Rendering Partial Collections
+### 파셜 컬렉션 렌더링하기
 
-First, we will make a comment partial to extract showing all the comments for
-the article. Create the file `app/views/comments/_comment.html.erb` and put the
-following into it:
+먼저 해당 기사에 대한 모든 댓글을 보여 주기 위해 댓글 파셜을 작성한다. `app/views/comments/_comment.html.erb` 파일을 생성하고 아래와 같이 입력한다.
 
 ```html+erb
 <p>
@@ -1389,8 +1387,7 @@ following into it:
 </p>
 ```
 
-Then you can change `app/views/articles/show.html.erb` to look like the
-following:
+그런 다음 `app/views/articles/show.html.erb`를 아래와 같이 변경할 수 있다.
 
 ```html+erb
 <p>
@@ -1425,16 +1422,11 @@ following:
 <%= link_to 'Back', articles_path %>
 ```
 
-This will now render the partial in `app/views/comments/_comment.html.erb` once
-for each comment that is in the `@article.comments` collection. As the `render`
-method iterates over the `@article.comments` collection, it assigns each
-comment to a local variable named the same as the partial, in this case
-`comment`, which is then available in the partial for us to show.
+이것은 이제 `@article.comments` 컬렉션에 있는 각 댓글마다 `app/views/comments/_comment.html.erb` 파셜을 한번씩 렌더링한다. `render` 메소드가 `@article.comments` 컬렉션을 반복 할 때, 각 댓글을 파셜과 같은 이름의 로컬 변수 (이 경우에는 `comment`)에 할당하며 이 변수는 파셜 템플릿에서 사용할 수 있다.
 
-### Rendering a Partial Form
+### 파셜 폼 렌더링하기
 
-Let us also move that new comment section out to its own partial. Again, you
-create a file `app/views/comments/_form.html.erb` containing:
+새로운 댓글 섹션을 파셜 템플릿으로 옮기도록 한다. 또 다시, 아래와 같은 내용을 포함하는 `app/views/comments/_form.html.erb` 파일을 생성한다.
 
 ```html+erb
 <%= form_with(model: [ @article, @article.comments.build ], local: true) do |form| %>
@@ -1452,7 +1444,7 @@ create a file `app/views/comments/_form.html.erb` containing:
 <% end %>
 ```
 
-Then you make the `app/views/articles/show.html.erb` look like the following:
+그런 다음 `app/views/articles/show.html.erb`를 아래와 같이 작성한다.
 
 ```html+erb
 <p>
@@ -1475,23 +1467,16 @@ Then you make the `app/views/articles/show.html.erb` look like the following:
 <%= link_to 'Back', articles_path %>
 ```
 
-The second render just defines the partial template we want to render,
-`comments/form`. Rails is smart enough to spot the forward slash in that
-string and realize that you want to render the `_form.html.erb` file in
-the `app/views/comments` directory.
+두 번째 render 메소드는 파셜 템플릿 `comments/form`을 정의한다. 레일스는 이 문자열에서 슬래시를 인식할 수 있기 때문에 `_form.html.erb` 파일을 `app/views/comments` 디렉토리에 렌더링하게 된다.
 
-The `@article` object is available to any partials rendered in the view because
-we defined it as an instance variable.
+`@article` 객체는 인스턴스 변수로 정의 되었기 때문에 뷰에서 렌더링되는 모든 파셜에서 사용할 수 있다.
 
-Deleting Comments
+댓글 삭제하기
 -----------------
 
-Another important feature of a blog is being able to delete spam comments. To do
-this, we need to implement a link of some sort in the view and a `destroy`
-action in the `CommentsController`.
+블로그의 또 다른 중요한 기능은 스팸 댓글을 삭제할 수 있어야 한다. 이를 위해서 뷰에서 댓글 삭제를 위한 링크와 `CommentsController`에서 `destroy` 액션을 구현해야 한다.
 
-So first, let's add the delete link in the
-`app/views/comments/_comment.html.erb` partial:
+먼저 `app/views/comments/_comment.html.erb` 파셜에 삭제 링크를 추가한다.
 
 ```html+erb
 <p>
@@ -1511,10 +1496,7 @@ So first, let's add the delete link in the
 </p>
 ```
 
-Clicking this new "Destroy Comment" link will fire off a `DELETE
-/articles/:article_id/comments/:id` to our `CommentsController`, which can then
-use this to find the comment we want to delete, so let's add a `destroy` action
-to our controller (`app/controllers/comments_controller.rb`):
+새로이 추가한 "Destroy Comment" 링크를 클릭하면 `CommentsController`로 `DELETE /articles/:article_id/comments/:id`를 라우팅하게 되며, 이로써 삭제하려는 댓글을 찾을 수 있게 된다. 이어서 컨트롤러(`app/controllers/comments_controller.rb`)에 `destroy` 액션을 추가한다.
 
 ```ruby
 class CommentsController < ApplicationController
@@ -1538,17 +1520,11 @@ class CommentsController < ApplicationController
 end
 ```
 
-The `destroy` action will find the article we are looking at, locate the comment
-within the `@article.comments` collection, and then remove it from the
-database and send us back to the show action for the article.
+`destroy` 액션는 우선 기사를 먼저 찾은 후 `@article.comments` 컬렉션에서 대상 댓글을 찾아 데이터베이스에서 제거하고 기사의 show 액션으로 돌려 보낸다.
 
+### 관련 객체 삭제하기
 
-### Deleting Associated Objects
-
-If you delete an article, its associated comments will also need to be
-deleted, otherwise they would simply occupy space in the database. Rails allows
-you to use the `dependent` option of an association to achieve this. Modify the
-Article model, `app/models/article.rb`, as follows:
+기사를 삭제하면 관련 댓글도 삭제해야 한다. 그렇지 않으면 사용하지 않는 댓글이 데이터베이스의 공간을 차지하게 된다. 레일스를 사용하면 관계 설정시 `dependent` 옵션을 사용하여 이런 문제를 해결할 수 있다. 아래와 같이 Article 모델 `app/models/article.rb`를 수정한다.
 
 ```ruby
 class Article < ApplicationRecord
@@ -1558,26 +1534,18 @@ class Article < ApplicationRecord
 end
 ```
 
-Security
+보안
 --------
 
-### Basic Authentication
+### 기본 인증
 
-If you were to publish your blog online, anyone would be able to add, edit and
-delete articles or delete comments.
+블로그를 온라인으로 게시할 경우, 누구나 기사를 추가, 수정, 삭제할 수 있으며 댓글을 삭제할 수 있다.
 
-Rails provides a very simple HTTP authentication system that will work nicely in
-this situation.
+레일스는 이런 상황에서 잘 작동하는 매우 간단한 HTTP 인증 시스템을 제공한다.
 
-In the `ArticlesController` we need to have a way to block access to the
-various actions if the person is not authenticated. Here we can use the Rails
-`http_basic_authenticate_with` method, which allows access to the requested
-action if that method allows it.
+`ArticlesController`에서는 인증되지 않은 사용자의 경우 액션에 대한 접근 권한을 차단하는 방법이 필요하다. 여기서 레일스 `http_basic_authenticate_with` 메소드를 사용할 수 있는데, 이 메소드가 허용하는 경우 요청된 액션에 대해 접근할 수 있게 한다.
 
-To use the authentication system, we specify it at the top of our
-`ArticlesController` in `app/controllers/articles_controller.rb`. In our case,
-we want the user to be authenticated on every action except `index` and `show`,
-so we write that:
+인증 시스템을 사용하기 위해 `app/controllers/articles_controller.rb` 파일에 있는 `ArticlesController` 상단에 이것을 명시한다. 여기서는 `index`와 `show`를 제외한 모든 액션에 대해 사용자가 인증되기를 원한다.
 
 ```ruby
 class ArticlesController < ApplicationController
@@ -1591,8 +1559,7 @@ class ArticlesController < ApplicationController
   # snippet for brevity
 ```
 
-We also want to allow only authenticated users to delete comments, so in the
-`CommentsController` (`app/controllers/comments_controller.rb`) we write:
+또한 인증된 사용자만이 댓글을 삭제할 수 있도록 하기 위해 `CommentsController` (`app/controllers/comments_controller.rb`)에서 아래와 같이 작성한다.
 
 ```ruby
 class CommentsController < ApplicationController
@@ -1607,69 +1574,38 @@ class CommentsController < ApplicationController
   # snippet for brevity
 ```
 
-Now if you try to create a new article, you will be greeted with a basic HTTP
-Authentication challenge:
+이제 새 기사를 작성하려고 하면 기본 HTTP 인증창이 표시된다.
 
 ![Basic HTTP Authentication Challenge](images/getting_started/challenge.png)
 
-Other authentication methods are available for Rails applications. Two popular
-authentication add-ons for Rails are the
-[Devise](https://github.com/plataformatec/devise) rails engine and
-the [Authlogic](https://github.com/binarylogic/authlogic) gem,
-along with a number of others.
+레일스 애플리케이션에 다른 인증 방법을 사용할 수 있다. 레일스에 널리 사용되는 두 가지 인증 애드온은 [Devise](https://github.com/plataformatec/devise) 레일스 엔진과 [Authlogic](https://github.com/binarylogic/authlogic) 젬이 있으며 기타 다른 젬들도 다수 존재한다.
 
 
-### Other Security Considerations
+### 다른 보안 고려사항
 
-Security, especially in web applications, is a broad and detailed area. Security
-in your Rails application is covered in more depth in
-the [Ruby on Rails Security Guide](security.html).
+특히 웹 애플리케이션의 보안은 광범위하고 세밀한 분야이다. 레일스 애플리케이션의 보안은 [Ruby on Rails Security Guide](security.html)에 자세히 설명되어 있다.
 
-
-What's Next?
+향후 계획
 ------------
 
-Now that you've seen your first Rails application, you should feel free to
-update it and experiment on your own.
+이제 처음으로 레일스 애플리케이션을 경험해 보았으므로 자유롭게 수정해 보고  마음 껏 테스트해 보기 바란다.
 
-Remember, you don't have to do everything without help. As you need assistance
-getting up and running with Rails, feel free to consult these support
-resources:
+도움없이 모든 것을 할 필요는 없다는 것을 기억하기 바란다. 레일스를 작동시키는데 도움이 필요할 경우 아래의 지원 리소스를 참조하면 된다.
 
-* The [Ruby on Rails Guides](index.html)
-* The [Ruby on Rails Tutorial](https://www.railstutorial.org/book)
-* The [Ruby on Rails mailing list](https://groups.google.com/group/rubyonrails-talk)
-* The [#rubyonrails](irc://irc.freenode.net/#rubyonrails) channel on irc.freenode.net
+* [Ruby on Rails Guides](index.html)
+* [Ruby on Rails Tutorial](https://www.railstutorial.org/book)
+* [Ruby on Rails mailing list](https://groups.google.com/group/rubyonrails-talk)
+* irc.freenode.net : [#rubyonrails](irc://irc.freenode.net/#rubyonrails) 채널
 
 
-Configuration Gotchas
+설정시 유의사항
 ---------------------
 
-The easiest way to work with Rails is to store all external data as UTF-8. If
-you don't, Ruby libraries and Rails will often be able to convert your native
-data into UTF-8, but this doesn't always work reliably, so you're better off
-ensuring that all external data is UTF-8.
+레일스를 사용하는 가장 쉬운 방법은 모든 외부 데이터를 UTF-8로 저장하는 것이다. 그렇지 못할 경우, 루비 라이브러리와 레일스가 종종 원본 데이터를 UTF-8로 변환 할 수 있지만 항상 안정적으로 작동하는 것이 아니므로 모든 외부 데이터가 UTF-8인지 확인하는 것이 좋다.
 
-If you have made a mistake in this area, the most common symptom is a black
-diamond with a question mark inside appearing in the browser. Another common
-symptom is characters like "Ã¼" appearing instead of "ü". Rails takes a number
-of internal steps to mitigate common causes of these problems that can be
-automatically detected and corrected. However, if you have external data that is
-not stored as UTF-8, it can occasionally result in these kinds of issues that
-cannot be automatically detected by Rails and corrected.
+이 부분에서 실수를 할 때 발생하는 가장 일반적인 증상은 브라우저에 가운데 물음표가 있는 검은 색 다이아몬드가 표시된다는 것이다. 또 다른 일반적인 증상은 "ü" 문자가 "Ã"와 같은 문자로 보이는 것이다. 레일스는 이러한 문제의 일반적인 원인을 완화하기 위해 자동으로 감지하고 수정할 수 있는  여러 가지 내부 단계를 수행한다. 그러나 UTF-8로 저장되지 않은 외부 데이터가 있는 경우 레일스에서 자동으로 감지하여 수정할 수 없는 이러 종류의 문제가 발생할 수 있다.
 
-Two very common sources of data that are not UTF-8:
+UTF-8이 아닌 두 가지 매우 일반적인 데이터 소스:
 
-* Your text editor: Most text editors (such as TextMate), default to saving
-  files as UTF-8. If your text editor does not, this can result in special
-  characters that you enter in your templates (such as é) to appear as a diamond
-  with a question mark inside in the browser. This also applies to your i18n
-  translation files. Most editors that do not already default to UTF-8 (such as
-  some versions of Dreamweaver) offer a way to change the default to UTF-8. Do
-  so.
-* Your database: Rails defaults to converting data from your database into UTF-8
-  at the boundary. However, if your database is not using UTF-8 internally, it
-  may not be able to store all characters that your users enter. For instance,
-  if your database is using Latin-1 internally, and your user enters a Russian,
-  Hebrew, or Japanese character, the data will be lost forever once it enters
-  the database. If possible, use UTF-8 as the internal storage of your database.
+* 사용 중인 텍스트 에디터: (TextMate와 같은) 대부분의 텍스트 에디터들은 기본적으로 UTF-8 인코딩 방식으로 파일을 저장한다. 그렇지 못할 경우, (é와 같은) 특수한 문자를 템플릿 파일에 입력할 경우 브라우저 상에서 가운데 물음표가 있는 다이어몬드 문자로 표시될 수 있다. 또한 이러한 무제는 i18n 변환 파일에도 적용된다. Dreamweaver의 일부 버전에서와 같이 UTF-8을 기본 인코딩 방식으로 지정하지 않는 대부분의 에디터들은 기본 인코딩을 UTF-8로 변경할 수 있는 방법을 제공한다. 이와 같이 설정을 변경해 두도록 한다.
+* 사용 중인 데이터베이스: 레일스는 기본적으로 데이터베이스로부터 가져 오는 데이터를 UTF-8 인코딩 방식으로 변환한다. 그러나 사용 중인 데이터베이스가 내부적으로 UTF-8을 사용하지 않을 경우, 사용자가 입력하는 모든 문자들을 저장하지 못할 수 있다. 예를 들어, 사용 중인 데이터베이스가 내부적으로 Latin-1 인코딩을 사용하고 있는 상태에서 사용자들이 러시아어, 히브리어, 일본어를 입력할 경우 데이터는 일단 데이터베이스로 들어 간후 영구히 소실될 것이다. 가능한한 데이터베이스의 내부 저장 방식을 UTF-8로 지정하도록 한다.
