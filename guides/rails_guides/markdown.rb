@@ -116,7 +116,7 @@ module RailsGuides
             end
 
             doc.css("h3, h4, h5, h6").each do |node|
-              node.inner_html = "<a class='anchorlink' href='##{node[:id]}'>#{node.inner_html}</a>"
+              node.inner_html = "<a class='anchorlink' href='##{node[:id].encode('UTF-8')}'>#{node.inner_html}</a>"
             end
           end.to_html
         end

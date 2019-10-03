@@ -125,7 +125,7 @@ Generating 4_2_release_notes.md as 4_2_release_notes.html
 
 ## 빌드 상태
 
-[![Build Status](https://travis-ci.org/rorlakr/rails-guides.svg?branch=guides-ko)](https://travis-ci.org/rorlakr/rails-guides)
+[![Build Status](https://travis-ci.org/rorlakr/rails-guides.svg?branch=6.0-ko)](https://travis-ci.org/rorlakr/rails-guides)
 
 ## License
 
