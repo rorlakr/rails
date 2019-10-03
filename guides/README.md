@@ -129,4 +129,4 @@ Generating 4_2_release_notes.md as 4_2_release_notes.html
 
 ## License
 
-레일스 가이드는 [Creative Commons Attribution-ShareAlike 4.0 International](update license as same as origin repository) License로 배포되고 있습니다.
+레일스 가이드는 [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/) License로 배포되고 있습니다.
