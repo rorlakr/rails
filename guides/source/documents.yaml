@@ -1,8 +1,8 @@
-- name: 시작하면서
+- name: Start Here
   documents:
-    - name: 레일스로 시작하기
+    - name: Getting Started with Rails
       url: getting_started.html
-      description: 레일스를 설치하고 첫 번째 애플리케이션을 만들기 위해 알아야 할 모든 것.
+      description: Everything you need to know to install Rails and create your first application.
 - name: Models
   documents:
     - name: Active Record Basics
