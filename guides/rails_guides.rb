@@ -20,11 +20,12 @@ version = env_value["RAILS_VERSION"]
 edge    = `git rev-parse HEAD`.strip unless version
 
 RailsGuides::Generator.new(
-  edge:      edge,
-  version:   version,
-  all:       env_flag["ALL"],
-  only:      env_value["ONLY"],
-  kindle:    env_flag["KINDLE"],
-  language:  env_value["GUIDES_LANGUAGE"],
-  direction: env_value["DIRECTION"]
+  edge: edge,
+  version: version,
+  all: env_flag["ALL"],
+  only: env_value["ONLY"],
+  kindle: env_flag["KINDLE"],
+  language: env_value["GUIDES_LANGUAGE"],
+  direction: env_value["DIRECTION"],
+  target_dir: env_value["TARGET_DIR"]
 ).generate

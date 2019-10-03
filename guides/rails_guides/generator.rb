@@ -17,7 +17,7 @@ module RailsGuides
   class Generator
     GUIDES_RE = /\.(?:erb|md)\z/
 
-    def initialize(edge:, version:, all:, only:, kindle:, language:, direction: "ltr")
+    def initialize(edge:, version:, all:, only:, kindle:, language:, direction: "ltr", target_dir:)
       @edge      = edge
       @version   = version
       @all       = all
@@ -25,6 +25,7 @@ module RailsGuides
       @kindle    = kindle
       @language  = language
       @direction = direction
+      @target_dir = target_dir
 
       if @kindle
         check_for_kindlegen
@@ -77,6 +78,7 @@ module RailsGuides
         @output_dir  = "#{@guides_dir}/output"
         @output_dir += "/kindle"       if @kindle
         @output_dir += "/#{@language}" if @language
+        @output_dir += "/#{@target_dir}" if @target_dir
       end
 
       def create_output_dir_if_needed
