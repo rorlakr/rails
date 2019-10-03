@@ -49,12 +49,12 @@ $ cd sources/ko
 
 ```bash
 $ cd rails-guides/guides
-$ bundle exec rake guides:generate:html:ko [ALL=1]
+$ bundle exec rake guides:generate GUIDES_LANGUAGE=ko [ALL=1]
 $ cd rails-guides/guides/output/ko
 $ open xxxx.html
 ```
 
-> **노트** : `ALL=1` 옵션을 붙이지 않으면 변경된 파일만 생성
+> **노트** : `ALL=1` 옵션을 붙이지 않으면 변경된 파일만 생성된다. 또한 특정 디렉토리(output/ko/v6.0)로 빌드 대상을 지정하고자 할 경우는 `TARGET_DIR=v6.0`와 같이 옵션을 추가한다.
 
 4. 작업이 완료되면 적절한 메시지와 함께 커밋한다.
 
@@ -96,7 +96,7 @@ $ guard init shell
 
 ```ruby
  guard :shell do
-    watch(/(.*).md/) { system("rake guides:generate:html:ko")}
+    watch(/(.*).md/) { system("rake guides:generate GUIDES_LANGUAGE=ko")}
 end
 ```
 
@@ -119,7 +119,7 @@ Generating 4_2_release_notes.md as 4_2_release_notes.html
 
 ## 기여하기
 
-누구라도 번역에 참가 할 수 있습니다. guides/source/ko 하위의 파일들을 번역후 `guides-ko` 브랜치에 풀리퀘스트 하면됩니다.
+누구라도 번역에 참가 할 수 있습니다. guides/source/ko 하위의 파일들을 번역후 저장소의 디폴트 브랜치(현재 `v6.0`)에 풀리퀘스트 하면 됩니다.
 
 ## 빌드 상태
 
