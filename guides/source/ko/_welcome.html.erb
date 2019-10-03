@@ -2,20 +2,22 @@
 
 <% if @edge %>
 <p>
+  본 가이드는 <a href="https://github.com/rails/rails/tree/<%= @edge %>">master@<%= @edge[0, 7] %></a>에 근거해서 빌드된 <b>최신 버전</b>이다.
   These are <b>Edge Guides</b>, based on <a href="https://github.com/rails/rails/tree/<%= @edge %>">master@<%= @edge[0, 7] %></a>.
 </p>
 <p>
   If you are looking for the ones for the stable version, please check
   <a href="https://guides.rubyonrails.org">https://guides.rubyonrails.org</a> instead.
+  대신에 안정화 버전을 원할 경우 <a href="https://guides.rubyonrails.org">https://guides.rubyonrails.org</a>을 확인하기 바란다.
 </p>
 <% else %>
 <p>
-  These are the new guides for Rails 6.0 based on <a href="https://github.com/rails/rails/tree/<%= @version %>"><%= @version %></a>.
-  These guides are designed to make you immediately productive with Rails, and to help you understand how all of the pieces fit together.
+  본 가이드는 <a href="https://github.com/rails/rails/tree/<%= @version %>"><%= @version %></a>에 근거해서 빌드된 레일스 6.0 버전용이다.
+  본 가이드는 레일스를 사용하여 즉시 생산성을 높이고 모든 부분이 어떻게 결합되는지 이해하는 데 도움이 되도록 작성되었다.
 </p>
 <% end %>
 <p>
-The guides for earlier releases:
+이전 버전의 가이드 목록:
 <a href="https://guides.rubyonrails.org/v5.2/">Rails 5.2</a>,
 <a href="https://guides.rubyonrails.org/v5.1/">Rails 5.1</a>,
 <a href="https://guides.rubyonrails.org/v5.0/">Rails 5.0</a>,
