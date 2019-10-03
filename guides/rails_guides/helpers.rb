@@ -9,7 +9,7 @@ module RailsGuides
       result = content_tag(:dt, link)
 
       if options[:work_in_progress]
-        result << content_tag(:dd, "Work in progress", class: "work-in-progress")
+        result << content_tag(:dd, "진행 중인 작업", class: "work-in-progress")
       end
 
       result << content_tag(:dd, capture(&block))
