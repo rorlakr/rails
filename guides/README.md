@@ -49,7 +49,7 @@ $ cd sources/ko
 
 ```bash
 $ cd rails-guides/guides
-$ bundle exec rake guides:generate GUIDES_LANGUAGE=ko [ALL=1]
+$ bundle exec rake guides:generate RAILS_VERSION=6-0-stable GUIDES_LANGUAGE=ko [ALL=1]
 $ cd rails-guides/guides/output/ko
 $ open xxxx.html
 ```
@@ -98,7 +98,7 @@ $ guard init shell
 
 ```ruby
  guard :shell do
-    watch(/(.*).md/) { system("rake guides:generate GUIDES_LANGUAGE=ko")}
+    watch(/(.*).md/) { system("rake guides:generate RAILS_VERSION=6-0-stable GUIDES_LANGUAGE=ko")}
 end
 ```
 
