@@ -1132,7 +1132,7 @@ TIP: [Working With JavaScript in Rails](working_with_javascript_in_rails.html) �
 
 TIP: 일반적으로 레일스는 라우트를 수동으로 선언하는 대신 리소스 객체를 사용하도록 권장한다. 라우팅에 대한 자세한 내용은 [Rails Routing from the Outside In](routing.html)을 참조하기 바란다.
 
-두번째 모델 추가하기
+두번째 모델 추가하기 {#adding-a-second-model}
 ---------------------
 
 이제 애플리케이션에 두 번째 모델을 추가할 때가 되었다. 두 번째 모델은 기사에 대한 댓글을 처리할 것이다.

@@ -45,6 +45,27 @@ $ cd sources/ko
 ```
 
 2. 본인이 번역하기를 원하는 파일이나 수정이 필요한 파일을 찾아 에디터로 열고 작업을 한다.
+
+   > 한글 인코딩 문제로 글제목에 대한 anchoring 기능이 제대로 동작하기 않기 때문에 마크다운의 **"사용자 ID"** 기능을 사용하여야 하며 방법은 이 곳을 참고한다. https://www.markdownguide.org/extended-syntax/#heading-ids
+
+   특히, 글 제목 번역시에는
+
+   ```
+   ### Starting up the web server
+   ```
+
+   아래와 같이 원본 영문을 사용자 ID로 사용한다.(단어 사이의 공백문자는 "-" 문자로 대체하고 소문자로 변경함)
+
+   ```
+   ### 웹서버 시작하기 {#starting-up-the-web-server}
+   ```
+
+   이제 가이드 빌드후 아래와 같은 HTML로 변환될 것이다.
+
+   ```
+   <h3 id="starting-up-the-web-server">웹서버 시작하기</h3>
+   ```
+
 3. 번역 작업 중간 중간에 html 파일로 확인하여 작성한 번역이 제대로 포맷되었는지 확인한다. 이 과정은 반드시 필요하다. 아래와 같이 명령을 실행하면 `rails-guides/guides/output/ko` 디렉토리로 `html` 파일이 생성/업데이트 되는데, 본인이 작업한 파일명의 `.html` 확장자를 가진 파일을 브라우져로 열어 본다.
 
 ```bash
