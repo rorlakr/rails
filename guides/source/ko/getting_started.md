@@ -1,6 +1,6 @@
 **GITHUB 온라인에서 이 파일을 읽으면 제대로 보이지 않을 수 있다. 공식 가이드는 https://guides.rubyonrails.org 상에 게시되어 있다.**
 
-레일스로 시작하기
+레일스로 시작하기 {#getting-started-with-rails}
 ==========================
 
 본 가이드 내용에서는 루비온레일스(이하 레일스)를 준비하고 실행하는 것에 대해서 다룬다.
@@ -14,7 +14,7 @@
 
 --------------------------------------------------------------------------------
 
-가이드에 대한 전제조건
+가이드에 대한 전제조건 {#guide-assumptions}
 -----------------
 
 본 가이드 내용은 레일스 애플리케이션을 만들어 본 경험이 없는 초보자를 대상으로 작성되었다. 반드시 레일스에 대한 경험을 필요로 하지 않는다.
@@ -27,7 +27,7 @@
 
 주의할 것은 위에서 소개한 서적 중에는, 그 내용이 아주 훌륭한 것이지만, 오래된 버전인 루비 1.6과 주로 1.8 버전에 대한 것들이 있어서 레일스로 개발할 때 주로 접하게 되는 루비 문법들이 포함되지 않을 수 있다는 것이다.
 
-레일스란 무엇인가
+레일스란 무엇인가 {#what-is-rails}
 --------------
 
 레일스란 루비 언어로 작성된 웹애플리케이션 개발 프레임워크이다.
@@ -42,7 +42,7 @@
 * **Don't Repeat Yourself(같은 내용의 정보를 반복하지 말 것):** DRY란 하나의 소프트웨어 개발 원칙으로 "모든 지식은 하나의 시스템 내에서 유일해야 하고 모호성이 없어야 하며 권위를 가져야 한다"는 내용을 의미한다. 같은 내용의 정보를 반복해서 작성하지 않으므로써 코드를 더 잘 유지할 수 있고 더 많은 확장성을 부여할 수 있으며 버그를 줄일 수 있게 되는 것이다.
 * **Convention Over Configuration(설정보다는 관례를 우선시 함):** 레일스는 웹애플리케이션에서 발생할 수 있는 다양한 작업들에 대한 최선의 방법을 알고 있기 때문에, 한없이 이어지는 설정파일들을 사용해서 상세한 설정 내용을 명시하는 대신에 이런 것들에 대한 일련의 사전 정의된 설정을 기본 규칙으로 지정해 준다.
 
-레일스 프로젝트 생성하기
+레일스 프로젝트 생성하기 {#creating-a-new-rails-project}
 ----------------------------
 본 가이드를 읽어가는 최선의 방식은 단계별로 따라서 해 보는 것이다. 모든 단계는 예제 애플리케이션을 실행하는데 필수이며 어떠한 코드나 단계도 추가적으로 필요하지 않다.  
 
@@ -50,7 +50,7 @@
 
 TIP: 아래의 예제에서 사용하는 `$` 문자는 유닉스계열의 운영체제에서 터미널 프롬프트로 사용하는 것인데 설정에 따라 다르게 보일 수 있다. 윈도우를 사용할 경우에는 `C:\sourc_code`와 같이 보일 것이다.
 
-### 레일스 설치하기
+### 레일스 설치하기 {#installing-rails}
 
 레일스를 설치하기 전에 각자의 시스템에 레일스 프레이워크에서 사용하는 연관 언어나 프로그램이 설치되어 있는지 확인해야 하는데, 여기에는 루비와 SQLite3 등이 포함된다.
 
@@ -92,7 +92,7 @@ $ rails --version
 
 "Rails 6.0.0"과 같이 표시된다면 이제 시작할 준비가 된 것이다. 
 
-### Blog 애플리케이션 생성하기
+### Blog 애플리케이션 생성하기 {#creating–the–blog-application}
 
 레일스에서 기본으로 제공해 주는 많은 생성자 스크립트를 이용하면 특정 작업에 필요한 모든 것을 자동으로 생성해 주기 때문에 개발을 보다 쉽게 할 수 있다. 이 중에 하나는 애플리케이션을 만들어 주는 생성자 스크립트인데 레일스 애플리케이션의 기본 골격구조를 제공해 주기 때문에 직접 코드를 작성할 필요가 없다.
 
@@ -142,7 +142,7 @@ Hello, Rails!
 
 먼저, 스크린 상에 어떤 문자들이 보이도록 해 보자. 이를 위해서 레일스 애플리케이션 서버를 실행시켜야 한다.
 
-### 웹서버 시작하기
+### 웹서버 시작하기 {#starting-up-the-web-server}
 
 레일스 애플리케이션은 사실 이미 정상적으로 동작이 가능한 상태이다. 이를 확인하려면 각자의 개발 머신에서 웹서버를 시작할 필요가 있다. `blog` 디렉토리에서 아래의 명령을 실행하여 서버를 시작할 수 있다.
 
@@ -162,7 +162,7 @@ TIP: 웹서버를 중단하기 위해서는 서버가 실행 중인 터미널 �
 
 "Welcome aboard" 페이지는 레일스 애플리케이션이 제대로 생성되었는지를 알 수 있는 일종의 _smoke test_ 의 의미를 가진다. 즉, 소프트웨어가 제대로 설정되어 페이지를 서비스할 수 있음을 확인하는 것이다.
 
-### "Hello, Rails" 표시하기
+### "Hello, Rails" 표시하기 {#say-hello-rails}
 
 "Hello" 문자를 표시하기 위해서는 최소한 하나의 _controller(컨트롤러)_ 와 하나의 _view(뷰)_ 를 생성해야 한다.
 
@@ -203,7 +203,7 @@ create      app/assets/stylesheets/welcome.scss
 <h1>Hello, Rails!</h1>
 ```
 
-### 애플리케이션 홈 페이지 설정하기
+### 애플리케이션 홈 페이지 설정하기 {#setting-the-application-home-page}
 
 컨트롤러와 뷰를 작성했기 때문에 이제 레일스에게 "Hello, Rails!"라는 글을 보여줄 시점을 알려 주어야 한다. 여기서는 루트 URL <http://localhost:3000>로 이동할 때 보여 주고자 한다. 이 순간 바로 "Welcom aboard" 라는 글을 보게 될 것이다.
 
@@ -235,7 +235,7 @@ end
 
 TIP: 라우팅에 대한 더 자세한 내용은 [Rails Routing from the Outside In](routing.html)를 참고하기 바란다.
 
-작동하기
+작동하기 {#getting-up-and-running}
 ----------------------
 
 컨트롤러, 액션, 뷰 작성법을 알게 되었으니 이제 좀 더 실질적인 것을 만들어 보도록 하자.
@@ -277,7 +277,7 @@ welcome_index GET    /welcome/index(.:format)     welcome#index
 
 현재 상태는 기본 형태로 보이지만 작동하는데 문제가 없다. 이후에 스타일을 좋게 만드는 작업을 보게 될 것이다.
 
-### 기본틀 잡기
+### 기본틀 잡기 {#laying-down-the-groundwork}
 
 먼저, 새로운 기사를 작성할 장소가 필요하다. 이를 위한 적당한 위치는 `/articles/new`가 될 것이다. 이미 정의된 바 있는 라우트를 따라 외부로부터의 요청은 `/articles/new`로 이어질 것이다. <http://localhost:3000/articles/new>로 이동하면 라우팅 에러가 발생할 것이다. 
 
@@ -347,7 +347,7 @@ end
 
 <http://localhost:3000/articles/new>를 새로 보기하면 하나의 타이틀을 포함하는 페이지를 보게 될 것이다. 라우트, 컨트롤러, 액션, 뷰가 조화롭게 잘 동작하고 있는 것이다. 새로운 기사를 작성할 폼을 생성할 시점이 되었다.
 
-### 첫번째 폼
+### 첫번째 폼 {#the-first-form}
 
 이 템플릿 파일에 폼을 생성하기 위해 *폼 빌더* 를 사용할 것이다. 레일스에서 사용하는 기본 폼 빌더는 `form_with` 헬퍼메소드가 제공해 준다. 이 메소드를 사용하기 위해서는 아래의 코드를 `app/views/articles/new.html.erb` 파일에 추가해 준다.
 
@@ -411,7 +411,7 @@ welcome_index GET    /welcome/index(.:format)     welcome#index
 
 NOTE: 보통은 `form_with` 헬퍼는 Ajax로 폼을 서밋하게 되므로 전체 페이지 리디렉션이 발생하지 않는다. 현재는 이 가이드를 보다 쉽게 이해할 수 있도록 `local: true`로 옵션을 지정하여 이 기능을 사용하지 않도록 했다.
 
-### 기사 작성하기
+### 기사 작성하기 {#creating-articles}
 
 "Unknow action" 에러 메시지가 사라지게 하려면, 아래와 같이 `app/controllers/articles_controller.rb` 파일 내의 `ArticlesController` 클래스에서, `new` 액션 바로 아래에, `create` 액션을 정의한다.
 
@@ -447,7 +447,7 @@ TIP: `params` 메소드를 꽤나 일상적으로 사용할 것이기 때문에 
 
 이 액션은 폼으로부터 넘어 오는 해당 기사에 대한 매개변수를 보여 준다. 그러나 이것은 실제로 그렇게 유용하지 못하다. 그렇다. 매개변수들을 볼 수 있지만 그것들을 이용하여 특별히 작업한 것이 전혀 없다.
 
-### Article 모델 생성하기
+### Article 모델 생성하기 {#creating-the-article-model}
 
 레일스에서는 모델 이름을 단수형으로 사용하고 해당 데이터베이스 테이블명으로는 복수형을 사용한다. 레일스는 모델을 생성하는 생성자 스크립트를 제공하는데 대부분의 레일스 개발자들은 새로운 모델을 작성할 때 이것을 사용하려고 한다. 새로운 모델을 작성할 때는 터미널에서 아래의 명령을 실행한다.
 
@@ -460,7 +460,7 @@ $ rails generate model Article title:string text:text
 
 TIP: 액티브 레코드는 매우 스마트해서 자동으로 컬럼명을 모델 속성으로 매핑해 주는데, 이것은 액티브 레코드가 자동으로 해 주기 때문에 레일스 모델 내에서 속성들을 따로 선언해 줄 필요가 없다는 것을 뜻한다.
 
-### 마이그레이션 작업 수행하기
+### 마이그레이션 작업 수행하기 {#running-a-migration}
 
 방금 보았듯이 `rails generate model` 명령으로 `db/migrate` 디렉토리 내에 _데이터베이스 마이그레이션_ 파일이 생성되었다. 마이그레이션을 데이터베이스 테이블을 생성하고 변경하는 작업을 쉽게 해 주기 위해 작성된 루비 클래스이다. 레일스는 rake 명령을 사용하여 마이그레이션 작업을 수행하며 데이터베이스에 적용이 완료된 후에도 마이그레이션을 취소할 수도 있다. 마이그레이션 파일명은 타임스탬프를 포함하는데 생성된 순서대로 마이그레이션으로 처리하기 위한 것이다.
 
@@ -501,7 +501,7 @@ $ rails db:migrate
 
 NOTE. 보통 개발 환경에서 작업을 할 것이기 때문에 `config/database.yml` 파일의 `development` 섹션에 정의된 데이터베이스에 마이그레이션 작업이 적용될 것이다. 다른 환경에서 마이그레이션을 실행하고자 할 경우, 예를 들어 운영 환경에서, `rails db:migrate RAILS_ENV=production`와 같이 명령을 호출할 때 명시적으로 지정해 주어야 한다.
 
-### 컨트롤러에서 데이터 저장하기
+### 컨트롤러에서 데이터 저장하기 {#saving-data-in-the-controller}
 
 새로 생성한 `Article` 모델을 이용하여 데이터베이스로 데이터를 저장하기 위해서는 `ArticlesController`로 돌아가서 `create` 액션을 변경할 필요가 있다. `app/controllers/articles_controller.rb` 파일을 열고 아래와 같이 `create` 액션을 변경한다.
 
@@ -553,7 +553,7 @@ private
 
 TIP: 자세한 내용은 위의 레퍼런스 및 [Strong Paramters에 대한 이 블로그의 관련 기사](ttps://weblog.rubyonrails.org/2012/3/21/strong-parameters/)를 참고한다.
 
-### 기사 보여주기
+### 기사 보여주기 {#showing-articles}
 
 지금 폼을 다시 서밋하면 레일스는 `show` 액션를 찾지 못한다고 불평할 것이다. 그다지 유용하지는 않더라도 계속하기 전에 `show` 액션을 추가하도록 한다.
 
@@ -604,7 +604,7 @@ class ArticlesController < ApplicationController
 
 ![Show action for articles](images/getting_started/show_action_for_articles.png)
 
-### 모든 기사 목록 보기
+### 모든 기사 목록 보기 {#listing-all-articles}
 
 모든 기사를 나열할 방법도 필요하므로 함께 진행하도록 하자.
 `rails routes`의 결과에 따른 라우트는 아래와 같다.
@@ -655,7 +655,7 @@ class ArticlesController < ApplicationController
 
 이제 <http://localhost:3000/articles>로 이동하면 지금까지 작성한 모든 기사 목록이 표시될 것이다.
 
-### 링크 추가하기
+### 링크 추가하기 {#adding-links}
 
 이제 기사를 작성하고 보여주고 목록을 나열할 수 있게 되었다. 다음으로 페이지간의 이동을 위한 몇가지 링크를 추가해 보도록 하자.
 
@@ -706,7 +706,7 @@ TIP: 레일스는 기본적으로 현재 컨트롤러를 사용하기 때문에 
 
 TIP: 개발 모드(기본적으로 작업중인 모드)에서 레일스는 모든 브라우저 요청에 따라 애플리케이션을 다시 로드하므로 소스 코드의 변경시 웹 서버를 중지했다가 다시 시작할 필요가 없다.
 
-### 몇가지 유효성 검사 추가하기
+### 몇가지 유효성 검사 추가하기 {#adding-some-validation}
 
 `app/models/article.rb` 모델 파일은 아래와 같이 간단하다.
 
@@ -807,7 +807,7 @@ TIP: 레일스는 `field_with_errors` 클래스가 지정되어 있는 div 태�
 
 ![Form With Errors](images/getting_started/form_with_errors.png)
 
-### 기사 업데이트하기
+### 기사 업데이트하기 {#updating-articles}
 
 지금까지 CRUD의 "CR"부분을 다뤘다. 이제 기사를 업데이트하면서 "U"부분에 초점을 맞추어 보자.
 
@@ -948,7 +948,7 @@ TIP: 모든 속성을 `update`에 전달할 필요는 없다. 예를 들어, `@a
 
 ![Index action with edit link](images/getting_started/index_action_with_edit_link.png)
 
-### 파셜을 이용하여 뷰의 중복 코드 정리하기
+### 파셜을 이용하여 뷰의 중복 코드 정리하기 {#using-partials-to-clean-up-duplication-in-views}
 
 `edit` 페이지는 `new` 페이지와 매우 유사하다. 실제로 둘 다 폼을 표시하기 위해 동일한 코드를 공유한다. 뷰 파셜을 사용하여 이러한 중복 코드를 제거할 수 있다. 일반적으로 파셜 파일의 이름은 밑줄로 시작된다.
 
@@ -1014,7 +1014,7 @@ TIP: 파셜에 대한 자세한 내용은 [Layouts and Rendering in Rails](layou
 <%= link_to 'Back', articles_path %>
 ```
 
-### 기사 삭제하기
+### 기사 삭제하기 {#deleting-articles}
 
 이제 데이터베이스에서 기사를 삭제하는 CRUD의 "D"부분에 대해선 언급할 것이다. REST 규칙에 따른 `rails routes`의 결과를 근거로 기사 삭제 라우트는 아래와 같다.
 
@@ -1137,7 +1137,7 @@ TIP: 일반적으로 레일스는 라우트를 수동으로 선언하는 대신 
 
 이제 애플리케이션에 두 번째 모델을 추가할 때가 되었다. 두 번째 모델은 기사에 대한 댓글을 처리할 것이다.
 
-### 모델 생성하기
+### 모델 생성하기 {#generating-a-model}
 
 `Article` 모델을 생성할 때 전에 사용했던 것과 같은 생성자를 사용할 것이다. 이번에는 기사에 대한 참조를 담는 `Comment` 모델을 생성할 것이다. 터미널에서 아래의 명령을 실행한다.
 
@@ -1199,7 +1199,7 @@ $ rails db:migrate
 ==  CreateComments: migrated (0.0119s) ========================================
 ```
 
-### 모델 관계 선언하기
+### 모델 관계 선언하기 {#associating-models}
 
 액티브레코드 관계를 사용하면 두 모델 간의 관계를 쉽게 선언 할 수 있다. 댓글과 기사의 경우 다음과 같이 관계를 작성할 수 있다.
 
@@ -1228,7 +1228,7 @@ end
 
 TIP: 액티브 레코드 연결에 대한 자세한 내용은 [Active Record Associations](association_basics.html) 안내서를 참조한다.
 
-### 댓글에 대한 라우트 추가하기
+### 댓글에 대한 라우트 추가하기 {#adding-a-route-for-comments}
 
 `welcome` 컨트롤러와 마찬가지로 `comments` 리소스에 대한 라우트를 추가해야 할 것이다. `config/routes.rb` 파일을 다시 열고 아래와 같이 수정한다.
 
@@ -1242,7 +1242,7 @@ end
 
 TIP: 라우팅에 대한 자세한 내용은 [Rails Routing](routing.html) 안내서를 참조한다.
 
-### 컨트롤러 생성하기
+### 컨트롤러 생성하기 {#generating-a-controller}
 
 모델이 준비된 상태에서 다음으로 연관 컨트롤러를 만드는 데 집중해야 한다. 이 때 전에 사용했던 것과 동일한 생성자를 사용할 것이다.
 
@@ -1366,12 +1366,12 @@ end
 
 ![Article with Comments](images/getting_started/article_with_comments.png)
 
-리팩토링하기
+리팩토링하기 {#refactoring}
 -----------
 
 이제 기사와 댓글이 작성되었으므로 `app/views/articles/show.html.erb` 템플릿을 살펴 보도록 한다. 코드가 길어지면서 점점 어색해지고 있다. 파셜을 사용하면 깨끗하게 정리할 수 있다.
 
-### 파셜 컬렉션 렌더링하기
+### 파셜 컬렉션 렌더링하기 {#rendering-partial-collections}
 
 먼저 해당 기사에 대한 모든 댓글을 보여 주기 위해 댓글 파셜을 작성한다. `app/views/comments/_comment.html.erb` 파일을 생성하고 아래와 같이 입력한다.
 
@@ -1424,7 +1424,7 @@ end
 
 이것은 이제 `@article.comments` 컬렉션에 있는 각 댓글마다 `app/views/comments/_comment.html.erb` 파셜을 한번씩 렌더링한다. `render` 메소드가 `@article.comments` 컬렉션을 반복 할 때, 각 댓글을 파셜과 같은 이름의 로컬 변수 (이 경우에는 `comment`)에 할당하며 이 변수는 파셜 템플릿에서 사용할 수 있다.
 
-### 파셜 폼 렌더링하기
+### 파셜 폼 렌더링하기 {#rendering-a-partial-form}
 
 새로운 댓글 섹션을 파셜 템플릿으로 옮기도록 한다. 또 다시, 아래와 같은 내용을 포함하는 `app/views/comments/_form.html.erb` 파일을 생성한다.
 
@@ -1471,7 +1471,7 @@ end
 
 `@article` 객체는 인스턴스 변수로 정의 되었기 때문에 뷰에서 렌더링되는 모든 파셜에서 사용할 수 있다.
 
-댓글 삭제하기
+댓글 삭제하기 {#deleting-comments}
 -----------------
 
 블로그의 또 다른 중요한 기능은 스팸 댓글을 삭제할 수 있어야 한다. 이를 위해서 뷰에서 댓글 삭제를 위한 링크와 `CommentsController`에서 `destroy` 액션을 구현해야 한다.
@@ -1522,7 +1522,7 @@ end
 
 `destroy` 액션는 우선 기사를 먼저 찾은 후 `@article.comments` 컬렉션에서 대상 댓글을 찾아 데이터베이스에서 제거하고 기사의 show 액션으로 돌려 보낸다.
 
-### 관련 객체 삭제하기
+### 관련 객체 삭제하기 {#deleting-associated-objects}
 
 기사를 삭제하면 관련 댓글도 삭제해야 한다. 그렇지 않으면 사용하지 않는 댓글이 데이터베이스의 공간을 차지하게 된다. 레일스를 사용하면 관계 설정시 `dependent` 옵션을 사용하여 이런 문제를 해결할 수 있다. 아래와 같이 Article 모델 `app/models/article.rb`를 수정한다.
 
@@ -1534,10 +1534,10 @@ class Article < ApplicationRecord
 end
 ```
 
-보안
+보안 {#security}
 --------
 
-### 기본 인증
+### 기본 인증 {#basic-authentication}
 
 블로그를 온라인으로 게시할 경우, 누구나 기사를 추가, 수정, 삭제할 수 있으며 댓글을 삭제할 수 있다.
 
@@ -1581,11 +1581,11 @@ class CommentsController < ApplicationController
 레일스 애플리케이션에 다른 인증 방법을 사용할 수 있다. 레일스에 널리 사용되는 두 가지 인증 애드온은 [Devise](https://github.com/plataformatec/devise) 레일스 엔진과 [Authlogic](https://github.com/binarylogic/authlogic) 젬이 있으며 기타 다른 젬들도 다수 존재한다.
 
 
-### 다른 보안 고려사항
+### 다른 보안 고려사항 {#other-security-considerations}
 
 특히 웹 애플리케이션의 보안은 광범위하고 세밀한 분야이다. 레일스 애플리케이션의 보안은 [Ruby on Rails Security Guide](security.html)에 자세히 설명되어 있다.
 
-향후 계획
+향후 계획 {#whats-next}
 ------------
 
 이제 처음으로 레일스 애플리케이션을 경험해 보았으므로 자유롭게 수정해 보고  마음 껏 테스트해 보기 바란다.
@@ -1598,7 +1598,7 @@ class CommentsController < ApplicationController
 * irc.freenode.net : [#rubyonrails](irc://irc.freenode.net/#rubyonrails) 채널
 
 
-설정시 유의사항
+설정시 유의사항 {#configuration-gotchas}
 ---------------------
 
 레일스를 사용하는 가장 쉬운 방법은 모든 외부 데이터를 UTF-8로 저장하는 것이다. 그렇지 못할 경우, 루비 라이브러리와 레일스가 종종 원본 데이터를 UTF-8로 변환 할 수 있지만 항상 안정적으로 작동하는 것이 아니므로 모든 외부 데이터가 UTF-8인지 확인하는 것이 좋다.
