@@ -5,9 +5,9 @@
       description: 레일스를 설치하고 첫 번째 애플리케이션을 만들기 위해 알아야 할 모든 것.
 - name: Models
   documents:
-    - name: Active Record Basics
+    - name: 액티브 레코드 기본
       url: active_record_basics.html
-      description: This guide will get you started with models, persistence to database, and the Active Record pattern and library.
+      description: 이 가이드에서는 모델, 데이터베이스 지속성, 액티브 레코드 패턴 및 라이브러리를 시작하도록 도와 준다.
     - name: Active Record Migrations
       url: active_record_migrations.html
       description: This guide covers how you can use Active Record migrations to alter your database in a structured and organized manner.

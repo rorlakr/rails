@@ -19,5 +19,5 @@
 #   watch(%r{file/path}) { `command(s)` }
 #
 guard :shell do
-  watch(/(.*).md/) { system("rake guides:generate GUIDES_LANGUAGE=ko") }
+  watch(/(.*).md/) { system("rake guides:generate RAILS_VERSION=6-0-stable GUIDES_LANGUAGE=ko") }
 end
