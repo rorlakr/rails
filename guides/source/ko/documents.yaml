@@ -3,14 +3,14 @@
     - name: 레일스로 시작하기
       url: getting_started.html
       description: 레일스를 설치하고 첫 번째 애플리케이션을 만들기 위해 알아야 할 모든 것.
-- name: Models
+- name: 모델
   documents:
     - name: 액티브 레코드 기본
       url: active_record_basics.html
       description: 이 가이드에서는 모델, 데이터베이스 지속성, 액티브 레코드 패턴 및 라이브러리를 시작하도록 도와 준다.
-    - name: Active Record Migrations
+    - name: 액티브 레코드 마이그레이션
       url: active_record_migrations.html
-      description: This guide covers how you can use Active Record migrations to alter your database in a structured and organized manner.
+      description: 이 가이드에서는 액티브 레코드 마이그레이션을 사용하여 체계적이고 조직적인 방식으로 데이터베이스를 변경하는 방법에 대해 설명한다.
     - name: Active Record Validations
       url: active_record_validations.html
       description: This guide covers how you can use Active Record validations.
@@ -109,7 +109,7 @@
     - name: Autoloading and Reloading Constants (Classic Mode)
       url: autoloading_and_reloading_constants_classic_mode.html
       description: This guide documents how autoloading and reloading constants work (Classic mode).
-    - name: "Caching with Rails: An Overview"
+    - name: 'Caching with Rails: An Overview'
       url: caching_with_rails.html
       description: This guide is an introduction to speeding up your Rails application with caching.
     - name: Active Support Instrumentation
