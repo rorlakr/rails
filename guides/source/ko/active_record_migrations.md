@@ -1,38 +1,23 @@
-**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+# 액티브 레코드 마이그레이션 {#active-record-migrations}
 
-Active Record Migrations
-========================
+마이그레이션은 시간이 지남에 따라 데이터베이스 스키마를 발전시킬 수있는 액티브 레코드의 특수한 기능이다. 순수 SQL로 스키마 수정을 작성하는 대신 마이그레이션을 통해 쉬운 루비 DSL을 사용하여 테이블의 변경 사항을 기술할 수 있다.
 
-Migrations are a feature of Active Record that allows you to evolve your
-database schema over time. Rather than write schema modifications in pure SQL,
-migrations allow you to use an easy Ruby DSL to describe changes to your
-tables.
+이 가이드를 읽은 후에는 아래의 내용을 알게 될 것이다.
 
-After reading this guide, you will know:
+- 마이그레이션을 생성할 때 사용하는 생성자
+- 데이터베이스를 다루기 위해서 액티브 레코드가 제공하는 메소드
+- 마이그레이션과 스키마를 다루는 레일스 명령어
+- 마이그레이션이 `schema.rb`와 연관되는 방법
 
-* The generators you can use to create them.
-* The methods Active Record provides to manipulate your database.
-* The rails commands that manipulate migrations and your schema.
-* How migrations relate to `schema.rb`.
+---
 
---------------------------------------------------------------------------------
+## 마이그레이션 개요 {#migration-overview}
 
-Migration Overview
-------------------
+마이그레이션은 일관되고 쉬운 방법으로 [시간이 지남에 따라 데이터베이스 스키마를 변경](https://en.wikipedia.org/wiki/Schema_migration)하는 편리한 방법이다. SQL을 직접 작성하지 않고 루비 DSL을 사용하므로 스키마와 변경 사항을 데이터베이스와 독립적으로 만들 수 있다.
 
-Migrations are a convenient way to
-[alter your database schema over time](https://en.wikipedia.org/wiki/Schema_migration)
-in a consistent and easy way. They use a Ruby DSL so that you don't have to
-write SQL by hand, allowing your schema and changes to be database independent.
+각 마이그레이션을 데이터베이스의 새로운 '버전'으로 생각할 수 있다. 스키마는 아무 것도 없이 시작하며 각 마이그레이션은 테이블, 컬럼 또는 항목을 추가하거나 제거하도록 스키마를 수정한다. 액티브 레코드는 이와 같은 마이그레이션 타임 라인에 따라 스키마를 업데이트하는 방법을 알고 있으며 히스토리 상의 어느 지점에 있더라도 최신 버전으로 유지한다. 액티브 레코드는 또한 데이터베이스의 최신 구조와 일치하도록 `db/schema.rb` 파일을 업데이트 할 것이다.
 
-You can think of each migration as being a new 'version' of the database. A
-schema starts off with nothing in it, and each migration modifies it to add or
-remove tables, columns, or entries. Active Record knows how to update your
-schema along this timeline, bringing it from whatever point it is in the
-history to the latest version. Active Record will also update your
-`db/schema.rb` file to match the up-to-date structure of your database.
-
-Here's an example of a migration:
+마이그레이션의 예는 아래와 같다.
 
 ```ruby
 class CreateProducts < ActiveRecord::Migration[5.0]
@@ -47,29 +32,15 @@ class CreateProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-This migration adds a table called `products` with a string column called
-`name` and a text column called `description`. A primary key column called `id`
-will also be added implicitly, as it's the default primary key for all Active
-Record models. The `timestamps` macro adds two columns, `created_at` and
-`updated_at`. These special columns are automatically managed by Active Record
-if they exist.
+이 마이그레이션은 `name`이라는 문자열 컬럼과 `description`이라는 텍스트 컬럼으로 구성된 `products`라는 테이블을 추가한다. `id`라는 기본키 컬럼도 모든 액티브 레코드 모델의 기본 기본키이므로 암시적으로 추가된다. `timestamps` 매크로는 `created_at`와m`updated_at`의 두 컬럼을 추가한다. 이러한 특수 컬럼이 존재하는 경우 액티브 레코드에 의해 자동으로 관리된다.
 
-Note that we define the change that we want to happen moving forward in time.
-Before this migration is run, there will be no table. After, the table will
-exist. Active Record knows how to reverse this migration as well: if we roll
-this migration back, it will remove the table.
+앞으로 진행되기를 바라는 변경 내용을 미리 정의한다는 것에 주목한다. 이 마이그레이션이 실행되기 전에는 테이블이 존재하지 않는다. 그 후에 테이블이 존재한다. 액티브 레코드는 이 마이그레이션을 돌이키는 방법도 알고 있다. 즉, 이 마이그레이션을 롤백하면 테이블이 제거될 것이다.
 
-On databases that support transactions with statements that change the schema,
-migrations are wrapped in a transaction. If the database does not support this
-then when a migration fails the parts of it that succeeded will not be rolled
-back. You will have to rollback the changes that were made by hand.
+스키마를 변경하는 SQL문에 트랜잭션을 지원하는 데이터베이스에서는 트랜잭션이 마이그레이션을 랩핑한다. 데이터베이스가 이를 지원하지 않으면 마이그레이션이 실패 할 때 일부 성공한 부분이 롤백되지 않는다. 이 부분에 대해서는 별도의 롤백 작업을 해야 한다.
 
-NOTE: There are certain queries that can't run inside a transaction. If your
-adapter supports DDL transactions you can use `disable_ddl_transaction!` to
-disable them for a single migration.
+NOTE: 트랜잭션 내에서 실행할 수 없는 특정 쿼리가 있다. 어댑터가 DDL 트랜잭션을 지원하는 경우 `disable_ddl_transaction!`을 사용하여 단일 마이그레이션에 대해 트랜잭선을 비활성화 할 수 있다.
 
-If you wish for a migration to do something that Active Record doesn't know how
-to reverse, you can use `reversible`:
+액티브 레코드가 되돌릴 수 있는 방법을 모르는 작업을 수행하려면 `reversible` 메소드를 사용할 수 있다.
 
 ```ruby
 class ChangeProductsPrice < ActiveRecord::Migration[5.0]
@@ -84,7 +55,7 @@ class ChangeProductsPrice < ActiveRecord::Migration[5.0]
 end
 ```
 
-Alternatively, you can use `up` and `down` instead of `change`:
+또는 `change` 대신 `up`과 `down`을 사용할 수 있다.
 
 ```ruby
 class ChangeProductsPrice < ActiveRecord::Migration[5.0]
@@ -102,31 +73,19 @@ class ChangeProductsPrice < ActiveRecord::Migration[5.0]
 end
 ```
 
-Creating a Migration
---------------------
+## 마이그레이션 작성하기 {#creating-a-migration}
 
-### Creating a Standalone Migration
+### 별도의 마이그레이션 파일 작성하기 {#creating-a-standalone-migration}
 
-Migrations are stored as files in the `db/migrate` directory, one for each
-migration class. The name of the file is of the form
-`YYYYMMDDHHMMSS_create_products.rb`, that is to say a UTC timestamp
-identifying the migration followed by an underscore followed by the name
-of the migration. The name of the migration class (CamelCased version)
-should match the latter part of the file name. For example
-`20080906120000_create_products.rb` should define class `CreateProducts` and
-`20080906120001_add_details_to_products.rb` should define
-`AddDetailsToProducts`. Rails uses this timestamp to determine which migration
-should be run and in what order, so if you're copying a migration from another
-application or generate a file yourself, be aware of its position in the order.
+마이그레이션은 각 마이그레이션 클래스마다 하나씩 `db/migrate` 디렉토리에 파일로 저장된다. 파일 이름은 `YYYYMMDDHHMMSS_create_products.rb` 형식을 가진다. 즉, 마이그레이션을 식별하는 UTC 타임 스탬프와 밑줄 그리고 마이그레이션 이름으로 구성되어 있다. 마이그레이션 클래스의 이름 (CamelCased 버전)은 파일 이름의 후반 부분과 일치해야 한다. 예를 들어`20080906120000_create_products.rb`는 `CreateProducts` 클래스를 정의하고 `20080906120001_add_details_to_products.rb`는`AddDetailsToProducts`를 정의해야 한다. 레일스는 이 타임 스탬프를 사용하여 마이그레이션을 어떤 순서로 실행할지 결정하므로 다른 애플리케이션에서 마이그레이션을 복사하거나 파일을 직접 생성하는 경우 순서에 따라 위치를 알고 있어야 한다.
 
-Of course, calculating timestamps is no fun, so Active Record provides a
-generator to handle making it for you:
+물론 타임 스탬프 계산은 재미있는 작업이 아니기 때문에 액티브 레코드에서는 ㅇ아래와 같은 작업을 처리 할 수 있는 생성자를 제공한다.
 
 ```bash
 $ rails generate migration AddPartNumberToProducts
 ```
 
-This will create an appropriately named empty migration:
+적절한 이름의 빈 마이그레이션이 생성될 것이다.
 
 ```ruby
 class AddPartNumberToProducts < ActiveRecord::Migration[5.0]
@@ -135,20 +94,15 @@ class AddPartNumberToProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-This generator can do much more than append a timestamp to the file name.
-Based on naming conventions and additional (optional) arguments it can
-also start fleshing out the migration.
+이 생성자는 파일 이름에 타임 스탬프를 추가하는 것 이상을 수행 할 수 있다. 명명 규칙 및 추가 (선택적) 인수를 기반으로 마이그레이션의 불필요한 부분을 제거할 수 있다.
 
-If the migration name is of the form "AddColumnToTable" or
-"RemoveColumnFromTable" and is followed by a list of column names and
-types then a migration containing the appropriate `add_column` and
-`remove_column` statements will be created.
+마이그레이션 이름이 "AddColumnToTable" 또는 "RemoveColumnFromTable" 형식이고 컬럼의 이름과 데이터형 리스트가 오는 경우 적절한 `add_column`과 `remove_column` 문이 포함된 마이그레이션이 작성될 것이다.
 
 ```bash
 $ rails generate migration AddPartNumberToProducts part_number:string
 ```
 
-will generate
+위와 같은 마이그레이션 명령으로 아래와 같은 마이그레이션 클래스 파일이 생성될 것이다.
 
 ```ruby
 class AddPartNumberToProducts < ActiveRecord::Migration[5.0]
@@ -158,13 +112,13 @@ class AddPartNumberToProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-If you'd like to add an index on the new column, you can do that as well:
+새 컬럼에 인덱스를 추가하려면 아래와 같이 수행한다.
 
 ```bash
 $ rails generate migration AddPartNumberToProducts part_number:string:index
 ```
 
-will generate
+실행결과 아래와 같은 마이그레이션 클래스 파일이 생성될 것이다.
 
 ```ruby
 class AddPartNumberToProducts < ActiveRecord::Migration[5.0]
@@ -175,14 +129,13 @@ class AddPartNumberToProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-
-Similarly, you can generate a migration to remove a column from the command line:
+마찬가지로 커맨드라인에서 특정 컬럼을 제거하기 위해 마이그레이션을 생성할 수 있다.
 
 ```bash
 $ rails generate migration RemovePartNumberFromProducts part_number:string
 ```
 
-generates
+실행결과 아래와 같은 마이그레이션 클래스 파일이 생성될 것이다.
 
 ```ruby
 class RemovePartNumberFromProducts < ActiveRecord::Migration[5.0]
@@ -192,13 +145,13 @@ class RemovePartNumberFromProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-You are not limited to one magically generated column. For example:
+하나의 컬럼만 제한되지 않는다. 예를 들면 아래와 같이 두개의 컬럼을 추가할 수 있다.
 
 ```bash
 $ rails generate migration AddDetailsToProducts part_number:string price:decimal
 ```
 
-generates
+실행결과 아래와 같은 마이그레이션 클래스 파일이 생성될 것이다.
 
 ```ruby
 class AddDetailsToProducts < ActiveRecord::Migration[5.0]
@@ -209,15 +162,13 @@ class AddDetailsToProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-If the migration name is of the form "CreateXXX" and is
-followed by a list of column names and types then a migration creating the table
-XXX with the columns listed will be generated. For example:
+마이그레이션 이름이 "CreateXXX" 형식이고 컬럼 이름 및 데이터형 리스트가 뒤따라 오면 행달 컬럼들이 포함된 테이블 XXX를 작성하는 마이그레이션이 생성될 것이다. 예를 들면,
 
 ```bash
 $ rails generate migration CreateProducts name:string part_number:string
 ```
 
-generates
+실행결과 아래와 같은 마이그레이션 클래스 파일이 생성될 것이다.
 
 ```ruby
 class CreateProducts < ActiveRecord::Migration[5.0]
@@ -230,18 +181,15 @@ class CreateProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-As always, what has been generated for you is just a starting point. You can add
-or remove from it as you see fit by editing the
-`db/migrate/YYYYMMDDHHMMSS_add_details_to_products.rb` file.
+항상 그렇듯이 이렇게 생성된 것은 시작에 불과하다. `db/migrate/YYYYMMDDHHMMSS_add_details_to_products.rb` 파일을 편집하여 원하는 대로 추가하거나 제거 할 수 있다.
 
-Also, the generator accepts column type as `references` (also available as
-`belongs_to`). For instance:
+또한 생성자는 컬럼 데이터형으로 `references`(또는 `belongs_to`)을 사용할 수 있다. 예를 들면,
 
 ```bash
 $ rails generate migration AddUserRefToProducts user:references
 ```
 
-generates
+실행결과 아래와 같은 마이그레이션 클래스 파일이 생성될 것이다.
 
 ```ruby
 class AddUserRefToProducts < ActiveRecord::Migration[5.0]
@@ -251,16 +199,16 @@ class AddUserRefToProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-This migration will create a `user_id` column and appropriate index.
-For more `add_reference` options, visit the [API documentation](https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_reference).
+이 마이그레이션은 `user_id` 컬럼과 적절한 인덱스를 생성할 것이다 .
+`add_reference` 옵션에 대한 자세한 내용을 보기 위해서는 [API documentation](https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_reference)을 방문한다.
 
-There is also a generator which will produce join tables if `JoinTable` is part of the name:
+이름의 일부 중 `JoinTable`이 포함되어 있는 경우 조인 테이블을 생성하는 생성자도 있다.
 
 ```bash
 $ rails g migration CreateJoinTableCustomerProduct customer product
 ```
 
-will produce the following migration:
+실행결과 아래와 같은 마이그레이션 클래스 파일이 생성될 것이다.
 
 ```ruby
 class CreateJoinTableCustomerProduct < ActiveRecord::Migration[5.0]
@@ -273,18 +221,15 @@ class CreateJoinTableCustomerProduct < ActiveRecord::Migration[5.0]
 end
 ```
 
-### Model Generators
+### 모델 생성자 {#model-generators}
 
-The model and scaffold generators will create migrations appropriate for adding
-a new model. This migration will already contain instructions for creating the
-relevant table. If you tell Rails what columns you want, then statements for
-adding these columns will also be created. For example, running:
+모델 및 스카폴드 생성자는 새 모델 추가에 적합한 마이그레이션을 작성한다. 이 마이그레이션에는 관련 테이블 작성에 대한 지시 사항이 이미 포함되어 있다. 원하는 컬럼을 레일스에 알려 주면 이 컬럼을 추가하기 위한 명령문도 작성된다. 예를 들어 아래의 명령를 실행하면,
 
 ```bash
 $ rails generate model Product name:string description:text
 ```
 
-will create a migration that looks like this
+아래와 같은 마이그레이션 클래스를 생성할 것이다.
 
 ```ruby
 class CreateProducts < ActiveRecord::Migration[5.0]
@@ -299,20 +244,19 @@ class CreateProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-You can append as many column name/type pairs as you want.
+원하는 만큼 컬럼 이름/데이터형 쌍을 추가 할 수 있다.
 
-### Passing Modifiers
+### 데이터형 변경자 지정하기 {#passing-modifiers}
 
-Some commonly used [type modifiers](#column-modifiers) can be passed directly on
-the command line. They are enclosed by curly braces and follow the field type:
+일반적으로 사용되는 몇몇 [데이터형 변경자](#column-modifiers)는 커맨드 라인에서 직접 지정할 수 있다. 중괄호로 묶고 필드 데이터형 다음에 지정한다.
 
-For instance, running:
+예를 들어 아래와 같이 실행하면
 
 ```bash
 $ rails generate migration AddDetailsToProducts 'price:decimal{5,2}' supplier:references{polymorphic}
 ```
 
-will produce a migration that looks like this
+아래와 같은 마이그레이션 클래스 파일을 생성할 것이다.
 
 ```ruby
 class AddDetailsToProducts < ActiveRecord::Migration[5.0]
@@ -323,19 +267,15 @@ class AddDetailsToProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-TIP: Have a look at the generators help output for further details.
+TIP: 자세한 내용은 생성자 도움말을 살펴 보기 바란다.
 
-Writing a Migration
--------------------
+## 마이그레이션 작성하기 {#writing-a-migration}
 
-Once you have created your migration using one of the generators it's time to
-get to work!
+생성자 중 하나를 사용하여 마이그레이션을 생성했다면 이제는 작업해야 할 때다.
 
-### Creating a Table
+### 테이블 생성하기 {#creating-a-table}
 
-The `create_table` method is one of the most fundamental, but most of the time,
-will be generated for you from using a model or scaffold generator. A typical
-use would be
+`create_table` 메소드는 가장 기본적인 방법 중 하나이지만 대부분의 경우 모델 또는 스카폴드 생성자를 사용할 때 생성된다. 일반적인 용도는 아래와 같다.
 
 ```ruby
 create_table :products do |t|
@@ -343,14 +283,9 @@ create_table :products do |t|
 end
 ```
 
-which creates a `products` table with a column called `name` (and as discussed
-below, an implicit `id` column).
+위의 메소드는 `name`이라는 컬럼이 있는 `products` 테이블을 생성한다(아래에서 설명하는 것처럼, `id` 컬럼도 암묵적으로 자동 생성된다).
 
-By default, `create_table` will create a primary key called `id`. You can change
-the name of the primary key with the `:primary_key` option (don't forget to
-update the corresponding model) or, if you don't want a primary key at all, you
-can pass the option `id: false`. If you need to pass database specific options
-you can place an SQL fragment in the `:options` option. For example:
+기본적으로 `create_table`은 `id`라는 기본키를 생성한다. `:primary_key` 옵션을 사용하여 기본키 이름을 변경하거나 (이 경우, 해당 모델을 업데이트하는 것을 잊지 말아야 한다.) 기본키를 원하지 않으면 `id: false` 옵션을 전달할 수 있다. 데이터베이스 특정 옵션을 전달해야 하는 경우 `:options` 옵션에 SQL문 일부를 지정할 수 있다. 예를 들어,
 
 ```ruby
 create_table :products, options: "ENGINE=BLACKHOLE" do |t|
@@ -358,45 +293,34 @@ create_table :products, options: "ENGINE=BLACKHOLE" do |t|
 end
 ```
 
-will append `ENGINE=BLACKHOLE` to the SQL statement used to create the table.
+위의 코드는 테이블을 생성하는데 사용되는 SQL 문에 `ENGINE=BLACKHOLE` 옵션이 추가될 것이다.
 
-Also you can pass the `:comment` option with any description for the table
-that will be stored in database itself and can be viewed with database administration
-tools, such as MySQL Workbench or PgAdmin III. It's highly recommended to specify
-comments in migrations for applications with large databases as it helps people
-to understand data model and generate documentation.
-Currently only the MySQL and PostgreSQL adapters support comments.
+또한 테이블에 대한 설명을 `:comment` 옵션으로 전달하여 데이터베이스 자체에 저장할 수 있고 MySQL Workbench 또는 PgAdmin III과 같은 데이터베이스 관리 도구로 볼 수 있다. 데이터 모델을 이해하고 문서를 생성하는 데 도움이 될 수 있으므로 규모가 큰 데이터베이스와 연결되는 애플리케이션에 사용하는 마이그레이션에는 주석을 지정하는 것이 좋다. 현재로는 MySQL 및 PostgreSQL 어댑터 만 주석을 지원한다.
 
-### Creating a Join Table
+### 조인 테이블 생성하기 {#creating-a-join-table}
 
-The migration method `create_join_table` creates an HABTM (has and belongs to
-many) join table. A typical use would be:
+마이그레이션 메소드인 `create_join_table`은 HABTM(has and belongs to
+many) 조인 테이블을 생성한다. 일반적인 사용법 아래와 같다.
 
 ```ruby
 create_join_table :products, :categories
 ```
 
-which creates a `categories_products` table with two columns called
-`category_id` and `product_id`. These columns have the option `:null` set to
-`false` by default. This can be overridden by specifying the `:column_options`
-option:
+`category_id`와`product_id`라는 두 개의 컬럼이 있는 `categories_products` 테이블을 만든다. 이 컬럼에는 기본적으로 `:null` 옵션이 `false`로 설정되어 있다. `:column_options` 옵션을 지정하여 덮어 쓸 수 있다 .
 
 ```ruby
 create_join_table :products, :categories, column_options: { null: true }
 ```
 
-By default, the name of the join table comes from the union of the first two
-arguments provided to create_join_table, in alphabetical order.
-To customize the name of the table, provide a `:table_name` option:
+기본적으로, 조인 테이블의 이름은 알파벳 순서로 create_join_table에 제공된 처음 두 인수를 합쳐서 만들어진다. 테이블 이름을 사용자 정의하려면 `:table_name` 옵션을 지정하면 된다.
 
 ```ruby
 create_join_table :products, :categories, table_name: :categorization
 ```
 
-creates a `categorization` table.
+위의 명령을 실행하면 `categorization` 테이블이 생성된다.
 
-`create_join_table` also accepts a block, which you can use to add indices
-(which are not created by default) or additional columns:
+`create_join_table`은 (기본적으로 생성되지 않은) 인덱스 또는 컬럼을 추가하는 데 사용할 수 있는 블록도 허용한다.
 
 ```ruby
 create_join_table :products, :categories do |t|
@@ -405,11 +329,9 @@ create_join_table :products, :categories do |t|
 end
 ```
 
-### Changing Tables
+### 테이블 변경하기 {#changing-tables}
 
-A close cousin of `create_table` is `change_table`, used for changing existing
-tables. It is used in a similar fashion to `create_table` but the object
-yielded to the block knows more tricks. For example:
+`create_table`의 가까운 사촌은 `change_table`이며 기존 테이블을 변경하는 데 사용된다. `create_table`과 비슷한 방식으로 사용 되지만 블록 변수로 넘겨지는 객체는 더 많은 마술 같은 능력을 가진다. 예를 들면 아래와 같다.
 
 ```ruby
 change_table :products do |t|
@@ -420,148 +342,111 @@ change_table :products do |t|
 end
 ```
 
-removes the `description` and `name` columns, creates a `part_number` string
-column and adds an index on it. Finally it renames the `upccode` column.
+위의 코드는 `description` 및`name` 컬럼을 제거하고 `part_number` 문자열 컬럼을 작성하고 인덱스를 추가한다. 마지막으로 `upccode` 컬럼의 이름을 변경한다.
 
-### Changing Columns
+### 컬럼 변경하기 {#changing-columns}
 
-Like the `remove_column` and `add_column` Rails provides the `change_column`
-migration method.
+`remove_column` 및 `add_column`과 같이 레일스는`change_column` 마이그레이션 메소드를 제공한다.
 
 ```ruby
 change_column :products, :part_number, :text
 ```
 
-This changes the column `part_number` on products table to be a `:text` field.
-Note that `change_column` command is irreversible.
+위의 코드를 실행하면 products 테이블의 `part_number` 컬럼이 `:text` 필드로 변경된다. `change_column` 명령은 되돌릴 수 없다는 것에 주목해야 한다.
 
-Besides `change_column`, the `change_column_null` and `change_column_default`
-methods are used specifically to change a not null constraint and default
-values of a column.
+`change_column` 외에도 `change_column_null` 및`change_column_default` 메소드는 not null 제한 조건과 컬럼의 기본값을 변경하는 데 사용된다.
 
 ```ruby
 change_column_null :products, :name, false
 change_column_default :products, :approved, from: true, to: false
 ```
 
-This sets `:name` field on products to a `NOT NULL` column and the default
-value of the `:approved` field from true to false.
+위의 코드를 실행하면 products 테이블의 `:name` 필드를 `NOT NULL` 컬럼으로 설정하고 `:approved` 필드의 기본값을 true에서 false로 설정한다.
 
-NOTE: You could also write the above `change_column_default` migration as
-`change_column_default :products, :approved, false`, but unlike the previous
-example, this would make your migration irreversible.
+NOTE: 위의 `change_column_default` 마이그레이션을 `change_column_default :products, :approved, false`로 작성할 수도 있지만 이전 예제와 달리 마이그레이션을 되돌릴 수 없게 만든다.
 
-### Column Modifiers
+### 컬럼 변경자 {#column-modifiers}
 
-Column modifiers can be applied when creating or changing a column:
+컬럼을 만들거나 변경할 때 컬럼 변경자를 적용 할 수 있다.
 
-* `limit`        Sets the maximum size of the `string/text/binary/integer` fields.
-* `precision`    Defines the precision for the `decimal` fields, representing the
-total number of digits in the number.
-* `scale`        Defines the scale for the `decimal` fields, representing the
-number of digits after the decimal point.
-* `polymorphic`  Adds a `type` column for `belongs_to` associations.
-* `null`         Allows or disallows `NULL` values in the column.
-* `default`      Allows to set a default value on the column. Note that if you
-are using a dynamic value (such as a date), the default will only be calculated
-the first time (i.e. on the date the migration is applied).
-* `comment`      Adds a comment for the column.
+- `limit` : `string/text/binary/integer` 필드의 최대 크기를 설정한다.
+- `precision` : `decimal`(소수점) 필드의 정밀도를 지정하며 숫자의 총 자릿수를 표시한다.
+- `scale` : 소수점 이하 자릿수를 표시하며 `decimal` 필드의 스케일을 정의한다.
+- `polymorphic` : `belongs_to` 관계 설정을 위한 `type` 컬럼을 추가한다.
+- `null` : 컬럼에서 `NULL` 값의 허용 여부를 지정한다.
+- `default` : 컬럼에서 기본값을 설정할 수 있다. 동적 값 (예 : 날짜)을 사용할 경우 기본값은 처음 (즉, 마이그레이션이 적용된 날짜)에만 계산된다것에 주목한다.
+- `comment` : 컬럼에 주석을 추가한다.
 
-Some adapters may support additional options; see the adapter specific API docs
-for further information.
+일부 어댑터는 추가 옵션을 지원할 수 있다. 자세한 정보는 어댑터 별 API 문서를 참조한다.
 
-NOTE: `null` and `default` cannot be specified via command line.
+NOTE: `null` 및 `default`는 커맨드 라인을 통해 지정할 수 없다.
 
-### Foreign Keys
+### 외래키 {#foreign-keys}
 
-While it's not required you might want to add foreign key constraints to
-[guarantee referential integrity](#active-record-and-referential-integrity).
+필수 사항은 아니지만, [guarantee referential integrity](#active-record-and-reference-integrity)에 외래키 제약 조건을 추가할 수 있다.
 
 ```ruby
 add_foreign_key :articles, :authors
 ```
 
-This adds a new foreign key to the `author_id` column of the `articles`
-table. The key references the `id` column of the `authors` table. If the
-column names cannot be derived from the table names, you can use the
-`:column` and `:primary_key` options.
+이로써 `articles` 테이블의`author_id` 컬럼에 새로운 외래키가 추가됐다. 이 외래키는 `authors` 테이블의 `id` 컬럼을 참조한다. 컬럼 이름을 테이블 이름에서 유추할 수 없는 경우 `:column` 및 `:primary_key` 옵션을 사용한다.
 
-Rails will generate a name for every foreign key starting with
-`fk_rails_` followed by 10 characters which are deterministically
-generated from the `from_table` and `column`.
-There is a `:name` option to specify a different name if needed.
+레일스가 생성하는 모든 외래키는 `fk_rails`로 시작해서 `from_table`과 `column`으로부터 만들어지는 10개의 글자가 추가되어 생성하게 된다. 필요할 경우 다른 이름을 지정할 수 있는 `:name` 옵션이 있다.
 
-NOTE: Active Record only supports single column foreign keys. `execute` and
-`structure.sql` are required to use composite foreign keys. See
-[Schema Dumping and You](#schema-dumping-and-you).
-
-Removing a foreign key is easy as well:
+NOTE: 액티브 레코드는 단일 컬럼 외래키만 지원한다. 복합 외래키를 사용하려면 `execute` 및 `structure.sql`이 필요하다. [Schema Dumping and You](#schema-dumping-and-you)를 참조한다.
+외래키를 제거하는 것도 간단하다.
 
 ```ruby
-# let Active Record figure out the column name
+# 액티브 레코드가 컬럼 이름을 알아 내게 한다.
 remove_foreign_key :accounts, :branches
 
-# remove foreign key for a specific column
+# 특정 컬럼에 대한 외래키를 제거한다.
 remove_foreign_key :accounts, column: :owner_id
 
-# remove foreign key by name
+# 이름을 지정하여 외래키를 제거한다.
 remove_foreign_key :accounts, name: :special_fk_name
 ```
 
-### When Helpers aren't Enough
+### 헬퍼 메소드가 충분히 않을 때 {#when-helpers-aren't-enough}
 
-If the helpers provided by Active Record aren't enough you can use the `execute`
-method to execute arbitrary SQL:
+액티브 레코드에서 제공하는 헬퍼가 충분하지 않으면 `execute` 메소드를 사용하여 임의의 SQL을 실행할 수 있다.
 
 ```ruby
 Product.connection.execute("UPDATE products SET price = 'free' WHERE 1=1")
 ```
 
-For more details and examples of individual methods, check the API documentation.
-In particular the documentation for
-[`ActiveRecord::ConnectionAdapters::SchemaStatements`](https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html)
-(which provides the methods available in the `change`, `up` and `down` methods),
-[`ActiveRecord::ConnectionAdapters::TableDefinition`](https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html)
-(which provides the methods available on the object yielded by `create_table`)
-and
-[`ActiveRecord::ConnectionAdapters::Table`](https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/Table.html)
-(which provides the methods available on the object yielded by `change_table`).
+개별 메소드의 세부 사항 및 예제는 API 문서를 확인한다.
+특히, [`ActiveRecord::ConnectionAdapters::SchemaStatements`](https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html) ( `change`, `up`, `down` 메소드에서 사용할 수 있는 메소드를 제공하는 문서), [`ActiveRecord::ConnectionAdapters::TableDefinition`](https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/TableDefinition.html) (`create_table`에 의해 생성된 객체에서 사용 가능한 메소드를 제공하는 문서) 그리고 [`ActiveRecord::ConnectionAdapters::Table`](https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/Table.html) (`change_table`에 의해 생성 된 객체에서 사용 가능한 메소드를 제공하는 문서) 등이다.
 
-### Using the `change` Method
+### `change` 메소드 사용하기 {#using-the-change-method}
 
-The `change` method is the primary way of writing migrations. It works for the
-majority of cases, where Active Record knows how to reverse the migration
-automatically. Currently, the `change` method supports only these migration
-definitions:
+`change` 메소드는 마이그레이션을 작성하는 주된 방법이다. 액티브 레코드가 마이그레이션을 자동으로 되돌리는 방법을 알고 있는 경우에만 대부분 작동한다. 현재 `change` 메소드는 아래의 마이그레이션 정의만 지원한다.
 
-* add_column
-* add_foreign_key
-* add_index
-* add_reference
-* add_timestamps
-* change_column_default (must supply a :from and :to option)
-* change_column_null
-* create_join_table
-* create_table
-* disable_extension
-* drop_join_table
-* drop_table (must supply a block)
-* enable_extension
-* remove_column (must supply a type)
-* remove_foreign_key (must supply a second table)
-* remove_index
-* remove_reference
-* remove_timestamps
-* rename_column
-* rename_index
-* rename_table
+- add_column
+- add_foreign_key
+- add_index
+- add_reference
+- add_timestamps
+- change_column_default (:from 과 :to 옵션을 지정해야 함.)
+- change_column_null
+- create_join_table
+- create_table
+- disable_extension
+- drop_join_table
+- drop_table (블록을 지정해야 함.)
+- enable_extension
+- remove_column (데이터형을 지정해야 함.)
+- remove_foreign_key (두번째 테이블을 지정해야 함.)
+- remove_index
+- remove_reference
+- remove_timestamps
+- rename_column
+- rename_index
+- rename_table
 
-`change_table` is also reversible, as long as the block does not call `change`,
-`change_default` or `remove`.
+`change_table`은 블록이 `change`, `change_default` 또는`remove`를 호출하지 않는 한 가역적이다.
 
-`remove_column` is reversible if you supply the column type as the third
-argument. Provide the original column options too, otherwise Rails can't
-recreate the column exactly when rolling back:
+`remove_column`은 컬럼 데이터형을 세 번째 인수로 제공하면 되돌릴 수 있다. 원본의 컬럼 옵션도 제공하도록 한다. 그렇지 않으면 레일스가 롤백 할 때 컬럼을 정확하게 다시 생성할 수 없다.
 
 ```ruby
 remove_column :posts, :slug, :string, null: false, default: ''
@@ -728,8 +613,7 @@ NOTE: If you want to add check constraints like in the examples above,
 you will have to use `structure.sql` as dump method. See
 [Schema Dumping and You](#schema-dumping-and-you).
 
-Running Migrations
-------------------
+## Running Migrations
 
 Rails provides a set of rails commands to run certain sets of migrations.
 
@@ -846,11 +730,11 @@ A migration creating a table and adding an index might produce output like this
 
 Several methods are provided in migrations that allow you to control all this:
 
-| Method               | Purpose
-| -------------------- | -------
-| suppress_messages    | Takes a block as an argument and suppresses any output generated by the block.
-| say                  | Takes a message argument and outputs it as is. A second boolean argument can be passed to specify whether to indent or not.
-| say_with_time        | Outputs text along with how long it took to run its block. If the block returns an integer it assumes it is the number of rows affected.
+| Method            | Purpose                                                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| suppress_messages | Takes a block as an argument and suppresses any output generated by the block.                                                           |
+| say               | Takes a message argument and outputs it as is. A second boolean argument can be passed to specify whether to indent or not.              |
+| say_with_time     | Outputs text along with how long it took to run its block. If the block returns an integer it assumes it is the number of rows affected. |
 
 For example, this migration:
 
@@ -890,11 +774,9 @@ generates the following output
 ==  CreateProducts: migrated (10.0054s) =======================================
 ```
 
-If you want Active Record to not output anything, then running `rails db:migrate
-VERBOSE=false` will suppress all output.
+If you want Active Record to not output anything, then running `rails db:migrate VERBOSE=false` will suppress all output.
 
-Changing Existing Migrations
-----------------------------
+## Changing Existing Migrations
 
 Occasionally you will make a mistake when writing a migration. If you have
 already run the migration, then you cannot just edit the migration and run the
@@ -915,8 +797,7 @@ The `revert` method can be helpful when writing a new migration to undo
 previous migrations in whole or in part
 (see [Reverting Previous Migrations](#reverting-previous-migrations) above).
 
-Schema Dumping and You
-----------------------
+## Schema Dumping and You
 
 ### What are Schema Files for?
 
@@ -993,8 +874,7 @@ recommended that you check your schema file into source control.
 Merge conflicts can occur in your schema file when two branches modify schema.
 To resolve these conflicts run `rails db:migrate` to regenerate the schema file.
 
-Active Record and Referential Integrity
----------------------------------------
+## Active Record and Referential Integrity
 
 The Active Record way claims that intelligence belongs in your models, not in
 the database. As such, features such as triggers or constraints,
@@ -1011,8 +891,7 @@ with [foreign key constraints](#foreign-keys) in the database.
 Although Active Record does not provide all the tools for working directly with
 such features, the `execute` method can be used to execute arbitrary SQL.
 
-Migrations and Seed Data
-------------------------
+## Migrations and Seed Data
 
 The main purpose of Rails' migration feature is to issue commands that modify the
 schema using a consistent process. Migrations can also be used
@@ -1048,8 +927,7 @@ end
 This is generally a much cleaner way to set up the database of a blank
 application.
 
-Old Migrations
---------------
+## Old Migrations
 
 The `db/schema.rb` or `db/structure.sql` is a snapshot of the current state of your
 database and is the authoritative source for rebuilding that database. This
