@@ -1,5 +1,3 @@
-**GITHUB 온라인에서 이 파일을 읽으면 제대로 보이지 않을 수 있다. 공식 가이드는 https://guides.rubyonrails.org 상에 게시되어 있다.**
-
 레일스로 시작하기 {#getting-started-with-rails}
 ==========================
 

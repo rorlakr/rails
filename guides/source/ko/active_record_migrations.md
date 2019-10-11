@@ -9,7 +9,7 @@
 - 마이그레이션과 스키마를 다루는 레일스 명령어
 - 마이그레이션이 `schema.rb`와 연관되는 방법
 
----
+----------------------------------------------------------------------------------------------------------------------------
 
 ## 마이그레이션 개요 {#migration-overview}
 
@@ -383,7 +383,7 @@ NOTE: `null` 및 `default`는 커맨드 라인을 통해 지정할 수 없다.
 
 ### 외래키 {#foreign-keys}
 
-필수 사항은 아니지만, [guarantee referential integrity](#active-record-and-reference-integrity)에 외래키 제약 조건을 추가할 수 있다.
+필수 사항은 아니지만, [guarantee referential integrity](#active-record-and-referential-integrity)에 외래키 제약 조건을 추가할 수 있다.
 
 ```ruby
 add_foreign_key :articles, :authors
@@ -452,8 +452,7 @@ Product.connection.execute("UPDATE products SET price = 'free' WHERE 1=1")
 remove_column :posts, :slug, :string, null: false, default: ''
 ```
 
-If you're going to need to use any other methods, you should use `reversible`
-or write the `up` and `down` methods instead of using the `change` method.
+If you're going to need to use any other methods, you should use `reversible` or write the `up` and `down` methods instead of using the `change` method.
 
 ### Using `reversible`
 
