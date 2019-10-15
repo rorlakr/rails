@@ -1,6 +1,6 @@
 # 액티브 레코드 마이그레이션 {#active-record-migrations}
 
-마이그레이션은 시간이 지남에 따라 데이터베이스 스키마를 발전시킬 수있는 액티브 레코드의 특수한 기능이다. 순수 SQL로 스키마 수정을 작성하는 대신 마이그레이션을 통해 쉬운 루비 DSL을 사용하여 테이블의 변경 사항을 기술할 수 있다.
+마이그레이션은 시간이 지남에 따라 데이터베이스 스키마를 발전시킬 수 있는 액티브 레코드의 특수한 기능이다. 순수 SQL로 스키마 수정을 작성하는 대신 마이그레이션을 통해 쉬운 루비 DSL을 사용하여 테이블의 변경 사항을 기술할 수 있다.
 
 이 가이드를 읽은 후에는 아래의 내용을 알게 될 것이다.
 
@@ -79,7 +79,7 @@ end
 
 마이그레이션은 각 마이그레이션 클래스마다 하나씩 `db/migrate` 디렉토리에 파일로 저장된다. 파일 이름은 `YYYYMMDDHHMMSS_create_products.rb` 형식을 가진다. 즉, 마이그레이션을 식별하는 UTC 타임 스탬프와 밑줄 그리고 마이그레이션 이름으로 구성되어 있다. 마이그레이션 클래스의 이름 (CamelCased 버전)은 파일 이름의 후반 부분과 일치해야 한다. 예를 들어`20080906120000_create_products.rb`는 `CreateProducts` 클래스를 정의하고 `20080906120001_add_details_to_products.rb`는`AddDetailsToProducts`를 정의해야 한다. 레일스는 이 타임 스탬프를 사용하여 마이그레이션을 어떤 순서로 실행할지 결정하므로 다른 애플리케이션에서 마이그레이션을 복사하거나 파일을 직접 생성하는 경우 순서에 따라 위치를 알고 있어야 한다.
 
-물론 타임 스탬프 계산은 재미있는 작업이 아니기 때문에 액티브 레코드에서는 ㅇ아래와 같은 작업을 처리 할 수 있는 생성자를 제공한다.
+물론 타임 스탬프 계산은 재미있는 작업이 아니기 때문에 액티브 레코드에서는 아래와 같은 작업을 처리 할 수 있는 생성자를 제공한다.
 
 ```bash
 $ rails generate migration AddPartNumberToProducts
@@ -581,7 +581,7 @@ end
 
 `revert`를 사용하지 않고 동일한 마이그레이션을 작성할 수도 있겠지만 몇 가지 단계가 더 필요할 것이다. 즉, `create_table`과 `reversible` 순서를 바꾸고, `create_table`을 `drop_table`로 변경하며, 마지막으로 `up`을 `down`으로 대체하는 것이다. 이 반대로도 마찬가지다. 이것은 모두 `revert` 메소드에 의해 처리된다.
 
-위의 예와 같이 check 제약 조건을 추가하려면 `structure.sql`을 덤프 메소드로 사용해야 한다. [Schema Dumping and You](# schema-dumping-and-you)를 참조하기 바란다.
+위의 예와 같이 check 제약 조건을 추가하려면 `structure.sql`을 덤프 메소드로 사용해야 한다. [Schema Dumping and You](#schema-dumping-and-you)를 참조하기 바란다.
 
 ## 마이그레이션 실행하기 {#running-migrations}
 
