@@ -452,13 +452,11 @@ Product.connection.execute("UPDATE products SET price = 'free' WHERE 1=1")
 remove_column :posts, :slug, :string, null: false, default: ''
 ```
 
-If you're going to need to use any other methods, you should use `reversible` or write the `up` and `down` methods instead of using the `change` method.
+다른 메소드를 사용해야 할 경우에는 `change` 대신 `reversible` 메소드를 사용하거나 `up` 과 `down` 메소드를 작성해야 한다.
 
-### Using `reversible`
+### `reversible` 메소드 사용하기 {#using-reversible}
 
-Complex migrations may require processing that Active Record doesn't know how
-to reverse. You can use `reversible` to specify what to do when running a
-migration and what else to do when reverting it. For example:
+복잡한 마이그레이션에서는 액티브 레코드가 되돌릴 방법을 모르는 경우를 처리해야 할 필요가 있다. `reversible` 메소드를 사용하여 마이그레이션을 실행할 때 수행할 작업과 되돌릴 때 수행할 작업을 지정할 수 있다. 예를 들면 아래와 같다.
 
 ```ruby
 class ExampleMigration < ActiveRecord::Migration[5.0]
@@ -490,28 +488,14 @@ class ExampleMigration < ActiveRecord::Migration[5.0]
 end
 ```
 
-Using `reversible` will ensure that the instructions are executed in the
-right order too. If the previous example migration is reverted,
-the `down` block will be run after the `home_page_url` column is removed and
-right before the table `distributors` is dropped.
+`reversible` 메소드를 사용할 때 명령도 올바른 순서로 실행되어야 한다. 이전 예제 마이그레이션을 되돌릴 경우 `home_page_url` 컬럼이 제거 된 후 `distributors` 테이블이 삭제되기 직전에 `down` 블록이 실행될 것이다.
 
-Sometimes your migration will do something which is just plain irreversible; for
-example, it might destroy some data. In such cases, you can raise
-`ActiveRecord::IrreversibleMigration` in your `down` block. If someone tries
-to revert your migration, an error message will be displayed saying that it
-can't be done.
+때때로 마이그레이션은 돌이킬 수 없는 단순한 일을 할 것이다. 예를 들어 일부 데이터를 손상시킬 수도 있다. 이 경우 `down` 블록에서 `ActiveRecord::IrreversibleMigration` 예외를 발생시킬 수 있다. 누군가 마이그레이션을 되돌리려고 하면 수행 할 수 없다는 오류 메시지가 표시될 것이다.
 
-### Using the `up`/`down` Methods
+### `up`/`down` 메소드 사용하기  {#using-the-up/down-methods}
 
-You can also use the old style of migration using `up` and `down` methods
-instead of the `change` method.
-The `up` method should describe the transformation you'd like to make to your
-schema, and the `down` method of your migration should revert the
-transformations done by the `up` method. In other words, the database schema
-should be unchanged if you do an `up` followed by a `down`. For example, if you
-create a table in the `up` method, you should drop it in the `down` method. It
-is wise to perform the transformations in precisely the reverse order they were
-made in the `up` method. The example in the `reversible` section is equivalent to:
+`change` 메소드 대신 `up` 및 `down` 메소드를 사용하여 이전 스타일의 마이그레이션을 사용할 수도 있다.
+`up` 메소드는 스키마에 적용할 변환내용을 기술해야 하며, 마이그레이션의`down` 메소드는 `up` 메소드가 수행한 변환을 되돌려야 한다. 즉, `up` 다음에`down`을 수행하면 데이터베이스 스키마는 변경되지 않아야 한다. 예를 들어, `up` 메소드에서 테이블을 작성하는 경우 `down` 메소드에서 테이블을 삭제해야한다. `up` 메소드로 만들어진 역순으로 변환을 수행하는 것이 현명하다. 아래의 예는 `reversible` 섹션에 있는 것과 동일한 내용이다.
 
 ```ruby
 class ExampleMigration < ActiveRecord::Migration[5.0]
@@ -545,14 +529,11 @@ class ExampleMigration < ActiveRecord::Migration[5.0]
 end
 ```
 
-If your migration is irreversible, you should raise
-`ActiveRecord::IrreversibleMigration` from your `down` method. If someone tries
-to revert your migration, an error message will be displayed saying that it
-can't be done.
+마이그레이션이 되돌릴 수 없는 경우 `down` 메소드에서 `ActiveRecord::IrreversibleMigration` 예외를 발생시켜야 한다. 누군가 마이그레이션을 되돌리려고 하면 이를 수행 할 수 없다는 오류 메시지가 표시될 것이다.
 
-### Reverting Previous Migrations
+### 이전 마이그레이션 되돌리기 {#reverting-previous-migrations}
 
-You can use Active Record's ability to rollback migrations using the `revert` method:
+`revert` 메소드를 사용하여 액티브 레코드의 마이그레이션 롤백 기능을 사용할 수 있다.
 
 ```ruby
 require_relative '20121212123456_example_migration'
@@ -568,11 +549,7 @@ class FixupExampleMigration < ActiveRecord::Migration[5.0]
 end
 ```
 
-The `revert` method also accepts a block of instructions to reverse.
-This could be useful to revert selected parts of previous migrations.
-For example, let's imagine that `ExampleMigration` is committed and it
-is later decided it would be best to use Active Record validations,
-in place of the `CHECK` constraint, to verify the zipcode.
+또한, `revert` 메소드는 되돌리기 위한 명령을 블록으로 받을 수 있다. 이것은 이전 마이그레이션에서 특정 부분을 되돌리는 데 유용 할 수 있다. 예를 들어, 이미 `ExampleMigration`을 커밋한 상황을 가정한다면, 'CHECK' 제약 조건 대신 액티브 레코드 유효성 검사를 사용하여 우편 번호를 확인하는 것이 가장 좋은 방법이 될 것이다.
 
 ```ruby
 class DontUseConstraintForZipcodeValidationMigration < ActiveRecord::Migration[5.0]
@@ -602,123 +579,81 @@ class DontUseConstraintForZipcodeValidationMigration < ActiveRecord::Migration[5
 end
 ```
 
-The same migration could also have been written without using `revert`
-but this would have involved a few more steps: reversing the order
-of `create_table` and `reversible`, replacing `create_table`
-by `drop_table`, and finally replacing `up` by `down` and vice-versa.
-This is all taken care of by `revert`.
+`revert`를 사용하지 않고 동일한 마이그레이션을 작성할 수도 있겠지만 몇 가지 단계가 더 필요할 것이다. 즉, `create_table`과 `reversible` 순서를 바꾸고, `create_table`을 `drop_table`로 변경하며, 마지막으로 `up`을 `down`으로 대체하는 것이다. 이 반대로도 마찬가지다. 이것은 모두 `revert` 메소드에 의해 처리된다.
 
-NOTE: If you want to add check constraints like in the examples above,
-you will have to use `structure.sql` as dump method. See
-[Schema Dumping and You](#schema-dumping-and-you).
+위의 예와 같이 check 제약 조건을 추가하려면 `structure.sql`을 덤프 메소드로 사용해야 한다. [Schema Dumping and You](# schema-dumping-and-you)를 참조하기 바란다.
 
-## Running Migrations
+## 마이그레이션 실행하기 {#running-migrations}
 
-Rails provides a set of rails commands to run certain sets of migrations.
+레일스는 마이그레이션 작업을 실행하기 위해 몇가지 rails 명령을 제공한다.
 
-The very first migration related rails command you will use will probably be
-`rails db:migrate`. In its most basic form it just runs the `change` or `up`
-method for all the migrations that have not yet been run. If there are
-no such migrations, it exits. It will run these migrations in order based
-on the date of the migration.
+가장 먼저 사용할 마이그레이션 관련 rails 명령은 아마도 `rails db:migrate` 일 것이다. 가장 기본적인 형태로는, 아직 실행되지 않은 모든 마이그레이션에 대해 `change` 또는`up` 메소드만을 실행하는 것이다. 이와 같이 미실행 마이그레이션이 없으면 작업은 바로 종료된다. 이러한 마이그레이션 작업은 마이그레이션 날짜를 기준으로 순서대로 실행된다.
 
-Note that running the `db:migrate` command also invokes the `db:schema:dump` command, which
-will update your `db/schema.rb` file to match the structure of your database.
+`db:migrate` 명령을 실행하면 `db:schema:dump` 명령이 호출되어 데이터베이스의 구조와 일치하도록 `db/schema.rb` 파일이 업데이트된다는 것을 주목한다.
 
-If you specify a target version, Active Record will run the required migrations
-(change, up, down) until it has reached the specified version. The version
-is the numerical prefix on the migration's filename. For example, to migrate
-to version 20080906120000 run:
+대상 버전을 지정하면 액티브 레코드는 지정된 버전에 도달 할 때까지 필요한 마이그레이션(change, up, down)을 실행한다. 버전은 마이그레이션 파일 이름의 숫자 접두사에 해당한다. 예를 들어, 20080906120000 버전으로 마이그레이션하려면 아래와 같이 실행한다.
 
 ```bash
 $ rails db:migrate VERSION=20080906120000
 ```
 
-If version 20080906120000 is greater than the current version (i.e., it is
-migrating upwards), this will run the `change` (or `up`) method
-on all migrations up to and
-including 20080906120000, and will not execute any later migrations. If
-migrating downwards, this will run the `down` method on all the migrations
-down to, but not including, 20080906120000.
+20080906120000 버전이 현재 버전보다 큰 경우 (즉, 위로 마이그레이션하는 경우) 20080906120000 이하의 모든 마이그레이션에서 `change` (또는 `up`) 메소드를 실행하며 이후 마이그레이션은 실행되지 않는다. 아래쪽으로 마이그레이션하는 경우 20080906120000 이전까지(포함하지 않음)의 모든 마이그레이션에서 `down` 메소드가 실행된다.
 
-### Rolling Back
+### 롤백하기 {#rolling-back}
 
-A common task is to rollback the last migration. For example, if you made a
-mistake in it and wish to correct it. Rather than tracking down the version
-number associated with the previous migration you can run:
+일반적인 작업으로는 마지막 마이그레이션을 롤백하는 것이다. 예를 들어, 마이그레이션 코딩에 오류가 있어 정정하려는 경우다. 이 경우에는 이전 마이그레이션과 관련된 버전 번호를 추적할 필요없이 아래와 같이 실행할 수 있다.
 
 ```bash
 $ rails db:rollback
 ```
 
-This will rollback the latest migration, either by reverting the `change`
-method or by running the `down` method. If you need to undo
-several migrations you can provide a `STEP` parameter:
+이로써 `change` 메소드를 되돌리거나 `down` 메소드를 실행하여 최신 마이그레이션을 롤백한다. 여러 마이그레이션을 취소해야하는 경우는 `STEP` 매개 변수를 사용할 수 있다.
 
 ```bash
 $ rails db:rollback STEP=3
 ```
 
-will revert the last 3 migrations.
+위의 명령은 마지만 3개의 마이그레이션을 되돌릴 것이다.
 
-The `db:migrate:redo` command is a shortcut for doing a rollback and then migrating
-back up again. As with the `db:rollback` command, you can use the `STEP` parameter
-if you need to go more than one version back, for example:
+`db:migrate:redo` 명령은 롤백을 수행 한 후 다시 마이그레이션하기 위한 손쉬운 방법이다. `db:rollback` 명령과 마찬가지로, 하나 이상의 버전으로 되돌아가야 하는 경우 `STEP` 옵션을 사용할 수 있다. 예를 들면 아래와 같다. 
 
 ```bash
 $ rails db:migrate:redo STEP=3
 ```
 
-Neither of these rails commands do anything you could not do with `db:migrate`. They
-are simply more convenient, since you do not need to explicitly specify the
-version to migrate to.
+이와 같은 rails 명령은 `db:migrate`로 할 수 있는 모든 작업을 할 수 있다. 마이그레이션할 버전을 명시적으로 지정할 필요가 없기 때문에 더 편리하다.
 
-### Setup the Database
+### 데이터베이스 셋업하기 {#setup-the-database}
 
-The `rails db:setup` command will create the database, load the schema, and initialize
-it with the seed data.
+`rails db:setup` 명령은 데이터베이스를 생성하고 스키마를 로드한 후 시드(seed) 데이터로 초기화 한다.
 
-### Resetting the Database
+### 데이터베이스 재설정(reset)하기 {#resetting-the-database}
 
-The `rails db:reset` command will drop the database and set it up again. This is
-functionally equivalent to `rails db:drop db:setup`.
+`rails db:reset` 명령은 데이터베이스를 삭제하고 다시 셋업한다. 이것은 `rails db:drop db:setup`과 기능상 동일하다.
 
-NOTE: This is not the same as running all the migrations. It will only use the
-contents of the current `db/schema.rb` or `db/structure.sql` file. If a migration can't be rolled back,
-`rails db:reset` may not help you. To find out more about dumping the schema see
-[Schema Dumping and You](#schema-dumping-and-you) section.
+NOTE: 이것은 모든 마이그레이션을 실행하는 것과 다르다. 이 명령은 현재 상태의  `db/schema.rb` 또는 `db/structure.sql` 파일의 내용만 사용한다. 마이그레이션을 롤백 할 수 없으면 `rails db:reset`이 도움이 되지 않을 수 있다. 스키마 덤프에 대한 자세한 내용은 [Schema Dumping and You](#schema-dumping-and-you) 섹션을 참조한다.
 
-### Running Specific Migrations
+### 특정 마이그레이션 실행하기 {#running-specific-migrations}
 
-If you need to run a specific migration up or down, the `db:migrate:up` and
-`db:migrate:down` commands will do that. Just specify the appropriate version and
-the corresponding migration will have its `change`, `up` or `down` method
-invoked, for example:
+특정 마이그레이션 up 또는 down을 실행해야 하는 경우 `db:migrate:up` 및 `db:migrate:down` 명령을 사용한다. 적절한 버전을 지정하면 해당 마이그레이션에 `change`,`up` 또는 `down` 메소드가 호출된다. 예를 들면 아래와 같다.
 
 ```bash
 $ rails db:migrate:up VERSION=20080906120000
 ```
 
-will run the 20080906120000 migration by running the `change` method (or the
-`up` method). This command will
-first check whether the migration is already performed and will do nothing if
-Active Record believes that it has already been run.
+위의 명령을 실행하면 `change` 메소드 (또는 `up` 메소드)를 실행하여 20080906120000 마이그레이션을 실행할 것이다. 이 명령은 먼저 마이그레이션이 이미 수행되었는지 확인하고 액티브 레코드가 이미 실행 된 것으로 판단되면 아무 작업도 수행하지 않는다.
 
-### Running Migrations in Different Environments
+### 환경별로 마이그레이션 실행하기 {#running-migrations-in-different-environments}
 
-By default running `rails db:migrate` will run in the `development` environment.
-To run migrations against another environment you can specify it using the
-`RAILS_ENV` environment variable while running the command. For example to run
-migrations against the `test` environment you could run:
+기본적으로 `rails db:migrate`를 실행하면 `development` 환경에서 실행된다. 다른 환경에 대해 마이그레이션을 실행하려면 명령을 실행하는 동안`RAILS_ENV` 환경 변수를 사용하여 마이그레이션을 지정할 수 있다. 예를 들어`test` 환경에 대해 마이그레이션을 실행하려면 아래와 같이 실행할 수 있다.
 
 ```bash
 $ rails db:migrate RAILS_ENV=test
 ```
 
-### Changing the Output of Running Migrations
+### 마이그레이션 실행 결과 변경하기 {#changing-the-output-of-running-migrations}
 
-By default migrations tell you exactly what they're doing and how long it took.
-A migration creating a table and adding an index might produce output like this
+기본적으로 마이그레이션은 수행 중인 작업과 소요 시간을 정확하게 알려 준다. 테이블을 작성하고 인덱스를 추가하는 마이그레이션은 아래와 같은 결과를 생성할 수 있다.
 
 ```bash
 ==  CreateProducts: migrating =================================================
@@ -727,15 +662,15 @@ A migration creating a table and adding an index might produce output like this
 ==  CreateProducts: migrated (0.0028s) ========================================
 ```
 
-Several methods are provided in migrations that allow you to control all this:
+이 모든 것을 제어 할 수 있는 몇 가지 메소드를 마이그레이션에서 사용할 수 있다.
 
 | Method            | Purpose                                                                                                                                  |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| suppress_messages | Takes a block as an argument and suppresses any output generated by the block.                                                           |
-| say               | Takes a message argument and outputs it as is. A second boolean argument can be passed to specify whether to indent or not.              |
-| say_with_time     | Outputs text along with how long it took to run its block. If the block returns an integer it assumes it is the number of rows affected. |
+| suppress_messages | 블록을 인수로 사용하고 블록에서 생성 된 출력을 보이지 않도록 한다.                                                           |
+| say               | 메시지 인수를 받아서 그대로 출력한다. 들여 쓰기 여부를 지정하기 위해 두 번째 논리값 인수를 전달할 수 있다.              |
+| say_with_time     | 블록을 실행하는 데 걸린 시간과 함께 텍스트를 출력한다. 블록이 정수를 반환하면 영향을 받는 레코드 갯수로 가정한다. |
 
-For example, this migration:
+예를 들어, 아래의 마이그레이션 작업은 
 
 ```ruby
 class CreateProducts < ActiveRecord::Migration[5.0]
@@ -761,7 +696,7 @@ class CreateProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-generates the following output
+아래와 같은 결과를 보일 것이다.
 
 ```bash
 ==  CreateProducts: migrating =================================================
@@ -773,58 +708,31 @@ generates the following output
 ==  CreateProducts: migrated (10.0054s) =======================================
 ```
 
-If you want Active Record to not output anything, then running `rails db:migrate VERBOSE=false` will suppress all output.
+액티브 레코드가 아무 것도 출력하지 않게 하려면, `rails db:migrate VERBOSE=false`를 실행하면 모든 출력이 보이지 않게 된다.
 
-## Changing Existing Migrations
+## 기존 마이그레이션 변경하기 {#changing-existing-migrations}
 
-Occasionally you will make a mistake when writing a migration. If you have
-already run the migration, then you cannot just edit the migration and run the
-migration again: Rails thinks it has already run the migration and so will do
-nothing when you run `rails db:migrate`. You must rollback the migration (for
-example with `rails db:rollback`), edit your migration, and then run
-`rails db:migrate` to run the corrected version.
+때때로 마이그레이션을 작성할 때 실수를 할 수 있다. 이미 마이그레이션을 실행했다면, 마이그레이션을 편집하고 마이그레이션을 다시 실행할 수 없다. 레일스는 마이그레이션이 이미 실행 된 것으로 생각하고 `rails db:migrate`를 실행할 때 아무런 작업도 하지 않는다. 마이그레이션을 롤백 (예 : `rails db:rollback`)하고 마이그레이션을 편집한 다음 `rails db:migrate`를 실행하여 수정된 버전을 실행한다.
 
-In general, editing existing migrations is not a good idea. You will be
-creating extra work for yourself and your co-workers and cause major headaches
-if the existing version of the migration has already been run on production
-machines. Instead, you should write a new migration that performs the changes
-you require. Editing a freshly generated migration that has not yet been
-committed to source control (or, more generally, which has not been propagated
-beyond your development machine) is relatively harmless.
+일반적으로 기존 마이그레이션을 변경하는 것은 좋지 않다. 기존 버전의 마이그레이션이 이미 운영 시스템에서 실행된 경우 자신과 동료를 위해 추가 작업을 작성하면 심각한 문제를 유발할 수 있다. 대신 필요한 작업을 변경하는 새 마이그레이션을 작성해야 한다. 아직 소스 컨트롤(SCM)(또는 일반적으로 개발 시스템을 넘어 전파되지 않은 경우)에 커밋하지 않은 새로 생성된 마이그레이션을 편집하는 것은 상대적으로 무해하다.
 
-The `revert` method can be helpful when writing a new migration to undo
-previous migrations in whole or in part
-(see [Reverting Previous Migrations](#reverting-previous-migrations) above).
+`revert` 메소드는 이전 마이그레이션 전체 또는 일부를 취소하기 위해 새 마이그레이션을 작성할 때 유용 할 수 있다(위의 [Reverting Previous Migrations](#reverting-previous-migrations) 참조).
 
-## Schema Dumping and You
+## 스키마 덤핑과 개발자 {#schema-dumping-and-you}
 
-### What are Schema Files for?
+### 스키마 파일의 목적 {#what-are-schema-files-for?}
 
-Migrations, mighty as they may be, are not the authoritative source for your
-database schema. Your database remains the authoritative source. By default,
-Rails generates `db/schema.rb` which attempts to capture the current state of
-your database schema.
+마이그레이션이 강력하기는 하지만 데이터베이스 스키마의 신뢰할 수 있는 소스가 될 수는 없다. 데이터베이스는 신뢰할 수 있는 소스로서의 역할을 한다. 기본적으로 레일스는 데이터베이스 스키마의 현재 상태를 그대로 가져오는 `db/schema.rb`를 생성한다.
 
-It tends to be faster and less error prone to create a new instance of your
-application's database by loading the schema file via `rails db:schema:load`
-than it is to replay the entire migration history.
-[Old migrations](#old-migrations) may fail to apply correctly if those
-migrations use changing external dependencies or rely on application code which
-evolves separately from your migrations.
+전체 마이그레이션 히스토리를 재생하는 것보다 `rails db:schema:load`를 통해 스키마 파일을 로드하여 애플리케이션 데이터베이스의 새 인스턴스를 작성하는 것이 더 빠르고 오류가 적은 경향이 있다. 변경될 수 있는 외부 의존성을 마이그레이션에서 사용하거나 마이그레이션과 별개로 발전되는 응용 프로그램 코드에 의존하는 경우 [이전의 오래된 마이그레이션](#old-migrations)은 올바르게 적용되지 않을 수 있다.
 
-Schema files are also useful if you want a quick look at what attributes an
-Active Record object has. This information is not in the model's code and is
-frequently spread across several migrations, but the information is nicely
-summed up in the schema file.
+스키마 파일은 액티브 레코드 객체의 속성을 빠르게 보고자 할 때도 유용하다. 이 정보는 모델 코드에 포함되어 있지 않고 여러 마이그레이션에 걸쳐 흩어져 있지만 스키마 파일에 잘 요약되어 있다.
 
-### Types of Schema Dumps
+### 스키마 덤프의 형식 {#types-of-schema-dumps}
 
-The format of the schema dump generated by Rails is controlled by the
-`config.active_record.schema_format` setting in `config/application.rb`. By
-default, the format is `:ruby`, but can also be set to `:sql`.
+레일스가 생성한 스키마 덤프의 형식은 `config/application.rb`의`config.active_record.schema_format` 설정에 의해 조절된다. 기본적으로 형식은 `: ruby`이지만 `: sql`로 설정할 수도 있다.
 
-If `:ruby` is selected, then the schema is stored in `db/schema.rb`. If you look
-at this file you'll find that it looks an awful lot like one very big migration:
+`:ruby`를 선택하면 스키마는 `db/schema.rb`에 저장된다. 이 파일을 보면 매우 큰 마이그레이션 코드와 매우 흡사하다는 것을 알 수 있다.
 
 ```ruby
 ActiveRecord::Schema.define(version: 2008_09_06_171750) do
@@ -844,58 +752,31 @@ ActiveRecord::Schema.define(version: 2008_09_06_171750) do
 end
 ```
 
-In many ways this is exactly what it is. This file is created by inspecting the
-database and expressing its structure using `create_table`, `add_index`, and so
-on.
+여러면에서 이것은 바로 현재 상태 그대로를 반영하는 것이다. 이 파일은 데이터베이스를 조사한 후 `create_table`, `add_index` 등을 사용하여 구조를 표현함으로써 작성된다.
 
-`db/schema.rb` cannot express everything your database may support such as
-triggers, sequences, stored procedures, check constraints, etc. While migrations
-may use `execute` to create database constructs that are not supported by the
-Ruby migration DSL, these constructs may not be able to be reconstituted by the
-schema dumper. If you are using features like these, you should set the schema
-format to `:sql` in order to get an accurate schema file that is useful to
-create new database instances.
+`db/schema.rb`는 트리거, 시퀀스, 저장 프로시저, check 제약 조건 등과 같은 데이터베이스가 지원할 수 있는 모든 것을 표현할 수 없다. 마이그레이션시`execute`를 사용하여 루비 마이그레이션 DSL에서 지원하지 않는 데이터베이스 구조를 작성할 수 있지만, 스키마 덤퍼가 구문을 재구성하지 못할 수 있다. 이와 같은 기능을 사용하는 경우 새 데이터베이스 인스턴스를 만드는 데 유용한 정확한 스키마 파일을 얻으려면 스키마 형식을 `: sql`로 설정해야 한다.
 
-When the schema format is set to `:sql`, the database structure will be dumped
-using a tool specific to the database into `db/structure.sql`. For example, for
-PostgreSQL, the `pg_dump` utility is used. For MySQL and MariaDB, this file will
-contain the output of `SHOW CREATE TABLE` for the various tables.
+스키마 형식이 `: sql`로 설정되면 해당 데이터베이스에서 제공하는 도구를 사용하여 데이터베이스 구조가 `db/structure.sql`로 덤프된다. 예를 들어 PostgreSQL의 경우`pg_dump` 유틸리티가 사용된다. MySQL과 MariaDB의 경우, 이 파일에는 다양한 테이블에 대한 `SHOW CREATE TABLE`의 출력이 포함될 것이다.
 
-To load the schema from `db/structure.sql`, run `rails db:structure:load`.
-Loading this file is done by executing the SQL statements it contains. By
-definition, this will create a perfect copy of the database's structure.
+`db/structure.sql`에서 스키마를 로드하려면 `rails db:structure:load`를 실행한다. 파일에 포함된 SQL 문을 실행하여 이 파일이 로드된다. 정의에 따라 데이터베이스 구조의 완벽한 복사본이 만들어진다.
 
-### Schema Dumps and Source Control
+### 스키마 덤프와 소스 컨트롤 {#schema-dumps-and-source-control}
 
-Because schema files are commonly used to create new databases, it is strongly
-recommended that you check your schema file into source control.
+스키마 파일은 일반적으로 새 데이터베이스를 생성하는데 사용되므로 스키마 파일을 소스 컨트롤 하에 두는 것이 좋다.
 
-Merge conflicts can occur in your schema file when two branches modify schema.
-To resolve these conflicts run `rails db:migrate` to regenerate the schema file.
+두 개의 브랜치에서 각각 스키마를 수정한 후 머지할 경우 스키마 파일에서 병합 충돌이 발생할 수 있다. 이러한 충돌을 해결하려면 `rails db:migrate`를 실행하여 스키마 파일을 재생성하면 된다.
 
-## Active Record and Referential Integrity
+## 액티브 레코드와 참조 무결성 {#active-record-and-referential-integrity}
 
-The Active Record way claims that intelligence belongs in your models, not in
-the database. As such, features such as triggers or constraints,
-which push some of that intelligence back into the database, are not heavily
-used.
+액티브 레코드 방식에서는 논리적인 작업이 데이터베이스가 아닌 모델에 속한다고 주장한다. 따라서 일부 논리적인 작업을 데이터베이스로 가져오는 트리거 또는 제약 조건과 같은 기능은 그리 많이 사용되지는 않는다.
 
-Validations such as `validates :foreign_key, uniqueness: true` are one way in
-which models can enforce data integrity. The `:dependent` option on
-associations allows models to automatically destroy child objects when the
-parent is destroyed. Like anything which operates at the application level,
-these cannot guarantee referential integrity and so some people augment them
-with [foreign key constraints](#foreign-keys) in the database.
+`validates :foreign_key, uniqueness: true`와 같은 데이터 유효성 검증은 모델이 데이터 무결성을 강화할 수 있는 한 가지 방법이다. 관계 설정시 `:dependent` 옵션은 모델이 부모가 삭제될 때 자식 객체를 자동으로 삭제하도록 한다. 애플리케이션 수준에서 작동하는 것과 마찬가지로 이것도 참조 무결성을 보장할 수 없으므로 일부 사람들은 데이터베이스의 [foreign key constraints](#foreign-keys)로 기능을 보강한다.
 
-Although Active Record does not provide all the tools for working directly with
-such features, the `execute` method can be used to execute arbitrary SQL.
+액티브 레코드는 이러한 기능을 직접 사용하기 위한 모든 도구를 제공하지는 않지만 `execute` 메소드를 사용하여 임의의 SQL을 실행할 수 있다.
 
-## Migrations and Seed Data
+## 마이그레이션과 시드 데이터 {#migrations-and-seed-data}
 
-The main purpose of Rails' migration feature is to issue commands that modify the
-schema using a consistent process. Migrations can also be used
-to add or modify data. This is useful in an existing database that can't be destroyed
-and recreated, such as a production database.
+레일스의 마이그레이션 기능의 주요 목적은 일관된 프로세스를 사용하여 스키마를 수정하는 명령을 실행하는 것이다. 마이그레이션을 사용하여 데이터를 추가하거나 수정할 수도 있다. 이것은 운영 데이터베이스와 같이 파괴하거나 다시 만들 수 없는 기존 데이터베이스에 유용하다.
 
 ```ruby
 class AddInitialProducts < ActiveRecord::Migration[5.0]
@@ -911,11 +792,7 @@ class AddInitialProducts < ActiveRecord::Migration[5.0]
 end
 ```
 
-To add initial data after a database is created, Rails has a built-in
-'seeds' feature that makes the process quick and easy. This is especially
-useful when reloading the database frequently in development and test environments.
-It's easy to get started with this feature: just fill up `db/seeds.rb` with some
-Ruby code, and run `rails db:seed`:
+데이터베이스 생성 후 초기 데이터를 추가하기 위해 레일스에는 프로세스를 빠르고 쉽게 만드는 '시드(seed)' 기능이 내장되어 있다. 개발 및 테스트 환경에서 데이터베이스를 자주 다시 로드 할 때 특히 유용하다. 이 기능을 시작하는 것은 쉽다. 즉, 루비 코드로 `db/seeds.rb` 파일을 채우고 `rails db:seed` 명령을 실행하면된다.
 
 ```ruby
 5.times do |i|
@@ -923,22 +800,12 @@ Ruby code, and run `rails db:seed`:
 end
 ```
 
-This is generally a much cleaner way to set up the database of a blank
-application.
+This is generally a much cleaner way to set up the database of a blank application.
 
-## Old Migrations
+## 과거 마이그레이션 {#old-migrations}
 
-The `db/schema.rb` or `db/structure.sql` is a snapshot of the current state of your
-database and is the authoritative source for rebuilding that database. This
-makes it possible to delete old migration files.
+`db/schema.rb` 또는 `db/structure.sql`은 데이터베이스의 현재 상태에 대한 스냅 샷이며 해당 데이터베이스를 재구축하기 위한 신뢰할 수 있는 소스이다. 과거 마이그레이션 파일을 삭제하는 것이 가능하다. 
 
-When you delete migration files in the `db/migrate/` directory, any environment
-where `rails db:migrate` was run when those files still existed will hold a reference
-to the migration timestamp specific to them inside an internal Rails database
-table named `schema_migrations`. This table is used to keep track of whether
-migrations have been executed in a specific environment.
+`db/migrate/` 디렉토리에서 마이그레이션 파일을 삭제하면, 해당 파일이 존재하는 상태에서 `rails db:migrate`가 실행되었던 환경에는 내부 레일스 데이터베이스 테이블(`schema_migrations`) 내부에 해당 마이그레이션의 타임스탬프 참조가 포함된다. 이 테이블은 특정 환경에서 마이그레이션이 실행되었는지 여부를 추적하는 데 사용된다.
 
-If you run the `rails db:migrate:status` command, which displays the status
-(up or down) of each migration, you should see `********** NO FILE **********`
-displayed next to any deleted migration file which was once executed on a
-specific environment but can no longer be found in the `db/migrate/` directory.
+각 마이그레이션의 상태 (up 또는 down)를 표시하는 `rails db:migrate :status` 명령을 실행하면, 특정 환경에서 한 번 실행 되었지만 더 이상 `db/migrate/` 디렉토리에서 찾을 수 없는 삭제된 마이그레이션 파일 옆에 `********** NO FILE **********`이 표시된다.
