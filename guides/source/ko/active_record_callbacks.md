@@ -1,7 +1,7 @@
 액티브 레코드 콜백 {#active-record-callbacks}
 =======================
 
-본 가이드는 액티브 레코드 객체의 생명주기에 후크(hook, https://ko.wikipedia.org/wiki/후킹)을 거는 방법을 알려 준다.
+본 가이드는 액티브 레코드 객체의 생명주기에 후크(hook, https://ko.wikipedia.org/wiki/후킹) 을 거는 방법을 알려 준다.
 
 본 가이드를 읽은 후 아래와 같은 내용을 알게 될 것이다.
 
