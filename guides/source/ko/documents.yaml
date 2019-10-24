@@ -11,12 +11,12 @@
     - name: 액티브 레코드 마이그레이션
       url: active_record_migrations.html
       description: 이 가이드에서는 액티브 레코드 마이그레이션을 사용하여 체계적이고 조직적인 방식으로 데이터베이스를 변경하는 방법에 대해 설명한다.
-    - name: Active Record Validations
+    - name: 액티브 레코드 유효성 검증
       url: active_record_validations.html
-      description: This guide covers how you can use Active Record validations.
-    - name: Active Record Callbacks
+      description: 이 가이드에서는 액티브 레코드 유효성 검증 방법에 대해서 설명한다.
+    - name: 액티브 레코드 콜백
       url: active_record_callbacks.html
-      description: This guide covers how you can use Active Record callbacks.
+      description: 이 가이드에서는 액티브 레코드 콜백의 사용법을 설명한다.
     - name: Active Record Associations
       url: association_basics.html
       description: This guide covers all the associations provided by Active Record.

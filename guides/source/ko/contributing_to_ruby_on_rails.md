@@ -1,26 +1,24 @@
-**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
-
-Contributing to Ruby on Rails
+루비온레일스에 기여하기 {#contributing-to-ruby-on-rails}
 =============================
 
-This guide covers ways in which _you_ can become a part of the ongoing development of Ruby on Rails.
+이 가이드에서는 _여러분도_ 진행 중인 루비온레일스 개발의 일원이 될 수 있는 방법에 대해서 다룬다.
 
-After reading this guide, you will know:
+이 가이드를 읽은 후에 아래와 같은 내용을 알게 될 것이다. 
 
-* How to use GitHub to report issues.
-* How to clone master and run the test suite.
-* How to help resolve existing issues.
-* How to contribute to the Ruby on Rails documentation.
-* How to contribute to the Ruby on Rails code.
+* GitHub를 이용하여 이슈를 리포트하는 방법
+* master 브랜치를 복사한 후 테스트 셋을 돌리는 방법
+* 기존의 이슈를 해결하는데 도움을 주는 방법
+* 루비온레일스 문서화에 기여하는 방법
+* 루이온레일스 코드에 기여하는 방법
 
-Ruby on Rails is not "someone else's framework." Over the years, thousands of people have contributed to Ruby on Rails ranging from a single character to massive architectural changes or significant documentation - all with the goal of making Ruby on Rails better for everyone. Even if you don't feel up to writing code or documentation yet, there are a variety of other ways that you can contribute, from reporting issues to testing patches.
+루비온레일스는 "다른 사람이나 하는 프레임워크"가 아니다.
+수년간에 걸쳐 수많은 사람들이 하나의 문자 교정부터 상당량의 시스템상의 변경이나 의미있는 문서화 작업에 이르기 까지 루비온레일스에 기여하여 왔으며 이 모든 것은 루비온레일스를 모든 사람이 더 좋게 사용할 수 있도록 하는데 목적이 있다. 아직 코드 나 문서를 작성하고 싶지 않은 경우에는 이슈 보고에서 패치 테스트에 이르기까지 다양한 방법으로 기여할 수 있다.
 
-As mentioned in [Rails'
-README](https://github.com/rails/rails/blob/master/README.md), everyone interacting in Rails and its sub-projects' codebases, issue trackers, chat rooms, and mailing lists is expected to follow the Rails [code of conduct](https://rubyonrails.org/conduct/).
+[레일스의 README](https://github.com/rails/rails/blob/master/README.md)에서 언급했듯이 레일스와 그 하위 프로젝트의 코드베이스, 이슈 트래커, 대화방 및 메일 목록에서 상호작용하는 모든 사람은 레일스 [행동 강령](https://rubyonrails.org/conduct/)을 따라야 한다.
 
 --------------------------------------------------------------------------------
 
-Reporting an Issue
+이슈 보고하기 {#reporting-an-issue}
 ------------------
 
 Ruby on Rails uses [GitHub Issue Tracking](https://github.com/rails/rails/issues) to track issues (primarily bugs and contributions of new code). If you've found a bug in Ruby on Rails, this is the place to start. You'll need to create a (free) GitHub account in order to submit an issue, to comment on them, or to create pull requests.

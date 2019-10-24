@@ -30,16 +30,16 @@
   <% end %>
   <div id="topNav">
     <div class="wrapper">
-      <strong class="more-info-label">More at <a href="https://rubyonrails.org/">rubyonrails.org:</a> </strong>
+      <strong class="more-info-label">공식 웹사이트 <a href="https://rubyonrails.org/">rubyonrails.org:</a> </strong>
       <span class="red-button more-info-button">
-        More Ruby on Rails
+        루비온레일스 웹사이트
       </span>
       <ul class="more-info-links s-hidden">
-        <li class="more-info"><a href="https://weblog.rubyonrails.org/">Blog</a></li>
-        <li class="more-info"><a href="https://guides.rubyonrails.org/">Guides</a></li>
-        <li class="more-info"><a href="https://api.rubyonrails.org/">API</a></li>
-        <li class="more-info"><a href="https://stackoverflow.com/questions/tagged/ruby-on-rails">Ask for help</a></li>
-        <li class="more-info"><a href="https://github.com/rails/rails">Contribute on GitHub</a></li>
+        <li class="more-info"><a href="https://weblog.rubyonrails.org/">블로그</a></li>
+        <li class="more-info"><a href="https://guides.rubyonrails.org/">영문가이드</a></li>
+        <li class="more-info"><a href="https://api.rubyonrails.org/">레일스API</a></li>
+        <li class="more-info"><a href="https://stackoverflow.com/questions/tagged/ruby-on-rails">질문하기</a></li>
+        <li class="more-info"><a href="https://github.com/rails/rails">GitHub에서 기여하기</a></li>
       </ul>
     </div>
   </div>
@@ -47,9 +47,9 @@
     <div class="wrapper clearfix">
       <h1><a href="index.html" title="Return to home page">Guides.rubyonrails.org</a></h1>
       <ul class="nav">
-        <li><a class="nav-item" href="index.html">Home</a></li>
+        <li><a class="nav-item" href="index.html">홈</a></li>
         <li class="guides-index guides-index-large">
-          <a href="index.html" id="guidesMenu" class="guides-index-item nav-item">Guides Index</a>
+          <a href="index.html" id="guidesMenu" class="guides-index-item nav-item">가이드 인덱스</a>
           <div id="guides" class="clearfix" style="display: none;">
             <hr />
             <div class="guides-section-container">
@@ -64,10 +64,10 @@
             </div>
           </div>
         </li>
-        <li><a class="nav-item" href="contributing_to_ruby_on_rails.html">Contribute</a></li>
+        <li><a class="nav-item" href="contributing_to_ruby_on_rails.html">기여하기</a></li>
         <li class="guides-index guides-index-small">
           <select class="guides-index-item nav-item">
-            <option value="index.html">Guides Index</option>
+            <option value="index.html">가이드 인덱스</option>
             <% docs_for_menu.each do |section| %>
               <optgroup label="<%= section['name'] %>">
                 <% finished_documents(section['documents']).each do |document| %>
@@ -97,26 +97,19 @@
 
         <h3>피드백</h3>
         <p>
-          You're encouraged to help improve the quality of this guide.
+          이 가이드의 품질을 향상시키기 위해 여러분의 도움이 필요하다.
         </p>
         <p>
-          Please contribute if you see any typos or factual errors.
-          To get started, you can read our <%= link_to 'documentation contributions', 'https://edgeguides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation' %> section.
+          오타나 실제 오류를 발견시 여러분의 기여를 권고한다. 시작하려면 본 <%= link_to '가이드의 기여', 'https://edgeguides.rubyonrails.org/contributing_to_ruby_on_rails.html#contributing-to-the-rails-documentation' %> 섹션을 읽어보기 바란다.
         </p>
         <p>
-          You may also find incomplete content or stuff that is not up to date.
-          Please do add any missing documentation for master. Make sure to check
-          <%= link_to 'Edge Guides', 'https://edgeguides.rubyonrails.org' %> first to verify
-          if the issues are already fixed or not on the master branch.
-          Check the <%= link_to 'Ruby on Rails Guides Guidelines', 'ruby_on_rails_guides_guidelines.html' %>
-          for style and conventions.
+          미완성된 컨텐츠나 업데이트되지 않은 내용을 발견할 수도 있다. 누락된 문서는 master 브랜치에 추가한다. 제시된 이슈들이 master 브랜치 상에서 이미 해결되었는지 여부를 확인하려면 먼저 <%= link_to 'Edge Guides', 'https://edgeguides.rubyonrails.org' %>를 확인한다. 스타일과 규칙에 대해서는 <%= link_to 'Ruby on Rails Guides Guidelines', 'ruby_on_rails_guides_guidelines.html' %>을 확인한다.
         </p>
         <p>
-          If for whatever reason you spot something to fix but cannot patch it yourself, please
-          <%= link_to 'open an issue', 'https://github.com/rails/rails/issues' %>.
+          어떤 이유로든 고칠 수 있지만 직접 패치 할 수 없는 경우 <%= link_to '이슈를 새로 오픈', 'https://github.com/rails/rails/issues' %>하면 된다. 
         </p>
-        <p>And last but not least, any kind of discussion regarding Ruby on Rails
-          documentation is very welcome on the <%= link_to 'rubyonrails-docs mailing list', 'https://groups.google.com/forum/#!forum/rubyonrails-docs' %>.
+        <p>
+          그리고 마지막으로, 루비온레일스 문서에 관한 모든 논의는 <%= link_to 'rubyonrails-docs 메일링 리스트', 'https://groups.google.com/forum/#!forum/rubyonrails-docs' %> 상에서 언제든지 가능하다. 
         </p>
       </div>
     </div>

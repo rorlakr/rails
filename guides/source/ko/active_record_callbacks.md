@@ -1,21 +1,22 @@
-**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+2019-10-24 초벌번역 시작
 
-Active Record Callbacks
+액티브 레코드 콜백 {#active-record-callbacks}
 =======================
 
-This guide teaches you how to hook into the life cycle of your Active Record
-objects.
+본 가이드는 액티브 레코드 객체의 생명주기에 연결하는 방법을 알려 준다.
 
-After reading this guide, you will know:
+본 가이드를 읽은 후 아래와 같은 내용을 알게 될 것이다.
 
-* The life cycle of Active Record objects.
-* How to create callback methods that respond to events in the object life cycle.
-* How to create special classes that encapsulate common behavior for your callbacks.
+* 액티브 레코드 객체의 생명주기.
+* 객체 생명주기의 이벤트에 응답하는 콜백 메소드를 만드는 방법.
+* 콜백의 일반적인 동작을 캡슐화하는 별도의 클래스를 만드는 방법.
 
 --------------------------------------------------------------------------------
 
-The Object Life Cycle
+액티브 레코드 객체의 생명주기 {#the-object-life-cycle}
 ---------------------
+
+레일스 애플리케이션이 정상적으로 작동하는 동안 객체가 생성, 업데이트, 파괴될 수 있다. 액티브 레코드는 이 객체 생명주기에 대한 연결 고리를 제공하므로 애플리케이션 및 해당 데이터를 제어할 수 있다.
 
 During the normal operation of a Rails application, objects may be created, updated, and destroyed. Active Record provides hooks into this *object life cycle* so that you can control your application and its data.
 
